@@ -7,8 +7,13 @@ import (
 )
 
 var (
-	DbName      string
-	GatewayPort string
+	DbName          string
+	GatewayPort     string
+	EtcdHost        string
+	EtcdPort        string
+	UserServiceName string
+	UserServicePort string
+	UserServiceHost string
 )
 
 func LoadConfig() {
@@ -17,13 +22,29 @@ func LoadConfig() {
 		fmt.Println("Fail to load ini file")
 	}
 
-	LoadDbConfig(file)
+	loadDbConfig(file)
+	loadUserConfig(file)
+	loadGateWay(file)
+	loadEtcdConfig(file)
 }
 
-func LoadGateWay(file *ini.File) {
-	GatewayPort = file.Section("Gateway").Key("port").String()
+func loadGateWay(file *ini.File) {
+	GatewayPort = file.Section("gateway").Key("Port").String()
 }
 
-func LoadDbConfig(file *ini.File) {
+func loadDbConfig(file *ini.File) {
 	DbName = file.Section("sqlite").Key("DbName").String()
+}
+
+func loadUserConfig(file *ini.File) {
+	userSection := file.Section("user")
+	UserServiceName = userSection.Key("ServiceName").String()
+	UserServicePort = userSection.Key("Port").String()
+	UserServiceHost = userSection.Key("Host").String()
+}
+
+func loadEtcdConfig(file *ini.File) {
+	etcdSection :=file.Section("etcd")
+	EtcdHost = etcdSection.Key("Host").String()
+	EtcdPort = etcdSection.Key("Port").String()
 }
