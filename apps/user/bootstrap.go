@@ -31,7 +31,7 @@ func main() {
 		micro.Registry(etcdRegistry),
 	)
 
-	clientService.InitClient(etcdRegistry)
+	clientService.InitClient(config.UserServiceName, etcdRegistry)
 
 	microService.Init()
 	user.RegisterUserSerivceHandler(microService.Server(), service.GetUserServiceRpc())

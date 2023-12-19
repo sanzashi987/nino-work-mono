@@ -8,25 +8,35 @@ import (
 	"go-micro.dev/v4/selector"
 )
 
-var microClient client.Client
+type ServiceClient struct {
+	name   string
+	client client.Client
+}
 
-func InitClient(reg registry.Registry) {
+var serviceClient *ServiceClient
+
+func InitClient(name string, reg registry.Registry) {
 	mySelector := selector.NewSelector(
 		selector.Registry(reg),
 		selector.SetStrategy(selector.RoundRobin),
 	)
 
-	microClient = client.NewClient(
+	c := client.NewClient(
 		client.Selector(mySelector),
 	)
 
+	serviceClient = &ServiceClient{
+		name:   name,
+		client: c,
+	}
+
 }
 
-func GetClientSession() *client.Client {
-	return &microClient
+func GetClientSession() *ServiceClient {
+	return serviceClient
 }
 
-func CallRpc(ctx context.Context, service, endpoint string, req *interface{}, res *interface{}, reqOpts []client.RequestOption, resOpts []client.CallOption) error {
-	request := client.NewRequest(service, endpoint, req, reqOpts...)
-	return microClient.Call(ctx, request, res, resOpts...)
+func CallRpc(ctx context.Context, endpoint string, req *interface{}, res *interface{}, reqOpts []client.RequestOption, resOpts []client.CallOption) error {
+	request := client.NewRequest(serviceClient.name, endpoint, req, reqOpts...)
+	return serviceClient.client.Call(ctx, request, res, resOpts...)
 }
