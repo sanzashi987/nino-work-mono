@@ -3,7 +3,7 @@
 [Quick start & environment configuration](https://grpc.io/docs/languages/go/quickstart/)
 
 #### For `Protocol Buffer`:
-  - Go to [download](https://github.com/protocolbuffers/protobuf/releases) release for the platform. Should be an archive. Unzip and make the `bin/` directory from the content is added to the system `PATH` variable
+  - Go to [download](https://github.com/protocolbuffers/protobuf/releases) release for the platform. Should be an archive. Unzip and make sure the `bin/` directory from the content is added to the system `PATH` variable
     ```
      protoc --version
     ```
@@ -21,7 +21,7 @@
     $ export PATH="$PATH:$(go env GOPATH)/bin"
     ```
 
-And you should be able to use following command to generate pb.go & micor.pb.go
+And you should be able to use following command to generate pb.go & micro.pb.go
 ```
 protoc --micro_out=. --go_out=. proto/**/*.proto
 ```
