@@ -13,7 +13,7 @@ import (
 var instance *gorm.DB
 
 func ConnectDB() {
-	db, err := gorm.Open(sqlite.Open(config.DbName), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(config.InitConfig().DbName), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
@@ -27,6 +27,6 @@ func migrateTable(db *gorm.DB) {
 	db.AutoMigrate(&model.UserModel{})
 }
 
-func NewDBSession(ctx context.Context) *gorm.DB {
+func newDBSession(ctx context.Context) *gorm.DB {
 	return instance.WithContext(ctx)
 }

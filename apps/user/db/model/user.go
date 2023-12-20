@@ -19,6 +19,10 @@ func (u UserModel) TableName() string {
 	return "users"
 }
 
+func (user *UserModel) CheckPassowrd(password string) bool {
+	return utils.CompareHash(user.Password, password)
+}
+
 // Gorm hook
 func (user *UserModel) BeforeSave(tx *gorm.DB) (err error) {
 	if !utils.IsHashed(user.Password) {
