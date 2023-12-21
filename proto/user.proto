@@ -2,9 +2,10 @@ syntax="proto3";
 package services;
 option go_package = "./;user";
 
+//protoc --micro_out=./proto/user --go_out=./proto/user proto/user.proto
 
 message UserLoginRequest {
-  string user_name = 1;
+  string username = 1;
   string password = 2;
 }
 
@@ -15,13 +16,19 @@ message UserLoginResponse {
 
 
 message UserRegisterRequest {
-  string user_name = 1;
+  string username = 1;
   string password = 2 ;
   string password_confirm = 3;
+}
+
+message UserRegisterResponse {
+  optional string jwt_token = 1;
+  bool success = 2;
+  int32 reason = 4;
 }
 
 
 service UserSerivce {
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse){}
-  rpc UserRegister(UserRegisterRequest) returns (UserLoginResponse){}
+  rpc UserRegister(UserRegisterRequest) returns (UserRegisterResponse){}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/cza14h/nino-work/proto/user"
 )
 
-type UserServiceRpcImpl struct {}
+type UserServiceRpcImpl struct{}
 
 var UserServiceRpc *UserServiceRpcImpl
 var once *sync.Once
@@ -22,7 +22,7 @@ func GetUserServiceRpc() *UserServiceRpcImpl {
 }
 
 func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
-	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.UserName)
+	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
 	if err != nil {
 		out.Success = false
 		return
@@ -42,7 +42,11 @@ func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRe
 	return
 }
 
-func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserLoginResponse) (err error) {
-
+func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) (err error) {
+	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
+	if user != nil || err != nil {
+		out.Success = false
+		return
+	}
 	return
 }

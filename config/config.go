@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	DbName          string
-	GatewayPort     string
-	EtcdHost        string
-	EtcdPort        string
-	UserServiceName string
-	UserServicePort string
-	UserServiceHost string
+	DbName             string
+	GatewayPort        string
+	EtcdHost           string
+	EtcdPort           string
+	UserServiceName    string
+	UserServiceHost    string
+	UserServicePort    string
+	UserServiceWebPort string
 }
 
 var config *Config
@@ -50,8 +51,9 @@ func loadDbConfig(file *ini.File) {
 func loadUserConfig(file *ini.File) {
 	userSection := file.Section("user")
 	config.UserServiceName = userSection.Key("ServiceName").String()
-	config.UserServicePort = userSection.Key("Port").String()
 	config.UserServiceHost = userSection.Key("Host").String()
+	config.UserServicePort = userSection.Key("Port").String()
+	config.UserServiceWebPort = userSection.Key("WebPort").String()
 }
 
 func loadEtcdConfig(file *ini.File) {
@@ -59,4 +61,3 @@ func loadEtcdConfig(file *ini.File) {
 	config.EtcdHost = etcdSection.Key("Host").String()
 	config.EtcdPort = etcdSection.Key("Port").String()
 }
-
