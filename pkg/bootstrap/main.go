@@ -36,11 +36,11 @@ func GetAddress(host, port string) string {
 }
 
 func CommonBootstrap(name string) (*config.Config, registry.Registry) {
-	configInstance := config.InitConfig()
+	conf := config.GetConfig()
 	etcdRegistry := etcd.NewRegistry(
-		registry.Addrs(GetAddress(configInstance.EtcdHost, configInstance.EtcdPort)),
+		registry.Addrs(GetAddress(conf.System.EtcdHost, conf.System.EtcdPort)),
 	)
 
 	InitClient(name, etcdRegistry)
-	return configInstance, etcdRegistry
+	return conf, etcdRegistry
 }

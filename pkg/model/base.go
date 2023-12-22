@@ -2,13 +2,13 @@ package model
 
 import (
 	"strconv"
-	"time"
+
+	"gorm.io/gorm"
 )
 
 type BaseModel struct {
-	ID uint64 `gorm:"column:id;primaryKey;not null;index"`
-	CreatedAt time.Time `gorm:"column:created_at;"`
-	UpdatedAt time.Time `gorm:"column:updated_at;index"`
+	ID uint64 `gorm:"column:id;primaryKey;not null"`
+	gorm.Model
 }
 
 func (model *BaseModel) GetStringID() string {

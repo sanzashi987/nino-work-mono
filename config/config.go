@@ -4,60 +4,77 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/ini.v1"
 )
 
-type Config struct {
-	DbName             string
-	GatewayPort        string
-	EtcdHost           string
-	EtcdPort           string
-	UserServiceName    string
-	UserServiceHost    string
-	UserServicePort    string
-	UserServiceWebPort string
+type SystemConfig struct {
+	DbName   string
+	EtcdHost string
+	EtcdPort string
 }
 
-var config *Config
+type ServiceConfig struct {
+	Name    string
+	Host    string
+	Port    string
+	WebPort string
+	Feature bool
+}
+
+type SerivceConfigMap = map[string]*ServiceConfig
+
+type Config struct {
+	System  *SystemConfig
+	Service SerivceConfigMap
+}
+
+var conf *Config
 var once *sync.Once
 
-func InitConfig() *Config {
-	if config == nil {
+func GetConfig() *Config {
+	if conf == nil {
 		once.Do(func() {
+			conf = &Config{
+				Service: make(map[string]*ServiceConfig),
+			}
 			file, err := ini.Load("./config/config.ini")
-			config = &Config{}
 			if err != nil {
 				fmt.Println("Fail to load ini file")
 			}
-
-			loadDbConfig(file)
-			loadUserConfig(file)
-			loadGateWay(file)
-			loadEtcdConfig(file)
+			loadConfig(file)
 		})
 	}
 
-	return config
+	return conf
 }
 
-func loadGateWay(file *ini.File) {
-	config.GatewayPort = file.Section("gateway").Key("Port").String()
+func loadConfig(file *ini.File) {
+	sections := file.Sections()
+
+	for _, section := range sections {
+		name := section.Name()
+		if name == "system" {
+			conf.System = loadSystemConfig(section)
+		} else {
+			stringMap := make(map[string]any)
+
+			for _, key := range section.Keys() {
+				stringMap[key.Name()] = section.Key(key.Name()).String()
+			}
+			result := &ServiceConfig{}
+			mapstructure.Decode(stringMap, &result)
+			conf.Service[name] = result
+		}
+	}
+
 }
 
-func loadDbConfig(file *ini.File) {
-	config.DbName = file.Section("sqlite").Key("DbName").String()
-}
-
-func loadUserConfig(file *ini.File) {
-	userSection := file.Section("user")
-	config.UserServiceName = userSection.Key("ServiceName").String()
-	config.UserServiceHost = userSection.Key("Host").String()
-	config.UserServicePort = userSection.Key("Port").String()
-	config.UserServiceWebPort = userSection.Key("WebPort").String()
-}
-
-func loadEtcdConfig(file *ini.File) {
-	etcdSection := file.Section("etcd")
-	config.EtcdHost = etcdSection.Key("Host").String()
-	config.EtcdPort = etcdSection.Key("Port").String()
+func loadSystemConfig(systemSection *ini.Section) *SystemConfig {
+	systemConfig := &SystemConfig{
+		EtcdHost: systemSection.Key("EtcdHost").String(),
+		EtcdPort: systemSection.Key("EtcdPort").String(),
+		DbName:   systemSection.Key("DbName").String(),
+	}
+	return systemConfig
 }

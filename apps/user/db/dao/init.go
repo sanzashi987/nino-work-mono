@@ -13,7 +13,8 @@ import (
 var instance *gorm.DB
 
 func ConnectDB() {
-	db, err := gorm.Open(sqlite.Open(config.InitConfig().DbName), &gorm.Config{
+	conf := config.GetConfig()
+	db, err := gorm.Open(sqlite.Open(conf.System.DbName), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {

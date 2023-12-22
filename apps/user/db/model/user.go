@@ -6,7 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	User  = 0
+	Admin = 1
+)
+
 type UserModel struct {
+	
 	model.BaseModel
 	Username string `gorm:"column:username;type:varchar(255);unique"`
 	Password string `gorm:"column:password;type:varchar(255)"`

@@ -11,30 +11,35 @@ import (
 )
 
 func main() {
-	config, etcdRegistry := bootstrap.CommonBootstrap("userSevice.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("userSevice.client")
 	dao.ConnectDB()
 
+	userServiceConf, ok := conf.Service["userSevice"]
+	if !ok {
+		panic("UserService is not configured")
+	}
+
 	rpcService := micro.NewService(
-		micro.Name(config.UserServiceName),
-		micro.Address(bootstrap.GetAddress(config.UserServiceHost, config.UserServicePort)),
+		micro.Name(userServiceConf.Name),
+		micro.Address(bootstrap.GetAddress(userServiceConf.Host, userServiceConf.Port)),
 		micro.Registry(etcdRegistry),
 	)
 
 	webService := web.NewService(
-		web.Name(config.UserServiceName+".web"),
-		web.Address(bootstrap.GetAddress(config.UserServiceHost, config.UserServiceWebPort)),
+		web.Name(userServiceConf.Name+".web"),
+		web.Address(bootstrap.GetAddress(userServiceConf.Host, userServiceConf.WebPort)),
 		web.Handler(http.NewRouter()),
 		web.Registry(etcdRegistry),
 	)
 
+	user.RegisterUserSerivceHandler(rpcService.Server(), service.GetUserServiceRpc())
 	webService.Init()
 	rpcService.Init()
-	user.RegisterUserSerivceHandler(rpcService.Server(), service.GetUserServiceRpc())
 
 	go func() {
 		webService.Run()
 	}()
-	
+
 	rpcService.Run()
 
 }
