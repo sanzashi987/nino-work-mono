@@ -11,10 +11,10 @@ import (
 )
 
 func main() {
-	conf, etcdRegistry := bootstrap.CommonBootstrap("userSevice.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("userService.client")
 	dao.ConnectDB()
 
-	userServiceConf, ok := conf.Service["userSevice"]
+	userServiceConf, ok := conf.Service["userService"]
 	if !ok {
 		panic("UserService is not configured")
 	}

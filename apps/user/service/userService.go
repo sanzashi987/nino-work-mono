@@ -15,7 +15,7 @@ import (
 type UserServiceRpcImpl struct{}
 
 var UserServiceRpc *UserServiceRpcImpl
-var once *sync.Once
+var once sync.Once
 
 func GetUserServiceRpc() *UserServiceRpcImpl {
 	once.Do(func() {

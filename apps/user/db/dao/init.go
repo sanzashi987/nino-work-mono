@@ -14,7 +14,7 @@ var instance *gorm.DB
 
 func ConnectDB() {
 	conf := config.GetConfig()
-	db, err := gorm.Open(sqlite.Open(conf.System.DbName), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(conf.System.DbName+".db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {

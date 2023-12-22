@@ -26,6 +26,11 @@ And you should be able to use following command to generate pb.go & micro.pb.go
 protoc --micro_out=. --go_out=. proto/**/*.proto
 ```
 
+
+#### Install `etcd`
+[Etcd release page](https://github.com/etcd-io/etcd/releases/)
+
+
 ## TODOS
   
 - [ ] Add makefile for quick batch generating proto files to individual directories
