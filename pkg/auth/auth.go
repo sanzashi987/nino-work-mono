@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var signer = []byte("singer.nino.work")
+var signer = []byte("signer.nino.work")
 
 type AuthClaims struct {
 	UserID   uint

@@ -3,11 +3,10 @@ package dao
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/user/db/model"
+	"github.com/cza14h/nino-work/apps/chat/db/model"
 	"github.com/cza14h/nino-work/pkg/db"
 	"gorm.io/gorm"
 )
-
 
 func ConnectDB() {
 	instance := db.ConnectDB()
@@ -15,9 +14,9 @@ func ConnectDB() {
 }
 
 func migrateTable(db *gorm.DB) {
-	db.AutoMigrate(&model.UserModel{})
+	db.AutoMigrate(&model.DialogModel{}, &model.MessageModel{})
 }
 
-func newDBSession(ctx context.Context) *gorm.DB {
+func NewDBSession(ctx context.Context) *gorm.DB {
 	return db.NewDBSession(ctx)
 }

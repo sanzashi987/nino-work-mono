@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/cza14h/nino-work/pkg/model"
+	"github.com/cza14h/nino-work/pkg/db"
 	"github.com/cza14h/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
@@ -12,8 +12,7 @@ const (
 )
 
 type UserModel struct {
-	
-	model.BaseModel
+	db.BaseModel
 	Username string `gorm:"column:username;type:varchar(255);unique"`
 	Password string `gorm:"column:password;type:varchar(255)"`
 	Role     int32  `gorm:"column:role"`
