@@ -1,0 +1,33 @@
+syntax = "proto3";
+package services;
+
+option go_package = "./;chat";
+
+
+message ChatRequest {
+  string content = 1;
+  string config = 2;
+  int64 dialog_id =3;
+  repeated History history =4;
+}
+
+message ChatResponse {
+  string id = 1;
+  string content = 2;
+}
+
+message History {
+  string role = 1;
+  string content =2;
+  string name =3 ;
+  Function function_call =4;
+}
+
+message Function {
+  string name =1;
+  string arguments =2;
+}
+
+service ChatService {
+  rpc Chat(ChatRequest) returns (ChatResponse) {} 
+}

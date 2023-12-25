@@ -27,7 +27,7 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 			ctx,
 			iHttp.StatusBadRequest,
 			"Fail to read required fields",
-			&res,
+			nil,
 		)
 		return
 	}
