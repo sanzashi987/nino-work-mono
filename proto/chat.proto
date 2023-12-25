@@ -3,6 +3,8 @@ package services;
 
 option go_package = "./;chat";
 
+//protoc --micro_out=./proto/chat --go_out=./proto/chat proto/chat.proto
+
 
 message ChatRequest {
   string content = 1;
