@@ -9,13 +9,14 @@ option go_package = "./;chat";
 message ChatRequest {
   string content = 1;
   string config = 2;
-  int64 dialog_id =3;
+  uint64 dialog_id =3;
   repeated History history =4;
 }
 
 message ChatResponse {
-  string id = 1;
+  uint64 id = 1;
   string content = 2;
+  bool fail = 3;
 }
 
 message History {

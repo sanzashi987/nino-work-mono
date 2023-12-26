@@ -14,13 +14,13 @@ type UserController struct {
 	controller.BaseController
 }
 
-var voidStr = ""
+const voidStr = ""
 
 func (controller *UserController) UserLogin(ctx *gin.Context) {
 	var req = user.UserLoginRequest{}
 	var res = user.UserLoginResponse{
-		Success:  false,
-		JwtToken: &voidStr,
+		Fail:     false,
+		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
 		controller.ResponseJson(
@@ -34,8 +34,8 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 
 	service.GetUserServiceRpc().UserLogin(ctx, &req, &res)
 
-	if target, shouldRedirect := ctx.GetQuery("redirect"); shouldRedirect && res.Success {
-		ctx.Redirect(iHttp.StatusSeeOther, fmt.Sprintf("%s?token=%s", target, *res.JwtToken))
+	if target, shouldRedirect := ctx.GetQuery("redirect"); shouldRedirect && !res.Fail {
+		ctx.Redirect(iHttp.StatusSeeOther, fmt.Sprintf("%s?token=%s", target, res.JwtToken))
 		return
 	}
 
@@ -45,8 +45,8 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 func (controller *UserController) UserRegister(ctx *gin.Context) {
 	var req = user.UserRegisterRequest{}
 	var res = user.UserRegisterResponse{
-		Success:  false,
-		JwtToken: &voidStr,
+		Fail:     false,
+		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
 		controller.ResponseJson(
@@ -57,7 +57,7 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 		)
 		return
 	}
-
+	//TODO extract reason code to response
 	service.GetUserServiceRpc().UserRegister(ctx, &req, &res)
 	controller.ResponseJson(ctx, iHttp.StatusOK, "", &res)
 }

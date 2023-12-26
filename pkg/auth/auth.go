@@ -11,12 +11,12 @@ import (
 var signer = []byte("signer.nino.work")
 
 type AuthClaims struct {
-	UserID   uint
+	UserID   uint64
 	Username string
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(username string, userId uint, expires ...time.Duration) (string, error) {
+func GenerateToken(username string, userId uint64, expires ...time.Duration) (string, error) {
 	now := time.Now()
 	var expiry time.Duration
 	if len(expires) == 0 {

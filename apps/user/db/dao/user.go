@@ -26,12 +26,12 @@ func (dao *UserDao) FindUserByUsername(username string) (user *model.UserModel, 
 	return
 }
 
-func (dao *UserDao) CreateUser(newUser model.UserModel) (err error) {
+func (dao *UserDao) CreateUser(newUser *model.UserModel) (err error) {
 	err = dao.Create(newUser).Error
 	return
 }
 
-func (dao *UserDao) UpdateUser(nextUser model.UserModel) (err error) {
+func (dao *UserDao) UpdateUser(nextUser *model.UserModel) (err error) {
 	err = dao.Updates(nextUser).Error
 	return
 }

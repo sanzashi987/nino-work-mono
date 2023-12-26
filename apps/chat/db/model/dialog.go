@@ -6,7 +6,7 @@ type MessageModel struct {
 	db.BaseModel
 	DialogID uint64 `gorm:"index"`
 	Content string `gorm:"column:contet;type:char(255)"`
-	ReplyTo int    `gorm:"column:reply_to;default:0"`
+	ReplyTo uint64    `gorm:"column:reply_to;default:0"`
 	Deleted bool   `gorm:"index:default:false;type:boolean"`
 }
 

@@ -10,8 +10,8 @@ message UserLoginRequest {
 }
 
 message UserLoginResponse {
-  optional string jwt_token = 1;
-  bool success = 2;
+  string jwt_token = 1;
+  bool fail = 2;
 }
 
 
@@ -22,8 +22,8 @@ message UserRegisterRequest {
 }
 
 message UserRegisterResponse {
-  optional string jwt_token = 1;
-  bool success = 2;
+  string jwt_token = 1;
+  bool fail = 2;
   int32 reason = 4;
 }
 

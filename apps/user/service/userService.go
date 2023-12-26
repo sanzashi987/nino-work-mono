@@ -27,50 +27,58 @@ func GetUserServiceRpc() *UserServiceRpcImpl {
 func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
 	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
 	if err != nil {
-		out.Success = false
+		out.Fail = true
 		return
 	}
 
 	if valid := user.CheckPassowrd(in.Password); !valid {
-		out.Success = false
+		out.Fail = true
 		return
 	}
-	token, err := auth.GenerateToken(user.Username, uint(user.ID))
+	token, err := auth.GenerateToken(user.Username, user.ID)
 	if err != nil {
-		out.Success = false
+		out.Fail = true
 		return
 	}
-	out.JwtToken = &token
-	out.Success = true
+	out.JwtToken = token
+	out.Fail = true
 	return
 }
 
-func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) (err error) {
-	out.Success = false
+func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) error {
+	out.Fail = true
 	dbSession := dao.NewUserDao(ctx)
 	user, err := dbSession.FindUserByUsername(in.Username)
 	if user != nil {
 		out.Reason = UsernameExisted
-		return
+		return err
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 
 		if in.Password != in.PasswordConfirm {
 			out.Reason = PasswordNotMatch
-			return
+			return err
 		}
 
-		dbSession.CreateUser(model.UserModel{
+		user := model.UserModel{
 			Username: in.Username,
 			Password: in.Password,
 			Fobidden: false,
 			Role:     model.User,
 			Features: defatultFeaturesJson,
-		})
+		}
 
-		return
+		dbSession.CreateUser(&user)
+		token, err := auth.GenerateToken(user.Username, user.ID)
+		if err != nil {
+			out.Reason = FailToCreateToken
+			return err
+		}
+		out.Fail = false
+		out.JwtToken = token
+		return nil
 	}
 
 	out.Reason = InternalServerError
-	return
+	return errors.New("Unknown edge case in user service")
 }

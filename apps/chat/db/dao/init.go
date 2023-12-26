@@ -17,6 +17,6 @@ func migrateTable(db *gorm.DB) {
 	db.AutoMigrate(&model.DialogModel{}, &model.MessageModel{})
 }
 
-func NewDBSession(ctx context.Context) *gorm.DB {
+func newDBSession(ctx context.Context) *gorm.DB {
 	return db.NewDBSession(ctx)
 }
