@@ -27,26 +27,27 @@ func GetUserServiceRpc() *UserServiceRpcImpl {
 func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
 	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
 	if err != nil {
-		out.Fail = true
+		out.Reason = UsernameNotExist
 		return
 	}
 
 	if valid := user.CheckPassowrd(in.Password); !valid {
-		out.Fail = true
+		out.Reason = PasswordNotMatch
 		return
 	}
+
 	token, err := auth.GenerateToken(user.Username, user.ID)
 	if err != nil {
-		out.Fail = true
+		out.Reason = FailToCreateToken
 		return
 	}
+
 	out.JwtToken = token
-	out.Fail = true
+	out.Reason = Success
 	return
 }
 
 func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) error {
-	out.Fail = true
 	dbSession := dao.NewUserDao(ctx)
 	user, err := dbSession.FindUserByUsername(in.Username)
 	if user != nil {
@@ -74,7 +75,6 @@ func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegi
 			out.Reason = FailToCreateToken
 			return err
 		}
-		out.Fail = false
 		out.JwtToken = token
 		return nil
 	}

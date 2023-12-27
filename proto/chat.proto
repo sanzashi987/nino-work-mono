@@ -16,7 +16,7 @@ message ChatRequest {
 message ChatResponse {
   uint64 id = 1;
   string content = 2;
-  bool fail = 3;
+  int32 reason = 3;
 }
 
 message History {

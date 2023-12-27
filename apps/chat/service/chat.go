@@ -26,7 +26,6 @@ func GetChatServiceRpc() *ChatServiceRpcImpl {
 
 func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out *chat.ChatResponse) error {
 	dbSession := dao.NewChatDao(ctx)
-	out.Fail = true
 	var gptRequest openai.ChatCompletionRequest
 	messages := []openai.ChatCompletionMessage{}
 	for _, history := range in.History {
@@ -54,6 +53,7 @@ func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out
 	if ok := consts.SupportModels[gptRequest.Model]; ok {
 		response, err := client.CreateChatCompletion(ctx, gptRequest)
 		if err != nil {
+			out.Reason = consts.FailToCreateCompletion
 			return err
 		}
 
@@ -61,11 +61,12 @@ func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out
 
 		userMessageId, _, err := dbSession.CreateMessagePair(content, in.Content, uint64(in.DialogId))
 		if err != nil {
+			out.Reason = consts.FailToInsertMessagePair
 			return err
 		}
 		out.Content = content
+		out.Reason = consts.Success
 		out.Id = userMessageId
-		out.Fail = false
 		return nil
 	}
 	return errors.New("Unknown edge case in chat service")

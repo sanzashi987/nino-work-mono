@@ -11,7 +11,7 @@ message UserLoginRequest {
 
 message UserLoginResponse {
   string jwt_token = 1;
-  bool fail = 2;
+  int32 reason = 2;
 }
 
 
@@ -23,8 +23,7 @@ message UserRegisterRequest {
 
 message UserRegisterResponse {
   string jwt_token = 1;
-  bool fail = 2;
-  int32 reason = 4;
+  int32 reason = 2;
 }
 
 
