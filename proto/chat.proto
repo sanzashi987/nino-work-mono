@@ -8,7 +8,7 @@ option go_package = "./;chat";
 
 message ChatRequest {
   string content = 1;
-  string config = 2;
+  string preference = 2;
   uint64 dialog_id =3;
   repeated History history =4;
 }

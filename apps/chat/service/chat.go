@@ -37,7 +37,7 @@ func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out
 		messages = append(messages, convert)
 	}
 
-	json.Unmarshal([]byte(in.Config), &gptRequest)
+	json.Unmarshal([]byte(in.Preference), &gptRequest)
 
 	messages = append(messages, openai.ChatCompletionMessage{
 		Role:    "user",

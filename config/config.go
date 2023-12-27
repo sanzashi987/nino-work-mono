@@ -8,9 +8,10 @@ import (
 )
 
 type SystemConfig struct {
-	DbName   string
-	EtcdHost string
-	EtcdPort string
+	DbName    string
+	EtcdHost  string
+	EtcdPort  string
+	LoginPage string
 }
 
 type ServiceConfig struct {
@@ -66,10 +67,11 @@ func init() {
 }
 
 func loadSystemConfig(systemSection *ini.Section) *SystemConfig {
-	systemConfig := &SystemConfig{
-		EtcdHost: systemSection.Key("EtcdHost").String(),
-		EtcdPort: systemSection.Key("EtcdPort").String(),
-		DbName:   systemSection.Key("DbName").String(),
+	systemConfig := SystemConfig{}
+	tempMap := make(map[string]any)
+	for _, key := range systemSection.Keys() {
+		tempMap[key.Name()] = key.String()
 	}
-	return systemConfig
+	mapstructure.Decode(tempMap, &systemConfig)
+	return &systemConfig
 }
