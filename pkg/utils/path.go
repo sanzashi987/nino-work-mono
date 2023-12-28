@@ -2,11 +2,14 @@ package utils
 
 import (
 	// "github.com/gin-contrib/static"
-	"os"
-	"path/filepath"
+	// "os"
+	// "path/filepath"
+
+	"github.com/kardianos/osext"
 )
 
 func GetAppRoot() string {
-	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	return dir
+	folderPath, _ := osext.ExecutableFolder()
+	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	return folderPath
 }
