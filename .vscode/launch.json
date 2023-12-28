@@ -15,6 +15,18 @@
         "run"
       ],
       "program": "apps/user/bootstrap.go",
+    },
+    {
+      "name": "Launch chat service",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "cwd": ".",
+      "args": [
+        "go",
+        "run"
+      ],
+      "program": "apps/chat/bootstrap.go",
     }
   ]
 }
