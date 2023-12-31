@@ -5,11 +5,19 @@ import (
 	// "os"
 	// "path/filepath"
 
+	"sync"
+
 	"github.com/kardianos/osext"
 )
 
+var path string
+var once sync.Once
+
 func GetAppRoot() string {
-	folderPath, _ := osext.ExecutableFolder()
+	once.Do(func() {
+		folderPath, _ := osext.ExecutableFolder()
+		path = folderPath
+	})
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	return folderPath
+	return path
 }
