@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/cza14h/nino-work/pkg/bootstrap"
-  "go-micro.dev/v4"
 	"go-micro.dev/v4/web"
 )
 

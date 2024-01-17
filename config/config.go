@@ -20,6 +20,7 @@ type ServiceConfig struct {
 	Port    string
 	WebPort string
 	Feature bool
+	DbName  string
 }
 
 type SerivceConfigMap = map[string]*ServiceConfig
@@ -30,6 +31,7 @@ type Config struct {
 }
 
 var conf *Config
+
 // var once *sync.Once
 
 func GetConfig() *Config {
