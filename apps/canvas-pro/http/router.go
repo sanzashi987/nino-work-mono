@@ -5,7 +5,9 @@ import "github.com/gin-gonic/gin"
 func NewRouter(loginPageUrl string) *gin.Engine {
 	router := gin.Default()
 
-	loginGroup := router.Group(LOGIN_GROUP)
+	root := router.Group("enc-oss-canvas/V1")
+
+	loginGroup := root.Group(LOGIN_GROUP)
 	{
 		loginController := &LoginController{}
 		loginGroup.POST("login", loginController.login)
