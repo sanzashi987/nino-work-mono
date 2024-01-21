@@ -10,7 +10,7 @@ import (
 
 func ConnectDB(dbname string) {
 	instance := db.ConnectDB(dbname)
-	instance.AutoMigrate(&model.ThemeModel{}, &model.WorkSpaceModel{})
+	instance.AutoMigrate(&model.ThemeModel{}, &model.WorkspaceModel{})
 }
 
 func newDBSession(ctx context.Context) *gorm.DB {

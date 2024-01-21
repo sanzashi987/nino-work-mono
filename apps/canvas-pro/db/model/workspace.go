@@ -4,7 +4,7 @@ import (
 	"github.com/cza14h/nino-work/pkg/db"
 )
 
-type WorkSpaceModel struct {
+type WorkspaceModel struct {
 	db.BaseModel
 	Name       string `gorm:"column:name"`
 	Code       string `gorm:"type:varchar(255);index;unique"`
@@ -16,6 +16,6 @@ type WorkSpaceModel struct {
 	// Members    []CanvasUserModel `gorm:"foreignKey:Workspace;references:Code"`
 }
 
-func (s WorkSpaceModel) TableName() string {
+func (s WorkspaceModel) TableName() string {
 	return "workspaces"
 }
