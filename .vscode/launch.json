@@ -27,6 +27,18 @@
         "run"
       ],
       "program": "apps/chat/bootstrap.go",
+    },
+    {
+      "name": "Launch Canvas service",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "cwd": ".",
+      "args": [
+        "go",
+        "run"
+      ],
+      "program": "apps/canvas-pro/bootstrap.go",
     }
   ]
 }

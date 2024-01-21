@@ -1,7 +1,10 @@
 package model
 
+import "github.com/cza14h/nino-work/pkg/db"
+
 type CanvasUserModel struct {
-	ID         uint64           `gorm:"column:id;primaryKey;index:,unique"`
+	db.BaseModel
+	// ID         uint64           `gorm:"column:id;primaryKey;index:,unique"`
 	Workspaces []WorkspaceModel `gorm:"many2many:workspace_user;foreignKey:ID;References:Code"`
 	Permission uint64
 }

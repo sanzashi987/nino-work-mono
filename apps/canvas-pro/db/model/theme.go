@@ -8,7 +8,7 @@ type ThemeModel struct {
 	Deleted   int8   `gorm:"column:deleted"`
 	Flag      int8   `gorm:"column:flag"` //0 is built-in
 	Workspace uint64 `gorm:"column:workspace;index"`
-	Config    string `gorm:"type:text"`
+	Config    string `gorm:"type:blob"`
 }
 
 func (theme ThemeModel) TableName() string {
