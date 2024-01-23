@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const LOGIN_GROUP = "/api/auth/v1/"
+const login_group = "/api/auth/v1/"
 
 type LoginController struct {
 	controller.BaseController
@@ -31,6 +31,3 @@ func (c *LoginController) getVerifyCode(ctx *gin.Context) {
 
 }
 
-func (c *LoginController) getUserInfo(ctx *gin.Context) {
-
-}
