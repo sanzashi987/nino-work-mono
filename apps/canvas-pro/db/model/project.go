@@ -14,9 +14,10 @@ func (p ProjectGroup) TableName() string {
 
 type ProjectModel struct {
 	db.BaseModel
-	Name    string
-	Code    string
-	Version string
+	Name       string
+	Code       string
+	Version    string
+	RootConfig string `gorm:"type:blob"`
 }
 
 func (p ProjectModel) TableName() string {
