@@ -9,7 +9,7 @@ type ProjectGroup struct {
 }
 
 func (p ProjectGroup) TableName() string {
-	return "project_groups"
+	return "project_prefixs"
 }
 
 type ProjectModel struct {

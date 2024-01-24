@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const data_source_group = "jdbc-connect-template"
+const data_source_prefix = "jdbc-connect-template"
 
 type DataSourceController struct {
 	controller.BaseController
@@ -19,21 +19,21 @@ type QueryDataSourceRequest struct {
 	Search     string   `json:"search"`
 }
 
-func (c *DataSourceController) queryDataSourceList(ctx *gin.Context) {
+func (c *DataSourceController) list(ctx *gin.Context) {
 
 }
 
 /*CRUD*/
-func (c *DataSourceController) createDataSource(ctx *gin.Context) {
+func (c *DataSourceController) create(ctx *gin.Context) {
 
 }
-func (c *DataSourceController) readDataSource(ctx *gin.Context) {
+func (c *DataSourceController) read(ctx *gin.Context) {
 
 }
-func (c *DataSourceController) updateDataSource(ctx *gin.Context) {
+func (c *DataSourceController) update(ctx *gin.Context) {
 
 }
-func (c *DataSourceController) deleteDataSource(ctx *gin.Context) {
+func (c *DataSourceController) delete(ctx *gin.Context) {
 
 }
 

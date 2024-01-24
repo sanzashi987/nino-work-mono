@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const login_group = "/api/auth/v1/"
+const login_prefix = "/api/auth/v1/"
 
 type LoginController struct {
 	controller.BaseController

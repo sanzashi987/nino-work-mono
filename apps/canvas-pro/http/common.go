@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const common_group = "common"
+const common_prefix = "common"
 
 type CommonController struct {
 	controller.BaseController
