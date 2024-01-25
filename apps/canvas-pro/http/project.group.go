@@ -11,7 +11,6 @@ type ProjectGroupController struct {
 	controller.BaseController
 }
 
-
 /*CRUD*/
 func (c *ProjectGroupController) list(ctx *gin.Context) {
 
@@ -24,6 +23,11 @@ func (c *ProjectGroupController) create(ctx *gin.Context) {
 func (c *ProjectGroupController) update(ctx *gin.Context) {
 
 }
+
+func (c *ProjectGroupController) delete(ctx *gin.Context) {
+
+}
+
 // features
 func (c *ProjectGroupController) move(ctx *gin.Context) {
 

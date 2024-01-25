@@ -64,7 +64,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		groupedProjectRoutes.POST("list", groupedProjectController.list)
 		groupedProjectRoutes.POST("create", groupedProjectController.create)
 		groupedProjectRoutes.POST("update", groupedProjectController.update)
-		groupedProjectRoutes.DELETE("delete", projectController.delete)
+		groupedProjectRoutes.DELETE("delete", groupedProjectController.delete)
 		// for adapt
 		projectScreenRoutes.POST("move", groupedProjectController.move)
 
