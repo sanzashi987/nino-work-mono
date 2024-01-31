@@ -70,5 +70,25 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 	}
 
+	{
+		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare)
+		assetController := &AssetController{}
+		assetRoutes.POST("selectMyAssets", assetController.list)
+		assetRoutes.POST("updateMyAssetsName", assetController.update)
+		assetRoutes.POST("updateAssetsGroup", assetController.update)
+		assetRoutes.DELETE("deleteAssets", assetController.delete)
+		assetRoutes.POST("upload", assetController.upload)
+		assetRoutes.POST("detail", assetController.read)
+		assetRoutes.POST("replace", assetController.replace)
+		assetRoutes.POST("loadAsset", assetController.download)
+		assetRoutes.POST("importAsset", assetController._import)
+
+		assetGroupController := &AssetGroupController{}
+		assetRoutes.POST("addGroup", assetGroupController.create)
+		assetRoutes.GET("deleteGroup", assetGroupController.delete)
+		assetRoutes.POST("updateGroupsName", assetGroupController.update)
+		assetRoutes.POST("selectGroup", assetGroupController.list)
+	}
+
 	return router
 }
