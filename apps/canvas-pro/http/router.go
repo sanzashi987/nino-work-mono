@@ -94,7 +94,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		themeRoutes := root.Group(theme_prefix).Use(canvasAuthMiddleWare)
 		themeController := &ThemeController{}
 
-		themeRoutes.POST("lsit", themeController.list)
+		themeRoutes.POST("list", themeController.list)
 		themeRoutes.POST("create", themeController.create)
 		themeRoutes.POST("update", themeController.update)
 		themeRoutes.DELETE("delete", themeController.delete)
