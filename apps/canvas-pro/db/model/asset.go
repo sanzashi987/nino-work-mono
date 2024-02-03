@@ -2,8 +2,11 @@ package model
 
 import "github.com/cza14h/nino-work/pkg/db"
 
-const FILE = 0
-const FONT = 1
+const DESGIN = 1
+const FILE = 2
+const FONT = 3
+const BLOCK = 4
+const COMPONENT = 5
 
 type AssetModel struct {
 	db.BaseModel
@@ -17,4 +20,7 @@ type AssetModel struct {
 }
 
 type AssetGroupModel struct {
+	Type      uint8
+	Deleted   uint8 `gorm:"deleted:tinyint(8)"`
+	Workspace string
 }
