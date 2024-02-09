@@ -1,7 +1,7 @@
 package model
 
 // const
-const DESGIN = 1
+const DESIGN = 1
 
 // const FILE = 2
 const DATASOURCE = 2
