@@ -8,6 +8,7 @@ const DATASOURCE = 2
 const FONT = 3
 const BLOCK = 4
 const COMPONENT = 5
+const TEMPLATE = 6
 
 type AssetModel struct {
 	ProjectModel

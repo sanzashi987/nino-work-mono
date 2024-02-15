@@ -19,6 +19,15 @@ func (c *ProjectController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
+
+type ProjectCreateRequest struct {
+	Name      string
+	Version   string
+	GroupCode string `json:"groupCode"`
+	Config    string `json:"rootConfig"`
+	
+}
+
 func (c *ProjectController) create(ctx *gin.Context) {
 
 }
