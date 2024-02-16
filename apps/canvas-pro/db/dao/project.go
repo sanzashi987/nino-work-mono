@@ -3,19 +3,18 @@ package dao
 import (
 	"context"
 
-	"gorm.io/gorm"
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
+	"github.com/cza14h/nino-work/pkg/db"
 )
 
 type ProjectDao struct {
-	*gorm.DB
+	db.BaseDao[model.ProjectModel]
 }
 
 func NewProjectDao(ctx context.Context) *ProjectDao {
-	return &ProjectDao{
-		DB: newDBSession(ctx),
-	}
+	return &ProjectDao{db.InitBaseDao[model.ProjectModel](ctx)}
 }
 
-func (p *ProjectDao) Create() {
+func (p *ProjectDao) Create(project *model.ProjectModel) {
 
 }

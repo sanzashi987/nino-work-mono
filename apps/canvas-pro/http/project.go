@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -19,18 +20,21 @@ func (c *ProjectController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
-
-type CreateRequest struct {
-	Name        string
-	Version     string
+type CreateProjectRequest struct {
+	Name string `binding:"required"`
+	// Version     string
 	GroupCode   string `json:"groupCode"`
-	Config      string `json:"rootConfig"`
+	Config      string `json:"rootConfig" binding:"required"`
 	UseTemplate string //template Id
 }
 
 func (c *ProjectController) create(ctx *gin.Context) {
-	param := ctx.BindJSON(&CreateRequest{})
-
+	param := &CreateProjectRequest{}
+	if err := ctx.ShouldBindJSON(param); err != nil {
+		c.AbortJson(ctx, http.StatusBadRequest, "Error in create projecet handler: "+err.Error())
+		return
+	}
+	service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
 }
 func (c *ProjectController) read(ctx *gin.Context) {
 
@@ -50,7 +54,7 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 		return
 	}
 
-	c.AbortJson(ctx, http.StatusBadRequest, "Id is required", nil)
+	c.AbortJson(ctx, http.StatusBadRequest, "Id is required")
 }
 
 func (c *ProjectController) publish(ctx *gin.Context) {

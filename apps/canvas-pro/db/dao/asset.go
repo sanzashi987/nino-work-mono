@@ -3,19 +3,14 @@ package dao
 import (
 	"context"
 
-	"gorm.io/gorm"
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
+	"github.com/cza14h/nino-work/pkg/db"
 )
 
 type AssetDao struct {
-	*gorm.DB
+	db.BaseDao[model.AssetModel]
 }
 
 func NewAssetDao(ctx context.Context) *AssetDao {
-	return &AssetDao{
-		DB: newDBSession(ctx),
-	}
-}
-
-func (a *AssetDao) Create() {
-
+	return &AssetDao{db.InitBaseDao[model.AssetModel](ctx)}
 }

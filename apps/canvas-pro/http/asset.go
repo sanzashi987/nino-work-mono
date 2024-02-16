@@ -17,14 +17,14 @@ func (c *AssetController) list(ctx *gin.Context) {
 }
 
 type ReadQuery struct {
-	FileId string `json:"fileId"`
+	FileId string `json:"fileId" binding:"required"`
 }
 
 /*CRUD*/
 func (c *AssetController) read(ctx *gin.Context) {
 	query := &ReadQuery{}
-	if err := ctx.BindQuery(query); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, "FileId should be provided in query", nil)
+	if err := ctx.ShouldBindQuery(query); err != nil {
+		c.AbortJson(ctx, http.StatusBadRequest, "FileId should be provided in query")
 		return
 	}
 }
