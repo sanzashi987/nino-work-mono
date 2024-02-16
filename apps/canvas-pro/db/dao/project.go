@@ -16,7 +16,6 @@ func NewProjectDao(ctx context.Context) *ProjectDao {
 	}
 }
 
+func (p *ProjectDao) Create() {
 
-func (p *ProjectDao) CreateProject(){
-	
 }

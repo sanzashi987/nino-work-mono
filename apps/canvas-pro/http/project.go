@@ -20,15 +20,16 @@ func (c *ProjectController) list(ctx *gin.Context) {
 
 /*CRUD*/
 
-type ProjectCreateRequest struct {
-	Name      string
-	Version   string
-	GroupCode string `json:"groupCode"`
-	Config    string `json:"rootConfig"`
-	
+type CreateRequest struct {
+	Name        string
+	Version     string
+	GroupCode   string `json:"groupCode"`
+	Config      string `json:"rootConfig"`
+	UseTemplate string //template Id
 }
 
 func (c *ProjectController) create(ctx *gin.Context) {
+	param := ctx.BindJSON(&CreateRequest{})
 
 }
 func (c *ProjectController) read(ctx *gin.Context) {

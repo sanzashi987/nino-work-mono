@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"sync"
+
+	// "sync"
 
 	"github.com/cza14h/nino-work/apps/chat/consts"
 	"github.com/cza14h/nino-work/apps/chat/db/dao"
@@ -14,13 +15,18 @@ import (
 
 type ChatServiceRpcImpl struct{}
 
-var once sync.Once
+// var once sync.Once
 var chatService *ChatServiceRpcImpl
 
+func init() {
+	chatService = &ChatServiceRpcImpl{}
+	// return chatService
+}
+
 func GetChatServiceRpc() *ChatServiceRpcImpl {
-	once.Do(func() {
-		chatService = &ChatServiceRpcImpl{}
-	})
+	// once.Do(func() {
+	// 	chatService = &ChatServiceRpcImpl{}
+	// })
 	return chatService
 }
 
