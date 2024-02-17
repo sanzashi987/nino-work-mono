@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 )
 
 type ProjectService struct{}
@@ -21,5 +22,11 @@ func GetProjectService() *ProjectService {
 
 func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig, useTemplate string) {
 	projectDao := dao.NewProjectDao(ctx)
-	projectDao.Create()
+
+	newProject := &model.ProjectModel{
+		Name:    name,
+		Version: "0.1.0",
+		Config:  jsonConfig,
+	}
+	projectDao.Create(newProject)
 }

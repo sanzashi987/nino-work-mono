@@ -7,6 +7,15 @@ import (
 
 func ConnectDB(dbname string) {
 	instance := db.ConnectDB(dbname)
-	instance.AutoMigrate(&model.ThemeModel{}, &model.WorkspaceModel{})
+	instance.AutoMigrate(
+		&model.ThemeModel{},
+		&model.WorkspaceModel{},
+		&model.AssetModel{},
+		&model.AssetGroupModel{},
+		&model.CanvasUserModel{},
+		&model.ProjectModel{},
+		&model.ProjectGroupModel{},
+		&model.TemplateModel{},
+		&model.TemplateGroupModel{},
+	)
 }
-

@@ -1,15 +1,16 @@
 package model
 
-type ProjectGroup struct {
+type ProjectGroupModel struct {
 	BaseModel
 }
 
-func (p ProjectGroup) TableName() string {
+func (p ProjectGroupModel) TableName() string {
 	return "project_groups"
 }
 
 type ProjectModel struct {
-	ProjectGroup
+	ProjectGroupModel
+	Name    string
 	Code    string
 	Version string
 	Config  string `gorm:"type:blob"`

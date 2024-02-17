@@ -22,7 +22,7 @@ func (m AssetModel) TableName() string {
 }
 
 type AssetGroupModel struct {
-	ProjectGroup
+	ProjectGroupModel
 }
 
 func (m AssetGroupModel) TableName() string {
