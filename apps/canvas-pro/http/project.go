@@ -34,7 +34,11 @@ func (c *ProjectController) create(ctx *gin.Context) {
 		c.AbortJson(ctx, http.StatusBadRequest, "Error in create projecet handler: "+err.Error())
 		return
 	}
-	service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
+	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
+	if err != nil {
+		c.AbortJson(ctx, http.StatusInternalServerError, "Error in create projecet handler: "+err.Error())
+	}
+	c.ResponseJson(ctx, http.StatusOK, "Success", projectCode)
 }
 func (c *ProjectController) read(ctx *gin.Context) {
 

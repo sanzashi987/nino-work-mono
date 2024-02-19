@@ -14,7 +14,3 @@ type ProjectDao struct {
 func NewProjectDao(ctx context.Context) *ProjectDao {
 	return &ProjectDao{db.InitBaseDao[model.ProjectModel](ctx)}
 }
-
-func (p *ProjectDao) Create(project *model.ProjectModel) {
-
-}
