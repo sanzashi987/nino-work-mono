@@ -7,10 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type BaseModel struct {
-	ID        uint64 `gorm:"column:id;primaryKey;not null;index:,unique;"`
+type BaseModify struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type BaseModel struct {
+	BaseModify
+	ID        uint64 `gorm:"column:id;primaryKey;not null;index:,unique;"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 

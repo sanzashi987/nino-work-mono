@@ -7,6 +7,7 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 	"github.com/cza14h/nino-work/apps/canvas-pro/utils"
+	"github.com/cza14h/nino-work/pkg/db"
 )
 
 type ProjectService struct{}
@@ -38,9 +39,21 @@ func (p *ProjectService) Update(ctx context.Context) {
 }
 
 type ProjectInfoResponse struct {
-	
+	Id   string
+	Code string
+	db.BaseModify
 }
 
-func (p *ProjectService) GetInfoById(ctx context.Context) {
+func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectInfoResponse, error) {
+	projectDao := dao.NewProjectDao(ctx)
+
+	project, err := projectDao.FindByKey("id", id)
+	if err != nil {
+		return nil, err
+	}
+
+}
+
+func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group string) (*ProjectInfoResponse, error) {
 
 }

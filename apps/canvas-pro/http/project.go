@@ -2,8 +2,8 @@ package http
 
 import (
 	"net/http"
-	"strings"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
@@ -13,6 +13,12 @@ const project_prefix = "screen-operation"
 
 type ProjectController struct {
 	controller.BaseController
+}
+
+type GetProjectListRequest struct {
+	request.PaginationRequest
+	Name  string
+	Group string
 }
 
 func (c *ProjectController) list(ctx *gin.Context) {
@@ -42,7 +48,7 @@ func (c *ProjectController) create(ctx *gin.Context) {
 }
 
 func (c *ProjectController) read(ctx *gin.Context) {
-	value, err := c.MustGetParam(ctx, "id")
+	id, err := c.MustGetParam(ctx, "id")
 	if err != nil {
 		return
 	}
@@ -57,9 +63,8 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 
 // features
 func (c *ProjectController) duplicate(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if trimmedId := strings.Trim(id, "/"); trimmedId != "" {
-
+	id, err := c.MustGetParam(ctx, "id")
+	if err != nil {
 		return
 	}
 
