@@ -40,7 +40,12 @@ func (c *ProjectController) create(ctx *gin.Context) {
 	}
 	c.ResponseJson(ctx, http.StatusOK, "Success", projectCode)
 }
+
 func (c *ProjectController) read(ctx *gin.Context) {
+	value, err := c.MustGetParam(ctx, "id")
+	if err != nil {
+		return
+	}
 
 }
 func (c *ProjectController) update(ctx *gin.Context) {

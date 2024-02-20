@@ -36,3 +36,11 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 func (p *ProjectService) Update(ctx context.Context) {
 
 }
+
+type ProjectInfoResponse struct {
+	
+}
+
+func (p *ProjectService) GetInfoById(ctx context.Context) {
+
+}

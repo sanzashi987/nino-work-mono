@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,4 +25,14 @@ func (controller *BaseController) AbortJson(c *gin.Context, code int, msg string
 		"data": nil,
 		"code": code,
 	})
+}
+
+func (controller *BaseController) MustGetParam(c *gin.Context, key string) (string, error) {
+	value := c.Param(key)
+	if value == "" {
+		resultStr := key + " is not provided in url"
+		controller.AbortJson(c, http.StatusBadRequest, resultStr)
+		return "", errors.New(value)
+	}
+	return value, nil
 }
