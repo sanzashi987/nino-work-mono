@@ -2,11 +2,11 @@ package service
 
 import (
 	"context"
+	"math"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
-	"github.com/cza14h/nino-work/apps/canvas-pro/utils"
 	"github.com/cza14h/nino-work/pkg/db"
 )
 
@@ -27,7 +27,7 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 
 	newProject := &model.ProjectModel{
 		Name:    name,
-		Version: utils.DefaultVersion,
+		Version: enums.DefaultVersion,
 		Config:  jsonConfig,
 		Code:    enums.CreateCode(enums.PROJECT),
 	}
@@ -55,5 +55,6 @@ func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectIn
 }
 
 func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group string) (*ProjectInfoResponse, error) {
-
+	pageFallback := int(math.Max(float64(page), 1))
+	sizeFallback := int(math.Max(float64(size), 10))
 }

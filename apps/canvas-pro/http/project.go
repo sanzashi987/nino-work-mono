@@ -68,7 +68,6 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 		return
 	}
 
-	c.AbortJson(ctx, http.StatusBadRequest, "Id is required")
 }
 
 func (c *ProjectController) publish(ctx *gin.Context) {

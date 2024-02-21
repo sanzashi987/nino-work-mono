@@ -12,5 +12,5 @@ type AssetDao struct {
 }
 
 func NewAssetDao(ctx context.Context) *AssetDao {
-	return &AssetDao{db.InitBaseDao[model.AssetModel](ctx)}
+	return &AssetDao{db.InitChildDao[model.AssetModel](ctx)}
 }
