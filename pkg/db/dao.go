@@ -59,3 +59,20 @@ func InitBaseDao[Model any](ctx context.Context) BaseDao[Model] {
 		DB: NewDBSession(ctx),
 	}
 }
+
+func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		pageNumber, pageSize := page, size
+		if pageNumber == 0 {
+			pageNumber = 1
+		}
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 10
+		}
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"math"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
@@ -38,13 +37,13 @@ func (p *ProjectService) Update(ctx context.Context) {
 
 }
 
-type ProjectInfoResponse struct {
+type ProjectDetailResponse struct {
 	Id   string
 	Code string
 	db.BaseModify
 }
 
-func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectInfoResponse, error) {
+func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDetailResponse, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	project, err := projectDao.FindByKey("id", id)
@@ -54,7 +53,18 @@ func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectIn
 
 }
 
-func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group string) (*ProjectInfoResponse, error) {
-	pageFallback := int(math.Max(float64(page), 1))
-	sizeFallback := int(math.Max(float64(size), 10))
+type ProjectInfo struct {
+	Id        string
+	Name      string
+	Code      string
+	Thumbnail string
+	db.BaseModify
+}
+type ProjectListResponse = []ProjectInfo
+
+func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group string) (*ProjectListResponse, error) {
+
+	projectDao := dao.NewProjectDao(ctx)
+
+	projectDao.Scopes(db.Paginate(page, size)).Scan()
 }
