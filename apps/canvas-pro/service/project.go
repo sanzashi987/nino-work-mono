@@ -25,10 +25,10 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	projectDao := dao.NewProjectDao(ctx)
 
 	newProject := &model.ProjectModel{
-		Name:    name,
-		Version: enums.DefaultVersion,
-		Config:  jsonConfig,
-		Code:    enums.CreateCode(enums.PROJECT),
+		BaseModel: model.BaseModel{Name: name},
+		Version:   enums.DefaultVersion,
+		Config:    jsonConfig,
+		Code:      enums.CreateCode(enums.PROJECT),
 	}
 	return newProject.Code, projectDao.Create(newProject)
 }
@@ -62,9 +62,8 @@ type ProjectInfo struct {
 }
 type ProjectListResponse = []ProjectInfo
 
-func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group string) (*ProjectListResponse, error) {
+func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group, workspace string) (*ProjectListResponse, error) {
 
 	projectDao := dao.NewProjectDao(ctx)
 
-	projectDao.Scopes(db.Paginate(page, size)).Scan()
 }

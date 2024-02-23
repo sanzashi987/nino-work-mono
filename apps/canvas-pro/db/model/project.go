@@ -2,6 +2,7 @@ package model
 
 type ProjectGroupModel struct {
 	BaseModel
+	Projects []ProjectModel
 }
 
 func (p ProjectGroupModel) TableName() string {
@@ -9,8 +10,7 @@ func (p ProjectGroupModel) TableName() string {
 }
 
 type ProjectModel struct {
-	ProjectGroupModel
-	Name    string
+	BaseModel
 	Code    string
 	Version string
 	Config  string `gorm:"type:blob"`
