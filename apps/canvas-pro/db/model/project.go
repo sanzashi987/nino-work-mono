@@ -11,7 +11,6 @@ func (p ProjectGroupModel) TableName() string {
 
 type ProjectModel struct {
 	BaseModel
-	Code    string
 	Version string
 	Config  string `gorm:"type:blob"`
 }

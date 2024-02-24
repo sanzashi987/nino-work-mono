@@ -1,6 +1,7 @@
 package enums
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -47,26 +48,43 @@ func Encode[T ~int64](id T) string {
 	return string(result)
 }
 
-func Decode(code string) (result int64) {
+var ErrorDecodeIllegalChar = errors.New("contains an illegal coded char")
+
+func Decode(code string) (result int64, err error) {
 	for _, c := range code {
 		rem, exist := runeToIndex[c]
 		if !exist {
-			panic("Fail to parse the code")
+			err = ErrorDecodeIllegalChar
+			result = -1
+			return
 		}
 		result = result*int64(length) + int64(rem)
 	}
 	return
 }
 
-func CreateCode(cat string) string {
-	return fmt.Sprintf("%s%s%s", PREFIX, cat, Encode(utils.GenerateId()))
+func CreateCode(typeTag string) string {
+	return fmt.Sprintf("%s%s%s", PREFIX, typeTag, Encode(utils.GenerateId()))
 }
 
-func GetIdFromCode(canvasCode string) (int64, string) {
-	if !strings.HasPrefix(canvasCode, PREFIX) {
-		panic("Not a legal canvas code!")
-	}
-	
+var ErrorNotCanvasCode = errors.New("not a canvas code string")
 
-	Decode(canvasCode)
+func GetIdFromCode(canvasCode string) (id int64, typeTag string, err error) {
+	id, typeTag = int64(-1), ""
+	if !strings.HasPrefix(canvasCode, PREFIX) {
+		err = ErrorNotCanvasCode
+		return
+	}
+	decoded, e := Decode(canvasCode)
+	if e != nil {
+		err = e
+		return
+	}
+	id, typeTag = decoded, string(canvasCode[3])
+	return
+}
+
+func GetCodeFromId(typeTag string, id int64) string {
+	return fmt.Sprintf("%s%s%s", PREFIX, typeTag, Encode(id))
+
 }

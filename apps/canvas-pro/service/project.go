@@ -28,9 +28,13 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 		BaseModel: model.BaseModel{Name: name},
 		Version:   enums.DefaultVersion,
 		Config:    jsonConfig,
-		Code:      enums.CreateCode(enums.PROJECT),
 	}
-	return newProject.Code, projectDao.Create(newProject)
+
+	if err := projectDao.Create(newProject); err != nil {
+		return "", err
+	}
+
+	return enums.GetCodeFromId(enums.PROJECT, int64(newProject.Id)), nil
 }
 
 func (p *ProjectService) Update(ctx context.Context) {
@@ -40,7 +44,7 @@ func (p *ProjectService) Update(ctx context.Context) {
 type ProjectDetailResponse struct {
 	Id   string
 	Code string
-	db.BaseModify
+	db.BaseTime
 }
 
 func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDetailResponse, error) {
@@ -54,11 +58,9 @@ func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDe
 }
 
 type ProjectInfo struct {
-	Id        string
 	Name      string
-	Code      string
 	Thumbnail string
-	db.BaseModify
+	db.BaseTime
 }
 type ProjectListResponse = []ProjectInfo
 

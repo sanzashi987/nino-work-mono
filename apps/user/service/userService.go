@@ -36,7 +36,7 @@ func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRe
 		return
 	}
 
-	token, err := auth.GenerateToken(user.Username, user.ID)
+	token, err := auth.GenerateToken(user.Username, user.Id)
 	if err != nil {
 		out.Reason = FailToCreateToken
 		return
@@ -70,7 +70,7 @@ func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegi
 		}
 
 		dbSession.CreateUser(&user)
-		token, err := auth.GenerateToken(user.Username, user.ID)
+		token, err := auth.GenerateToken(user.Username, user.Id)
 		if err != nil {
 			out.Reason = FailToCreateToken
 			return err

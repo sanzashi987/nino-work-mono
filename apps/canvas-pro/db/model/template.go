@@ -1,7 +1,7 @@
 package model
 
 type TemplateModel struct {
-	AssetModel
+	ProjectModel
 }
 
 func (m TemplateModel) TableName() string {

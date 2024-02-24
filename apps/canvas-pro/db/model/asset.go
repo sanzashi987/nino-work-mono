@@ -11,7 +11,8 @@ const COMPONENT = 5
 const TEMPLATE = 6
 
 type AssetModel struct {
-	ProjectModel
+	BaseModel
+	Version  string
 	Type     uint8
 	FileId   string
 	FilePath string

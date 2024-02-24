@@ -26,7 +26,7 @@ func (c *ChatDao) CreateMessagePair(gptAnswer, userInput string, dialogID uint64
 	}
 
 	gptAnwserMessage := model.MessageModel{
-		ReplyTo:  userMessage.ID,
+		ReplyTo:  userMessage.Id,
 		DialogID: dialogID,
 		Content:  gptAnswer,
 	}
@@ -35,5 +35,5 @@ func (c *ChatDao) CreateMessagePair(gptAnswer, userInput string, dialogID uint64
 		return 0, 0, err
 	}
 
-	return userMessage.ID, gptAnwserMessage.ID, nil
+	return userMessage.Id, gptAnwserMessage.Id, nil
 }
