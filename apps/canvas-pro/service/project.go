@@ -24,17 +24,14 @@ func GetProjectService() *ProjectService {
 func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig, useTemplate string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
-	newProject := &model.ProjectModel{
-		BaseModel: model.BaseModel{Name: name},
-		Version:   enums.DefaultVersion,
-		Config:    jsonConfig,
-	}
+	newProject := &model.ProjectModel{}
+	newProject.TypeTag, newProject.Name, newProject.Version, newProject.Config = enums.PROJECT, name, enums.DefaultVersion, jsonConfig
 
 	if err := projectDao.Create(newProject); err != nil {
 		return "", err
 	}
 
-	return enums.GetCodeFromId(enums.PROJECT, int64(newProject.Id)), nil
+	return newProject.Code, nil
 }
 
 func (p *ProjectService) Update(ctx context.Context) {
@@ -60,12 +57,27 @@ func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDe
 type ProjectInfo struct {
 	Name      string
 	Thumbnail string
+	// Group     string
 	db.BaseTime
 }
 type ProjectListResponse = []ProjectInfo
 
 func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group, workspace string) (*ProjectListResponse, error) {
-
 	projectDao := dao.NewProjectDao(ctx)
+
+	infos, err := projectDao.GetList(page, size, name, group, workspace)
+	if err != nil {
+		return nil, err
+	}
+
+	result := []ProjectInfo{}
+
+	for _, info := range *infos {
+		temp := ProjectInfo{}
+		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.CreateTime, info.UpdateTime
+		result = append(result, temp)
+	}
+
+	return &result, nil
 
 }

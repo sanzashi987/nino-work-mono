@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/cza14h/nino-work/apps/canvas-pro/utils"
 )
 
 type AssetPrefix struct{}
@@ -21,25 +19,41 @@ const (
 	STATIC_SOURCE = "H"
 )
 
+var supportedTags = [7]string{
+	PROJECT,
+	BLOCK,
+	DESIGN,
+	FONT,
+	COMPONENT,
+	DATASOURCE,
+	STATIC_SOURCE,
+}
+
 const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const length = len(charset)
 
 var runeToIndex = map[rune]int{}
+var supportedTagMap = map[string]bool{}
 
 func init() {
 	for i, c := range charset {
 		runeToIndex[c] = i
 	}
+	for _, c := range supportedTags {
+		supportedTagMap[c] = true
+	}
 }
 
-func Encode[T ~int64](id T) string {
+func IsSupportedTypeTag(tag string) bool {
+	val, exist := supportedTagMap[tag]
+	return exist && val
+}
+
+func Encode[T ~uint64](id T) string {
 	var (
 		result []byte
 		abs    T = id
 	)
-	if id < 0 {
-		abs = -1 * id
-	}
 	for abs > 0 {
 		rem := abs % T(length)
 		abs = abs / T(length)
@@ -63,10 +77,6 @@ func Decode(code string) (result int64, err error) {
 	return
 }
 
-func CreateCode(typeTag string) string {
-	return fmt.Sprintf("%s%s%s", PREFIX, typeTag, Encode(utils.GenerateId()))
-}
-
 var ErrorNotCanvasCode = errors.New("not a canvas code string")
 
 func GetIdFromCode(canvasCode string) (id int64, typeTag string, err error) {
@@ -84,7 +94,6 @@ func GetIdFromCode(canvasCode string) (id int64, typeTag string, err error) {
 	return
 }
 
-func GetCodeFromId(typeTag string, id int64) string {
+func GetCodeFromId(typeTag string, id uint64) string {
 	return fmt.Sprintf("%s%s%s", PREFIX, typeTag, Encode(id))
-
 }

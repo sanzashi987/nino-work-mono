@@ -22,7 +22,7 @@ func (dao *BaseDao[Model]) Create(record *Model) (err error) {
 }
 
 func (dao *BaseDao[Model]) Update(record *Model) (err error) {
-	err = dao.Updates(record).Error
+	err = dao.DB.Updates(record).Error
 	return
 }
 

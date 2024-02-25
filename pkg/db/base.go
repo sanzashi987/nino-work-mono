@@ -29,9 +29,3 @@ func (model *BaseModel) GetCreatedAtDate() string {
 func (model *BaseModel) GetUpdatedDate() string {
 	return model.UpdateTime.Format("2006-01-02")
 }
-
-// func (model *BaseModel) CreateBaseModel() *BaseModel {
-// 	return &BaseModel{
-
-// 	}
-// }

@@ -1,7 +1,11 @@
 package model
 
+type ConfigMetaJson struct{}
+
 type TemplateModel struct {
-	ProjectModel
+	BaseModel
+	Version string
+	Config  string `gorm:"type:blob"`
 }
 
 func (m TemplateModel) TableName() string {

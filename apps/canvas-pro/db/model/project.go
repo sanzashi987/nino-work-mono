@@ -9,10 +9,11 @@ func (p ProjectGroupModel) TableName() string {
 	return "project_groups"
 }
 
+type SystemConfigJson struct{}
+
 type ProjectModel struct {
-	BaseModel
-	Version string
-	Config  string `gorm:"type:blob"`
+	TemplateModel
+	SystemConfig string `gorm:"type:blob"`
 }
 
 func (p ProjectModel) TableName() string {
