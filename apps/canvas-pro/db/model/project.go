@@ -9,7 +9,10 @@ func (p ProjectGroupModel) TableName() string {
 	return "project_groups"
 }
 
-type SystemConfigJson struct{}
+type SystemConfigJson struct {
+	Name      string `json:"name" binding:"required"`
+	Thumbnail string `json:"thumbnail" binding:"required"`
+}
 
 type ProjectModel struct {
 	TemplateModel

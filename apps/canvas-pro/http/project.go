@@ -56,6 +56,7 @@ func (c *ProjectController) read(ctx *gin.Context) {
 }
 func (c *ProjectController) update(ctx *gin.Context) {
 
+	service.GetProjectService().Update(ctx)
 }
 func (c *ProjectController) delete(ctx *gin.Context) {
 

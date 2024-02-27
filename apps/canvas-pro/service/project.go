@@ -34,7 +34,8 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context) {
+func (p *ProjectService) Update(ctx context.Context, code, name string) {
+	projectDao := dao.NewProjectDao(ctx)
 
 }
 
@@ -46,7 +47,7 @@ type ProjectDetailResponse struct {
 
 func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDetailResponse, error) {
 	projectDao := dao.NewProjectDao(ctx)
-
+	result := &ProjectDetailResponse{}
 	project, err := projectDao.FindByKey("id", id)
 	if err != nil {
 		return nil, err
