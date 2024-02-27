@@ -19,6 +19,14 @@ func (controler *BaseController) ResponseJson(c *gin.Context, code int, msg stri
 
 }
 
+func (controller *BaseController) AbortError(c *gin.Context, code int, err error) {
+	c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"msg":  err.Error(),
+		"data": nil,
+		"code": code,
+	})
+}
+
 func (controller *BaseController) AbortJson(c *gin.Context, code int, msg string) {
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{
 		"msg":  msg,

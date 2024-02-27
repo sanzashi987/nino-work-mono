@@ -34,24 +34,36 @@ type CreateProjectRequest struct {
 	UseTemplate string //template Id
 }
 
+const projectMessage = "Error in create project handler: "
+
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
 	if err := ctx.ShouldBindJSON(param); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, "Error in create projecet handler: "+err.Error())
+		c.AbortJson(ctx, http.StatusBadRequest, projectMessage+err.Error())
 		return
 	}
 	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, "Error in create projecet handler: "+err.Error())
+		c.AbortJson(ctx, http.StatusInternalServerError, projectMessage+err.Error())
+		return
 	}
 	c.ResponseJson(ctx, http.StatusOK, "Success", projectCode)
 }
 
 func (c *ProjectController) read(ctx *gin.Context) {
-	id, err := c.MustGetParam(ctx, "id")
+	code, err := c.MustGetParam(ctx, "id")
 	if err != nil {
+		c.AbortJson(ctx, http.StatusBadRequest, projectMessage+err.Error())
 		return
 	}
+
+	projectDetail, err := service.GetProjectService().GetInfoById(ctx, code)
+	if err != nil {
+		c.AbortJson(ctx, http.StatusInternalServerError, projectMessage+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, http.StatusOK, "", &projectDetail)
 
 }
 func (c *ProjectController) update(ctx *gin.Context) {

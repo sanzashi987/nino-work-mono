@@ -22,7 +22,7 @@ func (model *BaseModel) GetStringID() string {
 	return strconv.FormatUint(model.Id, 10)
 }
 
-func (model *BaseModel) GetCreatedAtDate() string {
+func (model *BaseModel) GetCreatedDate() string {
 	return model.CreateTime.Format("2006-01-02")
 }
 

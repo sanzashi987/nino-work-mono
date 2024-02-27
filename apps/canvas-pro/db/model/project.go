@@ -9,14 +9,14 @@ func (p ProjectGroupModel) TableName() string {
 	return "project_groups"
 }
 
-type SystemConfigJson struct {
+type ProjectSettingsJson struct {
 	Name      string `json:"name" binding:"required"`
-	Thumbnail string `json:"thumbnail" binding:"required"`
+	Thumbnail string `json:"thumbnail"`
 }
 
 type ProjectModel struct {
 	TemplateModel
-	SystemConfig string `gorm:"type:blob"`
+	Settings string `gorm:"type:blob"`
 }
 
 func (p ProjectModel) TableName() string {

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/bytedance/sonic"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
@@ -34,24 +35,33 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context, code, name string) {
+func (p *ProjectService) Update(ctx context.Context, code, name, config string) {
 	projectDao := dao.NewProjectDao(ctx)
 
 }
 
-type ProjectDetailResponse struct {
-	Id   string
-	Code string
-	db.BaseTime
+type ProjectDetail struct {
+	Code       string
+	Name       string
+	Thumbnail  string
+	CreateTime string `json:"createTime"`
+	UpdateTime string `json:"updateTime"`
 }
 
-func (p *ProjectService) GetInfoById(ctx context.Context, id string) (*ProjectDetailResponse, error) {
+func (p *ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
 	projectDao := dao.NewProjectDao(ctx)
-	result := &ProjectDetailResponse{}
-	project, err := projectDao.FindByKey("id", id)
-	if err != nil {
-		return nil, err
+	project, e := projectDao.FindByKey("code", code)
+	if e != nil {
+		err = e
+		return
 	}
+
+	projectSettings := model.ProjectSettingsJson{}
+	sonic.Unmarshal([]byte(project.Config), &projectSettings)
+	result.Code, result.Name, result.Thumbnail = code, projectSettings.Name, projectSettings.Thumbnail
+
+	result.CreateTime, result.UpdateTime = project.GetCreatedDate(), project.GetUpdatedDate()
+	return
 
 }
 
