@@ -66,7 +66,13 @@ func (c *ProjectController) read(ctx *gin.Context) {
 	c.ResponseJson(ctx, http.StatusOK, "", &projectDetail)
 
 }
+
+type ProjectUpdateRequest struct {
+}
+
 func (c *ProjectController) update(ctx *gin.Context) {
+	request := ProjectUpdateRequest{}
+	ctx.BindJSON(&request)
 
 	service.GetProjectService().Update(ctx)
 }
