@@ -34,17 +34,17 @@ type CreateProjectRequest struct {
 	UseTemplate string //template Id
 }
 
-const projectMessage = "Error in create project handler: "
+const projectCreateMessage = "Error in create project handler: "
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
 	if err := ctx.ShouldBindJSON(param); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectMessage+err.Error())
+		c.AbortJson(ctx, http.StatusBadRequest, projectCreateMessage+err.Error())
 		return
 	}
 	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectMessage+err.Error())
+		c.AbortJson(ctx, http.StatusInternalServerError, projectCreateMessage+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, http.StatusOK, "Success", projectCode)
@@ -53,13 +53,13 @@ func (c *ProjectController) create(ctx *gin.Context) {
 func (c *ProjectController) read(ctx *gin.Context) {
 	code, err := c.MustGetParam(ctx, "id")
 	if err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectMessage+err.Error())
+		c.AbortJson(ctx, http.StatusBadRequest, projectCreateMessage+err.Error())
 		return
 	}
 
 	projectDetail, err := service.GetProjectService().GetInfoById(ctx, code)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectMessage+err.Error())
+		c.AbortJson(ctx, http.StatusInternalServerError, projectCreateMessage+err.Error())
 		return
 	}
 
@@ -68,13 +68,24 @@ func (c *ProjectController) read(ctx *gin.Context) {
 }
 
 type ProjectUpdateRequest struct {
+	Code      string `json:"code" binding:"required"`
+	Name      string
+	Config    string `json:"rootConfig"`
+	Thumbnail string
+	GroupCode string `json:"groupCode"`
 }
 
-func (c *ProjectController) update(ctx *gin.Context) {
-	request := ProjectUpdateRequest{}
-	ctx.BindJSON(&request)
+const projectUpdateMessage = "Error in update project handler: "
 
-	service.GetProjectService().Update(ctx)
+func (c *ProjectController) update(ctx *gin.Context) {
+	param := ProjectUpdateRequest{}
+	err := ctx.BindJSON(&param)
+	if err != nil {
+		c.AbortJson(ctx, http.StatusInternalServerError, projectUpdateMessage+err.Error())
+		return
+	}
+
+	service.GetProjectService().Update(ctx, param.Code, param.Name, param.Config)
 }
 func (c *ProjectController) delete(ctx *gin.Context) {
 

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/cza14h/nino-work/config"
 	"github.com/glebarez/sqlite"
@@ -21,8 +22,12 @@ func (dao *BaseDao[Model]) Create(record *Model) (err error) {
 	return
 }
 
-func (dao *BaseDao[Model]) Update(record *Model) (err error) {
-	err = dao.DB.Updates(record).Error
+func (dao *BaseDao[Model]) UpdateById(record Model) (err error) {
+	originalStrcut := reflect.TypeOf(record)
+	model := reflect.New(originalStrcut).Elem()
+	model.FieldByName("Id").Set(reflect.ValueOf(record).FieldByName("Id"))
+
+	err = dao.DB.Model(&model).Updates(record).Error
 	return
 }
 

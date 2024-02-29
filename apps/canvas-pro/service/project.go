@@ -35,9 +35,25 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context, code, name, config string) {
+func (p *ProjectService) Update(ctx context.Context, code, name, config, thumbnail string) error {
 	projectDao := dao.NewProjectDao(ctx)
 
+	toUpdate := model.ProjectModel{}
+
+	if name != "" || thumbnail != "" {
+		result, err := sonic.Marshal(
+			model.ProjectSettingsJson{
+				Name:      name,
+				Thumbnail: thumbnail,
+			},
+		)
+		if err != nil {
+			return err
+		}
+		toUpdate.Settings = string(result)
+	}
+
+	return projectDao.UpdateById(toUpdate)
 }
 
 type ProjectDetail struct {
