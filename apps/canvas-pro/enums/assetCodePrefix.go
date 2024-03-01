@@ -64,23 +64,23 @@ func Encode[T ~uint64](id T) string {
 
 var ErrorDecodeIllegalChar = errors.New("contains an illegal coded char")
 
-func Decode(code string) (result int64, err error) {
+func Decode(code string) (result uint64, err error) {
 	for _, c := range code {
 		rem, exist := runeToIndex[c]
 		if !exist {
 			err = ErrorDecodeIllegalChar
-			result = -1
+			result = 0
 			return
 		}
-		result = result*int64(length) + int64(rem)
+		result = result*uint64(length) + uint64(rem)
 	}
 	return
 }
 
 var ErrorNotCanvasCode = errors.New("not a canvas code string")
 
-func GetIdFromCode(canvasCode string) (id int64, typeTag string, err error) {
-	id, typeTag = int64(-1), ""
+func GetIdFromCode(canvasCode string) (id uint64, typeTag string, err error) {
+	id, typeTag = uint64(0), ""
 	if !strings.HasPrefix(canvasCode, PREFIX) {
 		err = ErrorNotCanvasCode
 		return

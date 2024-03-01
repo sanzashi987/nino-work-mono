@@ -8,6 +8,7 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 	"github.com/cza14h/nino-work/pkg/db"
+	"github.com/cza14h/nino-work/pkg/utils"
 )
 
 type ProjectService struct{}
@@ -35,22 +36,39 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context, code, name, config, thumbnail string) error {
+func (p *ProjectService) Update(ctx context.Context, code, name, config, thumbnail string) (err error) {
 	projectDao := dao.NewProjectDao(ctx)
 
-	toUpdate := model.ProjectModel{}
+	toUpdate, idProject := model.ProjectModel{}, model.ProjectModel{}
+	var id uint64
+	if id, _, err = enums.GetIdFromCode(code); err != nil {
+		return
+	}
+
+	idProject.Id, toUpdate.Id = id, id
+	projectDao.DB.First(&idProject)
 
 	if name != "" || thumbnail != "" {
-		result, err := sonic.Marshal(
-			model.ProjectSettingsJson{
-				Name:      name,
-				Thumbnail: thumbnail,
-			},
-		)
+		existedSettings := model.ProjectSettingsJson{}
+		if err = sonic.Unmarshal([]byte(idProject.Settings), &existedSettings); err != nil {
+			return
+		}
+		toBeMerged := model.ProjectSettingsJson{
+			Name:      name,
+			Thumbnail: thumbnail,
+		}
+
+		merged := utils.ShallowMergeStructs[model.ProjectSettingsJson](&existedSettings, &toBeMerged)
+
+		result, err := sonic.Marshal(merged)
 		if err != nil {
 			return err
 		}
 		toUpdate.Settings = string(result)
+	}
+
+	if config != "" {
+		toUpdate.Config = config
 	}
 
 	return projectDao.UpdateById(toUpdate)

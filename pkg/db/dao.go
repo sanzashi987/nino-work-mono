@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -22,11 +23,16 @@ func (dao *BaseDao[Model]) Create(record *Model) (err error) {
 	return
 }
 
+var ErrorIdIsNotProvided = errors.New("id is not provided")
+
 func (dao *BaseDao[Model]) UpdateById(record Model) (err error) {
 	originalStrcut := reflect.TypeOf(record)
 	model := reflect.New(originalStrcut).Elem()
+	if model.FieldByName("Id").IsZero() {
+		err = ErrorIdIsNotProvided
+		return
+	}
 	model.FieldByName("Id").Set(reflect.ValueOf(record).FieldByName("Id"))
-
 	err = dao.DB.Model(&model).Updates(record).Error
 	return
 }
