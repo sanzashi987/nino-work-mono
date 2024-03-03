@@ -2,7 +2,7 @@ package model
 
 type ProjectGroupModel struct {
 	BaseModel
-	Projects []ProjectModel
+	Projects []ProjectModel `gorm:"foreignkey:GroupId;references:Id"`
 }
 
 func (p ProjectGroupModel) TableName() string {
@@ -14,6 +14,7 @@ type ProjectSettingsJson struct {
 
 type ProjectModel struct {
 	TemplateModel
+	GroupId uint64
 	/** In type of `ProjectSettingsJson`*/
 	// Settings string `gorm:"type:blob"`
 }

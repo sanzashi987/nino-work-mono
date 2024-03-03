@@ -57,6 +57,14 @@ func (p *ProjectService) Update(ctx context.Context, code string, name, config, 
 		toUpdate.Config = *config
 	}
 
+	if group != nil {
+		var groupId uint64
+		if groupId, _, err = enums.GetIdFromCode(*group); err != nil {
+			return
+		}
+		toUpdate.GroupId = groupId
+	}
+
 	return projectDao.UpdateById(toUpdate)
 }
 
