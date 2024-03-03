@@ -4,8 +4,9 @@ type ConfigMetaJson struct{}
 
 type TemplateModel struct {
 	BaseModel
-	Version string
-	Config  string `gorm:"type:blob"`
+	Thumbnail string `json:"thumbnail"`
+	Version   string
+	Config    string `gorm:"type:blob"`
 }
 
 func (m TemplateModel) TableName() string {

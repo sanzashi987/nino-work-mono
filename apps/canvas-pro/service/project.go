@@ -3,12 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/bytedance/sonic"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 	"github.com/cza14h/nino-work/pkg/db"
-	"github.com/cza14h/nino-work/pkg/utils"
 )
 
 type ProjectService struct{}
@@ -36,7 +34,7 @@ func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context, code, name, config, thumbnail string) (err error) {
+func (p *ProjectService) Update(ctx context.Context, code string, name, config, thumbnail, group *string) (err error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	toUpdate, idProject := model.ProjectModel{}, model.ProjectModel{}
@@ -48,27 +46,15 @@ func (p *ProjectService) Update(ctx context.Context, code, name, config, thumbna
 	idProject.Id, toUpdate.Id = id, id
 	projectDao.DB.First(&idProject)
 
-	if name != "" || thumbnail != "" {
-		existedSettings := model.ProjectSettingsJson{}
-		if err = sonic.Unmarshal([]byte(idProject.Settings), &existedSettings); err != nil {
-			return
-		}
-		toBeMerged := model.ProjectSettingsJson{
-			Name:      name,
-			Thumbnail: thumbnail,
-		}
-
-		merged := utils.ShallowMergeStructs[model.ProjectSettingsJson](&existedSettings, &toBeMerged)
-
-		result, err := sonic.Marshal(merged)
-		if err != nil {
-			return err
-		}
-		toUpdate.Settings = string(result)
+	if name != nil {
+		toUpdate.Name = *name
+	}
+	if thumbnail != nil {
+		toUpdate.Thumbnail = *thumbnail
 	}
 
-	if config != "" {
-		toUpdate.Config = config
+	if config != nil {
+		toUpdate.Config = *config
 	}
 
 	return projectDao.UpdateById(toUpdate)
@@ -90,10 +76,7 @@ func (p *ProjectService) GetInfoById(ctx context.Context, code string) (result *
 		return
 	}
 
-	projectSettings := model.ProjectSettingsJson{}
-	sonic.Unmarshal([]byte(project.Config), &projectSettings)
-	result.Code, result.Name, result.Thumbnail = code, projectSettings.Name, projectSettings.Thumbnail
-
+	result.Code, result.Name, result.Thumbnail = code, project.Name, project.Thumbnail
 	result.CreateTime, result.UpdateTime = project.GetCreatedDate(), project.GetUpdatedDate()
 	return
 

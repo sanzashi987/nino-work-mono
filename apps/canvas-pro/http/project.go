@@ -69,10 +69,10 @@ func (c *ProjectController) read(ctx *gin.Context) {
 
 type ProjectUpdateRequest struct {
 	Code      string `json:"code" binding:"required"`
-	Name      string
-	Config    string `json:"rootConfig"`
-	Thumbnail string
-	GroupCode string `json:"groupCode"`
+	Name      *string
+	Config    *string `json:"rootConfig"`
+	Thumbnail *string
+	GroupCode *string `json:"groupCode"`
 }
 
 const projectUpdateMessage = "Error in update project handler: "
@@ -85,7 +85,13 @@ func (c *ProjectController) update(ctx *gin.Context) {
 		return
 	}
 
-	service.GetProjectService().Update(ctx, param.Code, param.Name, param.Config)
+	if err := service.GetProjectService().Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
+		c.AbortJson(ctx, http.StatusInternalServerError, projectUpdateMessage+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, http.StatusOK, "Success", nil)
+
 }
 func (c *ProjectController) delete(ctx *gin.Context) {
 

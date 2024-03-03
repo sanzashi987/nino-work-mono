@@ -10,14 +10,12 @@ func (p ProjectGroupModel) TableName() string {
 }
 
 type ProjectSettingsJson struct {
-	Name      string `json:"name"`
-	Thumbnail string `json:"thumbnail"`
 }
 
 type ProjectModel struct {
 	TemplateModel
 	/** In type of `ProjectSettingsJson`*/
-	Settings string `gorm:"type:blob"`
+	// Settings string `gorm:"type:blob"`
 }
 
 func (p ProjectModel) TableName() string {
