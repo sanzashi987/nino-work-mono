@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
+	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 	"github.com/cza14h/nino-work/pkg/db"
 	"gorm.io/gorm"
 )
@@ -16,18 +17,22 @@ func NewProjectDao(ctx context.Context) *ProjectDao {
 	return &ProjectDao{db.InitBaseDao[model.ProjectModel](ctx)}
 }
 
-func (p *ProjectDao) GetList(page, size int, name, group, workspace string) (projects *[]model.ProjectModel, err error) {
+func (p *ProjectDao) GetList(page, size int, workspace string, name, group *string) (projects *[]model.ProjectModel, err error) {
 
-	groupModel := model.ProjectGroupModel{
-		BaseModel: model.BaseModel{
-			Workspace: workspace,
-		},
+	groupModel := model.ProjectGroupModel{}
+	groupModel.Workspace = workspace
+
+	if group != nil {
+		groupModel.Id, _, err = enums.GetIdFromCode(*group)
+		if err != nil {
+			return
+		}
 	}
 
 	filterByName := func(db *gorm.DB) *gorm.DB {
 		res := db
-		if name != "" {
-			res = res.Where(" name LIKE ?", "%"+name+"%")
+		if name != nil {
+			res = res.Where(" name LIKE ?", "%"+*name+"%")
 		}
 		return res
 	}

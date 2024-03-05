@@ -21,7 +21,13 @@ type GetProjectListRequest struct {
 	Group string
 }
 
+const projectListMessage = "Error in listing project handler: "
+
 func (c *ProjectController) list(ctx *gin.Context) {
+	param := &GetProjectListRequest{}
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+err.Error())
+	}
 
 }
 
