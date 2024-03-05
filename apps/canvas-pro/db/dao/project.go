@@ -17,8 +17,8 @@ func NewProjectDao(ctx context.Context) *ProjectDao {
 	return &ProjectDao{db.InitBaseDao[model.ProjectModel](ctx)}
 }
 
-func (p *ProjectDao) GetList(page, size int, workspace string, name, group *string) (projects *[]model.ProjectModel, err error) {
 
+func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, name, group *string) (projects *[]model.ProjectModel, err error) {
 	groupModel := model.ProjectGroupModel{}
 	groupModel.Workspace = workspace
 
@@ -36,6 +36,6 @@ func (p *ProjectDao) GetList(page, size int, workspace string, name, group *stri
 		}
 		return res
 	}
-	err = p.DB.Preload("Projects", filterByName).Scopes(db.Paginate(page, size)).Model(&groupModel).Association("Projects").Find(projects)
+	err = dao.DB.Preload("Projects", filterByName).Scopes(db.Paginate(page, size)).Model(&groupModel).Association("Projects").Find(projects)
 	return
 }

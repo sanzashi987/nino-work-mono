@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
@@ -96,12 +97,17 @@ type ProjectInfo struct {
 	// Group     string
 	db.BaseTime
 }
-type ProjectListResponse = []ProjectInfo
+type ProjectInfoList = []ProjectInfo
 
-func (p *ProjectService) GetList(ctx context.Context, page, size int, name, group, workspace string) (*ProjectListResponse, error) {
+var ErrorUserWorkspaceNotMatch = errors.New("current user does not have the access right to the given workspace")
+
+func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size int, workspace string, name, group *string) (*ProjectInfoList, error) {
 	projectDao := dao.NewProjectDao(ctx)
+	if !ValidateUserWorkspace(ctx, userId, workspace) {
+		return nil, ErrorUserWorkspaceNotMatch
+	}
 
-	infos, err := projectDao.GetList(page, size, name, group, workspace)
+	infos, err := projectDao.GetList(page, size, workspace, name, group)
 	if err != nil {
 		return nil, err
 	}

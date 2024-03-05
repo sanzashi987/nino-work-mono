@@ -5,6 +5,7 @@ import (
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
+	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -17,17 +18,33 @@ type ProjectController struct {
 
 type GetProjectListRequest struct {
 	request.PaginationRequest
-	Name  string
-	Group string
+	Workspace string
+	Name      *string
+	Group     *string
 }
 
 const projectListMessage = "Error in listing project handler: "
 
 func (c *ProjectController) list(ctx *gin.Context) {
-	param := &GetProjectListRequest{}
-	if err := ctx.ShouldBindJSON(&param); err != nil {
+	requestBody := &GetProjectListRequest{}
+	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
 		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+err.Error())
+		return
 	}
+
+	userId, exists := ctx.Get(auth.UserID)
+	if !exists {
+		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+" userId does not exist in http context")
+		return
+	}
+
+	userIdTyped := userId.(uint64)
+	infoList, err := service.GetProjectService().GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
+	if err != nil {
+		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+" userId does not exist in http context")
+		return
+	}
+	c.ResponseJson(ctx, infoList)
 
 }
 
@@ -53,7 +70,7 @@ func (c *ProjectController) create(ctx *gin.Context) {
 		c.AbortJson(ctx, http.StatusInternalServerError, projectCreateMessage+err.Error())
 		return
 	}
-	c.ResponseJson(ctx, http.StatusOK, "Success", projectCode)
+	c.ResponseJson(ctx, projectCode)
 }
 
 func (c *ProjectController) read(ctx *gin.Context) {
@@ -69,7 +86,7 @@ func (c *ProjectController) read(ctx *gin.Context) {
 		return
 	}
 
-	c.ResponseJson(ctx, http.StatusOK, "", &projectDetail)
+	c.ResponseJson(ctx, &projectDetail)
 
 }
 
@@ -96,7 +113,7 @@ func (c *ProjectController) update(ctx *gin.Context) {
 		return
 	}
 
-	c.ResponseJson(ctx, http.StatusOK, "Success", nil)
+	c.ResponseJson(ctx, nil)
 
 }
 func (c *ProjectController) delete(ctx *gin.Context) {

@@ -9,12 +9,12 @@ import (
 
 type BaseController struct{}
 
-func (controler *BaseController) ResponseJson(c *gin.Context, code int, msg string, data interface{}) {
+func (controler *BaseController) ResponseJson(c *gin.Context, data interface{}) {
 
 	c.JSON(http.StatusOK, gin.H{
-		"msg":  msg,
+		"msg":  "Success",
 		"data": data,
-		"code": code,
+		"code": 0,
 	})
 
 }

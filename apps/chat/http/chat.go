@@ -17,16 +17,14 @@ func (c *ChatController) Chat(ctx *gin.Context) {
 	req := chat.ChatRequest{}
 	res := chat.ChatResponse{}
 	if err := ctx.BindJSON(&req); err != nil {
-		c.ResponseJson(ctx, http.StatusBadRequest, "Fail to get required field", nil)
-		ctx.Abort()
+		c.AbortJson(ctx, http.StatusBadRequest, "Fail to get required field")
 		return
 	}
 	rpcInstance := service.GetChatServiceRpc()
 
 	if err := rpcInstance.Chat(ctx, &req, &res); err != nil {
-		ctx.Abort()
-		c.ResponseJson(ctx, int(res.Reason), "Error from chat instance", nil)
+		c.AbortJson(ctx, int(res.Reason), "Fail to get required field")
 		return
 	}
-	c.ResponseJson(ctx, int(res.Reason), "", &res)
+	c.ResponseJson(ctx, &res)
 }

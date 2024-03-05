@@ -22,17 +22,16 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
-		controller.ResponseJson(
+		controller.AbortJson(
 			ctx,
 			iHttp.StatusBadRequest,
 			"Fail to read required fields",
-			nil,
 		)
 		return
 	}
 
 	if err := service.GetUserServiceRpc().UserLogin(ctx, &req, &res); err != nil {
-		controller.ResponseJson(ctx, int(res.Reason), "Login Service Error", nil)
+		controller.AbortJson(ctx, int(res.Reason), "Login Service Error")
 		return
 	}
 
@@ -41,7 +40,7 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	controller.ResponseJson(ctx, int(res.Reason), "", &res)
+	controller.ResponseJson(ctx, &res)
 }
 
 func (controller *UserController) UserRegister(ctx *gin.Context) {
@@ -50,19 +49,18 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
-		controller.ResponseJson(
+		controller.AbortJson(
 			ctx,
 			iHttp.StatusBadRequest,
-			"Fail to read required fields",
-			&res,
+			"Fail to read required fields "+err.Error(),
 		)
 		return
 	}
 
 	if err := service.GetUserServiceRpc().UserRegister(ctx, &req, &res); err != nil {
-		controller.ResponseJson(ctx, int(res.Reason), "Register service error", nil)
+		controller.AbortJson(ctx, int(res.Reason), "Register service error")
 		return
 	}
 
-	controller.ResponseJson(ctx, int(res.Reason), "", &res)
+	controller.ResponseJson(ctx, &res)
 }
