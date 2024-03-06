@@ -1,8 +1,6 @@
 package http
 
 import (
-	"net/http"
-
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +22,7 @@ type ReadQuery struct {
 func (c *AssetController) read(ctx *gin.Context) {
 	query := &ReadQuery{}
 	if err := ctx.ShouldBindQuery(query); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, "FileId should be provided in query")
+		c.AbortClientError(ctx, "[http] canvas asset read: fail to get required field in query, "+err.Error())
 		return
 	}
 }

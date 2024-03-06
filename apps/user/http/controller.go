@@ -22,16 +22,12 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
-		controller.AbortJson(
-			ctx,
-			iHttp.StatusBadRequest,
-			"Fail to read required fields",
-		)
+		controller.AbortClientError(ctx, "[http] user login: Fail to read required fields")
 		return
 	}
 
 	if err := service.GetUserServiceRpc().UserLogin(ctx, &req, &res); err != nil {
-		controller.AbortJson(ctx, int(res.Reason), "Login Service Error")
+		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error")
 		return
 	}
 
@@ -49,16 +45,12 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 		JwtToken: voidStr,
 	}
 	if err := ctx.BindJSON(&req); err != nil {
-		controller.AbortJson(
-			ctx,
-			iHttp.StatusBadRequest,
-			"Fail to read required fields "+err.Error(),
-		)
+		controller.AbortClientError(ctx, "[http] user regiser: Fail to read required fields "+err.Error())
 		return
 	}
 
 	if err := service.GetUserServiceRpc().UserRegister(ctx, &req, &res); err != nil {
-		controller.AbortJson(ctx, int(res.Reason), "Register service error")
+		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
 		return
 	}
 

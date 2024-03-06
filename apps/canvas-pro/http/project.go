@@ -1,8 +1,6 @@
 package http
 
 import (
-	"net/http"
-
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/auth"
@@ -23,25 +21,25 @@ type GetProjectListRequest struct {
 	Group     *string
 }
 
-const projectListMessage = "Error in listing project handler: "
+const projectListMessage = "[http] canvas project list: "
 
 func (c *ProjectController) list(ctx *gin.Context) {
 	requestBody := &GetProjectListRequest{}
 	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+err.Error())
+		c.AbortClientError(ctx, projectListMessage+err.Error())
 		return
 	}
 
 	userId, exists := ctx.Get(auth.UserID)
 	if !exists {
-		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+" userId does not exist in http context")
+		c.AbortClientError(ctx, projectListMessage+" userId does not exist in http context")
 		return
 	}
 
 	userIdTyped := userId.(uint64)
 	infoList, err := service.GetProjectService().GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectListMessage+" userId does not exist in http context")
+		c.AbortServerError(ctx, projectListMessage+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, infoList)
@@ -57,17 +55,17 @@ type CreateProjectRequest struct {
 	UseTemplate string //template Id
 }
 
-const projectCreateMessage = "Error in create project handler: "
+const projectCreateMessage = "[http] canvas project create: "
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
 	if err := ctx.ShouldBindJSON(param); err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectCreateMessage+err.Error())
+		c.AbortClientError(ctx, projectCreateMessage+err.Error())
 		return
 	}
 	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectCreateMessage+err.Error())
+		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, projectCode)
@@ -76,13 +74,13 @@ func (c *ProjectController) create(ctx *gin.Context) {
 func (c *ProjectController) read(ctx *gin.Context) {
 	code, err := c.MustGetParam(ctx, "id")
 	if err != nil {
-		c.AbortJson(ctx, http.StatusBadRequest, projectCreateMessage+err.Error())
+		c.AbortClientError(ctx, projectCreateMessage+err.Error())
 		return
 	}
 
 	projectDetail, err := service.GetProjectService().GetInfoById(ctx, code)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectCreateMessage+err.Error())
+		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
 	}
 
@@ -98,18 +96,18 @@ type ProjectUpdateRequest struct {
 	GroupCode *string `json:"groupCode"`
 }
 
-const projectUpdateMessage = "Error in update project handler: "
+const projectUpdateMessage = "[http] canvas project update"
 
 func (c *ProjectController) update(ctx *gin.Context) {
 	param := ProjectUpdateRequest{}
 	err := ctx.BindJSON(&param)
 	if err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectUpdateMessage+err.Error())
+		c.AbortClientError(ctx, projectUpdateMessage+err.Error())
 		return
 	}
 
 	if err := service.GetProjectService().Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
-		c.AbortJson(ctx, http.StatusInternalServerError, projectUpdateMessage+err.Error())
+		c.AbortServerError(ctx, projectUpdateMessage+err.Error())
 		return
 	}
 

@@ -19,19 +19,27 @@ func (controler *BaseController) ResponseJson(c *gin.Context, data interface{}) 
 
 }
 
-func (controller *BaseController) AbortError(c *gin.Context, code int, err error) {
+func (controller *BaseController) AbortClientError(c *gin.Context, errMsg string) {
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{
-		"msg":  err.Error(),
+		"msg":  errMsg,
 		"data": nil,
-		"code": code,
+		"code": http.StatusBadRequest,
 	})
 }
 
-func (controller *BaseController) AbortJson(c *gin.Context, code int, msg string) {
+func (controller *BaseController) AbortServerError(c *gin.Context, errMsg string) {
+	c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"msg":  errMsg,
+		"data": nil,
+		"code": http.StatusInternalServerError,
+	})
+}
+
+func (controller *BaseController) AbortJson(c *gin.Context, reasonCode int, msg string) {
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{
 		"msg":  msg,
 		"data": nil,
-		"code": code,
+		"code": reasonCode,
 	})
 }
 
@@ -39,8 +47,8 @@ func (controller *BaseController) MustGetParam(c *gin.Context, key string) (stri
 	value := c.Param(key)
 	if value == "" {
 		resultStr := key + " is not provided in url"
-		controller.AbortJson(c, http.StatusBadRequest, resultStr)
-		return "", errors.New(value)
+		controller.AbortClientError(c, resultStr)
+		return "", errors.New(resultStr)
 	}
 	return value, nil
 }
