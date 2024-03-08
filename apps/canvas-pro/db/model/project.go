@@ -2,7 +2,7 @@ package model
 
 type ProjectGroupModel struct {
 	BaseModel
-	Projects []ProjectModel `gorm:"foreignkey:GroupId;references:Id"`
+	// Projects []ProjectModel `gorm:"foreignkey:GroupId;references:Id"`
 }
 
 func (p ProjectGroupModel) TableName() string {
