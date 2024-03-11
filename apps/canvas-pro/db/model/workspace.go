@@ -13,7 +13,7 @@ type WorkspaceModel struct {
 	Capacity   uint64
 	Permission uint64
 	Deleted    int8
-	// Members    []CanvasUserModel `gorm:"foreignKey:Workspace;references:Code"`
+	Members    []CanvasUserModel `gorm:"many2many:canvas_workspace_user;foreignKey:Id;joinForeginKey:WorkspaceId;joinReferences:CanvasUserId;References:Id"`
 }
 
 func (s WorkspaceModel) TableName() string {
