@@ -9,6 +9,7 @@ import (
 )
 
 const project_prefix = "screen-operation"
+const projectHandlerMessage = "[http] canvas project handler "
 
 type ProjectController struct {
 	controller.BaseController
@@ -21,7 +22,7 @@ type GetProjectListRequest struct {
 	Group     *string
 }
 
-const projectListMessage = "[http] canvas project list: "
+const projectListMessage = projectHandlerMessage + "list: "
 
 func (c *ProjectController) list(ctx *gin.Context) {
 	requestBody := &GetProjectListRequest{}
@@ -43,7 +44,6 @@ func (c *ProjectController) list(ctx *gin.Context) {
 		return
 	}
 	c.ResponseJson(ctx, infoList)
-
 }
 
 /*CRUD*/
@@ -55,7 +55,7 @@ type CreateProjectRequest struct {
 	UseTemplate string //template Id
 }
 
-const projectCreateMessage = "[http] canvas project create: "
+const projectCreateMessage = projectHandlerMessage + "create: "
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
@@ -85,7 +85,6 @@ func (c *ProjectController) read(ctx *gin.Context) {
 	}
 
 	c.ResponseJson(ctx, &projectDetail)
-
 }
 
 type ProjectUpdateRequest struct {
@@ -96,7 +95,7 @@ type ProjectUpdateRequest struct {
 	GroupCode *string `json:"groupCode"`
 }
 
-const projectUpdateMessage = "[http] canvas project update"
+const projectUpdateMessage = projectHandlerMessage + "update: "
 
 func (c *ProjectController) update(ctx *gin.Context) {
 	param := ProjectUpdateRequest{}
@@ -112,10 +111,26 @@ func (c *ProjectController) update(ctx *gin.Context) {
 	}
 
 	c.ResponseJson(ctx, nil)
-
 }
-func (c *ProjectController) delete(ctx *gin.Context) {
 
+type ProjectDeleteRequest struct {
+	Ids []string `json:"ids" binding:"required"`
+}
+
+const projectDeleteMessage = projectHandlerMessage + "delete: "
+
+func (c *ProjectController) delete(ctx *gin.Context) {
+	param := ProjectDeleteRequest{}
+	if err := ctx.BindJSON(&param); err != nil {
+		c.AbortClientError(ctx, projectDeleteMessage+err.Error())
+		return
+	}
+
+	if err := service.GetProjectService().LogicalDeletion(ctx, param.Ids); err != nil {
+		c.AbortServerError(ctx, projectDeleteMessage+err.Error())
+		return
+	}
+	c.ResponseJson(ctx, nil)
 }
 
 // features

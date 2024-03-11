@@ -45,3 +45,7 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 	// return
 
 }
+
+func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
+	return dao.DB.Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", model.Deleted).Error
+}

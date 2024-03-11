@@ -1,5 +1,8 @@
 package model
 
+const ProjectUnPublished = 0
+const ProjectPublished = 1
+
 type ProjectGroupModel struct {
 	BaseModel
 	// Projects []ProjectModel `gorm:"foreignkey:GroupId;references:Id"`
@@ -15,6 +18,8 @@ type ProjectSettingsJson struct {
 type ProjectModel struct {
 	TemplateModel
 	GroupId uint64
+	Publish int
+
 	/** In type of `ProjectSettingsJson`*/
 	// Settings string `gorm:"type:blob"`
 }

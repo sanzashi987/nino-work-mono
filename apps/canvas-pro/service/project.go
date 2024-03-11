@@ -88,7 +88,19 @@ func (p *ProjectService) GetInfoById(ctx context.Context, code string) (result *
 	result.Code, result.Name, result.Thumbnail = code, project.Name, project.Thumbnail
 	result.CreateTime, result.UpdateTime = project.GetCreatedDate(), project.GetUpdatedDate()
 	return
+}
 
+func (p *ProjectService) LogicalDeletion(ctx context.Context, codes []string) (err error) {
+	projectDao := dao.NewProjectDao(ctx)
+
+	intIds := []uint64{}
+
+	for _, code := range codes {
+		id, _, _ := enums.GetIdFromCode(code)
+		intIds = append(intIds, id)
+	}
+
+	return projectDao.BatchLogicalDelete(intIds)
 }
 
 type ProjectInfo struct {
