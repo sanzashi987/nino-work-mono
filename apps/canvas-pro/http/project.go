@@ -142,6 +142,10 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 
 }
 
+type ProjectPublishRequest struct {
+	Code string
+}
+
 func (c *ProjectController) publish(ctx *gin.Context) {
 
 }
