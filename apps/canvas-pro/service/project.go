@@ -135,3 +135,7 @@ func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size 
 	return &result, nil
 
 }
+
+func (p *ProjectService) PublishProject(ctx context.Context, Code string, PulishFlag int, PublishSecretKey *string) error {
+
+}

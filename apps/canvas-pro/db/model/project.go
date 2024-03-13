@@ -1,12 +1,11 @@
 package model
 
 const (
-	ProjectPublished = 1
-
+	ProjectPublished    = 1
 	ProjectUnPublished  = 0
-	PojectPublishNormal = "0"
-	PojectPublishToken  = "1"
-	PojectPublishSecret = "2"
+	PojectPublishNormal = "1"
+	PojectPublishToken  = "2"
+	PojectPublishSecret = "3"
 )
 
 type ProjectGroupModel struct {

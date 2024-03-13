@@ -26,11 +26,11 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 			return
 		}
 
-		query = query.Where(" group = ?", *group)
+		query = query.Where(" group_id = ?", *group)
 	}
 
 	if name != nil {
-		query = query.Where(" group LIKE ?", *name)
+		query = query.Where(" name LIKE ?", *name)
 	}
 	err = query.Find(projects).Error
 	return

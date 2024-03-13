@@ -143,11 +143,25 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 }
 
 type ProjectPublishRequest struct {
-	Code string
+	Code             string
+	PublishFlag      int
+	PublishSecretKey *string
 }
 
-func (c *ProjectController) publish(ctx *gin.Context) {
+const projectPublishMessage = projectHandlerMessage + "publish: "
 
+func (c *ProjectController) publish(ctx *gin.Context) {
+	req := &ProjectPublishRequest{}
+	if err := ctx.BindJSON(req); err != nil {
+		c.AbortClientError(ctx, projectPublishMessage+err.Error())
+		return
+	}
+
+	if err := service.GetProjectService().PublishProject(ctx, req.Code, req.PublishFlag, req.PublishSecretKey); err != nil {
+		c.AbortServerError(ctx, projectPublishMessage+err.Error())
+		return
+	}
+	c.ResponseJson(ctx, nil)
 }
 
 func (c *ProjectController) export(ctx *gin.Context) {
