@@ -22,12 +22,22 @@ func GetProjectService() *ProjectService {
 	return projectService
 }
 
-func (p *ProjectService) Create(ctx context.Context, name, groupCode, jsonConfig, useTemplate string) (string, error) {
+func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, groupCode, useTemplate *string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	newProject := &model.ProjectModel{}
 	newProject.TypeTag, newProject.Name, newProject.Version, newProject.Config = enums.PROJECT, name, enums.DefaultVersion, jsonConfig
 
+	if useTemplate != nil {
+		templateDao := dao.NewTemplateDao(ctx)
+		templateId, _, _ := enums.GetIdFromCode(*useTemplate)
+
+		template, e := templateDao.FindByKey("id", templateId)
+		if e != nil {
+			return "", e
+		}
+
+	}
 	if err := projectDao.Create(newProject); err != nil {
 		return "", err
 	}

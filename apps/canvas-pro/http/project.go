@@ -50,9 +50,9 @@ func (c *ProjectController) list(ctx *gin.Context) {
 type CreateProjectRequest struct {
 	Name string `binding:"required"`
 	// Version     string
-	GroupCode   string `json:"groupCode"`
-	Config      string `json:"rootConfig" binding:"required"`
-	UseTemplate string //template Id
+	Config      string  `json:"rootConfig" binding:"required"`
+	GroupCode   *string `json:"groupCode"`
+	UseTemplate *string //template Id
 }
 
 const projectCreateMessage = projectHandlerMessage + "create: "
@@ -63,7 +63,7 @@ func (c *ProjectController) create(ctx *gin.Context) {
 		c.AbortClientError(ctx, projectCreateMessage+err.Error())
 		return
 	}
-	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.GroupCode, param.Config, param.UseTemplate)
+	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.Config, param.GroupCode, param.UseTemplate)
 	if err != nil {
 		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
