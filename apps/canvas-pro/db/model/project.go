@@ -1,11 +1,10 @@
 package model
 
 const (
-	ProjectPublished    = 1
-	ProjectUnPublished  = 0
-	PojectPublishNormal = "1"
-	PojectPublishToken  = "2"
-	PojectPublishSecret = "3"
+	ProjectPublishFlagNotPublish = 0
+	ProjectPublishFlagNormal     = 1
+	ProjectPublishFlagToken      = 2
+	ProjectPublishFlagSecret     = 3
 )
 
 type ProjectGroupModel struct {
@@ -22,11 +21,9 @@ type ProjectSettingsJson struct {
 
 type ProjectModel struct {
 	TemplateModel
-	GroupId     uint64
-	Publish     int
-	Token       string
-	Secret      string
-	PublishFlag string
+	PublishToken  string
+	PublishSecret string
+	PublishFlag   int8
 	/** In type of `ProjectSettingsJson`*/
 	// Settings string `gorm:"type:blob"`
 }

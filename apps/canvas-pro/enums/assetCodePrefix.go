@@ -17,6 +17,7 @@ const (
 	COMPONENT     = "E"
 	DATASOURCE    = "F"
 	STATIC_SOURCE = "H"
+	WORKSPACE     = "P"
 )
 
 var supportedTags = [7]string{

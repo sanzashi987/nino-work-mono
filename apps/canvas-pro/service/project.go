@@ -38,6 +38,16 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 		}
 
 	}
+
+	if groupCode != nil {
+		groupId, _, err := enums.GetIdFromCode(*groupCode)
+		if err != nil {
+			return "", err
+		}
+		newProject.GroupId = groupId
+
+	}
+
 	if err := projectDao.Create(newProject); err != nil {
 		return "", err
 	}

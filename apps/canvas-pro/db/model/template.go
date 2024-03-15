@@ -7,6 +7,7 @@ type TemplateModel struct {
 	Thumbnail string `json:"thumbnail"`
 	Version   string
 	Config    string `gorm:"type:blob"`
+	GroupId   uint64
 }
 
 func (m TemplateModel) TableName() string {

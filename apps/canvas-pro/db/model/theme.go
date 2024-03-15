@@ -1,8 +1,11 @@
 package model
 
+const BuiltInTheme = 0
+const CustomizedTheme = 0
+
 type ThemeModel struct {
 	BaseModel
-	Flag   int8   `gorm:"column:flag"` //0 is built-in
+	Type   int8   `gorm:"column:type"` //0 is built-in
 	Config string `gorm:"type:blob"`
 }
 

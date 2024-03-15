@@ -2,8 +2,7 @@ package model
 
 // const
 const DESIGN = 1
-
-// const FILE = 2
+const FILE = 2
 const DATASOURCE = 2
 const FONT = 3
 const BLOCK = 4
@@ -16,6 +15,7 @@ type AssetModel struct {
 	Type     uint8
 	FileId   string
 	FilePath string
+	GroupId  uint64
 }
 
 func (m AssetModel) TableName() string {
@@ -23,7 +23,7 @@ func (m AssetModel) TableName() string {
 }
 
 type AssetGroupModel struct {
-	ProjectGroupModel
+	BaseModel
 }
 
 func (m AssetGroupModel) TableName() string {
