@@ -34,16 +34,6 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 	}
 	err = query.Find(projects).Error
 	return
-	// filterByName := func(db *gorm.DB) *gorm.DB {
-	// 	res := db
-	// 	if name != nil {
-	// 		res = res.Where(" name LIKE ?", "%"+*name+"%")
-	// 	}
-	// 	return res
-	// }
-	// err = dao.DB.Preload("Projects", filterByName).Scopes(db.Paginate(page, size)).Model(&groupModel).Association("Projects").Find(projects)
-	// return
-
 }
 
 func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
