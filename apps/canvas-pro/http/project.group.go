@@ -29,6 +29,9 @@ func (c *ProjectGroupController) delete(ctx *gin.Context) {
 }
 
 // features
+type ProjectMoveRequest struct {
+}
+
 func (c *ProjectGroupController) move(ctx *gin.Context) {
 
 }

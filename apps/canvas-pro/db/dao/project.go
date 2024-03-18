@@ -39,3 +39,11 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
 	return dao.DB.Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", model.Deleted).Error
 }
+
+type ProjectGroupDao struct {
+	db.BaseDao[model.ProjectGroupModel]
+}
+
+func NewProjectGroupDao(ctx context.Context) *ProjectGroupDao {
+	return &ProjectGroupDao{db.InitBaseDao[model.ProjectGroupModel](ctx)}
+}

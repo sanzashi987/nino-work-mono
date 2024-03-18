@@ -36,7 +36,7 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 		if e != nil {
 			return "", e
 		}
-
+		newProject.Config = template.Config
 	}
 
 	if groupCode != nil {
@@ -156,6 +156,24 @@ func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size 
 
 }
 
-func (p *ProjectService) PublishProject(ctx context.Context, Code string, PulishFlag int, PublishSecretKey *string) error {
+func (p *ProjectService) PublishProject(ctx context.Context, code string, pulishFlag int, publishSecretKey *string) error {
+	return nil
+}
 
+func (p *ProjectService) Duplicate(ctx context.Context, code string) (string, error) {
+	projectDao := dao.NewProjectDao(ctx)
+	copyFromId, _, err := enums.GetIdFromCode(code)
+	if err != nil {
+		return "", err
+	}
+	copyFrom, err := projectDao.FindByKey("id", copyFromId)
+	name := copyFrom.Name + "_copied"
+	hasGroupCode := copyFrom.GroupId == 0
+	var groupCode *string = nil
+	if hasGroupCode {
+		str := enums.GetCodeFromId(enums.GROUP, copyFrom.GroupId)
+		groupCode = &str
+	}
+
+	return p.Create(ctx, name, copyFrom.Config, groupCode, nil)
 }

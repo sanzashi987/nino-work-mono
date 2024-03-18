@@ -18,6 +18,7 @@ const (
 	DATASOURCE    = "F"
 	STATIC_SOURCE = "H"
 	WORKSPACE     = "P"
+	GROUP         = "R"
 )
 
 var supportedTags = [7]string{

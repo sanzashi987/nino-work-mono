@@ -136,10 +136,16 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 // features
 func (c *ProjectController) duplicate(ctx *gin.Context) {
 	id, err := c.MustGetParam(ctx, "id")
+
 	if err != nil {
 		return
 	}
-
+	projectCode, err := service.GetProjectService().Duplicate(ctx, id)
+	if err != nil {
+		c.AbortServerError(ctx, projectCreateMessage+err.Error())
+		return
+	}
+	c.ResponseJson(ctx, projectCode)
 }
 
 type ProjectPublishRequest struct {
