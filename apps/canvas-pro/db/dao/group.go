@@ -25,6 +25,16 @@ func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]mode
 	return
 }
 
+func (dao *GroupDao) FindById(id uint64, dbModel DBModel) (res *model.BaseModel, err error) {
+	err = dao.DB.Table(dbModel.TableName()).Where("id = ?", id).First(res).Error
+	return
+}
+
+// func (dao *GroupDao) UpdateById(id uint64, dbModel DBModel) (res *model.BaseModel, err error) {
+// 	err = dao.DB.Table(dbModel.TableName()).Where("id = ?", id).First(res).Error
+// 	return
+// }
+
 func (dao *GroupDao) Create(name, workspace string, dbModel DBModel) error {
 	newGroup := model.BaseModel{Name: name, Workspace: workspace, TypeTag: consts.GROUP}
 	return dao.DB.Table(dbModel.TableName()).Create(&newGroup).Error

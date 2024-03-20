@@ -55,11 +55,18 @@ func (serv *GroupService) Delete(ctx context.Context, code, workspace string, db
 
 	id, _, _ := consts.GetIdFromCode(code)
 
-	record, err := groupDao.FindByKey("id", id)
+	record, err := groupDao.FindById(id, dbModel)
 	if record == nil || err != nil {
 		err = ErrorGroupNotFound
 		return
 	}
 
+	if record.Deleted == model.Deleted {
+		return
+	}
+
+	record.Deleted = model.Deleted
+	groupDao.UpdateById(*record, dbModel.TableName())
 	return
+
 }

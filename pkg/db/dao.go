@@ -25,7 +25,7 @@ func (dao *BaseDao[Model]) Create(record *Model) (err error) {
 
 var ErrorIdIsNotProvided = errors.New("id is not provided")
 
-func (dao *BaseDao[Model]) UpdateById(record Model) (err error) {
+func (dao *BaseDao[Model]) UpdateById(record Model, table ...string) (err error) {
 	originalStrcut := reflect.TypeOf(record)
 	model := reflect.New(originalStrcut).Elem()
 	if model.FieldByName("Id").IsZero() {
@@ -33,7 +33,12 @@ func (dao *BaseDao[Model]) UpdateById(record Model) (err error) {
 		return
 	}
 	model.FieldByName("Id").Set(reflect.ValueOf(record).FieldByName("Id"))
-	err = dao.DB.Model(&model).Updates(record).Error
+
+	orm := dao.DB
+	if len(table) > 0 {
+		orm = orm.Table(table[0])
+	}
+	err = orm.Model(&model).Updates(record).Error
 	return
 }
 
