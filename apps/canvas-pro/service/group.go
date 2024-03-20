@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
-	"regexp"
+
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
+	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 )
 
 type GroupService struct{}
@@ -18,17 +20,19 @@ func GetGroupService() *GroupService {
 	return groupService
 }
 
-const legalNameRegex = `^[\u4E00-\u9FA5\uF900-\uFA2D\w][\u4E00-\u9FA5\uF900-\uFA2D\w-_]*[\u4E00-\u9FA5\uF900-\uFA2D\w]*$`
-
-var reg, _ = regexp.Compile(legalNameRegex)
-
 var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
 
 func (serv *GroupService) Create(ctx context.Context, name, workspace string) (err error) {
 
-	if reg.FindStringIndex(name) == nil {
+	if enums.LegalNameReg.FindStringIndex(name) == nil {
 		err = ErrorNameContainIllegalChar
 		return
+	}
+
+	groupDao := dao.NewGroupDao(ctx)
+
+	record, err := groupDao.FindByKey("name", name)
+	if record != nil {
 	}
 
 	return
