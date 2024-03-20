@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
-	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 )
 
 type GroupService struct{}
@@ -21,18 +22,43 @@ func GetGroupService() *GroupService {
 }
 
 var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
+var ErrorNameExisted = errors.New("error group name is exist")
 
-func (serv *GroupService) Create(ctx context.Context, name, workspace string) (err error) {
-
-	if enums.LegalNameReg.FindStringIndex(name) == nil {
+func create(ctx context.Context, name, workspace string, dbModel dao.DBModel) (err error) {
+	if consts.LegalNameReg.FindStringIndex(name) == nil {
 		err = ErrorNameContainIllegalChar
 		return
 	}
 
 	groupDao := dao.NewGroupDao(ctx)
 
-	record, err := groupDao.FindByKey("name", name)
-	if record != nil {
+	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
+	if records != nil && err == nil {
+		groupsInUse := model.FilterRecordsInUse(*records)
+		if len(groupsInUse) > 0 {
+			err = ErrorNameExisted
+			return
+		}
+	}
+	return groupDao.Create(name, workspace, dbModel)
+}
+
+func (serv *GroupService) CreateProjectGroup(ctx context.Context, name, workspace string) error {
+	return create(ctx, name, workspace, model.ProjectGroupModel{})
+}
+
+var ErrorGroupNotFound = errors.New("error group is not exist")
+
+func (serv *GroupService) Delete(ctx context.Context, code, workspace string, dbModel dao.DBModel) (err error) {
+
+	groupDao := dao.NewGroupDao(ctx)
+
+	id, _, _ := consts.GetIdFromCode(code)
+
+	record, err := groupDao.FindByKey("id", id)
+	if record == nil || err != nil {
+		err = ErrorGroupNotFound
+		return
 	}
 
 	return

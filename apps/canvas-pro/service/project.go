@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
-	"github.com/cza14h/nino-work/apps/canvas-pro/enums"
 	"github.com/cza14h/nino-work/pkg/db"
 )
 
@@ -26,11 +26,11 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 	projectDao := dao.NewProjectDao(ctx)
 
 	newProject := &model.ProjectModel{}
-	newProject.TypeTag, newProject.Name, newProject.Version, newProject.Config = enums.PROJECT, name, enums.DefaultVersion, jsonConfig
+	newProject.TypeTag, newProject.Name, newProject.Version, newProject.Config = consts.PROJECT, name, consts.DefaultVersion, jsonConfig
 
 	if useTemplate != nil {
 		templateDao := dao.NewTemplateDao(ctx)
-		templateId, _, _ := enums.GetIdFromCode(*useTemplate)
+		templateId, _, _ := consts.GetIdFromCode(*useTemplate)
 
 		template, e := templateDao.FindByKey("id", templateId)
 		if e != nil {
@@ -40,7 +40,7 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 	}
 
 	if groupCode != nil {
-		groupId, _, err := enums.GetIdFromCode(*groupCode)
+		groupId, _, err := consts.GetIdFromCode(*groupCode)
 		if err != nil {
 			return "", err
 		}
@@ -60,7 +60,7 @@ func (p *ProjectService) Update(ctx context.Context, code string, name, config, 
 
 	toUpdate, idProject := model.ProjectModel{}, model.ProjectModel{}
 	var id uint64
-	if id, _, err = enums.GetIdFromCode(code); err != nil {
+	if id, _, err = consts.GetIdFromCode(code); err != nil {
 		return
 	}
 
@@ -80,7 +80,7 @@ func (p *ProjectService) Update(ctx context.Context, code string, name, config, 
 
 	if group != nil {
 		var groupId uint64
-		if groupId, _, err = enums.GetIdFromCode(*group); err != nil {
+		if groupId, _, err = consts.GetIdFromCode(*group); err != nil {
 			return
 		}
 		toUpdate.GroupId = groupId
@@ -116,7 +116,7 @@ func (p *ProjectService) LogicalDeletion(ctx context.Context, codes []string) (e
 	intIds := []uint64{}
 
 	for _, code := range codes {
-		id, _, _ := enums.GetIdFromCode(code)
+		id, _, _ := consts.GetIdFromCode(code)
 		intIds = append(intIds, id)
 	}
 
@@ -162,7 +162,7 @@ func (p *ProjectService) PublishProject(ctx context.Context, code string, pulish
 
 func (p *ProjectService) Duplicate(ctx context.Context, code string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
-	copyFromId, _, err := enums.GetIdFromCode(code)
+	copyFromId, _, err := consts.GetIdFromCode(code)
 	if err != nil {
 		return "", err
 	}
@@ -171,7 +171,7 @@ func (p *ProjectService) Duplicate(ctx context.Context, code string) (string, er
 	hasGroupCode := copyFrom.GroupId == 0
 	var groupCode *string = nil
 	if hasGroupCode {
-		str := enums.GetCodeFromId(enums.GROUP, copyFrom.GroupId)
+		str := consts.GetCodeFromId(consts.GROUP, copyFrom.GroupId)
 		groupCode = &str
 	}
 
