@@ -26,7 +26,7 @@ func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]mode
 // }
 
 func (dao *GroupDao) Delete(id uint64, table string) (err error) {
-	toDelete := model.BaseModel{Deleted: model.Deleted}
+	toDelete := model.BaseModel{Deleted: db.Deleted}
 	toDelete.Id = id
 
 	if err = dao.UpdateById(toDelete, table); err != nil {
@@ -34,6 +34,6 @@ func (dao *GroupDao) Delete(id uint64, table string) (err error) {
 	}
 
 
-	
+
 	// return dao.DB.Table(table).Create(&newGroup).Error
 }

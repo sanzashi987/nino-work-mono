@@ -2,9 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"reflect"
 
 	"github.com/cza14h/nino-work/config"
 	"github.com/glebarez/sqlite"
@@ -14,60 +11,13 @@ import (
 
 var instance *gorm.DB
 
+const (
+	NotDeleted = 0
+	Deleted    = 1
+)
+
 type BaseDao[Model any] struct {
 	*gorm.DB
-}
-
-func (dao *BaseDao[Model]) Create(record *Model, table ...string) (err error) {
-	orm := dao.DB
-	if len(table) > 0 {
-		orm = orm.Table(table[0])
-	}
-	err = orm.Create(record).Error
-	return
-}
-
-var ErrorIdIsNotProvided = errors.New("id is not provided")
-
-func (dao *BaseDao[Model]) UpdateById(record Model, table ...string) (err error) {
-	originalStruct := reflect.TypeOf(record)
-	model := reflect.New(originalStruct).Elem()
-	if model.FieldByName("Id").IsZero() {
-		err = ErrorIdIsNotProvided
-		return
-	}
-	model.FieldByName("Id").Set(reflect.ValueOf(record).FieldByName("Id"))
-
-	orm := dao.DB
-	if len(table) > 0 {
-		orm = orm.Table(table[0])
-	}
-	err = orm.Model(&model).Updates(record).Error
-	return
-}
-
-var ErrorNotADbModel = errors.New("the record is not a db model")
-
-func (dao *BaseDao[Model]) LogicalDelete(record Model, table ...string) (err error) {
-
-	model := reflect.ValueOf(record)
-
-	var tableName = model.MethodByName("TableName").Call()
-	orm := dao.DB
-	if len(table) > 0 {
-		orm = orm.Table(table[0])
-	}
-	return dao.DB.Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", model.Deleted).Error
-
-}
-
-func (dao *BaseDao[Model]) FindByKey(key string, value any, table ...string) (result *Model, err error) {
-	orm := dao.DB
-	if len(table) > 0 {
-		orm = orm.Table(table[0])
-	}
-	err = orm.Where(fmt.Sprintf("%s = ?", key), value).First(result).Error
-	return
 }
 
 func ConnectDB(names ...string) *gorm.DB {

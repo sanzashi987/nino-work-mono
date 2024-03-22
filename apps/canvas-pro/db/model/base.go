@@ -11,10 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	NotDeleted = 0
-	Deleted    = 1
-)
+
 
 type BaseModel struct {
 	db.BaseModel
@@ -49,6 +46,6 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 
 func FilterRecordsInUse(records []BaseModel) []BaseModel {
 	return filter.Filter(records, func(e BaseModel) bool {
-		return e.Deleted == NotDeleted
+		return e.Deleted == db.NotDeleted
 	})
 }
