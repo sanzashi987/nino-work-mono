@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/pkg/db"
 )
@@ -16,17 +15,8 @@ func NewGroupDao(ctx context.Context) *GroupDao {
 	return &GroupDao{db.InitBaseDao[model.BaseModel](ctx)}
 }
 
-type DBModel interface {
-	TableName() string
-}
-
 func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]model.BaseModel, err error) {
 	err = dao.DB.Where("name = ? AND workspace = ?", name, workspace).Find(res).Error
-	return
-}
-
-func (dao *GroupDao) FindById(id uint64, dbModel DBModel) (res *model.BaseModel, err error) {
-	err = dao.DB.Table(dbModel.TableName()).Where("id = ?", id).First(res).Error
 	return
 }
 
@@ -35,12 +25,15 @@ func (dao *GroupDao) FindById(id uint64, dbModel DBModel) (res *model.BaseModel,
 // 	return
 // }
 
-func (dao *GroupDao) Create(name, workspace string, dbModel DBModel) error {
-	newGroup := model.BaseModel{Name: name, Workspace: workspace, TypeTag: consts.GROUP}
-	return dao.DB.Table(dbModel.TableName()).Create(&newGroup).Error
-}
+func (dao *GroupDao) Delete(id uint64, table string) (err error) {
+	toDelete := model.BaseModel{Deleted: model.Deleted}
+	toDelete.Id = id
 
-func (dao *GroupDao) Delete(name, workspace string, dbModel DBModel) error {
-	newGroup := model.BaseModel{Name: name, Workspace: workspace, Deleted: model.Deleted}
-	return dao.DB.Table(dbModel.TableName()).Create(&newGroup).Error
+	if err = dao.UpdateById(toDelete, table); err != nil {
+		return
+	}
+
+
+	
+	// return dao.DB.Table(table).Create(&newGroup).Error
 }

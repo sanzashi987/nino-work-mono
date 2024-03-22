@@ -49,13 +49,13 @@ func (serv *GroupService) CreateProjectGroup(ctx context.Context, name, workspac
 
 var ErrorGroupNotFound = errors.New("error group is not exist")
 
-func (serv *GroupService) Delete(ctx context.Context, code, workspace string, dbModel dao.DBModel) (err error) {
+func (serv *GroupService) delete(ctx context.Context, code, workspace string, dbModel dao.DBModel) (err error) {
 
 	groupDao := dao.NewGroupDao(ctx)
 
 	id, _, _ := consts.GetIdFromCode(code)
 
-	record, err := groupDao.FindById(id, dbModel)
+	record, err := groupDao.FindByKey("id", id, dbModel.TableName())
 	if record == nil || err != nil {
 		err = ErrorGroupNotFound
 		return
