@@ -48,7 +48,7 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 
 	}
 
-	if err := projectDao.Create(newProject); err != nil {
+	if err := projectDao.Create(*newProject); err != nil {
 		return "", err
 	}
 
@@ -65,7 +65,7 @@ func (p *ProjectService) Update(ctx context.Context, code string, name, config, 
 	}
 
 	idProject.Id, toUpdate.Id = id, id
-	projectDao.DB.First(&idProject)
+	projectDao.GetOrm().First(&idProject)
 
 	if name != nil {
 		toUpdate.Name = *name

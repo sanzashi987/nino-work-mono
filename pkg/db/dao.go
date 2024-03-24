@@ -17,7 +17,9 @@ const (
 )
 
 type BaseDao[Model any] struct {
-	*gorm.DB
+	db          *gorm.DB
+	transaction *gorm.DB
+	ctx         context.Context
 }
 
 func ConnectDB(names ...string) *gorm.DB {
@@ -45,7 +47,8 @@ func NewDBSession(ctx context.Context) *gorm.DB {
 
 func InitBaseDao[Model any](ctx context.Context) BaseDao[Model] {
 	return BaseDao[Model]{
-		DB: NewDBSession(ctx),
+		db: NewDBSession(ctx),
+		ctx:ctx,
 	}
 }
 

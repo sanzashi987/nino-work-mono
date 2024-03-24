@@ -18,7 +18,7 @@ func NewUserDao(ctx context.Context) *UserDao {
 func (dao *UserDao) GetUserWorkspaces(userId uint64) (*model.CanvasUserModel, error) {
 	canvasUser := model.CanvasUserModel{}
 	canvasUser.Id = userId
-	if err := dao.DB.Model(&canvasUser).Association("Workspaces").Find(&canvasUser.Workspaces); err != nil {
+	if err := dao.GetOrm().Model(&canvasUser).Association("Workspaces").Find(&canvasUser.Workspaces); err != nil {
 		return nil, err
 	}
 	return &canvasUser, nil

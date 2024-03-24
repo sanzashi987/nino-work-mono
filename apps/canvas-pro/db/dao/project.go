@@ -18,7 +18,7 @@ func NewProjectDao(ctx context.Context) *ProjectDao {
 
 func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, name, group *string) (projects *[]model.ProjectModel, err error) {
 
-	query := dao.DB.Scopes(db.Paginate(page, size)).Model(&model.ProjectModel{}).Where("workspace = ?", workspace)
+	query := dao.GetOrm().Scopes(db.Paginate(page, size)).Model(&model.ProjectModel{}).Where("workspace = ?", workspace)
 
 	if group != nil {
 		_, _, err = consts.GetIdFromCode(*group)
@@ -37,5 +37,5 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 }
 
 func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
-	return dao.DB.Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", model.Deleted).Error
+	return dao.GetOrm().Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", db.Deleted).Error
 }
