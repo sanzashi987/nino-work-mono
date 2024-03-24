@@ -11,16 +11,14 @@ import (
 	"gorm.io/gorm"
 )
 
-
-
 type BaseModel struct {
 	db.BaseModel
 	TypeTag   string `gorm:"-"`
 	Name      string
-	Workspace string
+	Workspace uint64 `gorm:"default:0"`
 	Creator   string
 	Code      string
-	Deleted   uint8 `gorm:"deleted:tinyint(8)"`
+	// Deleted   uint8 `gorm:"deleted:tinyint(8)"`
 }
 
 var ErrorNegativeSnowflakeId = errors.New("a negative id is generated")

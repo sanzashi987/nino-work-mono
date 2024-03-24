@@ -44,7 +44,7 @@ func create(ctx context.Context, name, workspace string, tableName string) (err 
 
 	record := model.BaseModel{}
 	record.Name, record.Workspace, record.TypeTag = name, workspace, consts.GROUP
-	return groupDao.Create(record, tableName)
+	return groupDao.Create(record, db.TableName(tableName))
 }
 
 var projectGroupTableName = model.ProjectGroupModel{}.TableName()
@@ -61,10 +61,9 @@ var ErrorGroupNotFound = errors.New("error group is not exist")
 
 func delete(ctx context.Context, code, workspace, tableName string) (err error) {
 	groupDao := dao.NewGroupDao(ctx)
-
 	id, _, _ := consts.GetIdFromCode(code)
 
-	record, err := groupDao.FindByKey("id", id, tableName)
+	record, err := groupDao.FindByKey("id", id, db.TableName(tableName))
 	if record == nil || err != nil {
 		err = ErrorGroupNotFound
 		return
@@ -74,7 +73,7 @@ func delete(ctx context.Context, code, workspace, tableName string) (err error) 
 		return
 	}
 	record.Deleted = db.Deleted
-	groupDao.LogicalDelete(*record, tableName)
+	groupDao.LogicalDelete(*record, db.TableName(tableName))
 	return
 }
 

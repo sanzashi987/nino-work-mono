@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -13,7 +14,9 @@ type ORMConfig struct {
 	TableName string
 }
 
-func ConfigureTable(tableName string) func(*ORMConfig) {
+type Configure = func(*ORMConfig)
+
+func TableName(tableName string) Configure {
 	return func(o *ORMConfig) {
 		o.TableName = tableName
 	}
@@ -55,11 +58,23 @@ func (dao *BaseDao[Model]) WithTransaction(fc func(tx *BaseDao[Model]) error) {
 	dao.db.Transaction(callback)
 }
 
-func (dao *BaseDao[Model]) GetOrm(config ...ORMConfig) *gorm.DB {
-	if dao.transaction != nil {
-		return dao.transaction
+func (dao *BaseDao[Model]) GetOrm(config ...Configure) *gorm.DB {
+	defaultConfig := ORMConfig{}
+
+	for _, fc := range config {
+		fc(&defaultConfig)
 	}
-	return dao.db
+
+	orm := dao.db
+	if dao.transaction != nil {
+		orm = dao.transaction
+	}
+
+	if defaultConfig.TableName != "" {
+		orm = orm.Table(defaultConfig.TableName)
+	}
+
+	return orm
 }
 
 func (dao *BaseDao[Model]) CommitTransaction() {
@@ -69,16 +84,15 @@ func (dao *BaseDao[Model]) CommitTransaction() {
 	}
 }
 
-func (dao *BaseDao[Model]) Create(record Model, config ...ORMConfig) (err error) {
-	orm := dao.GetOrm(config...)
-	err = orm.Create(&record).Error
+func (dao *BaseDao[Model]) Create(record Model, config ...Configure) (err error) {
+	err = dao.GetOrm(config...).Create(&record).Error
 	return
 }
 
 var ErrorIdIsNotProvided = errors.New("id is not provided")
 var ErrorRecordIsNotAStructInstance = errors.New("record is not a struct instance or instance pointer")
 
-func (dao *BaseDao[Model]) UpdateById(record Model, config ...ORMConfig) (err error) {
+func (dao *BaseDao[Model]) UpdateById(record Model, config ...Configure) (err error) {
 	originalStruct := reflect.TypeOf(record)
 	var structType reflect.Type = originalStruct
 
@@ -98,40 +112,35 @@ func (dao *BaseDao[Model]) UpdateById(record Model, config ...ORMConfig) (err er
 	}
 	model.FieldByName("Id").Set(reflect.ValueOf(record).FieldByName("Id"))
 
-	orm := dao.GetOrm(config...)
-	err = orm.Model(model.Elem().Interface()).Updates(record).Error
+	err = dao.GetOrm(config...).Model(model.Elem().Interface()).Updates(record).Error
 	return
 }
 
 var ErrorNotADbModel = errors.New("the record is not a db model")
 
-func (dao *BaseDao[Model]) LogicalDelete(record Model, table ...ORMConfig) (err error) {
+func (dao *BaseDao[Model]) LogicalDelete(record Model, config ...Configure) (err error) {
+
+	originalStruct := reflect.TypeOf(record)
 
 	reflectRecord := reflect.ValueOf(record)
 
+	var changeConfig []Configure
+
+	shouldTableName := reflectRecord.MethodByName("TableName")
 	var tableName string
-
-	if len(table) > 0 {
-		tableName = table[0]
+	if !shouldTableName.IsValid() {
+		modelStruct := reflect.TypeOf(record).Elem().Name()
+		tableName = strings.ToLower(modelStruct + "s")
 	} else {
-		shouldTableName := reflectRecord.MethodByName("TableName")
-		if !shouldTableName.IsValid() {
-			modelStruct := reflect.TypeOf(record).Elem().Name()
-			tableName = strings.ToLower(modelStruct + "s")
-		} else {
-			tableName = shouldTableName.Call(nil)[0].String()
-		}
+		tableName = shouldTableName.Call(nil)[0].String()
 	}
+	changeConfig = append(changeConfig, TableName(tableName))
 
-	return dao.GetOrm().Model(record).Update("deleted", Deleted).Error
+	return dao.GetOrm(config...).Model(record).Update("delete_time", time.Now()).Error
 
 }
 
-func (dao *BaseDao[Model]) FindByKey(key string, value any, table ...ORMConfig) (result *Model, err error) {
-	orm := dao.GetOrm()
-	if len(table) > 0 {
-		orm = orm.Table(table[0])
-	}
-	err = orm.Where(fmt.Sprintf("%s = ?", key), value).First(result).Error
+func (dao *BaseDao[Model]) FindByKey(key string, value any, config ...Configure) (result *Model, err error) {
+	err = dao.GetOrm(config...).Where(fmt.Sprintf("%s = ?", key), value).First(result).Error
 	return
 }

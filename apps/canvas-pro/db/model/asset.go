@@ -15,7 +15,7 @@ type AssetModel struct {
 	Type     uint8
 	FileId   string
 	FilePath string
-	GroupId  uint64
+	GroupId  uint64 `gorm:"default:0"`
 }
 
 func (m AssetModel) TableName() string {

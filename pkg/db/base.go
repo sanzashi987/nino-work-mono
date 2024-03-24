@@ -3,8 +3,6 @@ package db
 import (
 	"strconv"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type BaseTime struct {
@@ -14,8 +12,8 @@ type BaseTime struct {
 
 type BaseModel struct {
 	BaseTime
-	Id        uint64 `gorm:"column:id;primaryKey;not null;index:,unique;"`
-	DeleteTime gorm.DeletedAt `gorm:"index"`
+	Id         uint64     `gorm:"column:id;primaryKey;not null;index:,unique;"`
+	DeleteTime *time.Time `gorm:"index"`
 }
 
 func (model *BaseModel) GetStringID() string {

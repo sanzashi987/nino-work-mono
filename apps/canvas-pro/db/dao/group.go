@@ -25,15 +25,16 @@ func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]mode
 // 	return
 // }
 
-func (dao *GroupDao) Delete(id uint64, table string) (err error) {
+func (dao *GroupDao) Delete(id uint64, tableName string) (err error) {
 	toDelete := model.BaseModel{Deleted: db.Deleted}
 	toDelete.Id = id
 
-	if err = dao.UpdateById(toDelete, table); err != nil {
+	dao.LogicalDelete()
+
+	if err = dao.UpdateById(toDelete, db.TableName(tableName)); err != nil {
 		return
 	}
 
-
-
+	return
 	// return dao.DB.Table(table).Create(&newGroup).Error
 }

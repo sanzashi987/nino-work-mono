@@ -11,11 +11,6 @@ import (
 
 var instance *gorm.DB
 
-const (
-	NotDeleted = 0
-	Deleted    = 1
-)
-
 type BaseDao[Model any] struct {
 	db          *gorm.DB
 	transaction *gorm.DB
