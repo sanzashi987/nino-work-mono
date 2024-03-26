@@ -44,6 +44,6 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 
 func FilterRecordsInUse(records []BaseModel) []BaseModel {
 	return filter.Filter(records, func(e BaseModel) bool {
-		return e.Deleted == db.NotDeleted
+		return e.DeleteTime == nil
 	})
 }

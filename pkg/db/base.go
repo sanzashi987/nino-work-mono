@@ -12,7 +12,7 @@ type BaseTime struct {
 
 type BaseModel struct {
 	BaseTime
-	Id         uint64     `gorm:"column:id;primaryKey;not null;index:,unique;"`
+	Id         uint64     `gorm:"column:id;primaryKey;not null;index;unique;"`
 	DeleteTime *time.Time `gorm:"index"`
 }
 

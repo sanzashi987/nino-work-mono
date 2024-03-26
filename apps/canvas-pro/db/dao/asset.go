@@ -21,11 +21,9 @@ func NewAssetDao(ctx context.Context, dao ...db.BaseDao[model.AssetModel]) *Asse
 	return &AssetDao{BaseDao: baseDao}
 }
 
-func (dao *AssetDao) DeleleGroupEffect(groupId, workspace uint64) {
-	orm := dao.GetOrm()
-	selector := model.AssetModel{}
-	selector.GroupId, selector.Workspace = groupId, workspace
-	// res := &[]model.AssetModel{}
-	orm.Model(selector).Update("group_id", 0)
+var assetTableName = model.ProjectModel{}.TableName()
+
+func (dao *AssetDao) DeleleGroupEffect(groupId, workspace uint64) error {
+	return dao.GetOrm().Table(assetTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
 
 }

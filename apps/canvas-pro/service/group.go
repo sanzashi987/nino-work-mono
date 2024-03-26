@@ -41,9 +41,10 @@ func create(ctx context.Context, name, workspace string, tableName string) (err 
 			return
 		}
 	}
+	workspaceId, _, _ := consts.GetIdFromCode(workspace)
 
 	record := model.BaseModel{}
-	record.Name, record.Workspace, record.TypeTag = name, workspace, consts.GROUP
+	record.Name, record.Workspace, record.TypeTag = name, workspaceId, consts.GROUP
 	return groupDao.Create(record, db.TableName(tableName))
 }
 
@@ -69,10 +70,9 @@ func delete(ctx context.Context, code, workspace, tableName string) (err error) 
 		return
 	}
 
-	if record.Deleted == db.Deleted {
+	if record.DeleteTime != nil {
 		return
 	}
-	record.Deleted = db.Deleted
 	groupDao.LogicalDelete(*record, db.TableName(tableName))
 	return
 }

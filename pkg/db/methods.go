@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -119,24 +118,18 @@ func (dao *BaseDao[Model]) UpdateById(record Model, config ...Configure) (err er
 var ErrorNotADbModel = errors.New("the record is not a db model")
 
 func (dao *BaseDao[Model]) LogicalDelete(record Model, config ...Configure) (err error) {
-
 	originalStruct := reflect.TypeOf(record)
-
 	reflectRecord := reflect.ValueOf(record)
-
-	var changeConfig []Configure
-
-	shouldTableName := reflectRecord.MethodByName("TableName")
-	var tableName string
-	if !shouldTableName.IsValid() {
-		modelStruct := reflect.TypeOf(record).Elem().Name()
-		tableName = strings.ToLower(modelStruct + "s")
-	} else {
-		tableName = shouldTableName.Call(nil)[0].String()
+	reflectId := reflectRecord.FieldByName("Id")
+	if reflectId.IsZero() {
+		err = ErrorIdIsNotProvided
+		return
 	}
-	changeConfig = append(changeConfig, TableName(tableName))
 
-	return dao.GetOrm(config...).Model(record).Update("delete_time", time.Now()).Error
+	model := reflect.New(originalStruct)
+	model.FieldByName("Id").Set(reflectId)
+
+	return dao.GetOrm(config...).Model(model.Elem().Interface()).Update("delete_time", time.Now()).Error
 
 }
 

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"time"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
@@ -36,10 +37,12 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 	return
 }
 
+var projectTableName = model.ProjectModel{}.TableName()
+
 func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
-	return dao.GetOrm().Table(model.ProjectModel{}.TableName()).Where("id IN ?", ids).Update("deleted", db.Deleted).Error
+	return dao.GetOrm().Table(projectTableName).Where("id IN ?", ids).Update("delete_time", time.Now()).Error
 }
 
-func (dao *ProjectDao) DeleleGroupEffect(groupId uint64) {
-
+func (dao *ProjectDao) DeleleGroupEffect(groupId, workspace uint64) error {
+	return dao.GetOrm().Table(projectTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
 }
