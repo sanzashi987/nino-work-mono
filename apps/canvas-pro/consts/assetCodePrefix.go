@@ -35,20 +35,24 @@ const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const length = len(charset)
 
 var runeToIndex = map[rune]int{}
-var supportedTagMap = map[string]bool{}
+var supportedTagMap = map[string]int{}
 
 func init() {
 	for i, c := range charset {
 		runeToIndex[c] = i
 	}
-	for _, c := range supportedTags {
-		supportedTagMap[c] = true
+	length := len(supportedTags)
+	for i, c := range supportedTags {
+		supportedTagMap[c] = i
+		chars := []rune(c)
+		chars[0] += rune(i)
+		supportedTagMap[string(chars)] = length + i
 	}
 }
 
 func IsSupportedTypeTag(tag string) bool {
-	val, exist := supportedTagMap[tag]
-	return exist && val
+	_, exist := supportedTagMap[tag]
+	return exist
 }
 
 func Encode[T ~uint64](id T) string {
@@ -87,7 +91,7 @@ func GetIdFromCode(canvasCode string) (id uint64, typeTag string, err error) {
 		err = ErrorNotCanvasCode
 		return
 	}
-	decoded, e := Decode(canvasCode)
+	decoded, e := Decode(canvasCode[4:])
 	if e != nil {
 		err = e
 		return

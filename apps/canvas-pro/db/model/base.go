@@ -18,7 +18,6 @@ type BaseModel struct {
 	Workspace uint64 `gorm:"default:0"`
 	Creator   string
 	Code      string
-	// Deleted   uint8 `gorm:"deleted:tinyint(8)"`
 }
 
 var ErrorNegativeSnowflakeId = errors.New("a negative id is generated")
@@ -40,6 +39,11 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 	b.Code = consts.GetCodeFromId(b.TypeTag, b.Id)
 	b.CreateTime = time.Now()
 	return
+}
+
+func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
+	b.UpdateTime = time.Now()
+	return 
 }
 
 func FilterRecordsInUse(records []BaseModel) []BaseModel {

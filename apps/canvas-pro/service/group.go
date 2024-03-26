@@ -25,7 +25,7 @@ func GetGroupService() *GroupService {
 var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func create(ctx context.Context, name, workspace string, tableName string) (err error) {
+func create(ctx context.Context, name, workspace, typeTag string) (err error) {
 	if consts.LegalNameReg.FindStringIndex(name) == nil {
 		err = ErrorNameContainIllegalChar
 		return
@@ -35,7 +35,7 @@ func create(ctx context.Context, name, workspace string, tableName string) (err 
 
 	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
 	if records != nil && err == nil {
-		groupsInUse := model.FilterRecordsInUse(*records)
+		groupsInUse := model.FilterRecordsInUse(records)
 		if len(groupsInUse) > 0 {
 			err = ErrorNameExisted
 			return
@@ -48,8 +48,6 @@ func create(ctx context.Context, name, workspace string, tableName string) (err 
 	return groupDao.Create(record, db.TableName(tableName))
 }
 
-var projectGroupTableName = model.ProjectGroupModel{}.TableName()
-var assetGroupTableName = model.AssetGroupModel{}.TableName()
 
 func (serv *GroupService) CreateProjectGroup(ctx context.Context, name, workspace string) error {
 	return create(ctx, name, workspace, projectGroupTableName)

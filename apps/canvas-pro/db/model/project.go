@@ -7,15 +7,6 @@ const (
 	ProjectPublishFlagSecret     = 3
 )
 
-type ProjectGroupModel struct {
-	BaseModel
-	// Projects []ProjectModel `gorm:"foreignkey:GroupId;references:Id"`
-}
-
-func (p ProjectGroupModel) TableName() string {
-	return "project_groups"
-}
-
 type ProjectSettingsJson struct {
 }
 

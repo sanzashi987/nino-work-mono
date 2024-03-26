@@ -21,11 +21,3 @@ type AssetModel struct {
 func (m AssetModel) TableName() string {
 	return "assets"
 }
-
-type AssetGroupModel struct {
-	BaseModel
-}
-
-func (m AssetGroupModel) TableName() string {
-	return "asset_groups"
-}

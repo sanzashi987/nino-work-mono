@@ -8,28 +8,23 @@ import (
 )
 
 type GroupDao struct {
-	db.BaseDao[model.BaseModel]
+	db.BaseDao[model.GroupModel]
 }
 
 func NewGroupDao(ctx context.Context) *GroupDao {
-	return &GroupDao{db.InitBaseDao[model.BaseModel](ctx)}
+	return &GroupDao{db.InitBaseDao[model.GroupModel](ctx)}
 }
 
-func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]model.BaseModel, err error) {
+func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]model.GroupModel, err error) {
 	err = dao.GetOrm().Where("name = ? AND workspace = ?", name, workspace).Find(res).Error
 	return
 }
 
-// func (dao *GroupDao) UpdateById(id uint64, dbModel DBModel) (res *model.BaseModel, err error) {
-// 	err = dao.DB.Table(dbModel.TableName()).Where("id = ?", id).First(res).Error
-// 	return
-// }
-
-func (dao *GroupDao) Delete(id uint64, tableName string) (err error) {
-	toDelete := model.BaseModel{}
+func (dao *GroupDao) Delete(id uint64, typeTag string) (err error) {
+	toDelete := model.GroupModel{TypeTag: typeTag}
 	toDelete.Id = id
 
-	if err = dao.LogicalDelete(toDelete, db.TableName(tableName)); err != nil {
+	if err = dao.LogicalDelete(toDelete); err != nil {
 		return
 	}
 	return

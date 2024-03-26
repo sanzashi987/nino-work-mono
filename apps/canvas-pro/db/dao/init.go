@@ -11,11 +11,9 @@ func ConnectDB(dbname string) {
 		&model.ThemeModel{},
 		&model.WorkspaceModel{},
 		&model.AssetModel{},
-		&model.AssetGroupModel{},
 		&model.CanvasUserModel{},
 		&model.ProjectModel{},
-		&model.ProjectGroupModel{},
+		&model.GroupModel{},
 		&model.TemplateModel{},
-		&model.TemplateGroupModel{},
 	)
 }
