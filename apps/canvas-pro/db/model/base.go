@@ -15,7 +15,7 @@ type BaseModel struct {
 	db.BaseModel
 	TypeTag   string `gorm:"-"`
 	Name      string
-	Workspace uint64 `gorm:"default:0"`
+	Workspace uint64 `gorm:"default:0;index"`
 	Creator   string
 	Code      string
 }

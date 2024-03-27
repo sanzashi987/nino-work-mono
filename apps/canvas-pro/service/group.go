@@ -43,26 +43,16 @@ func create(ctx context.Context, name, workspace, typeTag string) (err error) {
 	}
 	workspaceId, _, _ := consts.GetIdFromCode(workspace)
 
-	record := model.BaseModel{}
-	record.Name, record.Workspace, record.TypeTag = name, workspaceId, consts.GROUP
-	return groupDao.Create(record, db.TableName(tableName))
-}
-
-
-func (serv *GroupService) CreateProjectGroup(ctx context.Context, name, workspace string) error {
-	return create(ctx, name, workspace, projectGroupTableName)
-}
-func (serv *GroupService) CreateAssetGroup(ctx context.Context, name, workspace string) error {
-	return create(ctx, name, workspace, assetGroupTableName)
+	record := model.GroupModel{}
+	record.Name, record.Workspace, record.TypeTag = name, workspaceId, typeTag
+	return groupDao.Create(record)
 }
 
 var ErrorGroupNotFound = errors.New("error group is not exist")
 
-func delete(ctx context.Context, code, workspace, tableName string) (err error) {
-	groupDao := dao.NewGroupDao(ctx)
-	id, _, _ := consts.GetIdFromCode(code)
+func delete(groupDao *dao.GroupDao, id, workspace uint64, typeTag string) (err error) {
 
-	record, err := groupDao.FindByKey("id", id, db.TableName(tableName))
+	record, err := groupDao.FindByKey("id", id)
 	if record == nil || err != nil {
 		err = ErrorGroupNotFound
 		return
@@ -71,22 +61,28 @@ func delete(ctx context.Context, code, workspace, tableName string) (err error) 
 	if record.DeleteTime != nil {
 		return
 	}
-	groupDao.LogicalDelete(*record, db.TableName(tableName))
+	groupDao.LogicalDelete(*record)
 	return
 }
 
-func (serv *GroupService) DeleteProjectGroup(ctx context.Context, code, workspace string) (err error) {
-	if err = delete(ctx, code, workspace, projectGroupTableName); err != nil {
+func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
+
+	groupDao := dao.NewGroupDao(ctx)
+	groupDao.BeginTransaction()
+	groupId, _, _ := consts.GetIdFromCode(groupCode)
+	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
+
+	chainProjectDao := dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(&groupDao.BaseDao))
+
+	if err = delete(groupDao, groupId, workspaceId, consts.PROJECT); err != nil {
+		groupDao.RollbackTransaction()
+		return
+	}
+	if err = chainProjectDao.DeleleGroupEffect(groupId, workspaceId); err != nil {
+		groupDao.RollbackTransaction()
 		return
 	}
 
-	return
-}
-
-func (serv *GroupService) DeleteAssetGroup(ctx context.Context, code, workspace string) (err error) {
-	if err = delete(ctx, code, workspace, assetGroupTableName); err != nil {
-		return
-	}
-
+	groupDao.CommitTransaction()
 	return
 }

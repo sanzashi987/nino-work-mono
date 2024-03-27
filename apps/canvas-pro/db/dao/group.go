@@ -21,8 +21,8 @@ func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]mode
 }
 
 func (dao *GroupDao) Delete(id uint64, typeTag string) (err error) {
-	toDelete := model.GroupModel{TypeTag: typeTag}
-	toDelete.Id = id
+	toDelete := model.GroupModel{}
+	toDelete.Id, toDelete.TypeTag = id, typeTag
 
 	if err = dao.LogicalDelete(toDelete); err != nil {
 		return

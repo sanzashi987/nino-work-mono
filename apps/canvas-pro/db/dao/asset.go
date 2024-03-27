@@ -11,10 +11,10 @@ type AssetDao struct {
 	db.BaseDao[model.AssetModel]
 }
 
-func NewAssetDao(ctx context.Context, dao ...db.BaseDao[model.AssetModel]) *AssetDao {
+func NewAssetDao(ctx context.Context, dao ...*db.BaseDao[model.AssetModel]) *AssetDao {
 	var baseDao db.BaseDao[model.AssetModel]
 	if len(dao) > 0 {
-		baseDao = dao[0]
+		baseDao = *dao[0]
 	} else {
 		baseDao = db.InitBaseDao[model.AssetModel](ctx)
 	}
