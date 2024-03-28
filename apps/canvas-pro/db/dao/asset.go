@@ -25,5 +25,4 @@ var assetTableName = model.ProjectModel{}.TableName()
 
 func (dao *AssetDao) DeleleGroupEffect(groupId, workspace uint64) error {
 	return dao.GetOrm().Table(assetTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
-
 }

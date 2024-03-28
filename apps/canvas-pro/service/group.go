@@ -35,7 +35,7 @@ func create(ctx context.Context, name, workspace, typeTag string) (err error) {
 
 	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
 	if records != nil && err == nil {
-		groupsInUse := model.FilterRecordsInUse(records)
+		groupsInUse := model.FilterRecordsInUse(*records)
 		if len(groupsInUse) > 0 {
 			err = ErrorNameExisted
 			return

@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"reflect"
 	"time"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
@@ -16,7 +17,7 @@ type BaseModel struct {
 	TypeTag   string `gorm:"-"`
 	Name      string
 	Workspace uint64 `gorm:"default:0;index"`
-	Creator   string
+	Creator   uint64
 	Code      string
 }
 
@@ -43,11 +44,12 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 	b.UpdateTime = time.Now()
-	return 
+	return
 }
 
-func FilterRecordsInUse(records []BaseModel) []BaseModel {
-	return filter.Filter(records, func(e BaseModel) bool {
-		return e.DeleteTime == nil
+func FilterRecordsInUse[T any](records []T) []T {
+	return filter.Filter(records, func(e T) bool {
+		v := reflect.ValueOf(e)
+		return v.FieldByName("DeleteTime").Elem().Interface() == nil
 	})
 }

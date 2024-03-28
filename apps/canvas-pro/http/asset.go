@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -9,6 +10,15 @@ const asset_prefix = "assets"
 
 type AssetController struct {
 	controller.BaseController
+}
+
+type ListAssetReq struct {
+	GroupCode *string `json:"groupCode"`
+	MimeType  *string `json:"filter"`
+	FileName  *string `json:"fileName"`
+	FileType  *string `json:"fileType"`
+	Sort      *int    `json:"sort"`
+	request.PaginationRequest
 }
 
 func (c *AssetController) list(ctx *gin.Context) {

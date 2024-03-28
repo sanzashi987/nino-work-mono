@@ -64,13 +64,7 @@ func ValidateMiddleware(loginPageUrl string) func(*gin.Context) {
 		jwtToken := ctx.GetHeader("Authentication")
 		claim, err := ValidateToken(jwtToken)
 		if err != nil {
-			// ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			// 	"data": nil,
-			// 	"msg":  "Not authorized",
-			// 	"code": http.StatusUnauthorized,
-			// })
 			ctx.Redirect(http.StatusSeeOther, loginPageUrl+"?redirect="+ctx.Request.URL.String())
-
 			return
 		}
 		ctx.Set(UserID, claim.UserID)
