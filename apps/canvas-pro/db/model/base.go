@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"reflect"
 	"time"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
@@ -47,9 +46,8 @@ func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func FilterRecordsInUse[T any](records []T) []T {
+func FilterRecordsInUse[T db.GetDeleteTime](records []T) []T {
 	return filter.Filter(records, func(e T) bool {
-		v := reflect.ValueOf(e)
-		return v.FieldByName("DeleteTime").Elem().Interface() == nil
+		return e.GetDeleteTime() == nil
 	})
 }

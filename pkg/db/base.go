@@ -16,6 +16,14 @@ type BaseModel struct {
 	DeleteTime *time.Time `gorm:"index"`
 }
 
+type GetDeleteTime interface {
+	GetDeleteTime() *time.Time
+}
+
+func (model BaseModel) GetDeleteTime() *time.Time {
+	return model.DeleteTime
+}
+
 func (model *BaseModel) GetStringID() string {
 	return strconv.FormatUint(model.Id, 10)
 }
