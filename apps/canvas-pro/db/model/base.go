@@ -17,7 +17,7 @@ type BaseModel struct {
 	Name      string
 	Workspace uint64 `gorm:"default:0;index"`
 	Creator   uint64
-	Code      string
+	Code      string `gorm:"index"`
 }
 
 var ErrorNegativeSnowflakeId = errors.New("a negative id is generated")

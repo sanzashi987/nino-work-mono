@@ -31,22 +31,40 @@ var supportedTags = [7]string{
 	STATIC_SOURCE,
 }
 
+// may useful in the future
+var supportedGroupTags = []string{}
+
 const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const length = len(charset)
 
 var runeToIndex = map[rune]int{}
 var supportedTagMap = map[string]int{}
 
-func init() {
-	for i, c := range charset {
-		runeToIndex[c] = i
+const groupStandard = rune('R')
+
+func GetGroupTypeTagFromBasic(typeTag string) (string, error) {
+	index, exist := supportedTagMap[typeTag]
+	if !exist || index >= len(supportedTags) {
+		return "", errors.New("input is not a basic type tag")
 	}
-	length := len(supportedTags)
-	for i, c := range supportedTags {
-		supportedTagMap[c] = i
-		chars := []rune(c)
-		chars[0] += rune(i)
-		supportedTagMap[string(chars)] = length + i
+
+	charList := []rune(typeTag)
+	charList[0] += rune(index) + groupStandard
+	groupTypeTag := string(charList)
+
+	return groupTypeTag, nil
+}
+
+func init() {
+	for i, typeTag := range charset {
+		runeToIndex[typeTag] = i
+	}
+	basicTagListLength := len(supportedTags)
+	for i, typeTag := range supportedTags {
+		supportedTagMap[typeTag] = i
+		groupTypeTag, _ := GetGroupTypeTagFromBasic(typeTag)
+		supportedTagMap[groupTypeTag] = basicTagListLength + i
+		supportedGroupTags = append(supportedGroupTags, groupTypeTag)
 	}
 }
 
