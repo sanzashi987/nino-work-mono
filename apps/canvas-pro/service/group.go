@@ -12,20 +12,12 @@ import (
 
 type GroupService struct{}
 
-var groupService *GroupService
-
-func init() {
-	groupService = &GroupService{}
-}
-
-func GetGroupService() *GroupService {
-	return groupService
-}
+var GroupServiceImpl *GroupService = &GroupService{}
 
 var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func create(ctx context.Context, name, workspace, typeTag string) (err error) {
+func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag string) (err error) {
 	if consts.LegalNameReg.FindStringIndex(name) == nil {
 		err = ErrorNameContainIllegalChar
 		return

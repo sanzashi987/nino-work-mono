@@ -38,7 +38,7 @@ func (c *ProjectController) list(ctx *gin.Context) {
 	}
 
 	userIdTyped := userId.(uint64)
-	infoList, err := service.GetProjectService().GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
+	infoList, err := service.ProjectServiceImpl.GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
 	if err != nil {
 		c.AbortServerError(ctx, projectListMessage+err.Error())
 		return
@@ -63,7 +63,7 @@ func (c *ProjectController) create(ctx *gin.Context) {
 		c.AbortClientError(ctx, projectCreateMessage+err.Error())
 		return
 	}
-	projectCode, err := service.GetProjectService().Create(ctx, param.Name, param.Config, param.GroupCode, param.UseTemplate)
+	projectCode, err := service.ProjectServiceImpl.Create(ctx, param.Name, param.Config, param.GroupCode, param.UseTemplate)
 	if err != nil {
 		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
@@ -78,7 +78,7 @@ func (c *ProjectController) read(ctx *gin.Context) {
 		return
 	}
 
-	projectDetail, err := service.GetProjectService().GetInfoById(ctx, code)
+	projectDetail, err := service.ProjectServiceImpl.GetInfoById(ctx, code)
 	if err != nil {
 		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
@@ -105,7 +105,7 @@ func (c *ProjectController) update(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.GetProjectService().Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
+	if err := service.ProjectServiceImpl.Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
 		c.AbortServerError(ctx, projectUpdateMessage+err.Error())
 		return
 	}
@@ -126,7 +126,7 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.GetProjectService().LogicalDeletion(ctx, param.Ids); err != nil {
+	if err := service.ProjectServiceImpl.LogicalDeletion(ctx, param.Ids); err != nil {
 		c.AbortServerError(ctx, projectDeleteMessage+err.Error())
 		return
 	}
@@ -140,7 +140,7 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	projectCode, err := service.GetProjectService().Duplicate(ctx, id)
+	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, id)
 	if err != nil {
 		c.AbortServerError(ctx, projectCreateMessage+err.Error())
 		return
@@ -163,7 +163,7 @@ func (c *ProjectController) publish(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.GetProjectService().PublishProject(ctx, req.Code, req.PublishFlag, req.PublishSecretKey); err != nil {
+	if err := service.ProjectServiceImpl.PublishProject(ctx, req.Code, req.PublishFlag, req.PublishSecretKey); err != nil {
 		c.AbortServerError(ctx, projectPublishMessage+err.Error())
 		return
 	}

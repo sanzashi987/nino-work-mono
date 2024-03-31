@@ -8,11 +8,7 @@ import (
 
 type UserService struct{}
 
-var userService *UserService
-
-func init() {
-	userService = &UserService{}
-}
+var UserServiceImpl *UserService = &UserService{}
 
 func (serv UserService) ValidateUserWorkspace(ctx context.Context, userId uint64, workspaceCode string) bool {
 	userDao := dao.NewUserDao(ctx)

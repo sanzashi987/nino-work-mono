@@ -12,15 +12,7 @@ import (
 
 type ProjectService struct{}
 
-var projectService *ProjectService
-
-func init() {
-	projectService = &ProjectService{}
-}
-
-func GetProjectService() *ProjectService {
-	return projectService
-}
+var ProjectServiceImpl *ProjectService = &ProjectService{}
 
 func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, groupCode, useTemplate *string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
@@ -135,7 +127,7 @@ var ErrorUserWorkspaceNotMatch = errors.New("current user does not have the acce
 
 func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size int, workspace string, name, group *string) (*ProjectInfoList, error) {
 	projectDao := dao.NewProjectDao(ctx)
-	if !ValidateUserWorkspace(ctx, userId, workspace) {
+	if !UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspace) {
 		return nil, ErrorUserWorkspaceNotMatch
 	}
 
