@@ -2,8 +2,19 @@ package http
 
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/middleware"
+	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/gin-gonic/gin"
 )
+
+func getWorkspaceCode(ctx *gin.Context) string {
+	return ctx.GetHeader("Projectcode")
+}
+
+func getCurrentUser(ctx *gin.Context) uint64 {
+	userId, _ := ctx.Get(auth.UserID)
+	return userId.(uint64)
+}
+
 
 func NewRouter(loginPageUrl string) *gin.Engine {
 	router := gin.Default()
@@ -12,8 +23,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	canvasAuthMiddleWare := middleware.CanvasMiddleware(loginPageUrl)
 	{
 		loginGroup := root.Group(login_prefix)
-		loginController := &LoginController{}
-
 		loginGroup.POST("login", loginController.login)
 		loginGroup.GET("login-verification/get-uuidkey", loginController.getUuid)
 		loginGroup.GET("login-verification/get-verification-code", loginController.getVerifyCode)
@@ -22,15 +31,12 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 	{
 		commonRoutes := root.Group(common_prefix).Use(canvasAuthMiddleWare)
-		commonController := &CommonController{}
-
 		commonRoutes.POST("search", commonController.searchComponents)
 		commonRoutes.GET("userInfo", commonController.getUserInfo)
 	}
 
 	{
 		dataSourceRoutes := root.Group(data_source_prefix).Use(canvasAuthMiddleWare)
-		dataSourceController := &DataSourceController{}
 
 		dataSourceRoutes.POST("create", dataSourceController.create)
 		dataSourceRoutes.GET("info/:sourceId", dataSourceController.read)
@@ -44,7 +50,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 	{
 		projectScreenRoutes := root.Group(project_prefix).Use(canvasAuthMiddleWare)
-		projectController := &ProjectController{}
 
 		projectScreenRoutes.POST("create", projectController.create)
 		projectScreenRoutes.POST("addByTemplate", projectController.create)
@@ -61,7 +66,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare)
 
 		groupedProjectRoutes.POST("list", groupController.list)
-		groupedProjectRoutes.POST("create", groupController.create)
+		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
 		groupedProjectRoutes.POST("update", groupController.update)
 		groupedProjectRoutes.DELETE("delete", groupController.delete)
 		// for adapt
@@ -71,7 +76,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 	{
 		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare)
-		assetController := &AssetController{}
 		assetRoutes.POST("selectMyAssets", assetController.list)
 		assetRoutes.POST("updateMyAssetsName", assetController.update)
 		assetRoutes.POST("updateAssetsGroup", assetController.update)
@@ -82,7 +86,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		assetRoutes.POST("loadAsset", assetController.download)
 		assetRoutes.POST("importAsset", assetController._import)
 
-		assetRoutes.POST("addGroup", groupController.create)
+		assetRoutes.POST("addGroup", groupController.createDesginGroup)
 		assetRoutes.GET("deleteGroup", groupController.delete)
 		assetRoutes.POST("updateGroupsName", groupController.update)
 		assetRoutes.POST("selectGroup", groupController.list)
@@ -90,7 +94,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 	{
 		themeRoutes := root.Group(theme_prefix).Use(canvasAuthMiddleWare)
-		themeController := &ThemeController{}
 
 		themeRoutes.POST("list", themeController.list)
 		themeRoutes.POST("create", themeController.create)

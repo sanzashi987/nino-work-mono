@@ -12,6 +12,8 @@ type LoginController struct {
 }
 
 
+var loginController = &LoginController{}
+
 
 
 

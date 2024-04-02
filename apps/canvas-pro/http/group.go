@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/cza14h/nino-work/pkg/controller"
@@ -22,7 +23,7 @@ func (c *GroupController) list(ctx *gin.Context) {
 /*CRUD*/
 type CreateAssetGroupReq struct {
 	GroupName string `json:"groupName" binding:"required"`
-	Workspace string `json:"workspace" binding:"required"`
+	// Workspace string `json:"workspace" binding:"required"`
 	//TypeTag string `json:"type" binding:"required"`
 }
 
@@ -30,15 +31,22 @@ type CreateAssetGroupReq struct {
 
 // }
 
+func (c *GroupController) createProjectGroup(ctx *gin.Context) {
+	c.create(ctx, consts.PROJECT)
+}
+func (c *GroupController) createDesginGroup(ctx *gin.Context) {
+	c.create(ctx, consts.DESIGN)
+}
+
 func (c *GroupController) create(ctx *gin.Context, typeTag string) {
-	userId, _ := ctx.Get(auth.UserID)
+	userId, worspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
 	reqBody := CreateAssetGroupReq{}
 	if err := ctx.BindJSON(&reqBody); err != nil {
 		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
 		return
 	}
 
-	service.GroupServiceImpl.Create(ctx, reqBody.GroupName, reqBody.Workspace, typeTag)
+	service.GroupServiceImpl.Create(ctx, reqBody.GroupName, worspaceCode, typeTag)
 
 }
 
@@ -59,7 +67,6 @@ type DeleteAssetGroupReq struct {
 func (c *GroupController) delete(ctx *gin.Context) {
 
 }
-
 
 func (c *GroupController) move(ctx *gin.Context) {
 

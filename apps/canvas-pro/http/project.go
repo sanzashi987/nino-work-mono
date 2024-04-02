@@ -15,6 +15,8 @@ type ProjectController struct {
 	controller.BaseController
 }
 
+var projectController = &ProjectController{}
+
 type GetProjectListRequest struct {
 	request.PaginationRequest
 	Workspace string

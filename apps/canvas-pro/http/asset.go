@@ -12,6 +12,8 @@ type AssetController struct {
 	controller.BaseController
 }
 
+var assetController = &AssetController{}
+
 type ListAssetReq struct {
 	GroupCode *string `json:"groupCode"`
 	MimeType  *string `json:"filter"`

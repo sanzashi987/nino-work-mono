@@ -11,6 +11,8 @@ type ThemeController struct {
 
 const theme_prefix = "system-theme"
 
+var themeController = &ThemeController{}
+
 func (c *ThemeController) list(ctx *gin.Context) {
 
 }

@@ -11,6 +11,8 @@ type CommonController struct {
 	controller.BaseController
 }
 
+var commonController = &CommonController{}
+
 func (c *CommonController) searchComponents(ctx *gin.Context) {
 
 }

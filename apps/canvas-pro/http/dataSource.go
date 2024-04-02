@@ -7,6 +7,8 @@ import (
 
 const data_source_prefix = "jdbc-connect-template"
 
+var dataSourceController = &DataSourceController{}
+
 type DataSourceController struct {
 	controller.BaseController
 }
