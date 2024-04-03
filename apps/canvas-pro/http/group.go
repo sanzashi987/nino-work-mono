@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -39,14 +38,14 @@ func (c *GroupController) createDesginGroup(ctx *gin.Context) {
 }
 
 func (c *GroupController) create(ctx *gin.Context, typeTag string) {
-	userId, worspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
+	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
 	reqBody := CreateAssetGroupReq{}
 	if err := ctx.BindJSON(&reqBody); err != nil {
 		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
 		return
 	}
 
-	service.GroupServiceImpl.Create(ctx, reqBody.GroupName, worspaceCode, typeTag)
+	service.GroupServiceImpl.Create(ctx, reqBody.GroupName, workspaceCode, typeTag)
 
 }
 
@@ -57,7 +56,8 @@ type UpdateAssetGroupReq struct {
 
 // rename
 func (c *GroupController) update(ctx *gin.Context) {
-	userId, _ := ctx.Get(auth.UserID)
+	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
+	
 }
 
 type DeleteAssetGroupReq struct {
