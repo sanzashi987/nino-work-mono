@@ -54,10 +54,14 @@ type UpdateAssetGroupReq struct {
 	DeleteAssetGroupReq
 }
 
+func (c *GroupController) projectRename(ctx *gin.Context) {
+
+}
+
 // rename
-func (c *GroupController) update(ctx *gin.Context) {
-	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
-	
+func (c *GroupController) rename(ctx *gin.Context) {
+	reqBody := &UpdateAssetGroupReq{}
+	// service.GroupServiceImpl
 }
 
 type DeleteAssetGroupReq struct {

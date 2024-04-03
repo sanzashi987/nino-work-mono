@@ -78,3 +78,7 @@ func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, work
 	groupDao.CommitTransaction()
 	return
 }
+
+func (serv GroupService) Rename(ctx context.Context, userId uint64, workspaceCode, groupCode, groupName string) {
+	UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode)
+}
