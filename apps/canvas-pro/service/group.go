@@ -79,6 +79,6 @@ func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, work
 	return
 }
 
-func (serv GroupService) Rename(ctx context.Context, userId uint64, workspaceCode, groupCode, groupName string) {
+func (serv GroupService) Rename(ctx context.Context, userId uint64, workspaceCode, groupCode, groupName string) (err error) {
 	UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode)
 }

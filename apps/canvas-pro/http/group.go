@@ -22,7 +22,6 @@ func (c *GroupController) list(ctx *gin.Context) {
 /*CRUD*/
 type CreateAssetGroupReq struct {
 	GroupName string `json:"groupName" binding:"required"`
-	// Workspace string `json:"workspace" binding:"required"`
 	//TypeTag string `json:"type" binding:"required"`
 }
 
@@ -60,8 +59,20 @@ func (c *GroupController) projectRename(ctx *gin.Context) {
 
 // rename
 func (c *GroupController) rename(ctx *gin.Context) {
+	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
 	reqBody := &UpdateAssetGroupReq{}
-	// service.GroupServiceImpl
+
+	if err := ctx.BindJSON(reqBody); err != nil {
+		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
+		return
+	}
+
+	if err := service.GroupServiceImpl.Rename(ctx, userId, workspaceCode, reqBody.GroupCode, reqBody.GroupName); err != nil {
+		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx)
 }
 
 type DeleteAssetGroupReq struct {
