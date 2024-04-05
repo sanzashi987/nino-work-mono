@@ -9,13 +9,16 @@ import (
 )
 
 const project_prefix = "screen-operation"
-const projectHandlerMessage = "[http] canvas project handler "
 
 type ProjectController struct {
 	controller.BaseController
 }
 
-var projectController = &ProjectController{}
+var projectController = &ProjectController{
+	controller.BaseController{
+		ErrorPrefix: "[http] canvas project handler ",
+	},
+}
 
 type GetProjectListRequest struct {
 	request.PaginationRequest
@@ -24,25 +27,25 @@ type GetProjectListRequest struct {
 	Group     *string
 }
 
-const projectListMessage = projectHandlerMessage + "list: "
+const listPrefix = "list: "
 
 func (c *ProjectController) list(ctx *gin.Context) {
 	requestBody := &GetProjectListRequest{}
 	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-		c.AbortClientError(ctx, projectListMessage+err.Error())
+		c.AbortClientError(ctx, listPrefix+err.Error())
 		return
 	}
 
 	userId, exists := ctx.Get(auth.UserID)
 	if !exists {
-		c.AbortClientError(ctx, projectListMessage+" userId does not exist in http context")
+		c.AbortClientError(ctx, listPrefix+" userId does not exist in http context")
 		return
 	}
 
 	userIdTyped := userId.(uint64)
 	infoList, err := service.ProjectServiceImpl.GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
 	if err != nil {
-		c.AbortServerError(ctx, projectListMessage+err.Error())
+		c.AbortServerError(ctx, listPrefix+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, infoList)
@@ -57,17 +60,17 @@ type CreateProjectRequest struct {
 	UseTemplate *string //template Id
 }
 
-const projectCreateMessage = projectHandlerMessage + "create: "
+const createPrefix = "create: "
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
 	if err := ctx.ShouldBindJSON(param); err != nil {
-		c.AbortClientError(ctx, projectCreateMessage+err.Error())
+		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 	projectCode, err := service.ProjectServiceImpl.Create(ctx, param.Name, param.Config, param.GroupCode, param.UseTemplate)
 	if err != nil {
-		c.AbortServerError(ctx, projectCreateMessage+err.Error())
+		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, projectCode)
@@ -76,13 +79,13 @@ func (c *ProjectController) create(ctx *gin.Context) {
 func (c *ProjectController) read(ctx *gin.Context) {
 	code, err := c.MustGetParam(ctx, "id")
 	if err != nil {
-		c.AbortClientError(ctx, projectCreateMessage+err.Error())
+		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 
 	projectDetail, err := service.ProjectServiceImpl.GetInfoById(ctx, code)
 	if err != nil {
-		c.AbortServerError(ctx, projectCreateMessage+err.Error())
+		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
 	}
 
@@ -97,18 +100,18 @@ type ProjectUpdateRequest struct {
 	GroupCode *string `json:"groupCode"`
 }
 
-const projectUpdateMessage = projectHandlerMessage + "update: "
+const updatePrefix = "update: "
 
 func (c *ProjectController) update(ctx *gin.Context) {
 	param := ProjectUpdateRequest{}
 	err := ctx.BindJSON(&param)
 	if err != nil {
-		c.AbortClientError(ctx, projectUpdateMessage+err.Error())
+		c.AbortClientError(ctx, updatePrefix+err.Error())
 		return
 	}
 
 	if err := service.ProjectServiceImpl.Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
-		c.AbortServerError(ctx, projectUpdateMessage+err.Error())
+		c.AbortServerError(ctx, updatePrefix+err.Error())
 		return
 	}
 
@@ -119,17 +122,17 @@ type ProjectDeleteRequest struct {
 	Ids []string `json:"ids" binding:"required"`
 }
 
-const projectDeleteMessage = projectHandlerMessage + "delete: "
+const deletePrefix = "delete: "
 
 func (c *ProjectController) delete(ctx *gin.Context) {
 	param := ProjectDeleteRequest{}
 	if err := ctx.BindJSON(&param); err != nil {
-		c.AbortClientError(ctx, projectDeleteMessage+err.Error())
+		c.AbortClientError(ctx, deletePrefix+err.Error())
 		return
 	}
 
 	if err := service.ProjectServiceImpl.LogicalDeletion(ctx, param.Ids); err != nil {
-		c.AbortServerError(ctx, projectDeleteMessage+err.Error())
+		c.AbortServerError(ctx, deletePrefix+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, nil)
@@ -144,7 +147,7 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 	}
 	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, id)
 	if err != nil {
-		c.AbortServerError(ctx, projectCreateMessage+err.Error())
+		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, projectCode)
@@ -156,17 +159,17 @@ type ProjectPublishRequest struct {
 	PublishSecretKey *string
 }
 
-const projectPublishMessage = projectHandlerMessage + "publish: "
+const publishPrefix = "publish: "
 
 func (c *ProjectController) publish(ctx *gin.Context) {
 	req := &ProjectPublishRequest{}
 	if err := ctx.BindJSON(req); err != nil {
-		c.AbortClientError(ctx, projectPublishMessage+err.Error())
+		c.AbortClientError(ctx, publishPrefix+err.Error())
 		return
 	}
 
 	if err := service.ProjectServiceImpl.PublishProject(ctx, req.Code, req.PublishFlag, req.PublishSecretKey); err != nil {
-		c.AbortServerError(ctx, projectPublishMessage+err.Error())
+		c.AbortServerError(ctx, publishPrefix+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, nil)

@@ -14,21 +14,18 @@ type GroupService struct{}
 
 var GroupServiceImpl *GroupService = &GroupService{}
 
-var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
 var ErrorNameExisted = errors.New("error group name is exist")
 
 func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag string) (err error) {
-	if consts.LegalNameReg.FindStringIndex(name) == nil {
-		err = ErrorNameContainIllegalChar
-		return
+	if err = consts.IsLegalName(name); err != nil {
+		return err
 	}
 
 	groupDao := dao.NewGroupDao(ctx)
 
 	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
 	if records != nil && err == nil {
-		groupsInUse := model.FilterRecordsInUse(*records)
-		if len(groupsInUse) > 0 {
+		if len(*records) > 0 {
 			err = ErrorNameExisted
 			return
 		}
@@ -42,18 +39,14 @@ func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag st
 
 var ErrorGroupNotFound = errors.New("error group is not exist")
 
-func delete(groupDao *dao.GroupDao, id, workspace uint64, typeTag string) (err error) {
+func delete(groupDao *dao.GroupDao, id uint64) (err error) {
 
 	record, err := groupDao.FindByKey("id", id)
 	if record == nil || err != nil {
 		err = ErrorGroupNotFound
 		return
 	}
-
-	if record.DeleteTime != nil {
-		return
-	}
-	groupDao.LogicalDelete(*record)
+	groupDao.Delete(id)
 	return
 }
 
@@ -66,7 +59,7 @@ func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, work
 
 	chainProjectDao := dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(&groupDao.BaseDao))
 
-	if err = delete(groupDao, groupId, workspaceId, consts.PROJECT); err != nil {
+	if err = delete(groupDao, groupId); err != nil {
 		groupDao.RollbackTransaction()
 		return
 	}
@@ -79,6 +72,32 @@ func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, work
 	return
 }
 
-func (serv GroupService) Rename(ctx context.Context, userId uint64, workspaceCode, groupCode, groupName string) (err error) {
-	UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode)
+var ErrorFailToRename = errors.New("Fail to rename group")
+
+func (serv GroupService) Rename(ctx context.Context, workspaceCode, groupCode, groupName, typeTag string) (err error) {
+
+	if err = consts.IsLegalName(groupName); err != nil {
+		return
+	}
+
+	groupDao := dao.NewGroupDao(ctx)
+
+	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceCode)
+	if err != nil {
+		return err
+	}
+
+	tagedGroups := model.FilterRecordsByTypeTag(*groups, typeTag)
+
+	if len(tagedGroups) > 0 {
+		return ErrorFailToRename
+	}
+
+	id, _, _ := consts.GetIdFromCode(groupCode)
+	toUpdate := model.GroupModel{}
+	toUpdate.Id, toUpdate.Name = id, groupName
+	if err = groupDao.UpdateById(toUpdate); err != nil {
+		return
+	}
+	return
 }

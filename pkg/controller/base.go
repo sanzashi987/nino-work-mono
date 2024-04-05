@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type BaseController struct{}
+type BaseController struct {
+	ErrorPrefix string
+}
 
 func (controler *BaseController) ResponseJson(c *gin.Context, data interface{}) {
 
@@ -18,10 +20,19 @@ func (controler *BaseController) ResponseJson(c *gin.Context, data interface{}) 
 	})
 
 }
+func (controler *BaseController) SuccessVoid(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"msg":  "Success",
+		"data": nil,
+		"code": 0,
+	})
+
+}
 
 func (controller *BaseController) AbortClientError(c *gin.Context, errMsg string) {
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{
-		"msg":  errMsg,
+		"msg":  controller.ErrorPrefix + errMsg,
 		"data": nil,
 		"code": http.StatusBadRequest,
 	})
@@ -29,7 +40,7 @@ func (controller *BaseController) AbortClientError(c *gin.Context, errMsg string
 
 func (controller *BaseController) AbortServerError(c *gin.Context, errMsg string) {
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{
-		"msg":  errMsg,
+		"msg":  controller.ErrorPrefix + errMsg,
 		"data": nil,
 		"code": http.StatusInternalServerError,
 	})

@@ -20,11 +20,11 @@ func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]mode
 	return
 }
 
-func (dao *GroupDao) Delete(id uint64, typeTag string) (err error) {
+func (dao *GroupDao) Delete(id uint64) (err error) {
 	toDelete := model.GroupModel{}
-	toDelete.Id, toDelete.TypeTag = id, typeTag
+	toDelete.Id = id
 
-	if err = dao.LogicalDelete(toDelete); err != nil {
+	if err = dao.GetOrm().Delete(&toDelete).Error; err != nil {
 		return
 	}
 	return

@@ -7,14 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const assetGroupHandlerMessage = "[http] canvas asset group handler "
 const grouped_project_prefix = "group"
 
 type GroupController struct {
 	controller.BaseController
 }
 
-var groupController = &GroupController{}
+var groupController = &GroupController{
+	controller.BaseController{
+		ErrorPrefix: "[http] canvas asset group handler ",
+	},
+}
 
 func (c *GroupController) list(ctx *gin.Context) {
 }
@@ -37,15 +40,17 @@ func (c *GroupController) createDesginGroup(ctx *gin.Context) {
 }
 
 func (c *GroupController) create(ctx *gin.Context, typeTag string) {
-	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
+	workspaceCode := getWorkspaceCode(ctx)
 	reqBody := CreateAssetGroupReq{}
 	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
+		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
-
-	service.GroupServiceImpl.Create(ctx, reqBody.GroupName, workspaceCode, typeTag)
-
+	if err := service.GroupServiceImpl.Create(ctx, reqBody.GroupName, workspaceCode, typeTag); err != nil {
+		c.AbortClientError(ctx, "create: "+err.Error())
+		return
+	}
+	c.SuccessVoid(ctx)
 }
 
 type UpdateAssetGroupReq struct {
@@ -56,23 +61,26 @@ type UpdateAssetGroupReq struct {
 func (c *GroupController) projectRename(ctx *gin.Context) {
 
 }
+func (c *GroupController) assetRename(ctx *gin.Context) {
+
+}
 
 // rename
-func (c *GroupController) rename(ctx *gin.Context) {
-	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
+func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
+	workspaceCode := getWorkspaceCode(ctx)
 	reqBody := &UpdateAssetGroupReq{}
 
 	if err := ctx.BindJSON(reqBody); err != nil {
-		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
+		c.AbortClientError(ctx, err.Error())
 		return
 	}
 
-	if err := service.GroupServiceImpl.Rename(ctx, userId, workspaceCode, reqBody.GroupCode, reqBody.GroupName); err != nil {
-		c.AbortClientError(ctx, assetGroupHandlerMessage+err.Error())
+	if err := service.GroupServiceImpl.Rename(ctx, workspaceCode, reqBody.GroupCode, reqBody.GroupName, typeTag); err != nil {
+		c.AbortClientError(ctx, err.Error())
 		return
 	}
 
-	c.ResponseJson(ctx)
+	c.ResponseJson(ctx, nil)
 }
 
 type DeleteAssetGroupReq struct {

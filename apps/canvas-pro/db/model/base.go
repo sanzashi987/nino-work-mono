@@ -13,7 +13,7 @@ import (
 
 type BaseModel struct {
 	db.BaseModel
-	TypeTag   string `gorm:"-"`
+	TypeTag   string
 	Name      string
 	Workspace uint64 `gorm:"default:0;index"`
 	Creator   uint64
@@ -22,6 +22,14 @@ type BaseModel struct {
 
 var ErrorNegativeSnowflakeId = errors.New("a negative id is generated")
 var ErrorTypeTagIsNotSupported = errors.New("canvas typeTag is not supported")
+
+type GetTypeTag interface {
+	GetTypeTag() string
+}
+
+func (b BaseModel) GetTypeTag() string {
+	return b.TypeTag
+}
 
 func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 	tempId := utils.GenerateId()
@@ -49,5 +57,11 @@ func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 func FilterRecordsInUse[T db.GetDeleteTime](records []T) []T {
 	return filter.Filter(records, func(e T) bool {
 		return e.GetDeleteTime() == nil
+	})
+}
+
+func FilterRecordsByTypeTag[T GetTypeTag](records []T, typeTag string) []T {
+	return filter.Filter(records, func(e T) bool {
+		return e.GetTypeTag() == typeTag
 	})
 }

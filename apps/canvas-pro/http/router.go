@@ -87,7 +87,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 		groupedProjectRoutes.POST("list", groupController.list)
 		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
-		groupedProjectRoutes.POST("update", groupController.rename)
+		groupedProjectRoutes.POST("update", groupController.projectRename)
 		groupedProjectRoutes.DELETE("delete", groupController.delete)
 		// for adapt
 		projectScreenRoutes.POST("move", groupController.move)
@@ -95,7 +95,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	}
 
 	{
-		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare)
+		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare...)
 		assetRoutes.POST("selectMyAssets", assetController.list)
 		assetRoutes.POST("updateMyAssetsName", assetController.update)
 		assetRoutes.POST("updateAssetsGroup", assetController.update)
@@ -108,12 +108,12 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 		assetRoutes.POST("addGroup", groupController.createDesginGroup)
 		assetRoutes.GET("deleteGroup", groupController.delete)
-		assetRoutes.POST("updateGroupsName", groupController.rename)
+		assetRoutes.POST("updateGroupsName", groupController.assetRename)
 		assetRoutes.POST("selectGroup", groupController.list)
 	}
 
 	{
-		themeRoutes := root.Group(theme_prefix).Use(canvasAuthMiddleWare)
+		themeRoutes := root.Group(theme_prefix).Use(canvasAuthMiddleWare...)
 
 		themeRoutes.POST("list", themeController.list)
 		themeRoutes.POST("create", themeController.create)
