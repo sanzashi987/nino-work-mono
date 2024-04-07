@@ -88,7 +88,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		groupedProjectRoutes.POST("list", groupController.list)
 		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
 		groupedProjectRoutes.POST("update", groupController.projectRename)
-		groupedProjectRoutes.DELETE("delete", groupController.delete)
+		groupedProjectRoutes.DELETE("delete", groupController.deleteProjectGroup)
 		// for adapt
 		projectScreenRoutes.POST("move", groupController.move)
 
@@ -107,7 +107,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		assetRoutes.POST("importAsset", assetController._import)
 
 		assetRoutes.POST("addGroup", groupController.createDesginGroup)
-		assetRoutes.GET("deleteGroup", groupController.delete)
+		assetRoutes.GET("deleteGroup", groupController.deleteAssetGroup)
 		assetRoutes.POST("updateGroupsName", groupController.assetRename)
 		assetRoutes.POST("selectGroup", groupController.list)
 	}

@@ -39,20 +39,34 @@ const length = len(charset)
 
 var runeToIndex = map[rune]int{}
 var supportedTagMap = map[string]int{}
+var basicToGroup = map[string]string{}
+var groupToBasic = map[string]string{}
 
 const groupStandard = rune('R')
 
 func GetGroupTypeTagFromBasic(typeTag string) (string, error) {
-	index, exist := supportedTagMap[typeTag]
-	if !exist || index >= len(supportedTags) {
+	res, exist := basicToGroup[typeTag]
+	if !exist {
 		return "", errors.New("input is not a basic type tag")
 	}
+	return res, nil
+}
 
+func GetBasicTypeTagFromGroup(typeTag string) (string, error) {
+	res, exist := groupToBasic[typeTag]
+	if !exist {
+		return "", errors.New("input is not a basic type tag")
+	}
+	return res, nil
+}
+
+func initGroupTypeTagFromBasic(typeTag string, index int) string {
 	charList := []rune(typeTag)
 	charList[0] += rune(index) + groupStandard
 	groupTypeTag := string(charList)
-
-	return groupTypeTag, nil
+	basicToGroup[typeTag] = groupTypeTag
+	groupToBasic[groupTypeTag] = typeTag
+	return groupTypeTag
 }
 
 func init() {
@@ -62,7 +76,7 @@ func init() {
 	basicTagListLength := len(supportedTags)
 	for i, typeTag := range supportedTags {
 		supportedTagMap[typeTag] = i
-		groupTypeTag, _ := GetGroupTypeTagFromBasic(typeTag)
+		groupTypeTag := initGroupTypeTagFromBasic(typeTag, i)
 		supportedTagMap[groupTypeTag] = basicTagListLength + i
 		supportedGroupTags = append(supportedGroupTags, groupTypeTag)
 	}

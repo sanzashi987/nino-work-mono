@@ -25,7 +25,7 @@ func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag st
 
 	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
 	if records != nil && err == nil {
-		if len(*records) > 0 {
+		if len(records) > 0 {
 			err = ErrorNameExisted
 			return
 		}
@@ -37,39 +37,45 @@ func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag st
 	return groupDao.Create(record)
 }
 
-var ErrorGroupNotFound = errors.New("error group is not exist")
+// var ErrorGroupNotFound = errors.New("error group is not exist")
 
 func delete(groupDao *dao.GroupDao, id uint64) (err error) {
-
-	record, err := groupDao.FindByKey("id", id)
-	if record == nil || err != nil {
-		err = ErrorGroupNotFound
-		return
-	}
-	groupDao.Delete(id)
+	err = groupDao.Delete(id)
 	return
 }
 
-func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
+type DeleteGroupEffect interface {
+	DeleleGroupEffect(uint64, uint64) error
+}
 
+func deleteEntry(ctx context.Context, groupCode, workspaceCode string, chain func(*db.BaseDao[model.GroupModel]) DeleteGroupEffect) (err error) {
 	groupDao := dao.NewGroupDao(ctx)
 	groupDao.BeginTransaction()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
 	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
 
-	chainProjectDao := dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(&groupDao.BaseDao))
-
+	chainDao := chain(&groupDao.BaseDao)
 	if err = delete(groupDao, groupId); err != nil {
 		groupDao.RollbackTransaction()
 		return
 	}
-	if err = chainProjectDao.DeleleGroupEffect(groupId, workspaceId); err != nil {
+	if err = chainDao.DeleleGroupEffect(groupId, workspaceId); err != nil {
 		groupDao.RollbackTransaction()
 		return
 	}
-
 	groupDao.CommitTransaction()
 	return
+}
+
+func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
+	return deleteEntry(ctx, groupCode, workspaceCode, func(baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
+		return dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(baseDao))
+	})
+}
+func (serv GroupService) DeleteAssetGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
+	return deleteEntry(ctx, groupCode, workspaceCode, func(baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
+		return dao.NewAssetDao(ctx, (*db.BaseDao[model.AssetModel])(baseDao))
+	})
 }
 
 var ErrorFailToRename = errors.New("Fail to rename group")
@@ -87,7 +93,7 @@ func (serv GroupService) Rename(ctx context.Context, workspaceCode, groupCode, g
 		return err
 	}
 
-	tagedGroups := model.FilterRecordsByTypeTag(*groups, typeTag)
+	tagedGroups := model.FilterRecordsByTypeTag(groups, typeTag)
 
 	if len(tagedGroups) > 0 {
 		return ErrorFailToRename

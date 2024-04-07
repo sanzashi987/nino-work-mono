@@ -28,10 +28,6 @@ type CreateAssetGroupReq struct {
 	//TypeTag string `json:"type" binding:"required"`
 }
 
-// func (c *GroupController) create(ctx *gin.Context) {
-
-// }
-
 func (c *GroupController) createProjectGroup(ctx *gin.Context) {
 	c.create(ctx, consts.PROJECT)
 }
@@ -59,10 +55,12 @@ type UpdateAssetGroupReq struct {
 }
 
 func (c *GroupController) projectRename(ctx *gin.Context) {
-
+	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(consts.PROJECT)
+	c.rename(ctx, groupTypeTag)
 }
 func (c *GroupController) assetRename(ctx *gin.Context) {
-
+	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(consts.DESIGN)
+	c.rename(ctx, groupTypeTag)
 }
 
 // rename
@@ -87,7 +85,15 @@ type DeleteAssetGroupReq struct {
 	GroupCode string `json:"groupCode" binding:"required"`
 }
 
+func (c *GroupController) deleteProjectGroup(ctx *gin.Context) {}
+func (c *GroupController) deleteAssetGroup(ctx *gin.Context)   {}
+
 func (c *GroupController) delete(ctx *gin.Context) {
+	reqBody := &DeleteAssetGroupReq{}
+	if err := ctx.BindJSON(reqBody); err != nil {
+		c.AbortClientError(ctx, err.Error())
+		return
+	}
 
 }
 

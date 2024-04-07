@@ -15,8 +15,8 @@ func NewGroupDao(ctx context.Context) *GroupDao {
 	return &GroupDao{db.InitBaseDao[model.GroupModel](ctx)}
 }
 
-func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res *[]model.GroupModel, err error) {
-	err = dao.GetOrm().Where("name = ? AND workspace = ?", name, workspace).Find(res).Error
+func (dao *GroupDao) FindByNameAndWorkspace(name, workspace string) (res []model.GroupModel, err error) {
+	err = dao.GetOrm().Where("name = ? AND workspace = ?", name, workspace).Find(&res).Error
 	return
 }
 
