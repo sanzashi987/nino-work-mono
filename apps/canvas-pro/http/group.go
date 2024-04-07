@@ -55,16 +55,16 @@ type UpdateAssetGroupReq struct {
 }
 
 func (c *GroupController) projectRename(ctx *gin.Context) {
-	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(consts.PROJECT)
-	c.rename(ctx, groupTypeTag)
+	c.rename(ctx, consts.PROJECT)
 }
+
 func (c *GroupController) assetRename(ctx *gin.Context) {
-	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(consts.DESIGN)
-	c.rename(ctx, groupTypeTag)
+	c.rename(ctx, consts.DESIGN)
 }
 
 // rename
 func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
+	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(typeTag)
 	workspaceCode := getWorkspaceCode(ctx)
 	reqBody := &UpdateAssetGroupReq{}
 
@@ -73,30 +73,54 @@ func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
 		return
 	}
 
-	if err := service.GroupServiceImpl.Rename(ctx, workspaceCode, reqBody.GroupCode, reqBody.GroupName, typeTag); err != nil {
+	if err := service.GroupServiceImpl.Rename(ctx, workspaceCode, reqBody.GroupCode, reqBody.GroupName, groupTypeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
 
-	c.ResponseJson(ctx, nil)
+	c.SuccessVoid(ctx)
 }
 
 type DeleteAssetGroupReq struct {
 	GroupCode string `json:"groupCode" binding:"required"`
 }
 
-func (c *GroupController) deleteProjectGroup(ctx *gin.Context) {}
-func (c *GroupController) deleteAssetGroup(ctx *gin.Context)   {}
+func (c *GroupController) deleteProjectGroup(ctx *gin.Context) {
+	c.delete(ctx, consts.PROJECT)
+}
+func (c *GroupController) deleteAssetGroup(ctx *gin.Context) {
+	c.delete(ctx, consts.DESIGN)
+}
 
-func (c *GroupController) delete(ctx *gin.Context) {
+func (c *GroupController) delete(ctx *gin.Context, typeTag string) {
 	reqBody := &DeleteAssetGroupReq{}
 	if err := ctx.BindJSON(reqBody); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
+	workspaceCode := getWorkspaceCode(ctx)
+	if err := service.GroupServiceImpl.Delete(ctx, reqBody.GroupCode, workspaceCode, typeTag); err != nil {
+		c.AbortClientError(ctx, err.Error())
+		return
+	}
+	c.SuccessVoid(ctx)
+}
 
+type MoveAssetReq struct {
+	DeleteAssetGroupReq
+	Ids []string `json:"codes" binding:"required"`
+}
+type MoveProjectReq struct {
+	DeleteAssetGroupReq
+	Ids []string `json:"fileIds" binding:"required"`
 }
 
 func (c *GroupController) move(ctx *gin.Context) {
 
+}
+
+func (c *GroupController) moveProject(ctx *gin.Context) {
+}
+
+func (c *GroupController) moveAsset(ctx *gin.Context) {
 }

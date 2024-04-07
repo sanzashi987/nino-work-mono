@@ -48,13 +48,29 @@ type DeleteGroupEffect interface {
 	DeleleGroupEffect(uint64, uint64) error
 }
 
-func deleteEntry(ctx context.Context, groupCode, workspaceCode string, chain func(*db.BaseDao[model.GroupModel]) DeleteGroupEffect) (err error) {
+type GetChainedDao = func(context.Context, *db.BaseDao[model.GroupModel]) DeleteGroupEffect
+
+var typeTagToChainedHandler = map[string]GetChainedDao{
+	consts.PROJECT: func(ctx context.Context, baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
+		return dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(baseDao))
+	},
+	consts.DESIGN: func(ctx context.Context, baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
+		return dao.NewAssetDao(ctx, (*db.BaseDao[model.AssetModel])(baseDao))
+	},
+}
+
+func (serv GroupService) Delete(ctx context.Context, groupCode, workspaceCode, typeTag string) (err error) {
 	groupDao := dao.NewGroupDao(ctx)
 	groupDao.BeginTransaction()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
 	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
 
-	chainDao := chain(&groupDao.BaseDao)
+	chain, exist := typeTagToChainedHandler[typeTag]
+	if !exist {
+		return errors.New("Not a supported type tag")
+	}
+
+	chainDao := chain(ctx, &groupDao.BaseDao)
 	if err = delete(groupDao, groupId); err != nil {
 		groupDao.RollbackTransaction()
 		return
@@ -65,17 +81,6 @@ func deleteEntry(ctx context.Context, groupCode, workspaceCode string, chain fun
 	}
 	groupDao.CommitTransaction()
 	return
-}
-
-func (serv GroupService) DeleteProjectGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
-	return deleteEntry(ctx, groupCode, workspaceCode, func(baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
-		return dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(baseDao))
-	})
-}
-func (serv GroupService) DeleteAssetGroup(ctx context.Context, groupCode, workspaceCode string) (err error) {
-	return deleteEntry(ctx, groupCode, workspaceCode, func(baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
-		return dao.NewAssetDao(ctx, (*db.BaseDao[model.AssetModel])(baseDao))
-	})
 }
 
 var ErrorFailToRename = errors.New("Fail to rename group")
