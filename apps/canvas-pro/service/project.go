@@ -164,24 +164,32 @@ func (serv ProjectService) Duplicate(ctx context.Context, code string) (string, 
 	return serv.Create(ctx, name, copyFrom.Config, groupCode, nil)
 }
 
+func commonMoveGroup(projectCodes []string, groupCode, workspaceCode string) (workspaceId, groupId uint64, ids []uint64, err error) {
+	workspaceId, _, _ = consts.GetIdFromCode(workspaceCode)
+	groupId, _, err = consts.GetIdFromCode(groupCode)
+	if err != nil {
+		return
+	}
+
+	for _, projectCode := range projectCodes {
+		projectId, _, errInside := consts.GetIdFromCode(projectCode)
+		if errInside != nil {
+			err = errInside
+			return
+		}
+		ids = append(ids, projectId)
+	}
+	return
+}
+
 func (serv *ProjectService) BatchMoveGroup(ctx context.Context, projectCodes []string, groupCode, workspaceCode string) error {
-	projectDao := dao.NewProjectDao(ctx)
-	projectIds := []uint64{}
-	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
-	groupId, _, err := consts.GetIdFromCode(groupCode)
+
+	workspaceId, groupId, projectIds, err := commonMoveGroup(projectCodes, groupCode, workspaceCode)
 	if err != nil {
 		return err
 	}
 
-	for _, projectCode := range projectCodes {
-		projectId, _, err := consts.GetIdFromCode(projectCode)
-		if err != nil {
-			return err
-		}
-		projectIds = append(projectIds, projectId)
-	}
-
-	if err := projectDao.BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
+	if err := dao.NewProjectDao(ctx).BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
 		return err
 	}
 

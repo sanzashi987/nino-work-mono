@@ -1,7 +1,10 @@
 package http
 
 import (
+	"encoding/json"
+
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
+	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -64,4 +67,29 @@ func (c *AssetController) replace(ctx *gin.Context) {
 func (c *AssetController) download(ctx *gin.Context) {
 }
 func (c *AssetController) _import(ctx *gin.Context) {
+}
+
+func (c *AssetController) moveGroup(ctx *gin.Context) {
+	groupCode := ctx.Query("groupCode")
+	assetCodesString := ctx.Query("fileIds")
+
+	if groupCode == "" || assetCodesString == "" {
+		c.AbortClientError(ctx, "move: "+"groupCode or fileIds is not provide")
+		return
+	}
+
+	assetCodes := []string{}
+
+	if err := json.Unmarshal([]byte(assetCodesString), &assetCodes); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
+		return
+	}
+
+	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, assetCodes, groupCode, getWorkspaceCode(ctx)); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
+
 }

@@ -83,7 +83,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		projectScreenRoutes.POST("downloadScreen", projectController.export)
 		projectScreenRoutes.POST("importScreen", projectController._import)
 		projectScreenRoutes.POST("checkRef", projectController.getInteraction)
-		projectScreenRoutes.POST("move", projectController.moveProject)
+		projectScreenRoutes.POST("move", projectController.moveGroup)
 
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)
 
@@ -91,7 +91,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
 		groupedProjectRoutes.POST("update", groupController.projectRename)
 		groupedProjectRoutes.DELETE("delete", groupController.deleteProjectGroup)
-		// for adapt
 
 	}
 
@@ -99,7 +98,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare...)
 		assetRoutes.POST("selectMyAssets", assetController.list)
 		assetRoutes.POST("updateMyAssetsName", assetController.update)
-		assetRoutes.POST("updateAssetsGroup", assetController.update)
+		assetRoutes.POST("updateAssetsGroup", assetController.moveGroup)
 		assetRoutes.DELETE("deleteAssets", assetController.delete)
 		assetRoutes.POST("upload", assetController.upload)
 		assetRoutes.POST("detail", assetController.read)

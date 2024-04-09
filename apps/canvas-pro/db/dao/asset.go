@@ -26,3 +26,8 @@ var assetTableName = model.ProjectModel{}.TableName()
 func (dao *AssetDao) DeleleGroupEffect(groupId, workspace uint64) error {
 	return dao.GetOrm().Table(assetTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
 }
+
+func (dao *AssetDao) BatchMoveGroup(groupId, workspace uint64, projectIds []uint64) error {
+	orm := dao.GetOrm().Table(assetTableName)
+	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
+}

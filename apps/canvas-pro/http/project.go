@@ -115,23 +115,28 @@ func (c *ProjectController) update(ctx *gin.Context) {
 		return
 	}
 
-	c.ResponseJson(ctx, nil)
+	c.SuccessVoid(ctx)
 }
 
-type BatchMoveRequest struct {
+type BatchMoveProjectGroupRequest struct {
 	GroupCode string   `json:"groupCode" binding:"required"`
 	Ids       []string `json:"codes" binding:"required"`
 }
 
-func (c *ProjectController) moveProject(ctx *gin.Context) {
-	reqBody := BatchMoveRequest{}
+func (c *ProjectController) moveGroup(ctx *gin.Context) {
+	reqBody := BatchMoveProjectGroupRequest{}
 
 	if err := ctx.BindJSON(&reqBody); err != nil {
 		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
 
-	
+	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, reqBody.Ids, reqBody.GroupCode, getWorkspaceCode(ctx)); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
 }
 
 type ProjectDeleteRequest struct {
