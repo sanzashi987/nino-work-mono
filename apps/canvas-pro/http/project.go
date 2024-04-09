@@ -93,7 +93,7 @@ func (c *ProjectController) read(ctx *gin.Context) {
 }
 
 type ProjectUpdateRequest struct {
-	Code      string `json:"code" binding:"required"`
+	Code      string `json:"code"`
 	Name      *string
 	Config    *string `json:"rootConfig"`
 	Thumbnail *string
@@ -116,6 +116,22 @@ func (c *ProjectController) update(ctx *gin.Context) {
 	}
 
 	c.ResponseJson(ctx, nil)
+}
+
+type BatchMoveRequest struct {
+	GroupCode string   `json:"groupCode" binding:"required"`
+	Ids       []string `json:"codes" binding:"required"`
+}
+
+func (c *ProjectController) moveProject(ctx *gin.Context) {
+	reqBody := BatchMoveRequest{}
+
+	if err := ctx.BindJSON(&reqBody); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
+		return
+	}
+
+	
 }
 
 type ProjectDeleteRequest struct {

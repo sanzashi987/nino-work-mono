@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"time"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
@@ -22,7 +21,6 @@ func NewProjectDao(ctx context.Context, dao ...*db.BaseDao[model.ProjectModel]) 
 	}
 	return &ProjectDao{BaseDao: baseDao}
 }
-
 
 func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, name, group *string) (projects *[]model.ProjectModel, err error) {
 
@@ -47,9 +45,18 @@ func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, 
 var projectTableName = model.ProjectModel{}.TableName()
 
 func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
-	return dao.GetOrm().Table(projectTableName).Where("id IN ?", ids).Update("delete_time", time.Now()).Error
+	return dao.GetOrm().Table(projectTableName).Where("id IN ?", ids).Delete().Error
+
 }
 
 func (dao *ProjectDao) DeleleGroupEffect(groupId, workspace uint64) error {
 	return dao.GetOrm().Table(projectTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
+}
+
+func (dao *ProjectDao) BatchMoveGroup(groupId, workspace uint64, projectIds []uint64) error {
+
+	orm := dao.GetOrm().Table(projectTableName)
+
+	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
+
 }

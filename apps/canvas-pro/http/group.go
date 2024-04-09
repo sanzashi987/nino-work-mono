@@ -106,21 +106,7 @@ func (c *GroupController) delete(ctx *gin.Context, typeTag string) {
 	c.SuccessVoid(ctx)
 }
 
-type MoveAssetReq struct {
-	DeleteAssetGroupReq
-	Ids []string `json:"codes" binding:"required"`
-}
 type MoveProjectReq struct {
 	DeleteAssetGroupReq
 	Ids []string `json:"fileIds" binding:"required"`
-}
-
-func (c *GroupController) move(ctx *gin.Context) {
-
-}
-
-func (c *GroupController) moveProject(ctx *gin.Context) {
-}
-
-func (c *GroupController) moveAsset(ctx *gin.Context) {
 }

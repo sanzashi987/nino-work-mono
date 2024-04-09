@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
@@ -14,7 +13,7 @@ type ProjectService struct{}
 
 var ProjectServiceImpl *ProjectService = &ProjectService{}
 
-func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, groupCode, useTemplate *string) (string, error) {
+func (serv ProjectService) Create(ctx context.Context, name, jsonConfig string, groupCode, useTemplate *string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	newProject := &model.ProjectModel{}
@@ -47,7 +46,7 @@ func (p *ProjectService) Create(ctx context.Context, name, jsonConfig string, gr
 	return newProject.Code, nil
 }
 
-func (p *ProjectService) Update(ctx context.Context, code string, name, config, thumbnail, group *string) (err error) {
+func (serv ProjectService) Update(ctx context.Context, code string, name, config, thumbnail, group *string) (err error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	toUpdate, idProject := model.ProjectModel{}, model.ProjectModel{}
@@ -89,7 +88,7 @@ type ProjectDetail struct {
 	UpdateTime string `json:"updateTime"`
 }
 
-func (p *ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
+func (serv ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
 	projectDao := dao.NewProjectDao(ctx)
 	project, e := projectDao.FindByKey("code", code)
 	if e != nil {
@@ -102,7 +101,7 @@ func (p *ProjectService) GetInfoById(ctx context.Context, code string) (result *
 	return
 }
 
-func (p *ProjectService) LogicalDeletion(ctx context.Context, codes []string) (err error) {
+func (serv ProjectService) LogicalDeletion(ctx context.Context, codes []string) (err error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	intIds := []uint64{}
@@ -123,13 +122,8 @@ type ProjectInfo struct {
 }
 type ProjectInfoList = []ProjectInfo
 
-var ErrorUserWorkspaceNotMatch = errors.New("current user does not have the access right to the given workspace")
-
-func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size int, workspace string, name, group *string) (*ProjectInfoList, error) {
+func (serv ProjectService) GetList(ctx context.Context, userId uint64, page, size int, workspace string, name, group *string) (*ProjectInfoList, error) {
 	projectDao := dao.NewProjectDao(ctx)
-	if !UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspace) {
-		return nil, ErrorUserWorkspaceNotMatch
-	}
 
 	infos, err := projectDao.GetList(page, size, workspace, name, group)
 	if err != nil {
@@ -148,11 +142,11 @@ func (p *ProjectService) GetList(ctx context.Context, userId uint64, page, size 
 
 }
 
-func (p *ProjectService) PublishProject(ctx context.Context, code string, pulishFlag int, publishSecretKey *string) error {
+func (serv ProjectService) PublishProject(ctx context.Context, code string, pulishFlag int, publishSecretKey *string) error {
 	return nil
 }
 
-func (p *ProjectService) Duplicate(ctx context.Context, code string) (string, error) {
+func (serv ProjectService) Duplicate(ctx context.Context, code string) (string, error) {
 	projectDao := dao.NewProjectDao(ctx)
 	copyFromId, _, err := consts.GetIdFromCode(code)
 	if err != nil {
@@ -167,5 +161,30 @@ func (p *ProjectService) Duplicate(ctx context.Context, code string) (string, er
 		groupCode = &str
 	}
 
-	return p.Create(ctx, name, copyFrom.Config, groupCode, nil)
+	return serv.Create(ctx, name, copyFrom.Config, groupCode, nil)
+}
+
+func (serv *ProjectService) BatchMoveGroup(ctx context.Context, projectCodes []string, groupCode, workspaceCode string) error {
+	projectDao := dao.NewProjectDao(ctx)
+	projectIds := []uint64{}
+	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
+	groupId, _, err := consts.GetIdFromCode(groupCode)
+	if err != nil {
+		return err
+	}
+
+	for _, projectCode := range projectCodes {
+		projectId, _, err := consts.GetIdFromCode(projectCode)
+		if err != nil {
+			return err
+		}
+		projectIds = append(projectIds, projectId)
+	}
+
+	if err := projectDao.BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
+		return err
+	}
+
+	return nil
+
 }

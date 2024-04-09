@@ -18,6 +18,7 @@ func getCurrentUser(ctx *gin.Context) uint64 {
 	return userId.(uint64)
 }
 
+
 func UserWorkspace(ctx *gin.Context) {
 	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
 
@@ -26,7 +27,7 @@ func UserWorkspace(ctx *gin.Context) {
 	} else {
 		ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"code": 400,
-			"msg":  "User does not has the access to the given workspace",
+			"msg":  "Current user does not have the access right to the given workspace",
 			"data": nil,
 		})
 	}
@@ -82,6 +83,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		projectScreenRoutes.POST("downloadScreen", projectController.export)
 		projectScreenRoutes.POST("importScreen", projectController._import)
 		projectScreenRoutes.POST("checkRef", projectController.getInteraction)
+		projectScreenRoutes.POST("move", projectController.moveProject)
 
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)
 
@@ -90,7 +92,6 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		groupedProjectRoutes.POST("update", groupController.projectRename)
 		groupedProjectRoutes.DELETE("delete", groupController.deleteProjectGroup)
 		// for adapt
-		projectScreenRoutes.POST("move", groupController.move)
 
 	}
 
