@@ -12,19 +12,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserServiceRpcImpl struct{}
+type UserServiceRpc struct{}
 
-var UserServiceRpc *UserServiceRpcImpl
+var UserServiceRpcImpl *UserServiceRpc
 var once sync.Once
 
-func GetUserServiceRpc() *UserServiceRpcImpl {
+func GetUserServiceRpc() *UserServiceRpc {
 	once.Do(func() {
-		UserServiceRpc = &UserServiceRpcImpl{}
+		UserServiceRpcImpl = &UserServiceRpc{}
 	})
-	return UserServiceRpc
+	return UserServiceRpcImpl
 }
 
-func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
+func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
 	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
 	if err != nil {
 		out.Reason = UsernameNotExist
@@ -47,7 +47,7 @@ func (u *UserServiceRpcImpl) UserLogin(ctx context.Context, in *user.UserLoginRe
 	return
 }
 
-func (u *UserServiceRpcImpl) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) error {
+func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) error {
 	dbSession := dao.NewUserDao(ctx)
 	user, err := dbSession.FindUserByUsername(in.Username)
 	if user != nil {

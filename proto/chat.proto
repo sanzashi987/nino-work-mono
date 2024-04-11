@@ -1,7 +1,7 @@
 syntax = "proto3";
 package services;
 
-option go_package = "./;chat";
+option go_package = "./proto/chat;chat";
 
 //protoc --micro_out=./proto/chat --go_out=./proto/chat proto/chat.proto
 

@@ -15,7 +15,11 @@ type AssetController struct {
 	controller.BaseController
 }
 
-var assetController = &AssetController{}
+var assetController = &AssetController{
+	controller.BaseController{
+		ErrorPrefix: "[http] canvas asset handler ",
+	},
+}
 
 type ListAssetReq struct {
 	GroupCode *string `json:"groupCode"`
@@ -59,7 +63,26 @@ func (c *AssetController) delete(ctx *gin.Context) {
 
 }
 
+type UploadAssetReq struct {
+	GroupCode string `json:"groupCode"`
+	GroupName string `json:"groupName"`
+	Type      string `json:"type"`
+}
+
+type UploadAssetRes struct {
+	FileId   string `json:"fileId"`
+	MimeType string `json:"mimeType"`
+	Name     string `json:"name"`
+	Size     int64  `json:"size"`
+	Suffix   string `json:"suffix"`
+}
+
 func (c *AssetController) upload(ctx *gin.Context) {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		c.AbortClientError(ctx, "upload: "+err.Error())
+	}
+
 }
 func (c *AssetController) replace(ctx *gin.Context) {
 }

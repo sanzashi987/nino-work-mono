@@ -23,7 +23,7 @@
 
 And you should be able to use following command to generate pb.go & micro.pb.go
 ```
-protoc --micro_out=. --go_out=. proto/**/*.proto
+protoc --micro_out=. --go_out=. -I=./proto
 ```
 
 

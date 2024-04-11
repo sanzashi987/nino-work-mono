@@ -7,16 +7,16 @@ import (
 
 func main() {
 
-	conf, etcdRegistry := bootstrap.CommonBootstrap("fileService.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("uploadService.client")
 
-	fileServiceConf, ok := conf.Service["fileService"]
+	uploadServiceConf, ok := conf.Service["uploadService"]
 	if !ok {
 		panic("File Service is not configured")
 	}
 
 	rpcService := micro.NewService(
-		micro.Name(fileServiceConf.Name),
-		micro.Address(bootstrap.GetAddress(fileServiceConf.Host, fileServiceConf.Port)),
+		micro.Name(uploadServiceConf.Name),
+		micro.Address(bootstrap.GetAddress(uploadServiceConf.Host, uploadServiceConf.Port)),
 		micro.Registry(etcdRegistry),
 	)
 

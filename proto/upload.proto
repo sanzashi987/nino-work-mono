@@ -1,0 +1,19 @@
+syntax="proto3";
+package serivces;
+
+option go_package = "./proto/upload;upload";
+
+
+message FileUploadRequest {
+  string filename =1;
+  bytes data = 2;
+}
+
+message FileUploadResponse {
+  string id = 1;
+}
+
+
+service FileUploadService {
+  rpc UploadService(stream FileUploadRequest)returns (FileUploadResponse){}
+}
