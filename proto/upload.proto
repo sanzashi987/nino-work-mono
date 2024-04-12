@@ -15,5 +15,5 @@ message FileUploadResponse {
 
 
 service FileUploadService {
-  rpc UploadService(stream FileUploadRequest)returns (FileUploadResponse){}
+  rpc UploadFile(stream FileUploadRequest) returns (FileUploadResponse){}
 }

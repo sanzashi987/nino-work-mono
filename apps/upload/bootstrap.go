@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/cza14h/nino-work/apps/upload/service"
 	"github.com/cza14h/nino-work/pkg/bootstrap"
+	"github.com/cza14h/nino-work/proto/upload"
 	"go-micro.dev/v4"
 )
 
@@ -32,6 +34,8 @@ func main() {
 	// go func() {
 	// 	webService.Run()
 	// }()
+
+	upload.RegisterFileUploadServiceHandler(rpcService.Server(), service.GetUploadServiceRpc())
 
 	rpcService.Init()
 	rpcService.Run()
