@@ -17,7 +17,7 @@ type UserServiceRpc struct{}
 var UserServiceRpcImpl *UserServiceRpc
 var once sync.Once
 
-func GetUserServiceRpc() *UserServiceRpc {
+func GetUserServiceRpc() user.UserServiceHandler {
 	once.Do(func() {
 		UserServiceRpcImpl = &UserServiceRpc{}
 	})
@@ -47,18 +47,20 @@ func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginReques
 	return
 }
 
-func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) error {
+func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) (err error) {
 	dbSession := dao.NewUserDao(ctx)
 	user, err := dbSession.FindUserByUsername(in.Username)
 	if user != nil {
 		out.Reason = UsernameExisted
-		return err
+		err = errors.New("Username existed")
+		return
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 
 		if in.Password != in.PasswordConfirm {
 			out.Reason = PasswordNotMatch
-			return err
+			err = errors.New("Password does not match")
+			return
 		}
 
 		user := model.UserModel{
@@ -70,15 +72,17 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 		}
 
 		dbSession.CreateUser(&user)
-		token, err := auth.GenerateToken(user.Username, user.Id)
+		var token string
+		token, err = auth.GenerateToken(user.Username, user.Id)
 		if err != nil {
 			out.Reason = FailToCreateToken
-			return err
+			return
 		}
 		out.JwtToken = token
-		return nil
+		return
 	}
 
 	out.Reason = InternalServerError
-	return errors.New("Unknown edge case in user service")
+	err = errors.New("Unknown edge case in user service")
+	return
 }

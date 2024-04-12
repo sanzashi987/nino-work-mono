@@ -32,7 +32,7 @@ func main() {
 		web.Registry(etcdRegistry),
 	)
 
-	user.RegisterUserSerivceHandler(rpcService.Server(), service.GetUserServiceRpc())
+	user.RegisterUserServiceHandler(rpcService.Server(), service.GetUserServiceRpc())
 	webService.Init()
 	rpcService.Init()
 

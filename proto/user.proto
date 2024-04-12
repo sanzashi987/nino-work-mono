@@ -27,7 +27,7 @@ message UserRegisterResponse {
 }
 
 
-service UserSerivce {
+service UserService {
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse){}
   rpc UserRegister(UserRegisterRequest) returns (UserRegisterResponse){}
 }

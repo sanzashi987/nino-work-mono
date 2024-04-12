@@ -16,21 +16,16 @@ import (
 type ChatServiceRpcImpl struct{}
 
 // var once sync.Once
-var chatService *ChatServiceRpcImpl
+var chatService = &ChatServiceRpcImpl{}
 
-func init() {
-	chatService = &ChatServiceRpcImpl{}
-	// return chatService
-}
-
-func GetChatServiceRpc() *ChatServiceRpcImpl {
+func GetChatServiceRpc() chat.ChatServiceHandler {
 	// once.Do(func() {
 	// 	chatService = &ChatServiceRpcImpl{}
 	// })
 	return chatService
 }
 
-func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out *chat.ChatResponse) error {
+func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out *chat.ChatResponse) (err error) {
 	dbSession := dao.NewChatDao(ctx)
 	var gptRequest openai.ChatCompletionRequest
 	messages := []openai.ChatCompletionMessage{}
@@ -57,23 +52,26 @@ func (c *ChatServiceRpcImpl) Chat(ctx context.Context, in *chat.ChatRequest, out
 	client := openai.NewClientWithConfig(gptConfig)
 
 	if ok := consts.SupportModels[gptRequest.Model]; ok {
-		response, err := client.CreateChatCompletion(ctx, gptRequest)
+		var response openai.ChatCompletionResponse
+		response, err = client.CreateChatCompletion(ctx, gptRequest)
 		if err != nil {
 			out.Reason = consts.FailToCreateCompletion
-			return err
+			return
 		}
 
 		content := response.Choices[0].Message.Content
-
-		userMessageId, _, err := dbSession.CreateMessagePair(content, in.Content, uint64(in.DialogId))
+		var userMessageId uint64
+		userMessageId, _, err = dbSession.CreateMessagePair(content, in.Content, uint64(in.DialogId))
 		if err != nil {
 			out.Reason = consts.FailToInsertMessagePair
-			return err
+			return
 		}
 		out.Content = content
 		out.Reason = consts.Success
 		out.Id = userMessageId
-		return nil
+		return
 	}
-	return errors.New("Unknown edge case in chat service")
+
+	err = errors.New("Unknown edge case in chat service")
+	return
 }
