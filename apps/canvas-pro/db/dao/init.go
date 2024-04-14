@@ -5,8 +5,8 @@ import (
 	"github.com/cza14h/nino-work/pkg/db"
 )
 
-func ConnectDB(dbname string) {
-	instance := db.ConnectDB(dbname)
+func ConnectDB() {
+	instance := db.ConnectDB()
 	instance.AutoMigrate(
 		&model.ThemeModel{},
 		&model.WorkspaceModel{},

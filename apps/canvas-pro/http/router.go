@@ -6,8 +6,11 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/middleware"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/auth"
+	"github.com/cza14h/nino-work/proto/upload"
 	"github.com/gin-gonic/gin"
 )
+
+const RPCKEY = "RPCCLIENTS"
 
 func getWorkspaceCode(ctx *gin.Context) string {
 	return ctx.GetHeader("Projectcode")
@@ -18,6 +21,11 @@ func getCurrentUser(ctx *gin.Context) uint64 {
 	return userId.(uint64)
 }
 
+func getUploadRpcService(ctx *gin.Context) upload.FileUploadService {
+	rpcMap, _ := ctx.Get(RPCKEY)
+	m, _ := rpcMap.(map[string]any)
+	return m["upload"].(upload.FileUploadService)
+}
 
 func UserWorkspace(ctx *gin.Context) {
 	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
@@ -33,14 +41,21 @@ func UserWorkspace(ctx *gin.Context) {
 	}
 }
 
-func NewRouter(loginPageUrl string) *gin.Engine {
+func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 	router := gin.Default()
 
 	root := router.Group("enc-oss-canvas/V1")
+
+	mergeRpcMiddleware := func(ctx *gin.Context) {
+		ctx.Set(RPCKEY, rpcServices)
+	}
+
 	canvasAuthMiddleWare := []gin.HandlerFunc{
 		middleware.CanvasUserLoggedIn(loginPageUrl),
 		UserWorkspace,
 	}
+
+	root.Use(mergeRpcMiddleware)
 
 	{
 		loginGroup := root.Group(login_prefix)

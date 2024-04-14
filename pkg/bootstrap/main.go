@@ -15,9 +15,16 @@ type ServiceClient struct {
 	client client.Client
 }
 
+func (c ServiceClient) GetName() string {
+	return c.name
+}
+func (c ServiceClient) GetClientInstance() client.Client {
+	return c.client
+}
+
 var serviceClient *ServiceClient
 
-func InitClient(name string, reg registry.Registry) {
+func initClient(name string, reg registry.Registry) {
 	mySelector := selector.NewSelector(
 		selector.Registry(reg),
 		selector.SetStrategy(selector.RoundRobin),
@@ -31,6 +38,10 @@ func InitClient(name string, reg registry.Registry) {
 	}
 }
 
+func GetClient() *ServiceClient {
+	return serviceClient
+}
+
 func GetAddress(host, port string) string {
 	return fmt.Sprintf("%s:%s", host, port)
 }
@@ -41,6 +52,6 @@ func CommonBootstrap(name string) (*config.Config, registry.Registry) {
 		registry.Addrs(GetAddress(conf.System.EtcdHost, conf.System.EtcdPort)),
 	)
 
-	InitClient(name, etcdRegistry)
+	initClient(name, etcdRegistry)
 	return conf, etcdRegistry
 }
