@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http"
 	"github.com/cza14h/nino-work/pkg/bootstrap"
 	"go-micro.dev/v4/web"
@@ -8,7 +9,7 @@ import (
 
 func main() {
 	conf, etcdRegistry := bootstrap.CommonBootstrap("canvasService.client")
-	// dao.ConnectDB()
+	dao.ConnectDB()
 
 	canvasService, ok := conf.Service["canvasService"]
 	if !ok {

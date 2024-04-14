@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cza14h/nino-work/apps/upload/db"
 	"github.com/cza14h/nino-work/apps/upload/service"
 	"github.com/cza14h/nino-work/pkg/bootstrap"
 	"github.com/cza14h/nino-work/proto/upload"
@@ -16,6 +17,7 @@ func main() {
 		panic("File Service is not configured")
 	}
 
+	db.ConnectDB()
 	rpcService := micro.NewService(
 		micro.Name(uploadServiceConf.Name),
 		micro.Address(bootstrap.GetAddress(uploadServiceConf.Host, uploadServiceConf.Port)),

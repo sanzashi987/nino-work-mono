@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
+	model "github.com/cza14h/nino-work/apps/upload/db"
 	"github.com/cza14h/nino-work/proto/upload"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
@@ -47,14 +49,24 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 		if writer.Buffered() > 4096 {
 			err = writer.Flush()
 			if err != nil {
-				fmt.Println("刷新缓冲区时出错:", err)
+				fmt.Println("Flush Buffer Error:", err)
 				return
 			}
 		}
 	}
 	writer.Flush()
 
-	mimetype.Detect()
+	tempFilePath := tempFile.Name()
+	mimeType, err := mimetype.DetectFile(tempFilePath)
 
-	return
+	dt := time.Now().Format("2006/01/02")
+	path := fmt.Sprintf("./uploads/%s/%s.%s", dt, uuidStr, mimeType.Extension())
+	os.Rename(tempFilePath, path)
+
+	if err := model.NewUploadDao(ctx).CreateFile(mimeType.String(), path, uuidStr); err != nil {
+		return err
+	}
+
+	res.Id = uuidStr
+	return stream.SendMsg(&res)
 }

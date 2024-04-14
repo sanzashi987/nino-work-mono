@@ -41,3 +41,13 @@ func (model *BaseModel) GetCreatedDate() string {
 func (model *BaseModel) GetUpdatedDate() string {
 	return model.UpdateTime.Format("2006-01-02")
 }
+
+func (m *BaseModel) BeforCreate(tx *gorm.DB) (err error) {
+	m.CreateTime = time.Now()
+	return
+}
+
+func (m *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
+	m.UpdateTime = time.Now()
+	return
+}
