@@ -114,10 +114,15 @@ func (c *AssetController) moveGroup(ctx *gin.Context) {
 	groupCode := ctx.Query("groupCode")
 	assetCodesString := ctx.Query("fileIds")
 
-	query := MoveGroupQuery{}
+	// query := MoveGroupQuery{}
 
-	if err := ctx.BindQuery(&query); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
+	// if err := ctx.BindQuery(&query); err != nil {
+	// 	c.AbortClientError(ctx, "move: "+err.Error())
+	// 	return
+	// }
+
+	if groupCode == "" || assetCodesString == "" {
+		c.AbortClientError(ctx, "move: groupCode or fileIds is required")
 		return
 	}
 
