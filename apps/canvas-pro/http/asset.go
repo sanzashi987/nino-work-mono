@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"io"
 	"mime/multipart"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
@@ -36,14 +35,14 @@ func (c *AssetController) list(ctx *gin.Context) {
 }
 
 type ReadQuery struct {
-	FileId string `json:"fileId" binding:"required"`
+	FileId string `form:"fileId" binding:"required"`
 }
 
 /*CRUD*/
 func (c *AssetController) read(ctx *gin.Context) {
 	query := &ReadQuery{}
-	if err := ctx.ShouldBindQuery(query); err != nil {
-		c.AbortClientError(ctx, "[http] canvas asset read: fail to get required field in query, "+err.Error())
+	if err := ctx.BindQuery(query); err != nil {
+		c.AbortClientError(ctx, "read: "+err.Error())
 		return
 	}
 }
@@ -80,8 +79,6 @@ type UploadAssetRes struct {
 	Suffix   string `json:"suffix"`
 }
 
-const chunkSize = 1024 * 1024
-
 func (c *AssetController) upload(ctx *gin.Context) {
 	form := UploadAssetForm{}
 
@@ -92,25 +89,10 @@ func (c *AssetController) upload(ctx *gin.Context) {
 
 	uploadRpc := getUploadRpcService(ctx)
 
-	stream, err := uploadRpc.UploadFile(ctx)
-	if err != nil {
-		c.AbortClientError(ctx, "upload: "+err.Error())
+	_, workspaceId := getWorkspaceCode(ctx)
+	if err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.File.Filename, form.File); err != nil {
+		c.AbortServerError(ctx, "upload: "+err.Error())
 		return
-	}
-
-	reader, _ := form.File.Open()
-	defer reader.Close()
-	defer stream.Close()
-	for {
-		buf := make([]byte, chunkSize)
-		_, err := reader.Read(buf)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			c.AbortClientError(ctx, "upload: "+err.Error())
-			return
-		}
 	}
 
 }
@@ -122,12 +104,20 @@ func (c *AssetController) download(ctx *gin.Context) {
 func (c *AssetController) _import(ctx *gin.Context) {
 }
 
+// TODO test and refactor here with bind
+type MoveGroupQuery struct {
+	GroupCode string `form:"groupCode" binding:"required"`
+	FileIds   string `form:"fileIds" binding:"required"`
+}
+
 func (c *AssetController) moveGroup(ctx *gin.Context) {
 	groupCode := ctx.Query("groupCode")
 	assetCodesString := ctx.Query("fileIds")
 
-	if groupCode == "" || assetCodesString == "" {
-		c.AbortClientError(ctx, "move: "+"groupCode or fileIds is not provide")
+	query := MoveGroupQuery{}
+
+	if err := ctx.BindQuery(&query); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
 
@@ -138,8 +128,10 @@ func (c *AssetController) moveGroup(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, assetCodes, groupCode, getWorkspaceCode(ctx)); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
+	_, workspaceId := getWorkspaceCode(ctx)
+
+	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, assetCodes, groupCode); err != nil {
+		c.AbortServerError(ctx, "move: "+err.Error())
 		return
 	}
 

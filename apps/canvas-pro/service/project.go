@@ -164,8 +164,7 @@ func (serv ProjectService) Duplicate(ctx context.Context, code string) (string, 
 	return serv.Create(ctx, name, copyFrom.Config, groupCode, nil)
 }
 
-func commonMoveGroup(projectCodes []string, groupCode, workspaceCode string) (workspaceId, groupId uint64, ids []uint64, err error) {
-	workspaceId, _, _ = consts.GetIdFromCode(workspaceCode)
+func commonMoveGroup(projectCodes []string, groupCode string) (groupId uint64, ids []uint64, err error) {
 	groupId, _, err = consts.GetIdFromCode(groupCode)
 	if err != nil {
 		return
@@ -182,9 +181,9 @@ func commonMoveGroup(projectCodes []string, groupCode, workspaceCode string) (wo
 	return
 }
 
-func (serv *ProjectService) BatchMoveGroup(ctx context.Context, projectCodes []string, groupCode, workspaceCode string) error {
+func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint64, projectCodes []string, groupCode string) error {
 
-	workspaceId, groupId, projectIds, err := commonMoveGroup(projectCodes, groupCode, workspaceCode)
+	groupId, projectIds, err := commonMoveGroup(projectCodes, groupCode)
 	if err != nil {
 		return err
 	}

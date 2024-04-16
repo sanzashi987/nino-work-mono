@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/middleware"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/auth"
@@ -12,8 +13,10 @@ import (
 
 const RPCKEY = "RPCCLIENTS"
 
-func getWorkspaceCode(ctx *gin.Context) string {
-	return ctx.GetHeader("Projectcode")
+func getWorkspaceCode(ctx *gin.Context) (string, uint64) {
+	workspaceCode := ctx.GetHeader("Projectcode")
+	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
+	return workspaceCode, workspaceId
 }
 
 func getCurrentUser(ctx *gin.Context) uint64 {
@@ -28,8 +31,8 @@ func getUploadRpcService(ctx *gin.Context) upload.FileUploadService {
 }
 
 func UserWorkspace(ctx *gin.Context) {
-	userId, workspaceCode := getCurrentUser(ctx), getWorkspaceCode(ctx)
-
+	userId := getCurrentUser(ctx)
+	workspaceCode, _ := getWorkspaceCode(ctx)
 	if service.UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode) {
 		ctx.Next()
 	} else {

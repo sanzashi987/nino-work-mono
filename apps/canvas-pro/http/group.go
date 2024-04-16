@@ -36,13 +36,13 @@ func (c *GroupController) createDesginGroup(ctx *gin.Context) {
 }
 
 func (c *GroupController) create(ctx *gin.Context, typeTag string) {
-	workspaceCode := getWorkspaceCode(ctx)
+	_, workspaceId := getWorkspaceCode(ctx)
 	reqBody := CreateAssetGroupReq{}
 	if err := ctx.BindJSON(&reqBody); err != nil {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
-	if err := service.GroupServiceImpl.Create(ctx, reqBody.GroupName, workspaceCode, typeTag); err != nil {
+	if err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
@@ -65,7 +65,7 @@ func (c *GroupController) assetRename(ctx *gin.Context) {
 // rename
 func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
 	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(typeTag)
-	workspaceCode := getWorkspaceCode(ctx)
+	_, workspaceId := getWorkspaceCode(ctx)
 	reqBody := &UpdateAssetGroupReq{}
 
 	if err := ctx.BindJSON(reqBody); err != nil {
@@ -73,7 +73,7 @@ func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
 		return
 	}
 
-	if err := service.GroupServiceImpl.Rename(ctx, workspaceCode, reqBody.GroupCode, reqBody.GroupName, groupTypeTag); err != nil {
+	if err := service.GroupServiceImpl.Rename(ctx, workspaceId, reqBody.GroupCode, reqBody.GroupName, groupTypeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
@@ -98,8 +98,8 @@ func (c *GroupController) delete(ctx *gin.Context, typeTag string) {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
-	workspaceCode := getWorkspaceCode(ctx)
-	if err := service.GroupServiceImpl.Delete(ctx, reqBody.GroupCode, workspaceCode, typeTag); err != nil {
+	_, workspaceId := getWorkspaceCode(ctx)
+	if err := service.GroupServiceImpl.Delete(ctx, workspaceId, reqBody.GroupCode, typeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}

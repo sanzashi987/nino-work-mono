@@ -31,3 +31,8 @@ func (dao *AssetDao) BatchMoveGroup(groupId, workspace uint64, projectIds []uint
 	orm := dao.GetOrm().Table(assetTableName)
 	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
 }
+
+func (dao *AssetDao) CreateAsset(workspace uint64,) (err error) {
+
+	return
+}

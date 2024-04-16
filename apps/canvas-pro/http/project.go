@@ -135,8 +135,8 @@ func (c *ProjectController) moveGroup(ctx *gin.Context) {
 		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
-
-	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, reqBody.Ids, reqBody.GroupCode, getWorkspaceCode(ctx)); err != nil {
+	_, workspaceId := getWorkspaceCode(ctx)
+	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.Ids, reqBody.GroupCode); err != nil {
 		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}

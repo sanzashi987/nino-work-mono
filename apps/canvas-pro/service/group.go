@@ -16,22 +16,20 @@ var GroupServiceImpl *GroupService = &GroupService{}
 
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func (serv GroupService) Create(ctx context.Context, name, workspace, typeTag string) (err error) {
+func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (err error) {
 	if err = consts.IsLegalName(name); err != nil {
 		return err
 	}
 
 	groupDao := dao.NewGroupDao(ctx)
 
-	records, err := groupDao.FindByNameAndWorkspace(name, workspace)
+	records, err := groupDao.FindByNameAndWorkspace(name, workspaceId)
 	if records != nil && err == nil {
 		if len(records) > 0 {
 			err = ErrorNameExisted
 			return
 		}
 	}
-	workspaceId, _, _ := consts.GetIdFromCode(workspace)
-
 	record := model.GroupModel{}
 	record.Name, record.Workspace, record.TypeTag = name, workspaceId, typeTag
 	return groupDao.Create(record)
@@ -59,11 +57,10 @@ var typeTagToChainedHandler = map[string]GetChainedDao{
 	},
 }
 
-func (serv GroupService) Delete(ctx context.Context, groupCode, workspaceCode, typeTag string) (err error) {
+func (serv GroupService) Delete(ctx context.Context, workspaceId uint64, groupCode, typeTag string) (err error) {
 	groupDao := dao.NewGroupDao(ctx)
 	groupDao.BeginTransaction()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
-	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
 
 	chain, exist := typeTagToChainedHandler[typeTag]
 	if !exist {
@@ -85,7 +82,7 @@ func (serv GroupService) Delete(ctx context.Context, groupCode, workspaceCode, t
 
 var ErrorFailToRename = errors.New("Fail to rename group")
 
-func (serv GroupService) Rename(ctx context.Context, workspaceCode, groupCode, groupName, typeTag string) (err error) {
+func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCode, groupName, typeTag string) (err error) {
 
 	if err = consts.IsLegalName(groupName); err != nil {
 		return
@@ -93,7 +90,7 @@ func (serv GroupService) Rename(ctx context.Context, workspaceCode, groupCode, g
 
 	groupDao := dao.NewGroupDao(ctx)
 
-	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceCode)
+	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId)
 	if err != nil {
 		return err
 	}
