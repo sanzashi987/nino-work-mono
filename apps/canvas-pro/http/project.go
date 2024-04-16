@@ -76,14 +76,19 @@ func (c *ProjectController) create(ctx *gin.Context) {
 	c.ResponseJson(ctx, projectCode)
 }
 
+type ReadProjectQuery struct {
+	Id string `uri:"id" binding:"required"`
+}
+
 func (c *ProjectController) read(ctx *gin.Context) {
-	code, err := c.MustGetParam(ctx, "id")
-	if err != nil {
+	query := ReadProjectQuery{}
+
+	if err := ctx.BindUri(&query); err != nil {
 		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 
-	projectDetail, err := service.ProjectServiceImpl.GetInfoById(ctx, code)
+	projectDetail, err := service.ProjectServiceImpl.GetInfoById(ctx, query.Id)
 	if err != nil {
 		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
@@ -161,12 +166,12 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 
 // features
 func (c *ProjectController) duplicate(ctx *gin.Context) {
-	id, err := c.MustGetParam(ctx, "id")
+	query := ReadProjectQuery{}
 
-	if err != nil {
+	if err := ctx.BindUri(&query); err != nil {
 		return
 	}
-	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, id)
+	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, query.Id)
 	if err != nil {
 		c.AbortServerError(ctx, createPrefix+err.Error())
 		return

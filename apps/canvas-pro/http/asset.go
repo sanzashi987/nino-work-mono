@@ -2,6 +2,8 @@ package http
 
 import (
 	"encoding/json"
+	"io"
+	"mime/multipart"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
@@ -63,10 +65,11 @@ func (c *AssetController) delete(ctx *gin.Context) {
 
 }
 
-type UploadAssetReq struct {
-	GroupCode string `json:"groupCode"`
-	GroupName string `json:"groupName"`
-	Type      string `json:"type"`
+type UploadAssetForm struct {
+	GroupCode string                `form:"groupCode"`
+	GroupName string                `form:"groupName"`
+	Type      string                `form:"type"`
+	File      *multipart.FileHeader `form:"file" binding:"required"`
 }
 
 type UploadAssetRes struct {
@@ -77,10 +80,37 @@ type UploadAssetRes struct {
 	Suffix   string `json:"suffix"`
 }
 
+const chunkSize = 1024 * 1024
+
 func (c *AssetController) upload(ctx *gin.Context) {
-	file, err := ctx.FormFile("file")
+	form := UploadAssetForm{}
+
+	if err := ctx.Bind(&form); err != nil {
+		c.AbortClientError(ctx, "upload: "+err.Error())
+		return
+	}
+
+	uploadRpc := getUploadRpcService(ctx)
+
+	stream, err := uploadRpc.UploadFile(ctx)
 	if err != nil {
 		c.AbortClientError(ctx, "upload: "+err.Error())
+		return
+	}
+
+	reader, _ := form.File.Open()
+	defer reader.Close()
+	defer stream.Close()
+	for {
+		buf := make([]byte, chunkSize)
+		_, err := reader.Read(buf)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			c.AbortClientError(ctx, "upload: "+err.Error())
+			return
+		}
 	}
 
 }

@@ -2,7 +2,7 @@ package db
 
 import "github.com/cza14h/nino-work/pkg/db"
 
-func ConnectDB(dbname string) {
+func ConnectDB() {
 	instance := db.ConnectDB()
 	instance.AutoMigrate(&File{})
 }
