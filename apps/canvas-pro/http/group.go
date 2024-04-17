@@ -42,7 +42,7 @@ func (c *GroupController) create(ctx *gin.Context, typeTag string) {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
-	if err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
+	if _,err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}

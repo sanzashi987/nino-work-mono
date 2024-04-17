@@ -1,9 +1,9 @@
 package http
 
 import (
-	"encoding/json"
 	"mime/multipart"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
@@ -104,38 +104,37 @@ func (c *AssetController) download(ctx *gin.Context) {
 func (c *AssetController) _import(ctx *gin.Context) {
 }
 
-// TODO test and refactor here with bind
-type MoveGroupQuery struct {
-	GroupCode string `form:"groupCode" binding:"required"`
-	FileIds   string `form:"fileIds" binding:"required"`
+type MoveGroupReq struct {
+	FileIds []string `json:"fileIds" binding:"required"`
 }
 
 func (c *AssetController) moveGroup(ctx *gin.Context) {
 	groupCode := ctx.Query("groupCode")
-	assetCodesString := ctx.Query("fileIds")
+	groupName := ctx.Query("groupName")
 
-	// query := MoveGroupQuery{}
-
-	// if err := ctx.BindQuery(&query); err != nil {
-	// 	c.AbortClientError(ctx, "move: "+err.Error())
-	// 	return
-	// }
-
-	if groupCode == "" || assetCodesString == "" {
-		c.AbortClientError(ctx, "move: groupCode or fileIds is required")
+	reqBody := MoveGroupReq{}
+	if err := ctx.BindJSON(&reqBody); err != nil {
+		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
 
-	assetCodes := []string{}
-
-	if err := json.Unmarshal([]byte(assetCodesString), &assetCodes); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
+	if groupCode == "" && groupName == "" {
+		c.AbortClientError(ctx, "move: groupCode or groupName is required")
 		return
 	}
 
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, assetCodes, groupCode); err != nil {
+	if groupName != "" {
+		res, err := service.GroupServiceImpl.Create(ctx, workspaceId, groupName, consts.DESIGN)
+		if err != nil {
+			c.AbortServerError(ctx, "move: "+err.Error())
+			return
+		}
+		groupCode = res.Code
+	}
+
+	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupCode); err != nil {
 		c.AbortServerError(ctx, "move: "+err.Error())
 		return
 	}

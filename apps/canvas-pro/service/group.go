@@ -16,9 +16,9 @@ var GroupServiceImpl *GroupService = &GroupService{}
 
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (err error) {
+func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (record *model.GroupModel, err error) {
 	if err = consts.IsLegalName(name); err != nil {
-		return err
+		return
 	}
 
 	groupDao := dao.NewGroupDao(ctx)
@@ -30,9 +30,10 @@ func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, t
 			return
 		}
 	}
-	record := model.GroupModel{}
+	record = &model.GroupModel{}
 	record.Name, record.Workspace, record.TypeTag = name, workspaceId, typeTag
-	return groupDao.Create(record)
+	err = groupDao.Create(record)
+	return
 }
 
 // var ErrorGroupNotFound = errors.New("error group is not exist")

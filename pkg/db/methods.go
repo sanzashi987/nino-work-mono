@@ -83,8 +83,8 @@ func (dao *BaseDao[Model]) CommitTransaction() {
 	}
 }
 
-func (dao *BaseDao[Model]) Create(record Model, config ...Configure) (err error) {
-	err = dao.GetOrm(config...).Create(&record).Error
+func (dao *BaseDao[Model]) Create(record *Model, config ...Configure) (err error) {
+	err = dao.GetOrm(config...).Create(record).Error
 	return
 }
 

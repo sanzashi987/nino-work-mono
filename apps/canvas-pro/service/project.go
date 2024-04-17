@@ -39,7 +39,7 @@ func (serv ProjectService) Create(ctx context.Context, name, jsonConfig string, 
 
 	}
 
-	if err := projectDao.Create(*newProject); err != nil {
+	if err := projectDao.Create(newProject); err != nil {
 		return "", err
 	}
 
@@ -164,19 +164,19 @@ func (serv ProjectService) Duplicate(ctx context.Context, code string) (string, 
 	return serv.Create(ctx, name, copyFrom.Config, groupCode, nil)
 }
 
-func commonMoveGroup(projectCodes []string, groupCode string) (groupId uint64, ids []uint64, err error) {
+func commonMoveGroup(codes []string, groupCode string) (groupId uint64, ids []uint64, err error) {
 	groupId, _, err = consts.GetIdFromCode(groupCode)
 	if err != nil {
 		return
 	}
 
-	for _, projectCode := range projectCodes {
-		projectId, _, errInside := consts.GetIdFromCode(projectCode)
+	for _, code := range codes {
+		id, _, errInside := consts.GetIdFromCode(code)
 		if errInside != nil {
 			err = errInside
 			return
 		}
-		ids = append(ids, projectId)
+		ids = append(ids, id)
 	}
 	return
 }
