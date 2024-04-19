@@ -11,11 +11,11 @@ const TEMPLATE = 6
 
 type AssetModel struct {
 	BaseModel
-	Version  string
-	Type     uint8
-	FileId   string
-	FilePath string
-	GroupId  uint64 `gorm:"default:0"`
+	Version string
+	Type    string
+	FileId  string
+	// FilePath string
+	GroupId uint64 `gorm:"default:0"`
 }
 
 func (m AssetModel) TableName() string {

@@ -11,6 +11,8 @@ message FileUploadRequest {
 
 message FileUploadResponse {
   string id = 1;
+  string path = 2;
+  string type  =3;
 }
 
 

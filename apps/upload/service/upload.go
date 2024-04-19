@@ -67,6 +67,6 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 		return err
 	}
 
-	res.Id = uuidStr
+	res.Id, res.Path, res.Type = uuidStr, path, mimeType.String()
 	return stream.SendMsg(&res)
 }

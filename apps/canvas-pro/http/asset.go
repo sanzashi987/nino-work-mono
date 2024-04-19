@@ -90,7 +90,7 @@ func (c *AssetController) upload(ctx *gin.Context) {
 	uploadRpc := getUploadRpcService(ctx)
 
 	_, workspaceId := getWorkspaceCode(ctx)
-	if err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.File.Filename, form.File); err != nil {
+	if err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.GroupCode, form.GroupName, form.File.Filename, form.Type, form.File); err != nil {
 		c.AbortServerError(ctx, "upload: "+err.Error())
 		return
 	}

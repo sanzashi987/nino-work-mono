@@ -28,7 +28,7 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 
 const chunkSize = 1024 * 1024
 
-func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, filename string, file *multipart.FileHeader) (err error) {
+func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, groupName, groupCode, filename, assetType string, file *multipart.FileHeader) (err error) {
 	stream, err := uploadRpc.UploadFile(ctx)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 
 	assetDao := dao.NewAssetDao(ctx)
 
-	if err = assetDao.CreateAsset(workspaceId); err != nil {
+	if err = assetDao.CreateAsset(workspaceId, rpcResponse.Id, assetType); err != nil {
 		return
 	}
 
