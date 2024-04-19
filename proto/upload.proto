@@ -12,7 +12,9 @@ message FileUploadRequest {
 message FileUploadResponse {
   string id = 1;
   string path = 2;
-  string type  =3;
+  string mimeType  =3;
+  string extension  =4;
+  int64 size =5;
 }
 
 

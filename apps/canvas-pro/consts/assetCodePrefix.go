@@ -69,6 +69,11 @@ func initGroupTypeTagFromBasic(typeTag string, index int) string {
 	return groupTypeTag
 }
 
+func IsGroup(tag string) bool {
+	_, exist := groupToBasic[tag]
+	return exist
+}
+
 func init() {
 	for i, typeTag := range charset {
 		runeToIndex[typeTag] = i

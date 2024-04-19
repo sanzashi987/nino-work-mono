@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/auth"
@@ -139,18 +138,7 @@ func (c *ProjectController) moveGroup(ctx *gin.Context) {
 	}
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	groupCode := reqBody.GroupCode
-
-	if reqBody.GroupName != "" {
-		res, err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, consts.DESIGN)
-		if err != nil {
-			c.AbortServerError(ctx, "move: "+err.Error())
-			return
-		}
-		groupCode = res.Code
-	}
-
-	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.Ids, groupCode); err != nil {
+	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.Ids, reqBody.GroupName, reqBody.GroupCode); err != nil {
 		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}

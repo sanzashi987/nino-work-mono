@@ -12,7 +12,6 @@ const TEMPLATE = 6
 type AssetModel struct {
 	BaseModel
 	Version string
-	Type    string
 	FileId  string
 	// FilePath string
 	GroupId uint64 `gorm:"default:0"`

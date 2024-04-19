@@ -16,24 +16,14 @@ var GroupServiceImpl *GroupService = &GroupService{}
 
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (record *model.GroupModel, err error) {
-	if err = consts.IsLegalName(name); err != nil {
-		return
+func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (*model.GroupModel, error) {
+	if err := consts.IsLegalName(name); err != nil {
+		return nil, err
 	}
 
 	groupDao := dao.NewGroupDao(ctx)
 
-	records, err := groupDao.FindByNameAndWorkspace(name, workspaceId)
-	if records != nil && err == nil {
-		if len(records) > 0 {
-			err = ErrorNameExisted
-			return
-		}
-	}
-	record = &model.GroupModel{}
-	record.Name, record.Workspace, record.TypeTag = name, workspaceId, typeTag
-	err = groupDao.Create(record)
-	return
+	return groupDao.Create(workspaceId, name, typeTag)
 }
 
 // var ErrorGroupNotFound = errors.New("error group is not exist")
@@ -109,4 +99,25 @@ func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCo
 		return
 	}
 	return
+}
+
+func createGroup[T any](ctx context.Context, chainedDao *dao.AnyDao[T], workspaceId uint64, groupName, typeTag string) (*model.GroupModel, error) {
+
+	if groupName != "" {
+		if err := consts.IsLegalName(groupName); err != nil {
+			chainedDao.RollbackTransaction()
+			return nil, err
+		}
+
+		groupDao := dao.NewGroupDao(ctx, (*db.BaseDao[model.GroupModel])(&chainedDao.BaseDao))
+		newGroup, err := groupDao.Create(workspaceId, groupName, typeTag)
+		if err != nil {
+			chainedDao.RollbackTransaction()
+			return nil, err
+		}
+		return newGroup, nil
+	}
+
+	return nil, nil
+
 }

@@ -181,17 +181,27 @@ func commonMoveGroup(codes []string, groupCode string) (groupId uint64, ids []ui
 	return
 }
 
-func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint64, projectCodes []string, groupCode string) error {
+func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint64, projectCodes []string, groupName, groupCode string) error {
+	code := groupCode
+	projectDao := dao.NewProjectDao(ctx)
+	projectDao.BeginTransaction()
 
-	groupId, projectIds, err := commonMoveGroup(projectCodes, groupCode)
+	if newGroup, err := createGroup(ctx, (*dao.AnyDao[model.ProjectModel])(projectDao), workspaceId, groupName, consts.PROJECT); err != nil {
+		return err
+	} else if newGroup != nil {
+		code = newGroup.Code
+	}
+
+	groupId, projectIds, err := commonMoveGroup(projectCodes, code)
 	if err != nil {
 		return err
 	}
 
-	if err := dao.NewProjectDao(ctx).BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
+	if err := projectDao.BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
 		return err
 	}
 
+	projectDao.CommitTransaction()
 	return nil
 
 }

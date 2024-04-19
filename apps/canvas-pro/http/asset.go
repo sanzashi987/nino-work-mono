@@ -3,7 +3,6 @@ package http
 import (
 	"mime/multipart"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
@@ -71,14 +70,6 @@ type UploadAssetForm struct {
 	File      *multipart.FileHeader `form:"file" binding:"required"`
 }
 
-type UploadAssetRes struct {
-	FileId   string `json:"fileId"`
-	MimeType string `json:"mimeType"`
-	Name     string `json:"name"`
-	Size     int64  `json:"size"`
-	Suffix   string `json:"suffix"`
-}
-
 func (c *AssetController) upload(ctx *gin.Context) {
 	form := UploadAssetForm{}
 
@@ -90,10 +81,13 @@ func (c *AssetController) upload(ctx *gin.Context) {
 	uploadRpc := getUploadRpcService(ctx)
 
 	_, workspaceId := getWorkspaceCode(ctx)
-	if err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.GroupCode, form.GroupName, form.File.Filename, form.Type, form.File); err != nil {
+	res, err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.GroupCode, form.GroupName, form.File.Filename, form.Type, form.File)
+	if err != nil {
 		c.AbortServerError(ctx, "upload: "+err.Error())
 		return
 	}
+
+	c.ResponseJson(ctx, res)
 
 }
 func (c *AssetController) replace(ctx *gin.Context) {
@@ -125,16 +119,7 @@ func (c *AssetController) moveGroup(ctx *gin.Context) {
 
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	if groupName != "" {
-		res, err := service.GroupServiceImpl.Create(ctx, workspaceId, groupName, consts.DESIGN)
-		if err != nil {
-			c.AbortServerError(ctx, "move: "+err.Error())
-			return
-		}
-		groupCode = res.Code
-	}
-
-	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupCode); err != nil {
+	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupName, groupCode); err != nil {
 		c.AbortServerError(ctx, "move: "+err.Error())
 		return
 	}

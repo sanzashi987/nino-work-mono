@@ -33,12 +33,14 @@ func (dao *AssetDao) BatchMoveGroup(groupId, workspace uint64, projectIds []uint
 	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
 }
 
-func (dao *AssetDao) CreateAsset(workspace uint64, fileId, assetType string) (err error) {
+func (dao *AssetDao) CreateAsset(workspace, groupId uint64, name, fileId, assetType string) (*model.AssetModel, error) {
 	toCreate := model.AssetModel{
 		Version: consts.DefaultVersion,
 		FileId:  fileId,
-		Type:    assetType,
+		GroupId: groupId,
 	}
 	toCreate.Workspace, toCreate.TypeTag = workspace, assetType
-	return dao.GetOrm().Table(assetTableName).Create(&toCreate).Error
+	err := dao.GetOrm().Table(assetTableName).Create(&toCreate).Error
+
+	return &toCreate, err
 }
