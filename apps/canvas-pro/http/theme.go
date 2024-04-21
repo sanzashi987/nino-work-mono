@@ -25,4 +25,6 @@ func (c *ThemeController) create(ctx *gin.Context) {
 }
 func (c *ThemeController) delete(ctx *gin.Context) {
 
+	_, workspaceId := getWorkspaceCode(ctx)
+
 }
