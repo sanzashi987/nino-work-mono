@@ -17,6 +17,7 @@ const (
 	COMPONENT     = "E"
 	DATASOURCE    = "F"
 	STATIC_SOURCE = "H"
+	THEME         = "J"
 	WORKSPACE     = "P"
 	GROUP         = "R"
 )
