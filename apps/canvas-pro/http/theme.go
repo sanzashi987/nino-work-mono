@@ -18,9 +18,35 @@ var themeController = &ThemeController{
 	},
 }
 
+type ThemeItem struct {
+	Name       string `json:"name"`
+	Theme      string `json:"theme"`
+	Id         uint64 `json:"id"`
+	CreateTime string `json:"createTime"`
+	UpdateTime string `json:"updateTime"`
+}
+
 func (c *ThemeController) list(ctx *gin.Context) {
 	_, workspaceId := getWorkspaceCode(ctx)
+	models, err := service.ThemeServiceImpl.GetThemes(ctx, workspaceId)
+	if err != nil {
+		c.AbortServerError(ctx, "update: "+err.Error())
+		return
+	}
 
+	res := []ThemeItem{}
+
+	for _, model := range models {
+		res = append(res, ThemeItem{
+			Name:       model.Name,
+			Id:         model.Id,
+			CreateTime: model.GetCreatedDate(),
+			UpdateTime: model.GetUpdatedDate(),
+			Theme:      model.Config,
+		})
+	}
+
+	c.ResponseJson(ctx, res)
 }
 
 type UpdateThemeReq struct {
@@ -51,10 +77,32 @@ func (c *ThemeController) update(ctx *gin.Context) {
 
 	c.SuccessVoid(ctx)
 }
+
+type CreateThemeReq struct {
+	Name   string `json:"name" binding:"required"`
+	Config string `json:"theme" binding:"required"`
+}
+
 func (c *ThemeController) create(ctx *gin.Context) {
+
+	req := CreateThemeReq{}
+	if err := ctx.BindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "create: "+err.Error())
+		return
+	}
+
 	_, workspaceId := getWorkspaceCode(ctx)
 
+	if err := service.ThemeServiceImpl.CreateTheme(ctx, workspaceId, req.Name, req.Config); err != nil {
+		c.AbortServerError(ctx, "create: "+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
+
 }
+
+
 func (c *ThemeController) delete(ctx *gin.Context) {
 
 	_, workspaceId := getWorkspaceCode(ctx)
