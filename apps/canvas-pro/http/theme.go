@@ -102,9 +102,24 @@ func (c *ThemeController) create(ctx *gin.Context) {
 
 }
 
+type DeleteThemeReq struct {
+	Data []uint64 `json:"data" binding:"required"`
+}
 
 func (c *ThemeController) delete(ctx *gin.Context) {
 
+	req := DeleteThemeReq{}
+	if err := ctx.BindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "delete: "+err.Error())
+		return
+	}
 	_, workspaceId := getWorkspaceCode(ctx)
+
+	if err := service.ThemeServiceImpl.DeleteThemes(ctx, workspaceId, req.Data); err != nil {
+		c.AbortServerError(ctx, "delete: "+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
 
 }

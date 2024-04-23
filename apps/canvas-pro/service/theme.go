@@ -25,3 +25,8 @@ func (serv ThemeService) GetThemes(ctx context.Context, workspaceId uint64) ([]m
 	themeDao := dao.NewThemeDao(ctx)
 	return themeDao.GetWorkspaceThemes(workspaceId)
 }
+
+func (serv ThemeService) DeleteThemes(ctx context.Context, workspaceId uint64, ids []uint64) error {
+	themeDao := dao.NewThemeDao(ctx)
+	return themeDao.BatchDeleleTheme(workspaceId, ids)
+}
