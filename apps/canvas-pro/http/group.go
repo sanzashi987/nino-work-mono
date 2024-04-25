@@ -19,7 +19,35 @@ var groupController = &GroupController{
 	},
 }
 
-func (c *GroupController) list(ctx *gin.Context) {
+func (c *GroupController) listAssetGroup(ctx *gin.Context) {
+	c.listByType(ctx, consts.DESIGN)
+}
+
+func (c *GroupController) listProjectGroup(ctx *gin.Context) {
+	c.listByType(ctx, consts.PROJECT)
+}
+
+type ListGroupReq struct {
+	GroupName string `json:"groupName"`
+}
+
+func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
+
+	reqBody := ListGroupReq{}
+	if err := ctx.BindJSON(); err != nil {
+		c.AbortClientError(ctx, "list: "+err.Error())
+		return
+	}
+	_, workspaceId := getWorkspaceCode(ctx)
+
+	output, err := service.GroupServiceImpl.ListGroups(ctx, workspaceId, reqBody.GroupName, typeTag)
+	if err != nil {
+		c.AbortServerError(ctx, "list: "+err.Error())
+		return
+
+	}
+	c.ResponseJson(ctx, output)
+
 }
 
 /*CRUD*/
@@ -42,7 +70,7 @@ func (c *GroupController) create(ctx *gin.Context, typeTag string) {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
-	if _,err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
+	if _, err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}

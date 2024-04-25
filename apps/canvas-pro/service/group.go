@@ -81,14 +81,14 @@ func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCo
 
 	groupDao := dao.NewGroupDao(ctx)
 
-	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId)
+	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId, typeTag)
 	if err != nil {
 		return err
 	}
 
-	tagedGroups := model.FilterRecordsByTypeTag(groups, typeTag)
+	// tagedGroups := model.FilterRecordsByTypeTag(groups, typeTag)
 
-	if len(tagedGroups) > 0 {
+	if len(groups) > 0 {
 		return ErrorFailToRename
 	}
 
@@ -120,4 +120,17 @@ func createGroup[T any](ctx context.Context, chainedDao *dao.AnyDao[T], workspac
 
 	return nil, nil
 
+}
+
+type ListGroupOutput struct {
+	Id    uint64 `json:"id"`
+	Name  string `json:"name"`
+	Code  string `json:"code"`
+	Count uint   `json:"count"`
+}
+
+func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output []ListGroupOutput, err error) {
+	groupTypeTage, err := consts.GetGroupTypeTagFromBasic(typeTag)
+
+	return
 }

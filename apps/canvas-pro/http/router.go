@@ -105,7 +105,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)
 
-		groupedProjectRoutes.POST("list", groupController.list)
+		groupedProjectRoutes.POST("list", groupController.listProjectGroup)
 		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
 		groupedProjectRoutes.POST("update", groupController.projectRename)
 		groupedProjectRoutes.DELETE("delete", groupController.deleteProjectGroup)
@@ -127,7 +127,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		assetRoutes.POST("addGroup", groupController.createDesginGroup)
 		assetRoutes.GET("deleteGroup", groupController.deleteAssetGroup)
 		assetRoutes.POST("updateGroupsName", groupController.assetRename)
-		assetRoutes.POST("selectGroup", groupController.list)
+		assetRoutes.POST("selectGroup", groupController.listAssetGroup)
 	}
 
 	{

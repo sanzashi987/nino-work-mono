@@ -24,8 +24,8 @@ func NewGroupDao(ctx context.Context, dao ...*db.BaseDao[model.GroupModel]) *Gro
 	// return &GroupDao{db.InitBaseDao[model.GroupModel](ctx)}
 }
 
-func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64) (res []model.GroupModel, err error) {
-	err = dao.GetOrm().Where("name = ? AND workspace = ?", name, workspace).Find(&res).Error
+func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64, typeTag string) (res []model.GroupModel, err error) {
+	err = dao.GetOrm().Where("name = ? AND workspace = ? and type_tag = ?", name, workspace, typeTag).Find(&res).Error
 	return
 }
 
@@ -42,7 +42,7 @@ func (dao *GroupDao) Delete(id uint64) (err error) {
 var ErrorNameExisted = errors.New("error group name is exist")
 
 func (dao *GroupDao) Create(workspaceId uint64, name, typeTag string) (record *model.GroupModel, err error) {
-	records, err := dao.FindByNameAndWorkspace(name, workspaceId)
+	records, err := dao.FindByNameAndWorkspace(name, workspaceId, typeTag)
 	if records != nil && err == nil {
 		if len(records) > 0 {
 			err = ErrorNameExisted

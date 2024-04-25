@@ -13,7 +13,7 @@ import (
 
 type BaseModel struct {
 	db.BaseModel
-	TypeTag   string
+	TypeTag   string `gorm:"index"`
 	Name      string
 	Workspace uint64 `gorm:"default:0;index"`
 	Creator   uint64
