@@ -34,7 +34,7 @@ type ListGroupReq struct {
 func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
 
 	reqBody := ListGroupReq{}
-	if err := ctx.BindJSON(); err != nil {
+	if err := ctx.BindJSON(&reqBody); err != nil {
 		c.AbortClientError(ctx, "list: "+err.Error())
 		return
 	}

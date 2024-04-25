@@ -132,5 +132,12 @@ type ListGroupOutput struct {
 func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output []ListGroupOutput, err error) {
 	groupTypeTage, err := consts.GetGroupTypeTagFromBasic(typeTag)
 
+	groupDao := dao.NewGroupDao(ctx)
+
+	records, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId, groupTypeTage)
+	if err != nil {
+		return
+	}
+
 	return
 }

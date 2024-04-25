@@ -15,6 +15,10 @@ type AssetService struct{}
 
 var AssetServiceImpl *AssetService = &AssetService{}
 
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64) {
+
+}
+
 func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
 	code := groupCode
 	assetDao := dao.NewAssetDao(ctx)

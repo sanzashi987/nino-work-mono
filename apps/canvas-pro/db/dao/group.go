@@ -24,8 +24,14 @@ func NewGroupDao(ctx context.Context, dao ...*db.BaseDao[model.GroupModel]) *Gro
 	// return &GroupDao{db.InitBaseDao[model.GroupModel](ctx)}
 }
 
-func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64, typeTag string) (res []model.GroupModel, err error) {
-	err = dao.GetOrm().Where("name = ? AND workspace = ? and type_tag = ?", name, workspace, typeTag).Find(&res).Error
+func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64, groupTypeTag string) (res []model.GroupModel, err error) {
+
+	orm := dao.GetOrm().Where(" workspace = ? AND type_tag = ?", workspace, groupTypeTag)
+	if name != "" {
+		orm = orm.Where("name = ?", name)
+	}
+
+	err = orm.Find(&res).Error
 	return
 }
 
