@@ -44,3 +44,15 @@ func (dao *AssetDao) CreateAsset(workspace, groupId uint64, name, fileId, assetT
 
 	return &toCreate, err
 }
+
+type GroupCount struct {
+	Id    uint64
+	Count uint64
+}
+
+func (dao AssetDao) GetAssetCountByGroup(workspaceId uint64, groupIds []uint64) (res []GroupCount, err error) {
+
+	err = dao.GetOrm().Table(assetTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupIds).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
+	return
+
+}

@@ -128,6 +128,14 @@ type ListGroupOutput struct {
 	Code  string `json:"code"`
 	Count uint   `json:"count"`
 }
+type GetGroupCount interface {
+	GetCountFromGroupId(context.Context, uint64, []uint64)
+}
+
+var typeTagToGroupCountHandler = map[string]GetGroupCount{
+	consts.PROJECT: ProjectServiceImpl,
+	consts.DESIGN:  AssetServiceImpl,
+}
 
 func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output []ListGroupOutput, err error) {
 	groupTypeTage, err := consts.GetGroupTypeTagFromBasic(typeTag)

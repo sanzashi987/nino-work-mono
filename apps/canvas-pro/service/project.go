@@ -205,3 +205,7 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 	return nil
 
 }
+
+func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) {
+
+}

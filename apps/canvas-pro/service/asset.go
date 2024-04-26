@@ -19,6 +19,12 @@ func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint6
 
 }
 
+func (serv AssetService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]dao.GroupCount, error) {
+	assetDao := dao.NewAssetDao(ctx)
+
+	return assetDao.GetAssetCountByGroup(workspaceId, groupId)
+}
+
 func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
 	code := groupCode
 	assetDao := dao.NewAssetDao(ctx)
