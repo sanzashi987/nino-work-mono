@@ -60,3 +60,10 @@ func (dao *ProjectDao) BatchMoveGroup(groupId, workspace uint64, projectIds []ui
 	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
 
 }
+
+func (dao ProjectDao) GetProjectCountByGroup(workspaceId uint64, groupIds []uint64) (res []GroupCount, err error) {
+
+	err = dao.GetOrm().Table(projectTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupIds).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
+	return
+
+}

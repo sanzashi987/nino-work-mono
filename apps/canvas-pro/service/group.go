@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
@@ -128,8 +129,21 @@ type ListGroupOutput struct {
 	Code  string `json:"code"`
 	Count uint   `json:"count"`
 }
+
+type ListGroupOutputs []ListGroupOutput
+
+func (p ListGroupOutputs) Len() int {
+	return len(p)
+}
+func (p ListGroupOutputs) Less(i, j int) bool {
+	return p[i].Id < p[j].Id
+}
+func (p ListGroupOutputs) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
 type GetGroupCount interface {
-	GetCountFromGroupId(context.Context, uint64, []uint64)
+	GetCountFromGroupId(context.Context, uint64, []uint64) ([]dao.GroupCount, error)
 }
 
 var typeTagToGroupCountHandler = map[string]GetGroupCount{
@@ -137,7 +151,7 @@ var typeTagToGroupCountHandler = map[string]GetGroupCount{
 	consts.DESIGN:  AssetServiceImpl,
 }
 
-func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output []ListGroupOutput, err error) {
+func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output ListGroupOutputs, err error) {
 	groupTypeTage, err := consts.GetGroupTypeTagFromBasic(typeTag)
 
 	groupDao := dao.NewGroupDao(ctx)
@@ -146,6 +160,34 @@ func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, gro
 	if err != nil {
 		return
 	}
+
+	impl, exist := typeTagToGroupCountHandler[typeTag]
+	if !exist {
+		err = errors.New("Not find a corresponding interface related to the give type tag")
+		return
+	}
+
+	groupIds := []uint64{}
+
+	idToRecord := map[uint64]model.GroupModel{}
+	for _, record := range records {
+		groupIds = append(groupIds, record.Id)
+		idToRecord[record.Id] = record
+	}
+
+	groupCounts, err := impl.GetCountFromGroupId(ctx, workspaceId, groupIds)
+
+	for _, groupCount := range groupCounts {
+		record := idToRecord[groupCount.Id]
+		output = append(output, ListGroupOutput{
+			Id:    groupCount.Id,
+			Count: uint(groupCount.Count),
+			Name:  record.Name,
+			Code:  record.Code,
+		})
+	}
+
+	sort.Sort(output)
 
 	return
 }

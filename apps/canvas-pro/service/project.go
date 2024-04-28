@@ -206,6 +206,8 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 
 }
 
-func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) {
+func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]dao.GroupCount, error) {
+	projectDao := dao.NewProjectDao(ctx)
 
+	return projectDao.GetProjectCountByGroup(workspaceId, groupId)
 }
