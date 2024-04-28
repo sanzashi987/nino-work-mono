@@ -126,3 +126,16 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 	res.Suffix, res.Name, res.MimeType, res.FileId = rpcResponse.Extension, asset.Name, rpcResponse.MimeType, asset.Code
 	return
 }
+
+func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, assetName, assetCode string) error {
+	if err := consts.IsLegalName(assetName); err != nil {
+		return err
+	}
+
+	assetId, _, _ := consts.GetIdFromCode(assetCode)
+
+	assetDao := dao.NewAssetDao(ctx)
+
+	return assetDao.UpdateAssetName(workspaceId, assetId, assetName)
+
+}

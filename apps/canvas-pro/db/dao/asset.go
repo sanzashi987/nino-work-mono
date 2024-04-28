@@ -6,6 +6,7 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type AssetDao struct {
@@ -55,4 +56,13 @@ func (dao AssetDao) GetAssetCountByGroup(workspaceId uint64, groupIds []uint64) 
 	err = dao.GetOrm().Table(assetTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupIds).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
 	return
 
+}
+
+func (dao AssetDao) update(workspaceId, assetId uint64) *gorm.DB {
+	return dao.GetOrm().Table(assetTableName).Where("id = ?", assetId).Where("workspace = ?", workspaceId)
+
+}
+
+func (dao AssetDao) UpdateAssetName(workspaceId, assetId uint64, assetName string) error {
+	return dao.update(workspaceId, assetId).Update("name", assetName).Error
 }

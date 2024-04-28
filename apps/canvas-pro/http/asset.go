@@ -46,17 +46,31 @@ func (c *AssetController) read(ctx *gin.Context) {
 	}
 }
 
-type UpdateAssetParam struct {
-	FileId   string `json:"fileId"`
-	FIleName string `json:"fileName"`
-}
-
 type UpdateAssetQuery struct {
 	GroupCode string `json:"groupCode"`
 	GroupName string `json:"groupName"`
 }
 
+type UpdateAssetParam struct {
+	FileId   string `json:"fileId"`
+	FIleName string `json:"fileName"`
+}
+
 func (c *AssetController) update(ctx *gin.Context) {
+
+	reqBody := UpdateAssetParam{}
+	if err := ctx.BindJSON(&reqBody); err != nil {
+		c.AbortClientError(ctx, "update: "+err.Error())
+		return
+	}
+
+	_, workspaceId := getWorkspaceCode(ctx)
+
+	if err := service.AssetServiceImpl.Update(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
+		c.AbortServerError(ctx, "update: "+err.Error())
+		return
+	}
+	c.SuccessVoid(ctx)
 
 }
 func (c *AssetController) delete(ctx *gin.Context) {

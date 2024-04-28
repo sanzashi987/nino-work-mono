@@ -14,8 +14,13 @@ const legalNameRegex = `^[\u4E00-\u9FA5\uF900-\uFA2D\w][\u4E00-\u9FA5\uF900-\uFA
 var LegalNameReg, _ = regexp.Compile(legalNameRegex)
 
 var ErrorNameContainIllegalChar = errors.New("error name contains illegal character")
+var ErrorNameEmpty = errors.New("error name is empty")
 
 func IsLegalName(name string) error {
+	if name == "" {
+		return ErrorNameEmpty
+	}
+
 	if LegalNameReg.FindStringIndex(name) == nil {
 		return ErrorNameContainIllegalChar
 	}
