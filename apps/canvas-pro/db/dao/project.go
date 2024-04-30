@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
 	"github.com/cza14h/nino-work/pkg/db"
 )
@@ -22,17 +21,12 @@ func NewProjectDao(ctx context.Context, dao ...*db.BaseDao[model.ProjectModel]) 
 	return &ProjectDao{BaseDao: baseDao}
 }
 
-func (dao *ProjectDao) GetList(page, size int, workspace string /**optional**/, name, group *string) (projects *[]model.ProjectModel, err error) {
+func (dao *ProjectDao) GetList(page, size int, workspace uint64, name *string, groupId *uint64) (projects *[]model.ProjectModel, err error) {
 
 	query := dao.GetOrm().Scopes(db.Paginate(page, size)).Model(&model.ProjectModel{}).Where("workspace = ?", workspace)
 
-	if group != nil {
-		_, _, err = consts.GetIdFromCode(*group)
-		if err != nil {
-			return
-		}
-
-		query = query.Where(" group_id = ?", *group)
+	if groupId != nil {
+		query = query.Where(" group_id = ?", *groupId)
 	}
 
 	if name != nil {

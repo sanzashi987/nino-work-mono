@@ -31,6 +31,13 @@ type ListAssetReq struct {
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
+	reqBody := ListAssetReq{}
+	if err := ctx.BindJSON(&reqBody); err != nil {
+		c.AbortClientError(ctx, "list: "+err.Error())
+		return
+	}
+
+	
 }
 
 type ReadQuery struct {

@@ -122,10 +122,20 @@ type ProjectInfo struct {
 }
 type ProjectInfoList = []ProjectInfo
 
-func (serv ProjectService) GetList(ctx context.Context, userId uint64, page, size int, workspace string, name, group *string) (*ProjectInfoList, error) {
+func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page, size int, name, group *string) (*ProjectInfoList, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
-	infos, err := projectDao.GetList(page, size, workspace, name, group)
+	var groupId *uint64
+
+	if group != nil {
+		id, _, err := consts.GetIdFromCode(*group)
+		if err != nil {
+			return nil, err
+		}
+		groupId = &id
+	}
+
+	infos, err := projectDao.GetList(page, size, workspaceId, name, groupId)
 	if err != nil {
 		return nil, err
 	}

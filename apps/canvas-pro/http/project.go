@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -22,28 +21,27 @@ var projectController = &ProjectController{
 
 type GetProjectListRequest struct {
 	request.PaginationRequest
-	Workspace string
-	Name      *string
-	Group     *string
+	// Workspace string
+	Name  *string
+	Group *string
 }
 
 const listPrefix = "list: "
 
 func (c *ProjectController) list(ctx *gin.Context) {
 	requestBody := &GetProjectListRequest{}
-	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
+	if err := ctx.BindJSON(&requestBody); err != nil {
 		c.AbortClientError(ctx, listPrefix+err.Error())
 		return
 	}
 
-	userId, exists := ctx.Get(auth.UserID)
-	if !exists {
-		c.AbortClientError(ctx, listPrefix+" userId does not exist in http context")
-		return
-	}
-
-	userIdTyped := userId.(uint64)
-	infoList, err := service.ProjectServiceImpl.GetList(ctx, userIdTyped, requestBody.Page, requestBody.Size, requestBody.Workspace, requestBody.Name, requestBody.Group)
+	// userId, exists := ctx.Get(auth.UserID)
+	// if !exists {
+	// 	c.AbortClientError(ctx, listPrefix+" userId does not exist in http context")
+	// 	return
+	// }
+	_, workspaceId := getWorkspaceCode(ctx)
+	infoList, err := service.ProjectServiceImpl.GetList(ctx, workspaceId, requestBody.Page, requestBody.Size, requestBody.Name, requestBody.Group)
 	if err != nil {
 		c.AbortServerError(ctx, listPrefix+err.Error())
 		return
