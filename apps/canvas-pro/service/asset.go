@@ -15,7 +15,7 @@ type AssetService struct{}
 
 var AssetServiceImpl *AssetService = &AssetService{}
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64) {
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, typeTag, groupCode string) {
 
 }
 

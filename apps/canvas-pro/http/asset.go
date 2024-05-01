@@ -3,6 +3,7 @@ package http
 import (
 	"mime/multipart"
 
+	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/cza14h/nino-work/pkg/controller"
@@ -22,12 +23,28 @@ var assetController = &AssetController{
 }
 
 type ListAssetReq struct {
-	GroupCode *string `json:"groupCode"`
-	MimeType  *string `json:"filter"`
-	FileName  *string `json:"fileName"`
-	FileType  *string `json:"fileType"`
-	Sort      *int    `json:"sort"`
+	GroupCode string `json:"groupCode"`
+	// Name      string `json:"fileName"`
 	request.PaginationRequest
+}
+
+type ListAssetData struct {
+	FileCode   string  `json:"fileId"`
+	Name       string  `json:"fileName"`
+	GroupCode  string  `json:"groupCode"`
+	GroupName  string  `json:"groupName"`
+	MimeType   string  `json:"mimeType"`
+	Size       int     `json:"size"`
+	Suffix     *string `json:"suffix"`
+	CreateTime string  `json:"createTime"`
+	UpdateTime string  `json:"updateTime"`
+}
+type ListAssetRes struct {
+	Data        []ListAssetData `json:"data"`
+	PageIndex   int
+	PageSize    int
+	PageTotal   int
+	RecordTotal int
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
@@ -37,7 +54,9 @@ func (c *AssetController) list(ctx *gin.Context) {
 		return
 	}
 
-	
+	_, workspaceId := getWorkspaceCode(ctx)
+	service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, reqBody.GroupCode)
+
 }
 
 type ReadQuery struct {
