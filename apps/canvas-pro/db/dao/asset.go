@@ -66,3 +66,14 @@ func (dao AssetDao) update(workspaceId, assetId uint64) *gorm.DB {
 func (dao AssetDao) UpdateAssetName(workspaceId, assetId uint64, assetName string) error {
 	return dao.update(workspaceId, assetId).Update("name", assetName).Error
 }
+
+func (dao AssetDao) ListAssets(workspaceId uint64, groupId *uint64, page, size int, typeTag string) ([]model.AssetModel, error) {
+	res := []model.AssetModel{}
+	orm := dao.GetOrm().Scopes(db.Paginate(page, size)).Table(assetTableName).Where("workspace = ? ", workspaceId).Where("type_tag = ?", typeTag)
+	if groupId != nil {
+		orm = orm.Where("group_id = ? ", groupId)
+	}
+
+	err := orm.Find(&res).Error
+	return res, err
+}

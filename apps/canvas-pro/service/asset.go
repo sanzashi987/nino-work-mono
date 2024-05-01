@@ -15,7 +15,46 @@ type AssetService struct{}
 
 var AssetServiceImpl *AssetService = &AssetService{}
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, typeTag, groupCode string) {
+type ListAssetData struct {
+	FileCode string `json:"fileId"`
+	Name     string `json:"fileName"`
+	// GroupCode  string  `json:"groupCode"`
+	// GroupName  string  `json:"groupName"`
+	MimeType   string  `json:"mimeType"`
+	Size       int     `json:"size"`
+	Suffix     *string `json:"suffix"`
+	CreateTime string  `json:"createTime"`
+	UpdateTime string  `json:"updateTime"`
+}
+
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) ([]ListAssetData, error) {
+
+	var groupId *uint64
+	if groupCode != "" {
+		id, _, err := consts.GetIdFromCode(groupCode)
+		if err != nil {
+			return nil, err
+		}
+		groupId = &id
+	}
+
+	assetDao := dao.NewAssetDao(ctx)
+	records, err := assetDao.ListAssets(workspaceId, groupId, page, size, typeTag)
+	if err != nil {
+		return nil, err
+	}
+
+	res := []ListAssetData{}
+	for _, record := range records {
+		res = append(res, ListAssetData{
+			FileCode:   record.Code,
+			Name:       record.Name,
+			CreateTime: record.GetCreatedDate(),
+			UpdateTime: record.GetUpdatedDate(),
+		})
+	}
+
+	return res, nil
 
 }
 
