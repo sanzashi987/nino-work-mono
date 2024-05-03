@@ -28,19 +28,8 @@ type ListAssetReq struct {
 	request.PaginationRequest
 }
 
-type ListAssetData struct {
-	FileCode   string  `json:"fileId"`
-	Name       string  `json:"fileName"`
-	GroupCode  string  `json:"groupCode"`
-	GroupName  string  `json:"groupName"`
-	MimeType   string  `json:"mimeType"`
-	Size       int     `json:"size"`
-	Suffix     *string `json:"suffix"`
-	CreateTime string  `json:"createTime"`
-	UpdateTime string  `json:"updateTime"`
-}
 type ListAssetRes struct {
-	Data        []ListAssetData `json:"data"`
+	Data        []service.ListAssetData `json:"data"`
 	PageIndex   int
 	PageSize    int
 	PageTotal   int
@@ -55,7 +44,17 @@ func (c *AssetController) list(ctx *gin.Context) {
 	}
 
 	_, workspaceId := getWorkspaceCode(ctx)
-	service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, reqBody.GroupCode)
+	res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
+	if err != nil {
+		c.AbortServerError(ctx, "list: "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, ListAssetRes{
+		Data:      res,
+		PageIndex: reqBody.Page,
+		PageSize:  reqBody.Size,
+	})
 
 }
 
