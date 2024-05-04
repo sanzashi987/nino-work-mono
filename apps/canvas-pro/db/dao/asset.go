@@ -78,6 +78,13 @@ func (dao AssetDao) ListAssets(workspaceId uint64, groupId *uint64, page, size i
 	return res, err
 }
 
-func (dao AssetDao) GetAssetCount(workspaceId, groupId *uint64, page, size int, typeTag string) (int, error) {
+func (dao AssetDao) GetAssetCount(workspaceId uint64, groupId *uint64, page, size int, typeTag string) (int64, error) {
 
+	orm := dao.GetOrm().Table(assetTableName).Select("id").Where("workspace = ? ", workspaceId).Where("type_tag = ?", typeTag)
+	if groupId != nil {
+		orm = orm.Where("group_id = ? ", groupId)
+	}
+	var recordCount *int64
+	err := orm.Count(recordCount).Error
+	return *recordCount, err
 }

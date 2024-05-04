@@ -27,24 +27,30 @@ type ListAssetData struct {
 	UpdateTime string  `json:"updateTime"`
 }
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) ([]ListAssetData, error) {
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) (recordTotal int64, res []ListAssetData, err error) {
 
 	var groupId *uint64
 	if groupCode != "" {
-		id, _, err := consts.GetIdFromCode(groupCode)
-		if err != nil {
-			return nil, err
+
+		if id, _, e := consts.GetIdFromCode(groupCode); e != nil {
+			err = e
+			return
+		} else {
+			groupId = &id
 		}
-		groupId = &id
 	}
 
 	assetDao := dao.NewAssetDao(ctx)
 	records, err := assetDao.ListAssets(workspaceId, groupId, page, size, typeTag)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	res := []ListAssetData{}
+	recordTotal, err = assetDao.GetAssetCount(workspaceId, groupId, page, size, typeTag)
+	if err != nil {
+		return
+	}
+
 	for _, record := range records {
 		res = append(res, ListAssetData{
 			FileCode:   record.Code,
@@ -54,7 +60,7 @@ func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint6
 		})
 	}
 
-	return res, nil
+	return
 
 }
 

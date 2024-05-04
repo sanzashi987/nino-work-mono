@@ -1,6 +1,7 @@
 package http
 
 import (
+	"math"
 	"mime/multipart"
 
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
@@ -44,16 +45,18 @@ func (c *AssetController) list(ctx *gin.Context) {
 	}
 
 	_, workspaceId := getWorkspaceCode(ctx)
-	res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
+	recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
 	if err != nil {
 		c.AbortServerError(ctx, "list: "+err.Error())
 		return
 	}
 
 	c.ResponseJson(ctx, ListAssetRes{
-		Data:      res,
-		PageIndex: reqBody.Page,
-		PageSize:  reqBody.Size,
+		Data:        res,
+		PageIndex:   reqBody.Page,
+		PageSize:    reqBody.Size,
+		PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
+		RecordTotal: int(recordTotal),
 	})
 
 }
