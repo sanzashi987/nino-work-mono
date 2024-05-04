@@ -77,3 +77,7 @@ func (dao AssetDao) ListAssets(workspaceId uint64, groupId *uint64, page, size i
 	err := orm.Find(&res).Error
 	return res, err
 }
+
+func (dao AssetDao) GetAssetCount(workspaceId, groupId *uint64, page, size int, typeTag string) (int, error) {
+
+}
