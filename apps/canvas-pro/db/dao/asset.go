@@ -88,3 +88,8 @@ func (dao AssetDao) GetAssetCount(workspaceId uint64, groupId *uint64, page, siz
 	err := orm.Count(recordCount).Error
 	return *recordCount, err
 }
+
+func (dao AssetDao) GetSingleAsset(workspaceId, assetId uint64) (res model.AssetModel, err error) {
+	err = dao.GetOrm().Table(assetTableName).Where("id = ?", assetId).Where("workspace = ?", workspaceId).Take(&res).Error
+	return
+}

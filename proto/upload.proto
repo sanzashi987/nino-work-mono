@@ -9,7 +9,7 @@ message FileUploadRequest {
   bytes data = 2;
 }
 
-message FileUploadResponse {
+message FileDetailResponse {
   string id = 1;
   string path = 2;
   string mimeType  =3;
@@ -17,7 +17,15 @@ message FileUploadResponse {
   int64 size =5;
 }
 
+message FileQueryRequest {
+  string id = 1;
+}
+
+// message FileQueryResponse {
+
+// }
 
 service FileUploadService {
-  rpc UploadFile(stream FileUploadRequest) returns (FileUploadResponse){}
+  rpc UploadFile(stream FileUploadRequest) returns (FileDetailResponse){}
+  rpc GetFileDetail(FileQueryRequest) returns(FileDetailResponse){}
 }

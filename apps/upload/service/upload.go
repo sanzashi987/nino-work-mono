@@ -23,7 +23,7 @@ func GetUploadServiceRpc() upload.FileUploadServiceHandler {
 }
 
 func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileUploadService_UploadFileStream) (err error) {
-	res := upload.FileUploadResponse{}
+	res := upload.FileDetailResponse{}
 	uid, err := uuid.NewRandom()
 	if err != nil {
 		return
@@ -35,6 +35,9 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 		return
 	}
 	defer tempFile.Close()
+
+	var size int64 = 0
+
 	for {
 		var req *upload.FileUploadRequest
 		req, err = stream.Recv()
@@ -46,7 +49,8 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 		}
 
 		writer.Write(req.Data)
-		if writer.Buffered() > 4096 {
+		if buffered := writer.Buffered(); buffered > 4096 {
+			size += int64(buffered)
 			err = writer.Flush()
 			if err != nil {
 				fmt.Println("Flush Buffer Error:", err)
@@ -54,6 +58,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 			}
 		}
 	}
+	size += int64(writer.Buffered())
 	writer.Flush()
 
 	tempFilePath := tempFile.Name()
@@ -67,7 +72,11 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 		return err
 	}
 
-	// res.Size = 
+	res.Size = size
 	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeType.String(), mimeType.Extension()
 	return stream.SendMsg(&res)
+}
+
+func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *upload.FileQueryRequest, out *upload.FileDetailResponse) (err error) {
+
 }

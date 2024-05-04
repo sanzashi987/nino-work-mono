@@ -15,7 +15,7 @@ type AssetService struct{}
 
 var AssetServiceImpl *AssetService = &AssetService{}
 
-type ListAssetData struct {
+type ListAssetRes struct {
 	FileCode string `json:"fileId"`
 	Name     string `json:"fileName"`
 	// GroupCode  string  `json:"groupCode"`
@@ -27,7 +27,7 @@ type ListAssetData struct {
 	UpdateTime string  `json:"updateTime"`
 }
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) (recordTotal int64, res []ListAssetData, err error) {
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) (recordTotal int64, res []ListAssetRes, err error) {
 
 	var groupId *uint64
 	if groupCode != "" {
@@ -52,7 +52,7 @@ func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint6
 	}
 
 	for _, record := range records {
-		res = append(res, ListAssetData{
+		res = append(res, ListAssetRes{
 			FileCode:   record.Code,
 			Name:       record.Name,
 			CreateTime: record.GetCreatedDate(),
@@ -136,7 +136,7 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 	if err = stream.CloseSend(); err != nil {
 		return
 	}
-	rpcResponse := upload.FileUploadResponse{}
+	rpcResponse := upload.FileDetailResponse{}
 	if err = stream.RecvMsg(&rpcResponse); err != nil {
 		return
 	}
@@ -167,8 +167,8 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 	}
 
 	assetDao.CommitTransaction()
-	// TODO size not get
-	res.Suffix, res.Name, res.MimeType, res.FileId = rpcResponse.Extension, asset.Name, rpcResponse.MimeType, asset.Code
+	res.Size, res.FileId = rpcResponse.Size, asset.Code
+	res.Suffix, res.Name, res.MimeType = rpcResponse.Extension, asset.Name, rpcResponse.MimeType
 	return
 }
 
@@ -183,4 +183,46 @@ func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, ass
 
 	return assetDao.UpdateAssetName(workspaceId, assetId, assetName)
 
+}
+
+type AssetDetailRes struct {
+	Name       string `json:"fileName"`
+	Code       string `json:"fileId"`
+	GroupCode  string `json:"groupCode"`
+	CreateTime string `json:"createTime"`
+	UpdateTime string `json:"updateTime"`
+
+	MimeType string
+	Size     int64
+	Suffix   string
+}
+
+func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, assetCode string) (*AssetDetailRes, error) {
+
+	assetDao := dao.NewAssetDao(ctx)
+	assetId, _, _ := consts.GetIdFromCode(assetCode)
+
+	record, err := assetDao.GetSingleAsset(workspaceId, assetId)
+	if err != nil {
+		return nil, err
+	}
+
+	rpcReq := upload.FileQueryRequest{}
+	rpcRes, err := uploadRpc.GetFileDetail(ctx, &rpcReq)
+	if err != nil {
+		return nil, err
+	}
+	// result.CreateTime = record.
+
+	result := AssetDetailRes{
+		Name: record.Name,
+		Code: record.Code,
+		// GroupCode: record.GroupId,
+
+		MimeType: rpcRes.MimeType,
+		Size:     rpcRes.Size,
+		Suffix:   rpcRes.Extension,
+	}
+
+	return &result, err
 }

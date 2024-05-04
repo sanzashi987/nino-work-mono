@@ -30,7 +30,7 @@ type ListAssetReq struct {
 }
 
 type ListAssetRes struct {
-	Data        []service.ListAssetData `json:"data"`
+	Data        []service.ListAssetRes `json:"data"`
 	PageIndex   int
 	PageSize    int
 	PageTotal   int
@@ -72,6 +72,18 @@ func (c *AssetController) read(ctx *gin.Context) {
 		c.AbortClientError(ctx, "read: "+err.Error())
 		return
 	}
+	_, workspaceId := getWorkspaceCode(ctx)
+
+	uploadRpc := getUploadRpcService(ctx)
+
+	res, err := service.AssetServiceImpl.GetAssetDetail(ctx, uploadRpc, workspaceId, query.FileId)
+	if err != nil {
+		c.AbortServerError(ctx, "read: "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, res)
+
 }
 
 type UpdateAssetQuery struct {
@@ -94,7 +106,7 @@ func (c *AssetController) update(ctx *gin.Context) {
 
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	if err := service.AssetServiceImpl.Update(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
+	if err := service.AssetServiceImpl.UpdateName(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
 		c.AbortServerError(ctx, "update: "+err.Error())
 		return
 	}

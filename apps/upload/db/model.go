@@ -30,3 +30,6 @@ func (dao UploadDao) CreateFile(mimeType, uri, code string) error {
 
 	return dao.GetOrm().Create(&toInsert).Error
 }
+
+
+// func ()
