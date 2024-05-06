@@ -208,6 +208,8 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.Fi
 	}
 
 	rpcReq := upload.FileQueryRequest{}
+	rpcReq.Id = record.FileId
+
 	rpcRes, err := uploadRpc.GetFileDetail(ctx, &rpcReq)
 	if err != nil {
 		return nil, err

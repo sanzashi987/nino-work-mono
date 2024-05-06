@@ -8,9 +8,11 @@ import (
 
 type File struct {
 	db.BaseModel
-	Code     string `gorm:"unique;index"`
-	URI      string `gorm:"type:varchar(255);unique;index"`
-	MimeType string
+	FileId    string `gorm:"unique;index"`
+	URI       string `gorm:"type:varchar(255);unique;index"`
+	MimeType  string
+	Extension string
+	Size      int64
 }
 
 type UploadDao struct {
@@ -21,15 +23,22 @@ func NewUploadDao(ctx context.Context) *UploadDao {
 	return &UploadDao{db.InitBaseDao[File](ctx)}
 }
 
-func (dao UploadDao) CreateFile(mimeType, uri, code string) error {
+func (dao UploadDao) CreateFile(mimeType, uri, fileId, extension string, size int64) error {
 	toInsert := File{
-		Code:     code,
-		URI:      uri,
-		MimeType: mimeType,
+		FileId:    fileId,
+		URI:       uri,
+		MimeType:  mimeType,
+		Extension: extension,
+		Size:      size,
 	}
 
 	return dao.GetOrm().Create(&toInsert).Error
 }
 
+func (dao UploadDao) QueryFile(fileId string) (*File, error) {
+	res := File{}
 
-// func ()
+	err := dao.GetOrm().Model(&File{}).Where("file_id = ?", fileId).Take(&res).Error
+
+	return &res, err
+}

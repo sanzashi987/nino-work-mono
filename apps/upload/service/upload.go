@@ -65,18 +65,26 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 	mimeType, err := mimetype.DetectFile(tempFilePath)
 
 	dt := time.Now().Format("2006/01/02")
-	path := fmt.Sprintf("./uploads/%s/%s.%s", dt, uuidStr, mimeType.Extension())
+	mimeTypeSTr, ext := mimeType.String(), mimeType.Extension()
+	path := fmt.Sprintf("./uploads/%s/%s.%s", dt, uuidStr, ext)
 	os.Rename(tempFilePath, path)
 
-	if err := model.NewUploadDao(ctx).CreateFile(mimeType.String(), path, uuidStr); err != nil {
+	if err := model.NewUploadDao(ctx).CreateFile(mimeTypeSTr, path, uuidStr, ext, size); err != nil {
 		return err
 	}
 
 	res.Size = size
-	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeType.String(), mimeType.Extension()
+	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeTypeSTr, ext
 	return stream.SendMsg(&res)
 }
 
-func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *upload.FileQueryRequest, out *upload.FileDetailResponse) (err error) {
+func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *upload.FileQueryRequest, out *upload.FileDetailResponse) error {
+	fileId := in.Id
+	if record, err := model.NewUploadDao(ctx).QueryFile(fileId); err != nil {
+		return err
+	} else {
+		out.Extension, out.Id, out.Path, out.Size = record.Extension, record.FileId, record.URI, record.Size
+	}
 
+	return nil
 }
