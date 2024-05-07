@@ -51,7 +51,7 @@ func (c *ProjectController) list(ctx *gin.Context) {
 
 /*CRUD*/
 type CreateProjectRequest struct {
-	Name string `binding:"required"`
+	Name string `json:"name" binding:"required"`
 	// Version     string
 	Config      string  `json:"rootConfig" binding:"required"`
 	GroupCode   *string `json:"groupCode"`

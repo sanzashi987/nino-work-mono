@@ -8,6 +8,7 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
+	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/proto/upload"
 )
 
@@ -186,15 +187,15 @@ func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, ass
 }
 
 type AssetDetailRes struct {
-	Name       string `json:"fileName"`
-	Code       string `json:"fileId"`
-	GroupCode  string `json:"groupCode"`
-	CreateTime string `json:"createTime"`
-	UpdateTime string `json:"updateTime"`
+	Name      string `json:"fileName"`
+	Code      string `json:"fileId"`
+	GroupCode string `json:"groupCode"`
 
-	MimeType string
-	Size     int64
-	Suffix   string
+	MimeType string `json:"mimeType"`
+	Size     int64  `json:"size"`
+	Suffix   string `json:"suffix"`
+
+	request.DBTime
 }
 
 func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, assetCode string) (*AssetDetailRes, error) {
@@ -224,6 +225,10 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.Fi
 		MimeType: rpcRes.MimeType,
 		Size:     rpcRes.Size,
 		Suffix:   rpcRes.Extension,
+		DBTime: request.DBTime{
+			CreateTime: record.GetCreatedDate(),
+			UpdateTime: record.GetUpdatedDate(),
+		},
 	}
 
 	return &result, err

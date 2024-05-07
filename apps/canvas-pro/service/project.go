@@ -6,7 +6,7 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
 	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
-	"github.com/cza14h/nino-work/pkg/db"
+	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 )
 
 type ProjectService struct{}
@@ -81,11 +81,10 @@ func (serv ProjectService) Update(ctx context.Context, code string, name, config
 }
 
 type ProjectDetail struct {
-	Code       string
-	Name       string
-	Thumbnail  string
-	CreateTime string `json:"createTime"`
-	UpdateTime string `json:"updateTime"`
+	Code      string `json:"code"`
+	Name      string `json:"name"`
+	Thumbnail string `json:"thumbnail"`
+	request.DBTime
 }
 
 func (serv ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
@@ -115,14 +114,15 @@ func (serv ProjectService) LogicalDeletion(ctx context.Context, codes []string) 
 }
 
 type ProjectInfo struct {
-	Name      string
-	Thumbnail string
+	Name      string `json:"name"`
+	Thumbnail string `json:"thumbnail"`
 	// Group     string
-	db.BaseTime
+	request.DBTime
 }
-type ProjectInfoList = []ProjectInfo
 
-func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page, size int, name, group *string) (*ProjectInfoList, error) {
+// type ProjectInfoList = []ProjectInfo
+
+func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page, size int, name, group *string) ([]ProjectInfo, error) {
 	projectDao := dao.NewProjectDao(ctx)
 
 	var groupId *uint64
@@ -144,11 +144,11 @@ func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page
 
 	for _, info := range *infos {
 		temp := ProjectInfo{}
-		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.CreateTime, info.UpdateTime
+		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.GetCreatedDate(), info.GetUpdatedDate()
 		result = append(result, temp)
 	}
 
-	return &result, nil
+	return result, nil
 
 }
 
