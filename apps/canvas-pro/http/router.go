@@ -100,7 +100,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		projectScreenRoutes.POST("publish", projectController.publish)
 		projectScreenRoutes.POST("downloadScreen", projectController.export)
 		projectScreenRoutes.POST("importScreen", projectController._import)
-		projectScreenRoutes.POST("checkRef", projectController.getInteraction)
+		// projectScreenRoutes.POST("checkRef", projectController.getInteraction)
 		projectScreenRoutes.POST("move", projectController.moveGroup)
 
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)

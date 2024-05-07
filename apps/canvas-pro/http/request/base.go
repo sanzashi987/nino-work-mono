@@ -10,3 +10,8 @@ type BaseResponse[T any] struct {
 	ResultCode    int    `json:"resultCode"`
 	ResultMessage string `json:"resultMessage"`
 }
+
+type DBTime struct {
+	CreateTime string `json:"createTime"`
+	UpdateTime string `json:"updateTime"`
+}

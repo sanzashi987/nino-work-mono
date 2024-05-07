@@ -96,7 +96,7 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 	return nil
 }
 
-const chunkSize = 1024 * 1024
+const chunkSize = 1024 * 1024 / 2
 
 type UploadAssetRes struct {
 	FileId   string `json:"fileId"`

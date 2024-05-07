@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -11,17 +12,28 @@ type DataSourceController struct {
 	controller.BaseController
 }
 
-var dataSourceController = &DataSourceController{}
+var dataSourceController = &DataSourceController{
+	controller.BaseController{
+		ErrorPrefix: "[http] canvas data-source handler ",
+	},
+}
 
 type QueryDataSourceRequest struct {
-	Page       int16    `json:"page"`
-	Size       int16    `json:"size"`
+	request.PaginationRequest
 	SourceName string   `json:"sourceName"`
 	SourceType []string `json:"sourceType"`
 	Search     string   `json:"search"`
 }
 
 func (c *DataSourceController) list(ctx *gin.Context) {
+	reqBody := QueryDataSourceRequest{}
+
+	if err := ctx.BindJSON(&reqBody); err != nil {
+		c.AbortClientError(ctx, "list "+err.Error())
+		return
+	}
+
+	// service.AssetServiceImpl.ListDataSources()
 
 }
 

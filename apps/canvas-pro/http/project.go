@@ -209,6 +209,6 @@ func (c *ProjectController) _import(ctx *gin.Context) {
 
 }
 
-func (c *ProjectController) getInteraction(ctx *gin.Context) {
+// func (c *ProjectController) getInteraction(ctx *gin.Context) {
 
-}
+// }

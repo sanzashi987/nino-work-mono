@@ -18,6 +18,8 @@ type UploadServiceRpc struct{}
 
 var UploadServiceRpcImpl = &UploadServiceRpc{}
 
+const chunkSize = 1024 * 1024 / 2
+
 func GetUploadServiceRpc() upload.FileUploadServiceHandler {
 	return UploadServiceRpcImpl
 }
@@ -41,15 +43,13 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 	for {
 		var req *upload.FileUploadRequest
 		req, err = stream.Recv()
-		if err == io.EOF {
-			break
-		}
+
 		if err != io.EOF {
 			return
 		}
 
 		writer.Write(req.Data)
-		if buffered := writer.Buffered(); buffered > 4096 {
+		if buffered := writer.Buffered(); buffered > chunkSize {
 			size += int64(buffered)
 			err = writer.Flush()
 			if err != nil {
@@ -57,9 +57,18 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 				return
 			}
 		}
+
+		if err == io.EOF {
+			size += int64(writer.Buffered())
+			e := writer.Flush()
+			if e != nil {
+				fmt.Println("Flush Buffer Error:", e)
+				return
+			}
+			break
+		}
+
 	}
-	size += int64(writer.Buffered())
-	writer.Flush()
 
 	tempFilePath := tempFile.Name()
 	mimeType, err := mimetype.DetectFile(tempFilePath)
