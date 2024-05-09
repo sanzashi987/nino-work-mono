@@ -55,14 +55,14 @@ type CreateProjectRequest struct {
 	// Version     string
 	Config      string  `json:"rootConfig" binding:"required"`
 	GroupCode   *string `json:"groupCode"`
-	UseTemplate *string //template Id
+	UseTemplate *string `json:"useTemplate"` //template Id
 }
 
 const createPrefix = "create: "
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
-	if err := ctx.ShouldBindJSON(param); err != nil {
+	if err := ctx.BindJSON(param); err != nil {
 		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
@@ -96,10 +96,10 @@ func (c *ProjectController) read(ctx *gin.Context) {
 }
 
 type ProjectUpdateRequest struct {
-	Code      string `json:"code"`
-	Name      *string
+	Code      string  `json:"code"`
+	Name      *string `json:"name"`
 	Config    *string `json:"rootConfig"`
-	Thumbnail *string
+	Thumbnail *string `json:"thumbnail"`
 	GroupCode *string `json:"groupCode"`
 }
 
@@ -180,9 +180,9 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 }
 
 type ProjectPublishRequest struct {
-	Code             string
-	PublishFlag      int
-	PublishSecretKey *string
+	Code             string  `json:"code"`
+	PublishFlag      int     `json:"publishFlag"`
+	PublishSecretKey *string `json:"publishSecretKey"`
 }
 
 const publishPrefix = "publish: "

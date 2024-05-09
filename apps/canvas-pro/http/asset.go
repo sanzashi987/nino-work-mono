@@ -7,20 +7,17 @@ import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
 
 const asset_prefix = "assets"
 
 type AssetController struct {
-	controller.BaseController
+	CanvasController
 }
 
 var assetController = &AssetController{
-	controller.BaseController{
-		ErrorPrefix: "[http] canvas asset handler ",
-	},
+	CanvasController: createCanvasController("[http] canvas asset handler "),
 }
 
 type ListAssetReq struct {
@@ -39,25 +36,24 @@ type ListAssetRes struct {
 
 func (c *AssetController) list(ctx *gin.Context) {
 	reqBody := ListAssetReq{}
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "list: "+err.Error())
-		return
-	}
 
-	_, workspaceId := getWorkspaceCode(ctx)
-	recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
-	if err != nil {
-		c.AbortServerError(ctx, "list: "+err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
 		return
-	}
+	} else {
+		recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
+		if err != nil {
+			c.AbortServerError(ctx, "list: "+err.Error())
+			return
+		}
 
-	c.ResponseJson(ctx, ListAssetRes{
-		Data:        res,
-		PageIndex:   reqBody.Page,
-		PageSize:    reqBody.Size,
-		PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
-		RecordTotal: int(recordTotal),
-	})
+		c.ResponseJson(ctx, ListAssetRes{
+			Data:        res,
+			PageIndex:   reqBody.Page,
+			PageSize:    reqBody.Size,
+			PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
+			RecordTotal: int(recordTotal),
+		})
+	}
 
 }
 
@@ -97,20 +93,16 @@ type UpdateAssetParam struct {
 }
 
 func (c *AssetController) update(ctx *gin.Context) {
-
 	reqBody := UpdateAssetParam{}
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "update: "+err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "update"); err != nil {
 		return
+	} else {
+		if err := service.AssetServiceImpl.UpdateName(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
+			c.AbortServerError(ctx, "update: "+err.Error())
+			return
+		}
+		c.SuccessVoid(ctx)
 	}
-
-	_, workspaceId := getWorkspaceCode(ctx)
-
-	if err := service.AssetServiceImpl.UpdateName(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
-		c.AbortServerError(ctx, "update: "+err.Error())
-		return
-	}
-	c.SuccessVoid(ctx)
 
 }
 func (c *AssetController) delete(ctx *gin.Context) {
@@ -161,23 +153,21 @@ func (c *AssetController) moveGroup(ctx *gin.Context) {
 	groupName := ctx.Query("groupName")
 
 	reqBody := MoveGroupReq{}
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "move"); err != nil {
 		return
+	} else {
+
+		if groupCode == "" && groupName == "" {
+			c.AbortClientError(ctx, "move: groupCode or groupName is required")
+			return
+		}
+
+		if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupName, groupCode); err != nil {
+			c.AbortServerError(ctx, "move: "+err.Error())
+			return
+		}
+
+		c.SuccessVoid(ctx)
 	}
-
-	if groupCode == "" && groupName == "" {
-		c.AbortClientError(ctx, "move: groupCode or groupName is required")
-		return
-	}
-
-	_, workspaceId := getWorkspaceCode(ctx)
-
-	if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupName, groupCode); err != nil {
-		c.AbortServerError(ctx, "move: "+err.Error())
-		return
-	}
-
-	c.SuccessVoid(ctx)
 
 }

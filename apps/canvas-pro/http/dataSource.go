@@ -2,38 +2,32 @@ package http
 
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
-	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
 
 const data_source_prefix = "jdbc-connect-template"
 
 type DataSourceController struct {
-	controller.BaseController
+	CanvasController
 }
 
 var dataSourceController = &DataSourceController{
-	controller.BaseController{
-		ErrorPrefix: "[http] canvas data-source handler ",
-	},
+	CanvasController: createCanvasController("[http] canvas data-source handler "),
 }
 
 type QueryDataSourceRequest struct {
 	request.PaginationRequest
-	SourceName string   `json:"sourceName"`
-	SourceType []string `json:"sourceType"`
-	Search     string   `json:"search"`
+	SourceName string `json:"sourceName"`
+	SourceType string `json:"sourceType"`
+	Search     string `json:"search"`
 }
 
 func (c *DataSourceController) list(ctx *gin.Context) {
-	reqBody := QueryDataSourceRequest{}
 
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "list "+err.Error())
+	reqBody := QueryDataSourceRequest{}
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
 		return
 	}
-
-	// service.AssetServiceImpl.ListDataSources()
 
 }
 
@@ -51,6 +45,29 @@ func (c *DataSourceController) delete(ctx *gin.Context) {
 
 }
 
+type ReplaceIpRequest struct {
+	Search   string   `json:"search"`
+	Target   string   `json:"target"`
+	SourceId []string `json:"sourceId"`
+}
+
 func (c *DataSourceController) replaceIp(ctx *gin.Context) {
+	reqBody := ReplaceIpRequest{}
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+		return
+	}
+
+}
+
+type SearchByIpRequest struct {
+	SourceTypes []string `json:"sourceType"`
+	Search      string   `json:"search"`
+}
+
+func (c *DataSourceController) search(ctx *gin.Context) {
+	reqBody := SearchByIpRequest{}
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+		return
+	}
 
 }

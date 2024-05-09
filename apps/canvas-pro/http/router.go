@@ -84,7 +84,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		dataSourceRoutes.POST("replaceIp", dataSourceController.replaceIp)
 		dataSourceRoutes.POST("list-all", dataSourceController.list)
 		dataSourceRoutes.POST("list-page", dataSourceController.list)
-		dataSourceRoutes.POST("searchByIp", dataSourceController.list)
+		dataSourceRoutes.POST("searchByIp", dataSourceController.search)
 	}
 
 	{

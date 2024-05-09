@@ -3,20 +3,17 @@ package http
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
 	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
 
 const grouped_project_prefix = "group"
 
 type GroupController struct {
-	controller.BaseController
+	CanvasController
 }
 
 var groupController = &GroupController{
-	controller.BaseController{
-		ErrorPrefix: "[http] canvas asset group handler ",
-	},
+	CanvasController: createCanvasController("[http] canvas asset group handler "),
 }
 
 func (c *GroupController) listAssetGroup(ctx *gin.Context) {
@@ -34,19 +31,17 @@ type ListGroupReq struct {
 func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
 
 	reqBody := ListGroupReq{}
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "list: "+err.Error())
-		return
-	}
-	_, workspaceId := getWorkspaceCode(ctx)
 
-	output, err := service.GroupServiceImpl.ListGroups(ctx, workspaceId, reqBody.GroupName, typeTag)
-	if err != nil {
-		c.AbortServerError(ctx, "list: "+err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
 		return
-
+	} else {
+		output, err := service.GroupServiceImpl.ListGroups(ctx, workspaceId, reqBody.GroupName, typeTag)
+		if err != nil {
+			c.AbortServerError(ctx, "list: "+err.Error())
+			return
+		}
+		c.ResponseJson(ctx, output)
 	}
-	c.ResponseJson(ctx, output)
 
 }
 
@@ -64,13 +59,10 @@ func (c *GroupController) createDesginGroup(ctx *gin.Context) {
 }
 
 func (c *GroupController) create(ctx *gin.Context, typeTag string) {
-	_, workspaceId := getWorkspaceCode(ctx)
 	reqBody := CreateAssetGroupReq{}
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "create: "+err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "create"); err != nil {
 		return
-	}
-	if _, err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
+	} else if _, err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
 		c.AbortClientError(ctx, "create: "+err.Error())
 		return
 	}
@@ -93,15 +85,11 @@ func (c *GroupController) assetRename(ctx *gin.Context) {
 // rename
 func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
 	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(typeTag)
-	_, workspaceId := getWorkspaceCode(ctx)
 	reqBody := &UpdateAssetGroupReq{}
 
-	if err := ctx.BindJSON(reqBody); err != nil {
-		c.AbortClientError(ctx, err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "rename"); err != nil {
 		return
-	}
-
-	if err := service.GroupServiceImpl.Rename(ctx, workspaceId, reqBody.GroupCode, reqBody.GroupName, groupTypeTag); err != nil {
+	} else if err := service.GroupServiceImpl.Rename(ctx, workspaceId, reqBody.GroupCode, reqBody.GroupName, groupTypeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
@@ -122,12 +110,9 @@ func (c *GroupController) deleteAssetGroup(ctx *gin.Context) {
 
 func (c *GroupController) delete(ctx *gin.Context, typeTag string) {
 	reqBody := &DeleteAssetGroupReq{}
-	if err := ctx.BindJSON(reqBody); err != nil {
-		c.AbortClientError(ctx, err.Error())
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "delete"); err != nil {
 		return
-	}
-	_, workspaceId := getWorkspaceCode(ctx)
-	if err := service.GroupServiceImpl.Delete(ctx, workspaceId, reqBody.GroupCode, typeTag); err != nil {
+	} else if err := service.GroupServiceImpl.Delete(ctx, workspaceId, reqBody.GroupCode, typeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
