@@ -99,7 +99,7 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 
 const chunkSize = 1024 * 1024 / 2
 
-type UploadAssetRes struct {
+type UploadAssetResponse struct {
 	FileId   string `json:"fileId"`
 	MimeType string `json:"mimeType"`
 	Name     string `json:"name"`
@@ -107,7 +107,7 @@ type UploadAssetRes struct {
 	Suffix   string `json:"suffix"`
 }
 
-func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, groupName, groupCode, filename, typeTag string, file *multipart.FileHeader) (res *UploadAssetRes, err error) {
+func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, groupName, groupCode, filename, typeTag string, file *multipart.FileHeader) (res *UploadAssetResponse, err error) {
 	stream, err := uploadRpc.UploadFile(ctx)
 	if err != nil {
 		return
@@ -186,7 +186,7 @@ func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, ass
 
 }
 
-type AssetDetailRes struct {
+type AssetDetailResponse struct {
 	Name      string `json:"fileName"`
 	Code      string `json:"fileId"`
 	GroupCode string `json:"groupCode"`
@@ -198,7 +198,7 @@ type AssetDetailRes struct {
 	request.DBTime
 }
 
-func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, assetCode string) (*AssetDetailRes, error) {
+func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
 
 	assetDao := dao.NewAssetDao(ctx)
 	assetId, _, _ := consts.GetIdFromCode(assetCode)
@@ -217,7 +217,7 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.Fi
 	}
 	// result.CreateTime = record.
 
-	result := AssetDetailRes{
+	result := AssetDetailResponse{
 		Name: record.Name,
 		Code: record.Code,
 		// GroupCode: record.GroupId,

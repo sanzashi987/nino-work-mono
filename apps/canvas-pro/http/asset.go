@@ -26,12 +26,9 @@ type ListAssetReq struct {
 	request.PaginationRequest
 }
 
-type ListAssetRes struct {
-	Data        []service.ListAssetRes `json:"data"`
-	PageIndex   int
-	PageSize    int
-	PageTotal   int
-	RecordTotal int
+type ListAssetResponse struct {
+	Data []service.ListAssetRes `json:"data"`
+	request.PaginationResponse
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
@@ -46,12 +43,14 @@ func (c *AssetController) list(ctx *gin.Context) {
 			return
 		}
 
-		c.ResponseJson(ctx, ListAssetRes{
-			Data:        res,
-			PageIndex:   reqBody.Page,
-			PageSize:    reqBody.Size,
-			PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
-			RecordTotal: int(recordTotal),
+		c.ResponseJson(ctx, ListAssetResponse{
+			Data: res,
+			PaginationResponse: request.PaginationResponse{
+				PageIndex:   reqBody.Page,
+				PageSize:    reqBody.Size,
+				PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
+				RecordTotal: int(recordTotal),
+			},
 		})
 	}
 

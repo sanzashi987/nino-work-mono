@@ -5,6 +5,13 @@ type PaginationRequest struct {
 	Size int `json:"size"`
 }
 
+type PaginationResponse struct {
+	PageIndex   int `json:"pageIndex"`
+	PageSize    int `json:"pageSize"`
+	PageTotal   int `json:"pageTotal"`
+	RecordTotal int `json:"recordTotal"`
+}
+
 type BaseResponse[T any] struct {
 	Data          T      `json:"data"`
 	ResultCode    int    `json:"resultCode"`

@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
+	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,9 +26,17 @@ type QueryDataSourceRequest struct {
 func (c *DataSourceController) list(ctx *gin.Context) {
 
 	reqBody := QueryDataSourceRequest{}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list")
+	if err != nil {
 		return
 	}
+	dataSourceList, err := service.DataSourceServiceImpl.ListDataSources(ctx, workspaceId, reqBody.Page, reqBody.Size, reqBody.SourceName, reqBody.SourceType)
+	if err != nil {
+		c.AbortServerError(ctx, "list "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, dataSourceList)
 
 }
 
