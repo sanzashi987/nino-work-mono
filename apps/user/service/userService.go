@@ -5,10 +5,10 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/cza14h/nino-work/apps/user/db/dao"
-	"github.com/cza14h/nino-work/apps/user/db/model"
-	"github.com/cza14h/nino-work/pkg/auth"
-	"github.com/cza14h/nino-work/proto/user"
+	"github.com/sanzashi987/nino-work/apps/user/db/dao"
+	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/proto/user"
 	"gorm.io/gorm"
 )
 

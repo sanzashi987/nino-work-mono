@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/pkg/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/pkg/auth"
 )
 
 func NewRouter(loginPageUrl string) *gin.Engine {

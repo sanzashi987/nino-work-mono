@@ -5,8 +5,8 @@ import (
 
 	"path/filepath"
 
-	"github.com/cza14h/nino-work/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 )
 
 func NewRouter() *gin.Engine {

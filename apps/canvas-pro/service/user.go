@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 )
 
 type UserService struct{}

@@ -3,7 +3,7 @@ package dao
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"gorm.io/gorm"
 )
 

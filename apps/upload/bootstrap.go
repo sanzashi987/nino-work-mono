@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/cza14h/nino-work/apps/upload/db"
-	"github.com/cza14h/nino-work/apps/upload/service"
-	"github.com/cza14h/nino-work/pkg/bootstrap"
-	"github.com/cza14h/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/apps/upload/db"
+	"github.com/sanzashi987/nino-work/apps/upload/service"
+	"github.com/sanzashi987/nino-work/pkg/bootstrap"
+	"github.com/sanzashi987/nino-work/proto/upload"
 	"go-micro.dev/v4"
 )
 

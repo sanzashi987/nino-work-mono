@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/cza14h/nino-work/pkg/db"
-	"github.com/cza14h/nino-work/pkg/utils"
+	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 

@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
-	model "github.com/cza14h/nino-work/apps/upload/db"
-	"github.com/cza14h/nino-work/proto/upload"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
+	model "github.com/sanzashi987/nino-work/apps/upload/db"
+	"github.com/sanzashi987/nino-work/proto/upload"
 )
 
 type UploadServiceRpc struct{}

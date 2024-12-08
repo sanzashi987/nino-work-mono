@@ -1,4 +1,4 @@
-module github.com/cza14h/nino-work
+module github.com/sanzashi987/nino-work
 
 go 1.20
 

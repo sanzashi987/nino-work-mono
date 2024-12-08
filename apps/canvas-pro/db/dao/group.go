@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
-	"github.com/cza14h/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type GroupDao struct {

@@ -1,10 +1,10 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
-	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/controller"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
 type ThemeController struct {

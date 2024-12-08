@@ -5,11 +5,11 @@ import (
 	"io"
 	"mime/multipart"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/model"
-	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
-	"github.com/cza14h/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/proto/upload"
 )
 
 type AssetService struct{}

@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
-	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 )
 
 type DataSourceService struct{}

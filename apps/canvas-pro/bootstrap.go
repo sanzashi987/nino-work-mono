@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/cza14h/nino-work/apps/canvas-pro/db/dao"
-	"github.com/cza14h/nino-work/apps/canvas-pro/http"
-	"github.com/cza14h/nino-work/pkg/bootstrap"
-	"github.com/cza14h/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http"
+	"github.com/sanzashi987/nino-work/pkg/bootstrap"
+	"github.com/sanzashi987/nino-work/proto/upload"
 	"go-micro.dev/v4/web"
 )
 

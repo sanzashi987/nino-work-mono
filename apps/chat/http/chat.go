@@ -1,10 +1,10 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/apps/chat/service"
-	"github.com/cza14h/nino-work/pkg/controller"
-	"github.com/cza14h/nino-work/proto/chat"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/chat/service"
+	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/proto/chat"
 )
 
 type ChatController struct {

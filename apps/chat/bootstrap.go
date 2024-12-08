@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/cza14h/nino-work/apps/chat/db/dao"
-	"github.com/cza14h/nino-work/apps/chat/http"
-	"github.com/cza14h/nino-work/pkg/bootstrap"
+	"github.com/sanzashi987/nino-work/apps/chat/db/dao"
+	"github.com/sanzashi987/nino-work/apps/chat/http"
+	"github.com/sanzashi987/nino-work/pkg/bootstrap"
 	"go-micro.dev/v4/web"
 )
 

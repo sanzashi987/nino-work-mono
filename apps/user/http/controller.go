@@ -4,10 +4,10 @@ import (
 	"fmt"
 	iHttp "net/http"
 
-	"github.com/cza14h/nino-work/apps/user/service"
-	"github.com/cza14h/nino-work/pkg/controller"
-	"github.com/cza14h/nino-work/proto/user"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/user/service"
+	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/proto/user"
 )
 
 type UserController struct {

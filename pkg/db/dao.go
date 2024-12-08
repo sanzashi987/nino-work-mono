@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/config"
 	"github.com/glebarez/sqlite"
+	"github.com/sanzashi987/nino-work/config"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

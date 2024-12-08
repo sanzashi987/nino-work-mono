@@ -1,6 +1,6 @@
 package model
 
-import "github.com/cza14h/nino-work/pkg/db"
+import "github.com/sanzashi987/nino-work/pkg/db"
 
 type MessageModel struct {
 	db.BaseModel

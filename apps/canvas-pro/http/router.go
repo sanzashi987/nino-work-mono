@@ -3,12 +3,12 @@ package http
 import (
 	"net/http"
 
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
-	"github.com/cza14h/nino-work/apps/canvas-pro/http/middleware"
-	"github.com/cza14h/nino-work/apps/canvas-pro/service"
-	"github.com/cza14h/nino-work/pkg/auth"
-	"github.com/cza14h/nino-work/proto/upload"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/middleware"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/proto/upload"
 )
 
 const RPCKEY = "RPCCLIENTS"

@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 
-	"github.com/cza14h/nino-work/config"
+	"github.com/sanzashi987/nino-work/config"
 )
 
 var defatultFeaturesJson string

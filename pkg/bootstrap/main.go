@@ -3,8 +3,8 @@ package bootstrap
 import (
 	"fmt"
 
-	"github.com/cza14h/nino-work/config"
 	"github.com/go-micro/plugins/v4/registry/etcd"
+	"github.com/sanzashi987/nino-work/config"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"

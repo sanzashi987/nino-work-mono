@@ -7,9 +7,9 @@ import (
 
 	// "sync"
 
-	"github.com/cza14h/nino-work/apps/chat/consts"
-	"github.com/cza14h/nino-work/apps/chat/db/dao"
-	"github.com/cza14h/nino-work/proto/chat"
+	"github.com/sanzashi987/nino-work/apps/chat/consts"
+	"github.com/sanzashi987/nino-work/apps/chat/db/dao"
+	"github.com/sanzashi987/nino-work/proto/chat"
 	"github.com/sashabaranov/go-openai"
 )
 

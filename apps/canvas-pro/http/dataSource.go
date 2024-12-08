@@ -1,9 +1,9 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/apps/canvas-pro/http/request"
-	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
 )
 
 const data_source_prefix = "jdbc-connect-template"

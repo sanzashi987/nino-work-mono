@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/cza14h/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type File struct {

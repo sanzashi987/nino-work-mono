@@ -1,9 +1,9 @@
 package http
 
 import (
-	"github.com/cza14h/nino-work/apps/canvas-pro/consts"
-	"github.com/cza14h/nino-work/apps/canvas-pro/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
 )
 
 const grouped_project_prefix = "group"

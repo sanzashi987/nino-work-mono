@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/cza14h/nino-work/apps/user/db/dao"
-	"github.com/cza14h/nino-work/apps/user/http"
-	"github.com/cza14h/nino-work/apps/user/service"
-	"github.com/cza14h/nino-work/pkg/bootstrap"
-	"github.com/cza14h/nino-work/proto/user"
+	"github.com/sanzashi987/nino-work/apps/user/db/dao"
+	"github.com/sanzashi987/nino-work/apps/user/http"
+	"github.com/sanzashi987/nino-work/apps/user/service"
+	"github.com/sanzashi987/nino-work/pkg/bootstrap"
+	"github.com/sanzashi987/nino-work/proto/user"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/web"
 )
