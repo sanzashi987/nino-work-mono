@@ -16,11 +16,15 @@ var dataSourceController = &DataSourceController{
 	CanvasController: createCanvasController("[http] canvas data-source handler "),
 }
 
+type QueryDataSourceSearchRequest struct {
+	SourceName string   `json:"sourceName"`
+	SourceType []string `json:"sourceType"`
+	Search     string   `json:"search"`
+}
+
 type QueryDataSourceRequest struct {
 	request.PaginationRequest
-	SourceName string `json:"sourceName"`
-	SourceType string `json:"sourceType"`
-	Search     string `json:"search"`
+	QueryDataSourceSearchRequest
 }
 
 func (c *DataSourceController) list(ctx *gin.Context) {
@@ -41,15 +45,46 @@ func (c *DataSourceController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
+type CreateDataSourceRequest struct {
+	SourceName string `json:"sourceName"`
+	SourceType string `json:"sourceType"`
+	SourceInfo string `json:"sourceInfo"`
+}
+
 func (c *DataSourceController) create(ctx *gin.Context) {
 
 }
-func (c *DataSourceController) read(ctx *gin.Context) {
 
+type ReadDataSourceQuery struct {
+	SourceId string `uri:"sourceId" binding:"required"`
+}
+
+const readPreix = "read "
+
+func (c *DataSourceController) read(ctx *gin.Context) {
+	query := ReadDataSourceQuery{}
+	if err := ctx.BindUri(&query); err != nil {
+		c.AbortClientError(ctx, readPreix+err.Error())
+		return
+	}
+	_, workspaceId := getWorkspaceCode(ctx)
+
+	dataSource, err := service.DataSourceServiceImpl.GetDataSourceById(ctx, workspaceId, query.SourceId)
+	if err != nil {
+		c.AbortClientError(ctx, readPreix+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, dataSource)
 }
 func (c *DataSourceController) update(ctx *gin.Context) {
 
 }
+
+type DeleteDataSourceRequest struct {
+	SourceId []string `json:"sourceId"`
+}
+
 func (c *DataSourceController) delete(ctx *gin.Context) {
 
 }

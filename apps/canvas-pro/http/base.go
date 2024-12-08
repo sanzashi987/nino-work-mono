@@ -10,6 +10,7 @@ type CanvasController struct {
 	controller.BaseController
 }
 
+/** Also return the workspaceId */
 func (c CanvasController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
 	if err := ctx.BindJSON(reqBody); err != nil {
 		c.AbortClientError(ctx, funcName+" "+err.Error())
