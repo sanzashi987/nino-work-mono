@@ -12,7 +12,7 @@ type CanvasController struct {
 
 /** Also return the workspaceId */
 func (c CanvasController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
-	if err := ctx.BindJSON(reqBody); err != nil {
+	if err := ctx.ShouldBindJSON(reqBody); err != nil {
 		c.AbortClientError(ctx, funcName+" "+err.Error())
 		return 0, err
 	}
@@ -28,3 +28,10 @@ func createCanvasController(errorPrefix string) CanvasController {
 		},
 	}
 }
+
+/**** common prefix *****/
+const listPrefix = "list: "
+const readPreix = "read: "
+const createPrefix = "create: "
+const updatePrefix = "update: "
+const deletePrefix = "delete: "

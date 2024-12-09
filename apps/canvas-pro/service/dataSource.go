@@ -72,3 +72,26 @@ func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceI
 
 	return
 }
+
+type UpdateDataSourceRequest struct {
+	SourceName string `json:"sourceName"`
+	SourceType string `json:"sourceType"`
+	SourceInfo string `json:"sourceInfo"`
+	SourceId   string `json:"sourceId" binding:"required"`
+}
+
+func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (err error) {
+	dataSourceDao := dao.NewDataSourceDao(ctx)
+
+	var id uint64
+	if id, _, err = consts.GetIdFromCode(payload.SourceId); err != nil {
+		return
+	}
+
+	err = dataSourceDao.UpdateDataSourceById(workspaceId, id, payload.SourceName, payload.SourceType, payload.SourceInfo)
+	if err != nil {
+		return
+	}
+
+	return
+}

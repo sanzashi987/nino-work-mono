@@ -26,8 +26,6 @@ type GetProjectListRequest struct {
 	Group *string
 }
 
-const listPrefix = "list: "
-
 func (c *ProjectController) list(ctx *gin.Context) {
 	requestBody := &GetProjectListRequest{}
 	if err := ctx.BindJSON(&requestBody); err != nil {
@@ -58,8 +56,6 @@ type CreateProjectRequest struct {
 	UseTemplate *string `json:"useTemplate"` //template Id
 }
 
-const createPrefix = "create: "
-
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
 	if err := ctx.BindJSON(param); err != nil {
@@ -81,7 +77,7 @@ type ReadProjectQuery struct {
 func (c *ProjectController) read(ctx *gin.Context) {
 	query := ReadProjectQuery{}
 
-	if err := ctx.BindUri(&query); err != nil {
+	if err := ctx.ShouldBindUri(&query); err != nil {
 		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
@@ -102,8 +98,6 @@ type ProjectUpdateRequest struct {
 	Thumbnail *string `json:"thumbnail"`
 	GroupCode *string `json:"groupCode"`
 }
-
-const updatePrefix = "update: "
 
 func (c *ProjectController) update(ctx *gin.Context) {
 	param := ProjectUpdateRequest{}
@@ -148,8 +142,6 @@ type ProjectDeleteRequest struct {
 	Ids []string `json:"ids" binding:"required"`
 }
 
-const deletePrefix = "delete: "
-
 func (c *ProjectController) delete(ctx *gin.Context) {
 	param := ProjectDeleteRequest{}
 	if err := ctx.BindJSON(&param); err != nil {
@@ -168,7 +160,7 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 func (c *ProjectController) duplicate(ctx *gin.Context) {
 	query := ReadProjectQuery{}
 
-	if err := ctx.BindUri(&query); err != nil {
+	if err := ctx.ShouldBindUri(&query); err != nil {
 		return
 	}
 	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, query.Id)

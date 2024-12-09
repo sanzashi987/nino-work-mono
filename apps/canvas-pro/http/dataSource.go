@@ -59,11 +59,9 @@ type ReadDataSourceQuery struct {
 	SourceId string `uri:"sourceId" binding:"required"`
 }
 
-const readPreix = "read "
-
 func (c *DataSourceController) read(ctx *gin.Context) {
 	query := ReadDataSourceQuery{}
-	if err := ctx.BindUri(&query); err != nil {
+	if err := ctx.ShouldBindUri(&query); err != nil {
 		c.AbortClientError(ctx, readPreix+err.Error())
 		return
 	}
@@ -77,8 +75,20 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 
 	c.ResponseJson(ctx, dataSource)
 }
-func (c *DataSourceController) update(ctx *gin.Context) {
 
+func (c *DataSourceController) update(ctx *gin.Context) {
+	reqBody := service.UpdateDataSourceRequest{}
+	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "udpate")
+	if err != nil {
+		return
+	}
+	err = service.DataSourceServiceImpl.UpdateDataSourceById(ctx, workspaceId, &reqBody)
+	if err != nil {
+		c.AbortServerError(ctx, updatePrefix+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, nil)
 }
 
 type DeleteDataSourceRequest struct {

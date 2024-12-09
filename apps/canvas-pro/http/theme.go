@@ -30,7 +30,7 @@ func (c *ThemeController) list(ctx *gin.Context) {
 	_, workspaceId := getWorkspaceCode(ctx)
 	models, err := service.ThemeServiceImpl.GetThemes(ctx, workspaceId)
 	if err != nil {
-		c.AbortServerError(ctx, "update: "+err.Error())
+		c.AbortServerError(ctx, updatePrefix+err.Error())
 		return
 	}
 
@@ -63,7 +63,7 @@ func (c *ThemeController) update(ctx *gin.Context) {
 	reqBody := UpdateThemeReq{}
 
 	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "update: "+err.Error())
+		c.AbortClientError(ctx, updatePrefix+err.Error())
 		return
 	}
 
@@ -73,7 +73,7 @@ func (c *ThemeController) update(ctx *gin.Context) {
 	}
 
 	if err := service.ThemeServiceImpl.UpdateTheme(ctx, workspaceId, reqBody.Id, reqBody.Name, reqBody.Config); err != nil {
-		c.AbortServerError(ctx, "update: "+err.Error())
+		c.AbortServerError(ctx, updatePrefix+err.Error())
 		return
 	}
 
@@ -89,14 +89,14 @@ func (c *ThemeController) create(ctx *gin.Context) {
 
 	req := CreateThemeReq{}
 	if err := ctx.BindJSON(&req); err != nil {
-		c.AbortClientError(ctx, "create: "+err.Error())
+		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 
 	_, workspaceId := getWorkspaceCode(ctx)
 
 	if err := service.ThemeServiceImpl.CreateTheme(ctx, workspaceId, req.Name, req.Config); err != nil {
-		c.AbortServerError(ctx, "create: "+err.Error())
+		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
 	}
 
@@ -112,13 +112,13 @@ func (c *ThemeController) delete(ctx *gin.Context) {
 
 	req := DeleteThemeReq{}
 	if err := ctx.BindJSON(&req); err != nil {
-		c.AbortClientError(ctx, "delete: "+err.Error())
+		c.AbortClientError(ctx, deletePrefix+err.Error())
 		return
 	}
 	_, workspaceId := getWorkspaceCode(ctx)
 
 	if err := service.ThemeServiceImpl.DeleteThemes(ctx, workspaceId, req.Data); err != nil {
-		c.AbortServerError(ctx, "delete: "+err.Error())
+		c.AbortServerError(ctx, deletePrefix+err.Error())
 		return
 	}
 

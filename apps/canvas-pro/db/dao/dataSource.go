@@ -53,3 +53,8 @@ func (serv *DataSourceDao) GetDataSourceById(id uint64) (model.DataSourceModel, 
 	err := serv.GetOrm().Model(&model.DataSourceModel{}).Where("id = ?", id).First(&result).Error
 	return result, err
 }
+
+func (serv *DataSourceDao) UpdateDataSourceById(workspace, id uint64, sourceName, sourceType, sourceInfo string) (err error) {
+
+	return
+}
