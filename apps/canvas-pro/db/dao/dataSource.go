@@ -23,15 +23,24 @@ func NewDataSourceDao(ctx context.Context, dao ...*db.BaseDao[model.DataSourceMo
 
 var dataSourceTableName = model.DataSourceModel{}.TableName()
 
-func (serv *DataSourceDao) FindByNameOrType(page, size int, workspace uint64, name, sourceType string) (result []model.DataSourceModel, err error) {
+func (serv *DataSourceDao) FindByNameOrType(page, size int, workspace uint64, name string, sourceType []string) (result []model.DataSourceModel, err error) {
 	query := serv.GetOrm().Scopes(db.Paginate(page, size)).Model(&model.DataSourceModel{}).Where("workspace = ?", workspace)
 
 	if name != "" {
 		query = query.Where("name LIKE ?", name)
 	}
 
-	if sourceType != "" {
-		query = query.Where("source_type = ?", sourceType)
+	if len(sourceType) != 0 {
+		sourceTypeEnums := []int{}
+
+		for _, v := range sourceType {
+			enum, exist := model.SourceTypeStringToEnum[v]
+			if exist {
+				sourceTypeEnums = append(sourceTypeEnums, enum)
+			}
+		}
+
+		query = query.Where("source_type IN ?", sourceTypeEnums)
 	}
 
 	err = query.Find(&result).Error

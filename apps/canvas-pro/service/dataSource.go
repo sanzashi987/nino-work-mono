@@ -37,7 +37,7 @@ func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
 	}
 }
 
-func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId uint64, page, size int, sourceName, sourceType string) ([]DataSourceDetail, error) {
+func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId uint64, page, size int, sourceName string, sourceType []string) ([]DataSourceDetail, error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 
 	dataSources, err := dataSourceDao.FindByNameOrType(page, size, workspaceId, sourceName, sourceType)

@@ -22,12 +22,13 @@ var SourceTypeIntToString = [8]string{
 	POSTGRESQL,
 }
 
-var SourceTypeStringToInt = map[string]int{}
+var SourceTypeStringToEnum = map[string]int{}
 
 func init() {
 	for index, str := range SourceTypeIntToString {
-		SourceTypeStringToInt[str] = index
+		SourceTypeStringToEnum[str] = index
 	}
+
 }
 
 type DataSourceModel struct {
