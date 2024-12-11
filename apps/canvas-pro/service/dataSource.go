@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
@@ -27,7 +28,7 @@ func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
 	return DataSourceDetail{
 		SourceName: input.Name,
 		SourceType: input.SourceType,
-		SourceInfo: input.SourceConfig,
+		SourceInfo: input.SourceInfo,
 		SourceId:   strconv.FormatUint(input.Id, 10),
 		Creator:    strconv.FormatUint(input.Creator, 10),
 		DBTime: request.DBTime{
@@ -40,13 +41,13 @@ func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
 func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId uint64, page, size int, sourceName string, sourceType []string) ([]DataSourceDetail, error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 
-	dataSources, err := dataSourceDao.FindByNameOrType(page, size, workspaceId, sourceName, sourceType)
+	records, err := dataSourceDao.FindByNameOrType(page, size, workspaceId, sourceName, sourceType)
 	if err != nil {
 		return nil, err
 	}
 
 	response := []DataSourceDetail{}
-	for _, source := range dataSources {
+	for _, source := range records {
 		temp := intoDataSourceDetail(source)
 
 		response = append(response, temp)
@@ -55,7 +56,7 @@ func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId 
 	return response, nil
 }
 
-func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceId uint64, sourceIdCode string) (res *DataSourceDetail, err error) {
+func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceId uint64, sourceIdCode string) (res DataSourceDetail, err error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 
 	var id uint64
@@ -63,24 +64,22 @@ func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceI
 		return
 	}
 
-	dataSource, err := dataSourceDao.GetDataSourceById(id)
+	record, err := dataSourceDao.GetDataSourceById(id)
 	if err != nil {
 		return
 	}
-	temp := intoDataSourceDetail(dataSource)
-	res = &temp
+	res = intoDataSourceDetail(record)
 
 	return
 }
 
 type UpdateDataSourceRequest struct {
 	SourceName string `json:"sourceName"`
-	SourceType string `json:"sourceType"`
 	SourceInfo string `json:"sourceInfo"`
 	SourceId   string `json:"sourceId" binding:"required"`
 }
 
-func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (err error) {
+func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (res DataSourceDetail, err error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 
 	var id uint64
@@ -88,10 +87,34 @@ func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspa
 		return
 	}
 
-	err = dataSourceDao.UpdateDataSourceById(workspaceId, id, payload.SourceName, payload.SourceType, payload.SourceInfo)
+	record, err := dataSourceDao.UpdateDataSourceById(workspaceId, id, payload.SourceName, payload.SourceInfo)
 	if err != nil {
 		return
 	}
+	res = intoDataSourceDetail(record)
+
+	return
+}
+
+type CreateDataSourceRequest struct {
+	SourceName string `json:"sourceName" binding:"required"`
+	SourceType string `json:"sourceType" binding:"required"`
+	SourceInfo string `json:"sourceInfo" binding:"required"`
+}
+
+func (serv *DataSourceService) CreateDataSource(ctx context.Context, workspaceId uint64, payload *CreateDataSourceRequest) (res DataSourceDetail, err error) {
+	dataSourceDao := dao.NewDataSourceDao(ctx)
+	sourceTypeEnum, exist := model.SourceTypeStringToEnum[payload.SourceType]
+	if !exist {
+		err = errors.New("source type not found")
+		return
+	}
+
+	record, err := dataSourceDao.CreateDataSource(workspaceId, sourceTypeEnum, payload.SourceName, payload.SourceInfo)
+	if err != nil {
+		return
+	}
+	res = intoDataSourceDetail(record)
 
 	return
 }

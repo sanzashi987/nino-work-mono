@@ -22,20 +22,20 @@ var SourceTypeIntToString = [8]string{
 	POSTGRESQL,
 }
 
-var SourceTypeStringToEnum = map[string]int{}
+var SourceTypeStringToEnum = map[string]uint8{}
 
 func init() {
 	for index, str := range SourceTypeIntToString {
-		SourceTypeStringToEnum[str] = index
+		SourceTypeStringToEnum[str] = uint8(index)
 	}
 
 }
 
 type DataSourceModel struct {
 	BaseModel
-	Version      string
-	SourceType   uint8  `gorm:"index"`
-	SourceConfig string `gorm:"type:blob"`
+	Version    string
+	SourceType uint8  `gorm:"index"`
+	SourceInfo string `gorm:"type:blob"`
 }
 
 func (m DataSourceModel) TableName() string {

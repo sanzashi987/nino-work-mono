@@ -45,14 +45,21 @@ func (c *DataSourceController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
-type CreateDataSourceRequest struct {
-	SourceName string `json:"sourceName"`
-	SourceType string `json:"sourceType"`
-	SourceInfo string `json:"sourceInfo"`
-}
 
 func (c *DataSourceController) create(ctx *gin.Context) {
+	reqBody := service.CreateDataSourceRequest{}
+	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "create")
+	if err != nil {
+		return
+	}
 
+	dataSource, err := service.DataSourceServiceImpl.CreateDataSource(ctx, workspaceId, &reqBody)
+	if err != nil {
+		c.AbortServerError(ctx, createPrefix+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, dataSource)
 }
 
 type ReadDataSourceQuery struct {
@@ -82,17 +89,17 @@ func (c *DataSourceController) update(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	err = service.DataSourceServiceImpl.UpdateDataSourceById(ctx, workspaceId, &reqBody)
+	dataSource, err := service.DataSourceServiceImpl.UpdateDataSourceById(ctx, workspaceId, &reqBody)
 	if err != nil {
 		c.AbortServerError(ctx, updatePrefix+err.Error())
 		return
 	}
 
-	c.ResponseJson(ctx, nil)
+	c.ResponseJson(ctx, dataSource)
 }
 
 type DeleteDataSourceRequest struct {
-	SourceId []string `json:"sourceId"`
+	SourceId []string `json:"sourceId" binding:"required"`
 }
 
 func (c *DataSourceController) delete(ctx *gin.Context) {

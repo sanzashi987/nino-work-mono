@@ -54,7 +54,23 @@ func (serv *DataSourceDao) GetDataSourceById(id uint64) (model.DataSourceModel, 
 	return result, err
 }
 
-func (serv *DataSourceDao) UpdateDataSourceById(workspace, id uint64, sourceName, sourceType, sourceInfo string) (err error) {
+func (serv *DataSourceDao) UpdateDataSourceById(workspace, id uint64, sourceName, sourceInfo string) (model.DataSourceModel, error) {
+	toUpdate := map[string]string{}
+	// var resyu
+	if sourceName != "" {
+		toUpdate["name"] = sourceName
+	}
 
+	if sourceInfo != "" {
+		toUpdate["source_info"] = sourceInfo
+	}
+	err := serv.GetOrm().Model(&model.DataSourceModel{}).Where("id = ? and workspace = ?", id, workspace).Updates(toUpdate).Error
+
+	return
+}
+
+func (serv *DataSourceDao) CreateDataSource(workspace uint64, sourceType uint8, name, info string) (model.DataSourceModel, error) {
+	var result model.DataSourceModel
+	serv.GetOrm().Model(&result)
 	return
 }
