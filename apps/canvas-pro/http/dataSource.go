@@ -53,7 +53,7 @@ func (c *DataSourceController) create(ctx *gin.Context) {
 		return
 	}
 
-	dataSource, err := service.DataSourceServiceImpl.CreateDataSource(ctx, workspaceId, &reqBody)
+	dataSource, err := service.DataSourceServiceImpl.Create(ctx, workspaceId, &reqBody)
 	if err != nil {
 		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
@@ -89,7 +89,7 @@ func (c *DataSourceController) update(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataSource, err := service.DataSourceServiceImpl.UpdateDataSourceById(ctx, workspaceId, &reqBody)
+	dataSource, err := service.DataSourceServiceImpl.Update(ctx, workspaceId, &reqBody)
 	if err != nil {
 		c.AbortServerError(ctx, updatePrefix+err.Error())
 		return
@@ -103,6 +103,7 @@ type DeleteDataSourceRequest struct {
 }
 
 func (c *DataSourceController) delete(ctx *gin.Context) {
+
 
 }
 

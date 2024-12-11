@@ -79,7 +79,7 @@ type UpdateDataSourceRequest struct {
 	SourceId   string `json:"sourceId" binding:"required"`
 }
 
-func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (res DataSourceDetail, err error) {
+func (serv *DataSourceService) Update(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (res DataSourceDetail, err error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 
 	var id uint64
@@ -87,7 +87,12 @@ func (serv *DataSourceService) UpdateDataSourceById(ctx context.Context, workspa
 		return
 	}
 
-	record, err := dataSourceDao.UpdateDataSourceById(workspaceId, id, payload.SourceName, payload.SourceInfo)
+	if payload.SourceName == "" && payload.SourceInfo == "" {
+		err = errors.New("sourceName and sourceInfo are both empty")
+		return
+	}
+
+	record, err := dataSourceDao.Update(workspaceId, id, payload.SourceName, payload.SourceInfo)
 	if err != nil {
 		return
 	}
@@ -102,7 +107,7 @@ type CreateDataSourceRequest struct {
 	SourceInfo string `json:"sourceInfo" binding:"required"`
 }
 
-func (serv *DataSourceService) CreateDataSource(ctx context.Context, workspaceId uint64, payload *CreateDataSourceRequest) (res DataSourceDetail, err error) {
+func (serv *DataSourceService) Create(ctx context.Context, workspaceId uint64, payload *CreateDataSourceRequest) (res DataSourceDetail, err error) {
 	dataSourceDao := dao.NewDataSourceDao(ctx)
 	sourceTypeEnum, exist := model.SourceTypeStringToEnum[payload.SourceType]
 	if !exist {
@@ -110,7 +115,7 @@ func (serv *DataSourceService) CreateDataSource(ctx context.Context, workspaceId
 		return
 	}
 
-	record, err := dataSourceDao.CreateDataSource(workspaceId, sourceTypeEnum, payload.SourceName, payload.SourceInfo)
+	record, err := dataSourceDao.Create(workspaceId, sourceTypeEnum, payload.SourceName, payload.SourceInfo)
 	if err != nil {
 		return
 	}

@@ -37,7 +37,7 @@ func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
 	} else {
 		output, err := service.GroupServiceImpl.ListGroups(ctx, workspaceId, reqBody.GroupName, typeTag)
 		if err != nil {
-			c.AbortServerError(ctx, "list: "+err.Error())
+			c.AbortServerError(ctx, listPrefix+err.Error())
 			return
 		}
 		c.ResponseJson(ctx, output)
@@ -63,7 +63,7 @@ func (c *GroupController) create(ctx *gin.Context, typeTag string) {
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "create"); err != nil {
 		return
 	} else if _, err := service.GroupServiceImpl.Create(ctx, workspaceId, reqBody.GroupName, typeTag); err != nil {
-		c.AbortClientError(ctx, "create: "+err.Error())
+		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 	c.SuccessVoid(ctx)

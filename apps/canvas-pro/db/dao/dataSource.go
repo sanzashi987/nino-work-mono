@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
@@ -31,7 +32,7 @@ func (serv *DataSourceDao) FindByNameOrType(page, size int, workspace uint64, na
 	}
 
 	if len(sourceType) != 0 {
-		sourceTypeEnums := []int{}
+		sourceTypeEnums := []uint8{}
 
 		for _, v := range sourceType {
 			enum, exist := model.SourceTypeStringToEnum[v]
@@ -54,9 +55,9 @@ func (serv *DataSourceDao) GetDataSourceById(id uint64) (model.DataSourceModel, 
 	return result, err
 }
 
-func (serv *DataSourceDao) UpdateDataSourceById(workspace, id uint64, sourceName, sourceInfo string) (model.DataSourceModel, error) {
+func (serv *DataSourceDao) Update(workspace, id uint64, sourceName, sourceInfo string) (model.DataSourceModel, error) {
 	toUpdate := map[string]string{}
-	// var resyu
+	var result = model.DataSourceModel{}
 	if sourceName != "" {
 		toUpdate["name"] = sourceName
 	}
@@ -64,13 +65,21 @@ func (serv *DataSourceDao) UpdateDataSourceById(workspace, id uint64, sourceName
 	if sourceInfo != "" {
 		toUpdate["source_info"] = sourceInfo
 	}
-	err := serv.GetOrm().Model(&model.DataSourceModel{}).Where("id = ? and workspace = ?", id, workspace).Updates(toUpdate).Error
+	err := serv.GetOrm().Model(&result).Where("id = ? and workspace = ?", id, workspace).Updates(toUpdate).Error
 
-	return
+	return result, err
 }
 
-func (serv *DataSourceDao) CreateDataSource(workspace uint64, sourceType uint8, name, info string) (model.DataSourceModel, error) {
-	var result model.DataSourceModel
-	serv.GetOrm().Model(&result)
-	return
+func (serv *DataSourceDao) Create(workspace uint64, sourceType uint8, name, info string) (model.DataSourceModel, error) {
+	toCreate := model.DataSourceModel{
+		Version:    consts.DefaultVersion,
+		SourceType: sourceType,
+		SourceInfo: info,
+	}
+	toCreate.Workspace, toCreate.TypeTag = workspace, consts.DATASOURCE
+	err := serv.GetOrm().Table(dataSourceTableName).Create(&toCreate).Error
+
+	return toCreate, err
 }
+
+// func (serv * DataSourceDao) Delete
