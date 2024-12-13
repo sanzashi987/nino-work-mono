@@ -76,7 +76,7 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 
 	dataSource, err := service.DataSourceServiceImpl.GetDataSourceById(ctx, workspaceId, query.SourceId)
 	if err != nil {
-		c.AbortClientError(ctx, readPreix+err.Error())
+		c.AbortServerError(ctx, readPreix+err.Error())
 		return
 	}
 
@@ -103,8 +103,19 @@ type DeleteDataSourceRequest struct {
 }
 
 func (c *DataSourceController) delete(ctx *gin.Context) {
+	reqBody := DeleteDataSourceRequest{}
+	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "delete")
+	if err != nil {
+		return
+	}
 
+	err = service.DataSourceServiceImpl.Delete(ctx, workspaceId, reqBody.SourceId)
+	if err != nil {
+		c.AbortServerError(ctx, deletePrefix+err.Error())
+		return
+	}
 
+	c.SuccessVoid(ctx)
 }
 
 type ReplaceIpRequest struct {
@@ -115,7 +126,7 @@ type ReplaceIpRequest struct {
 
 func (c *DataSourceController) replaceIp(ctx *gin.Context) {
 	reqBody := ReplaceIpRequest{}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "replaceIp"); err != nil {
 		return
 	}
 
@@ -128,7 +139,7 @@ type SearchByIpRequest struct {
 
 func (c *DataSourceController) search(ctx *gin.Context) {
 	reqBody := SearchByIpRequest{}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "search"); err != nil {
 		return
 	}
 

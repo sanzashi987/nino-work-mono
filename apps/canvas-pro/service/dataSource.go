@@ -123,3 +123,21 @@ func (serv *DataSourceService) Create(ctx context.Context, workspaceId uint64, p
 
 	return
 }
+
+func (serv *DataSourceService) Delete(ctx context.Context, workspaceId uint64, codes []string) error {
+	dataSourceDao := dao.NewDataSourceDao(ctx)
+
+	ids := []uint64{}
+	for _, code := range codes {
+		id, tag, err := consts.GetIdFromCode(code)
+		if err != nil {
+			return err
+		}
+		if tag != consts.DATASOURCE {
+			return errors.New("Has invalid datasource code: " + code)
+		}
+		ids = append(ids, id)
+	}
+
+	return dataSourceDao.Delete(workspaceId, ids)
+}

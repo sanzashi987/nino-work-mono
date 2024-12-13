@@ -82,4 +82,6 @@ func (serv *DataSourceDao) Create(workspace uint64, sourceType uint8, name, info
 	return toCreate, err
 }
 
-// func (serv * DataSourceDao) Delete
+func (serv *DataSourceDao) Delete(workspace uint64, ids []uint64) error {
+	return serv.GetOrm().Table(dataSourceTableName).Where("workspace = ? and id in ?", workspace, ids).Delete(&model.DataSourceModel{}).Error
+}
