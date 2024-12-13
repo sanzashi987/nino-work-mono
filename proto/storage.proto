@@ -1,7 +1,7 @@
 syntax = "proto3";
 package serivces;
 
-option go_package = "./proto/upload;upload";
+option go_package = "./proto/storage;storage";
 
 
 message FileUploadRequest {
@@ -25,7 +25,7 @@ message FileQueryRequest {
 
 // }
 
-service FileUploadService {
+service StorageService {
   rpc UploadFile(stream FileUploadRequest) returns (FileDetailResponse){}
   rpc GetFileDetail(FileQueryRequest) returns(FileDetailResponse){}
 }

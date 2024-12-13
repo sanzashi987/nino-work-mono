@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	conf, etcdRegistry := bootstrap.CommonBootstrap("userService.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap()
 	dao.ConnectDB()
 
 	userServiceConf, ok := conf.Service["userService"]

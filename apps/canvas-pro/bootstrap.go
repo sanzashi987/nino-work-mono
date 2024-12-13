@@ -4,17 +4,19 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/http"
 	"github.com/sanzashi987/nino-work/pkg/bootstrap"
-	"github.com/sanzashi987/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/proto/storage"
 	"go-micro.dev/v4/web"
 )
 
 func main() {
-	conf, etcdRegistry := bootstrap.CommonBootstrap("canvasService.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("canvasService")
 	dao.ConnectDB()
 
-	client := bootstrap.GetClient()
-	client.GetClientInstance().Init()
-	uploadClient := upload.NewFileUploadService(client.GetName(), client.GetClientInstance())
+	client := bootstrap.InitClient("canvasService.client", etcdRegistry)
+
+	// client := bootstrap.GetClient()
+	// client.GetClientInstance().Init()
+	uploadClient := storage.NewStorageService(client.Name(), client.Client())
 
 	canvasService, ok := conf.Service["canvasService"]
 	if !ok {
@@ -25,7 +27,7 @@ func main() {
 		web.Name(canvasService.Name+".web"),
 		web.Address(bootstrap.GetAddress(canvasService.Host, canvasService.Port)),
 		web.Handler(http.NewRouter(conf.System.LoginPage, map[string]any{
-			"upload": uploadClient,
+			"storage": uploadClient,
 		})),
 		web.Registry(etcdRegistry),
 	)

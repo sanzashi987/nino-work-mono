@@ -9,7 +9,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
-	"github.com/sanzashi987/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
 type AssetService struct{}
@@ -107,7 +107,7 @@ type UploadAssetResponse struct {
 	Suffix   string `json:"suffix"`
 }
 
-func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, groupName, groupCode, filename, typeTag string, file *multipart.FileHeader) (res *UploadAssetResponse, err error) {
+func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, groupName, groupCode, filename, typeTag string, file *multipart.FileHeader) (res *UploadAssetResponse, err error) {
 	stream, err := uploadRpc.UploadFile(ctx)
 	if err != nil {
 		return
@@ -120,7 +120,7 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 		var n int
 		buf := make([]byte, chunkSize)
 		n, err = reader.Read(buf)
-		if err = stream.Send(&upload.FileUploadRequest{
+		if err = stream.Send(&storage.FileUploadRequest{
 			Filename: filename,
 			Data:     buf[:n],
 		}); err != nil {
@@ -137,7 +137,7 @@ func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc upload.FileU
 	if err = stream.CloseSend(); err != nil {
 		return
 	}
-	rpcResponse := upload.FileDetailResponse{}
+	rpcResponse := storage.FileDetailResponse{}
 	if err = stream.RecvMsg(&rpcResponse); err != nil {
 		return
 	}
@@ -198,7 +198,7 @@ type AssetDetailResponse struct {
 	request.DBTime
 }
 
-func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.FileUploadService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
+func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
 
 	assetDao := dao.NewAssetDao(ctx)
 	assetId, _, _ := consts.GetIdFromCode(assetCode)
@@ -208,7 +208,7 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc upload.Fi
 		return nil, err
 	}
 
-	rpcReq := upload.FileQueryRequest{}
+	rpcReq := storage.FileQueryRequest{}
 	rpcReq.Id = record.FileId
 
 	rpcRes, err := uploadRpc.GetFileDetail(ctx, &rpcReq)

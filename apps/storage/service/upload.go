@@ -10,8 +10,8 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
-	model "github.com/sanzashi987/nino-work/apps/upload/db"
-	"github.com/sanzashi987/nino-work/proto/upload"
+	model "github.com/sanzashi987/nino-work/apps/storage/db"
+	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
 type UploadServiceRpc struct{}
@@ -20,12 +20,12 @@ var UploadServiceRpcImpl = &UploadServiceRpc{}
 
 const chunkSize = 1024 * 1024 / 2
 
-func GetUploadServiceRpc() upload.FileUploadServiceHandler {
+func GetUploadServiceRpc() storage.StorageServiceHandler {
 	return UploadServiceRpcImpl
 }
 
-func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileUploadService_UploadFileStream) (err error) {
-	res := upload.FileDetailResponse{}
+func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.StorageService_UploadFileStream) (err error) {
+	res := storage.FileDetailResponse{}
 	uid, err := uuid.NewRandom()
 	if err != nil {
 		return
@@ -41,7 +41,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 	var size int64 = 0
 
 	for {
-		var req *upload.FileUploadRequest
+		var req *storage.FileUploadRequest
 		req, err = stream.Recv()
 
 		if err != io.EOF {
@@ -87,7 +87,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream upload.FileU
 	return stream.SendMsg(&res)
 }
 
-func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *upload.FileQueryRequest, out *upload.FileDetailResponse) error {
+func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
 	if record, err := model.NewUploadDao(ctx).QueryFile(fileId); err != nil {
 		return err

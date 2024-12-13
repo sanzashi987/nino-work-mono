@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	conf, etcdRegistry := bootstrap.CommonBootstrap("chatService.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("chatService")
 	dao.ConnectDB()
 
 	chatService, ok := conf.Service["chatService"]

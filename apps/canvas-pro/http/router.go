@@ -8,7 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/middleware"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
 	"github.com/sanzashi987/nino-work/pkg/auth"
-	"github.com/sanzashi987/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
 const RPCKEY = "RPCCLIENTS"
@@ -24,10 +24,10 @@ func getCurrentUser(ctx *gin.Context) uint64 {
 	return userId.(uint64)
 }
 
-func getUploadRpcService(ctx *gin.Context) upload.FileUploadService {
+func getUploadRpcService(ctx *gin.Context) storage.StorageService {
 	rpcMap, _ := ctx.Get(RPCKEY)
 	m, _ := rpcMap.(map[string]any)
-	return m["upload"].(upload.FileUploadService)
+	return m["storage"].(storage.StorageService)
 }
 
 func UserWorkspace(ctx *gin.Context) {

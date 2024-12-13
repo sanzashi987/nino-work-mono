@@ -31,6 +31,14 @@ protoc --micro_out=. --go_out=. -I=./proto
 [Etcd release page](https://github.com/etcd-io/etcd/releases/)
 
 
+
+#### Bootstrap the system
+```bash
+# cd to the etcd path, gerernally locates at ~/etcd/
+./etcd
+```
+
+
 ## TODOS
   
 - [ ] Add makefile for quick batch generating proto files to individual directories

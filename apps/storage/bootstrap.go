@@ -1,26 +1,26 @@
 package main
 
 import (
-	"github.com/sanzashi987/nino-work/apps/upload/db"
-	"github.com/sanzashi987/nino-work/apps/upload/service"
+	"github.com/sanzashi987/nino-work/apps/storage/db"
+	"github.com/sanzashi987/nino-work/apps/storage/service"
 	"github.com/sanzashi987/nino-work/pkg/bootstrap"
-	"github.com/sanzashi987/nino-work/proto/upload"
+	"github.com/sanzashi987/nino-work/proto/storage"
 	"go-micro.dev/v4"
 )
 
 func main() {
 
-	conf, etcdRegistry := bootstrap.CommonBootstrap("uploadService.client")
+	conf, etcdRegistry := bootstrap.CommonBootstrap("storageService")
 
-	uploadServiceConf, ok := conf.Service["uploadService"]
+	storageServiceConf, ok := conf.Service["storageService"]
 	if !ok {
 		panic("File Service is not configured")
 	}
 
 	db.ConnectDB()
 	rpcService := micro.NewService(
-		micro.Name(uploadServiceConf.Name),
-		micro.Address(bootstrap.GetAddress(uploadServiceConf.Host, uploadServiceConf.Port)),
+		micro.Name(storageServiceConf.Name),
+		micro.Address(bootstrap.GetAddress(storageServiceConf.Host, storageServiceConf.Port)),
 		micro.Registry(etcdRegistry),
 	)
 
@@ -37,7 +37,7 @@ func main() {
 	// 	webService.Run()
 	// }()
 
-	upload.RegisterFileUploadServiceHandler(rpcService.Server(), service.GetUploadServiceRpc())
+	storage.RegisterStorageServiceHandler(rpcService.Server(), service.GetUploadServiceRpc())
 
 	rpcService.Init()
 	rpcService.Run()
