@@ -5,8 +5,9 @@ option go_package = "./proto/storage;storage";
 
 
 message FileUploadRequest {
-  string filename =1;
-  bytes data = 2;
+  bytes data = 1;
+  string filename = 2;
+  uint64 bucket_id = 3;
 }
 
 message FileDetailResponse {

@@ -10,7 +10,8 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
-	model "github.com/sanzashi987/nino-work/apps/storage/db"
+	dao "github.com/sanzashi987/nino-work/apps/storage/db/dao"
+	model "github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
@@ -25,6 +26,23 @@ func GetUploadServiceRpc() storage.StorageServiceHandler {
 }
 
 func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.StorageService_UploadFileStream) (err error) {
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	bucketDao := dao.NewBucketDao(ctx)
+	var bucket *model.Bucket
+	if req.BucketId > 0 {
+		bucket, err = bucketDao.GetBucket(uint(req.BucketId))
+	} else {
+		return fmt.Errorf("bucket information required")
+	}
+	
+	if err != nil {
+		return fmt.Errorf("bucket not found: %v", err)
+	}
+
 	res := storage.FileDetailResponse{}
 	uid, err := uuid.NewRandom()
 	if err != nil {
@@ -78,7 +96,15 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	path := fmt.Sprintf("./uploads/%s/%s.%s", dt, uuidStr, ext)
 	os.Rename(tempFilePath, path)
 
-	if err := model.NewUploadDao(ctx).CreateFile(mimeTypeSTr, path, uuidStr, ext, size); err != nil {
+	if err := dao.NewFileDao(ctx).CreateFile(
+		bucket.ID,
+		req.Filename,
+		mimeTypeSTr,
+		path,
+		uuidStr,
+		ext,
+		size,
+	); err != nil {
 		return err
 	}
 
@@ -89,7 +115,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
-	if record, err := model.NewUploadDao(ctx).QueryFile(fileId); err != nil {
+	if record, err := dao.NewFileDao(ctx).QueryFile(fileId); err != nil {
 		return err
 	} else {
 		out.Extension, out.Id, out.Path, out.Size = record.Extension, record.FileId, record.URI, record.Size
