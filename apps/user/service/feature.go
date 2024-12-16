@@ -8,13 +8,23 @@ import (
 
 var defatultFeaturesJson string
 
+type Auth struct {
+	Read  bool
+	Write bool
+	Super bool
+}
+
 func init() {
 
-	featureMap := make(map[string]bool)
+	featureMap := make(map[string]Auth)
 	serviceMap := config.GetConfig().Service
 	for name, service := range serviceMap {
 		if service.Feature {
-			featureMap[name] = false
+			featureMap[name] = Auth{
+				Read:  false,
+				Write: false,
+				Super: false,
+			}
 		}
 	}
 

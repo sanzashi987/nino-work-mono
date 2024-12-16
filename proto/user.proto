@@ -7,11 +7,13 @@ option go_package = "./proto/user;user";
 message UserLoginRequest {
   string username = 1;
   string password = 2;
+  optional int32 expiry = 3;
 }
 
 message UserLoginResponse {
   string jwt_token = 1;
   int32 reason = 2;
+  int32 expiry = 3;
 }
 
 
@@ -21,13 +23,7 @@ message UserRegisterRequest {
   string password_confirm = 3;
 }
 
-message UserRegisterResponse {
-  string jwt_token = 1;
-  int32 reason = 2;
-}
-
-
 service UserService {
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse){}
-  rpc UserRegister(UserRegisterRequest) returns (UserRegisterResponse){}
+  rpc UserRegister(UserRegisterRequest) returns (UserLoginResponse){}
 }

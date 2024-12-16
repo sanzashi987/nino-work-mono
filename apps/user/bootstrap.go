@@ -9,12 +9,12 @@ import (
 )
 
 func main() {
-	bootstraper := bootstrap.CommonBootstrap("userService")
+	bootstraper := bootstrap.CommonBootstrap("ssoService")
 	dao.ConnectDB()
 
 	rpcService := bootstraper.InitRpcService()
 
-	webService := bootstraper.InitWebService(http.NewRouter())
+	webService := bootstraper.InitWebService(http.NewRouter(bootstraper.Config.System.LoginPage))
 
 	user.RegisterUserServiceHandler(rpcService.Server(), service.GetUserServiceRpc())
 	webService.Init()

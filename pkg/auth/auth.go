@@ -54,14 +54,20 @@ func ValidateToken(inputToken string) (*AuthClaims, error) {
 }
 
 const (
-	UserID   = "UserID"
-	Username = "Username"
+	UserID     = "UserID"
+	Username   = "Username"
+	CookieName = "login_token"
 )
 
 func ValidateMiddleware(loginPageUrl string) func(*gin.Context) {
 
 	return func(ctx *gin.Context) {
-		jwtToken := ctx.GetHeader("Authentication")
+		jwtToken, err := ctx.Cookie(CookieName)
+		if err != nil {
+			ctx.Redirect(http.StatusSeeOther, loginPageUrl+"?redirect="+ctx.Request.URL.String())
+			return
+		}
+		// jwtToken := ctx.GetHeader("Authentication")
 		claim, err := ValidateToken(jwtToken)
 		if err != nil {
 			ctx.Redirect(http.StatusSeeOther, loginPageUrl+"?redirect="+ctx.Request.URL.String())

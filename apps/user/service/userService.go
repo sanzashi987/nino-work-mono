@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
@@ -14,13 +15,10 @@ import (
 
 type UserServiceRpc struct{}
 
-var UserServiceRpcImpl *UserServiceRpc
+var UserServiceRpcImpl *UserServiceRpc = &UserServiceRpc{}
 var once sync.Once
 
 func GetUserServiceRpc() user.UserServiceHandler {
-	once.Do(func() {
-		UserServiceRpcImpl = &UserServiceRpc{}
-	})
 	return UserServiceRpcImpl
 }
 
@@ -36,18 +34,28 @@ func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginReques
 		return
 	}
 
-	token, err := auth.GenerateToken(user.Username, user.Id)
+	var token string
+
+	var days int
+	if in.Expiry != nil {
+		days = int(*in.Expiry)
+	} else {
+		days = 1
+	}
+
+	token, err = auth.GenerateToken(user.Username, user.Id, time.Hour*24*time.Duration(days))
 	if err != nil {
 		out.Reason = FailToCreateToken
 		return
 	}
 
+	out.Expiry = int32(days)
 	out.JwtToken = token
 	out.Reason = Success
 	return
 }
 
-func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserRegisterResponse) (err error) {
+func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserLoginResponse) (err error) {
 	dbSession := dao.NewUserDao(ctx)
 	user, err := dbSession.FindUserByUsername(in.Username)
 	if user != nil {

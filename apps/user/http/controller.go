@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/user/service"
+	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/proto/user"
 )
@@ -14,13 +15,9 @@ type UserController struct {
 	controller.BaseController
 }
 
-const voidStr = ""
-
 func (controller *UserController) UserLogin(ctx *gin.Context) {
 	var req = user.UserLoginRequest{}
-	var res = user.UserLoginResponse{
-		JwtToken: voidStr,
-	}
+	var res = user.UserLoginResponse{}
 	if err := ctx.BindJSON(&req); err != nil {
 		controller.AbortClientError(ctx, "[http] user login: Fail to read required fields")
 		return
@@ -31,6 +28,8 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 		return
 	}
 
+	expiry := int(res.Expiry)
+	ctx.SetCookie(auth.CookieName, res.JwtToken, expiry*60*60*24, "/", ".nino.work", false, false)
 	if target, shouldRedirect := ctx.GetQuery("redirect"); shouldRedirect {
 		ctx.Redirect(iHttp.StatusSeeOther, fmt.Sprintf("%s?token=%s", target, res.JwtToken))
 		return
@@ -41,9 +40,7 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 
 func (controller *UserController) UserRegister(ctx *gin.Context) {
 	var req = user.UserRegisterRequest{}
-	var res = user.UserRegisterResponse{
-		JwtToken: voidStr,
-	}
+	var res = user.UserLoginResponse{}
 	if err := ctx.BindJSON(&req); err != nil {
 		controller.AbortClientError(ctx, "[http] user regiser: Fail to read required fields "+err.Error())
 		return
@@ -55,4 +52,8 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 	}
 
 	controller.ResponseJson(ctx, &res)
+}
+
+func (controller *UserController) Dashboard(ctx *gin.Context) {
+
 }

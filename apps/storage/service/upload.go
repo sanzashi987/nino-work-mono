@@ -97,7 +97,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	os.Rename(tempFilePath, path)
 
 	if err := dao.NewFileDao(ctx).CreateFile(
-		bucket.ID,
+		uint(bucket.Id),
 		req.Filename,
 		mimeTypeSTr,
 		path,

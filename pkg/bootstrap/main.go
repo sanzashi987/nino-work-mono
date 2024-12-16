@@ -6,11 +6,13 @@ import (
 
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	"github.com/sanzashi987/nino-work/config"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"
 	"go-micro.dev/v4/web"
+	"gorm.io/gorm"
 )
 
 type ServiceClient struct {
@@ -83,4 +85,8 @@ func (b Bootstraper) InitRpcClient() *ServiceClient {
 	}
 
 	return serviceClient
+}
+
+func (b Bootstraper) ConnectDB() *gorm.DB {
+	return db.ConnectDB(b.PsmConf.DbName)
 }
