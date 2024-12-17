@@ -22,7 +22,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	{
 		v1.POST("login", userController.UserLogin)
 		v1.POST("register", userController.UserRegister)
-		v1.GET("dashboard", userController.Dashboard).Use(authMiddleware)
+		v1.GET("info", userController.UserInfo).Use(authMiddleware)
 	}
 	appRoot := utils.GetAppRoot()
 	feRoot := filepath.Join(appRoot, "./static/dist/")

@@ -8,14 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
-
 func ConnectDB() {
 	instance := db.ConnectDB()
 	migrateTable(instance)
 }
 
 func migrateTable(db *gorm.DB) {
-	db.AutoMigrate(&model.UserModel{})
+	db.AutoMigrate(&model.UserModel{}, &model.PermissionModel{}, &model.RoleModel{}, &model.ServiceModel{})
 }
 
 func newDBSession(ctx context.Context) *gorm.DB {

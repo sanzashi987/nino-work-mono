@@ -54,6 +54,14 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 	controller.ResponseJson(ctx, &res)
 }
 
-func (controller *UserController) Dashboard(ctx *gin.Context) {
+func (controller *UserController) UserInfo(ctx *gin.Context) {
+
+	userId := ctx.GetUint64(auth.UserID)
+	service.UserServiceWebImpl.UserInfo(ctx, userId)
+
+}
+
+func (controller *UserController) ListServiceUsers(ctx *gin.Context) {
+	userId := ctx.GetUint64(auth.UserID)
 
 }

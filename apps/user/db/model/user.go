@@ -13,11 +13,10 @@ const (
 
 type UserModel struct {
 	db.BaseModel
-	Username string `gorm:"column:username;type:varchar(255);unique"`
-	Password string `gorm:"column:password;type:varchar(255)"`
-	Role     int32  `gorm:"column:role"`
-	Features string `gorm:"column:features;type:varchar(255)"`
-	Fobidden bool   `gorm:"column:forbidden"`
+	Username string      `gorm:"column:username;type:varchar(255);unique"`
+	Password string      `gorm:"column:password;type:varchar(255)"`
+	Fobidden bool        `gorm:"column:forbidden"`
+	Roles    []RoleModel `gorm:"many2many:user_roles;"`
 }
 
 func (u UserModel) TableName() string {

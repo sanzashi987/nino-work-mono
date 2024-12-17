@@ -75,8 +75,6 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 			Username: in.Username,
 			Password: in.Password,
 			Fobidden: false,
-			Role:     model.User,
-			Features: defatultFeaturesJson,
 		}
 
 		dbSession.CreateUser(&user)
@@ -93,4 +91,47 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 	out.Reason = InternalServerError
 	err = errors.New("Unknown edge case in user service")
 	return
+}
+
+type UserServiceWeb struct{}
+
+var UserServiceWebImpl *UserServiceWeb = &UserServiceWeb{}
+
+type UserInfoResponse struct {
+	UserId   uint64 `json:"user_id"`
+	Username string `json:"username"`
+	Features string `json:"features"`
+}
+
+func (u *UserServiceWeb) UserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
+	if userId == 0 {
+		return nil, errors.New("user id is equired")
+	}
+
+	user, err := dao.NewUserDao(ctx).FindUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserInfoResponse{
+		UserId:   user.Id,
+		Username: user.Username,
+	}, nil
+}
+
+// func (u *UserServiceWeb) ListUsers(ctx context.Context, userId uint64) ([]*UserInfoResponse, error) {
+// 	db := dao.NewUserDao(ctx).FindUserById(userId)
+// }
+
+type ListServicesResponse struct {
+	ServiceId   uint64 `json:"service_id"`
+	ServiceName string `json:"service_name"`
+	Description string `json:"description"`
+}
+
+func (u *UserServiceWeb) ListServices(ctx context.Context, userId uint16) (res *[]ListServicesResponse, err error) {
+	if userId == 0 {
+		return nil, errors.New("user id is required")
+	}
+	
 }
