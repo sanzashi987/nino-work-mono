@@ -11,8 +11,8 @@ type FileDao struct {
 	db.BaseDao[model.File]
 }
 
-func NewFileDao(ctx context.Context) *FileDao {
-	return &FileDao{db.InitBaseDao[model.File](ctx)}
+func NewFileDao(ctx context.Context, dao ...*db.BaseDao[model.File]) *FileDao {
+	return &FileDao{BaseDao: db.NewDao[model.File](ctx, dao...)}
 }
 
 func (dao FileDao) CreateFile(bucketId uint, name, mimeType, uri, fileId, extension string, size int64) error {

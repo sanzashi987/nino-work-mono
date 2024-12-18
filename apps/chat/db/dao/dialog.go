@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/chat/db/model"
-	"gorm.io/gorm"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type ChatDao struct {
-	*gorm.DB
+	db.BaseDao[model.MessageModel]
 }
 
-func NewChatDao(ctx context.Context) *ChatDao {
-	return &ChatDao{DB: newDBSession(ctx)}
+func NewAssetDao(ctx context.Context, dao ...*db.BaseDao[model.MessageModel]) *ChatDao {
+	return &ChatDao{BaseDao: db.NewDao[model.MessageModel](ctx, dao...)}
 }
 
 func (c *ChatDao) CreateMessagePair(gptAnswer, userInput string, dialogID uint64) (uint64, uint64, error) {
@@ -21,7 +21,7 @@ func (c *ChatDao) CreateMessagePair(gptAnswer, userInput string, dialogID uint64
 		Content:  userInput,
 	}
 
-	if err := c.Create(&userMessage).Error; err != nil {
+	if err := c.GetOrm().Create(&userMessage).Error; err != nil {
 		return 0, 0, err
 	}
 
@@ -31,7 +31,7 @@ func (c *ChatDao) CreateMessagePair(gptAnswer, userInput string, dialogID uint64
 		Content:  gptAnswer,
 	}
 
-	if err := c.Create(&gptAnwserMessage).Error; err != nil {
+	if err := c.GetOrm().Create(&gptAnwserMessage).Error; err != nil {
 		return 0, 0, err
 	}
 

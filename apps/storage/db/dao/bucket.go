@@ -11,8 +11,8 @@ type BucketDao struct {
 	db.BaseDao[model.Bucket]
 }
 
-func NewBucketDao(ctx context.Context) *BucketDao {
-	return &BucketDao{db.InitBaseDao[model.Bucket](ctx)}
+func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *BucketDao {
+	return &BucketDao{BaseDao: db.NewDao[model.Bucket](ctx, dao...)}
 }
 
 func (dao BucketDao) CreateBucket(name string) (*model.Bucket, error) {

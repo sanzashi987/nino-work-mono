@@ -11,6 +11,6 @@ type TemplateDao struct {
 	db.BaseDao[model.TemplateModel]
 }
 
-func NewTemplateDao(ctx context.Context) *TemplateDao {
-	return &TemplateDao{db.InitBaseDao[model.TemplateModel](ctx)}
+func NewTemplateDao(ctx context.Context, dao ...*db.BaseDao[model.TemplateModel]) *TemplateDao {
+	return &TemplateDao{BaseDao: db.NewDao[model.TemplateModel](ctx, dao...)}
 }

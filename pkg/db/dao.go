@@ -42,9 +42,22 @@ func NewDBSession(ctx context.Context) *gorm.DB {
 
 func InitBaseDao[Model any](ctx context.Context) BaseDao[Model] {
 	return BaseDao[Model]{
-		db: NewDBSession(ctx),
-		ctx:ctx,
+		db:  NewDBSession(ctx),
+		ctx: ctx,
 	}
+}
+
+func NewDao[T any](ctx context.Context, dao ...*BaseDao[T]) BaseDao[T] {
+	var baseDao BaseDao[T]
+	if len(dao) > 0 {
+		baseDao = *dao[0]
+	} else {
+		baseDao = BaseDao[T]{
+			db:  NewDBSession(ctx),
+			ctx: ctx,
+		}
+	}
+	return baseDao
 }
 
 func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {

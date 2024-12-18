@@ -12,10 +12,8 @@ type ThemeDao struct {
 	db.BaseDao[model.ThemeModel]
 }
 
-func NewThemeDao(ctx context.Context) *ThemeDao {
-	return &ThemeDao{
-		db.InitBaseDao[model.ThemeModel](ctx),
-	}
+func NewThemeDao(ctx context.Context, dao ...*db.BaseDao[model.ThemeModel]) *ThemeDao {
+	return &ThemeDao{BaseDao: db.NewDao[model.ThemeModel](ctx, dao...)}
 }
 
 var themeTableName = model.ThemeModel{}.TableName()

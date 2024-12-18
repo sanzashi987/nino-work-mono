@@ -14,13 +14,7 @@ type AssetDao struct {
 }
 
 func NewAssetDao(ctx context.Context, dao ...*db.BaseDao[model.AssetModel]) *AssetDao {
-	var baseDao db.BaseDao[model.AssetModel]
-	if len(dao) > 0 {
-		baseDao = *dao[0]
-	} else {
-		baseDao = db.InitBaseDao[model.AssetModel](ctx)
-	}
-	return &AssetDao{BaseDao: baseDao}
+	return &AssetDao{BaseDao: db.NewDao[model.AssetModel](ctx, dao...)}
 }
 
 var assetTableName = model.ProjectModel{}.TableName()

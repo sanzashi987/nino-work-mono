@@ -12,13 +12,7 @@ type ProjectDao struct {
 }
 
 func NewProjectDao(ctx context.Context, dao ...*db.BaseDao[model.ProjectModel]) *ProjectDao {
-	var baseDao db.BaseDao[model.ProjectModel]
-	if len(dao) > 0 {
-		baseDao = *dao[0]
-	} else {
-		baseDao = db.InitBaseDao[model.ProjectModel](ctx)
-	}
-	return &ProjectDao{BaseDao: baseDao}
+	return &ProjectDao{BaseDao: db.NewDao[model.ProjectModel](ctx, dao...)}
 }
 
 func (dao *ProjectDao) GetList(page, size int, workspace uint64, name *string, groupId *uint64) (projects *[]model.ProjectModel, err error) {

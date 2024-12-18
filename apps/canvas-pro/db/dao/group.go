@@ -13,15 +13,7 @@ type GroupDao struct {
 }
 
 func NewGroupDao(ctx context.Context, dao ...*db.BaseDao[model.GroupModel]) *GroupDao {
-	var baseDao db.BaseDao[model.GroupModel]
-	if len(dao) > 0 {
-		baseDao = *dao[0]
-	} else {
-		baseDao = db.InitBaseDao[model.GroupModel](ctx)
-	}
-	return &GroupDao{BaseDao: baseDao}
-
-	// return &GroupDao{db.InitBaseDao[model.GroupModel](ctx)}
+	return &GroupDao{BaseDao: db.NewDao[model.GroupModel](ctx, dao...)}
 }
 
 func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64, groupTypeTag string) (res []model.GroupModel, err error) {

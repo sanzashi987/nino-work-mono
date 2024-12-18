@@ -11,8 +11,8 @@ type UserDao struct {
 	db.BaseDao[model.CanvasUserModel]
 }
 
-func NewUserDao(ctx context.Context) *UserDao {
-	return &UserDao{db.InitBaseDao[model.CanvasUserModel](ctx)}
+func NewUserDao(ctx context.Context, dao ...*db.BaseDao[model.CanvasUserModel]) *UserDao {
+	return &UserDao{BaseDao: db.NewDao[model.CanvasUserModel](ctx, dao...)}
 }
 
 func (dao *UserDao) GetUserWorkspaces(userId uint64) (*model.CanvasUserModel, error) {
