@@ -40,6 +40,7 @@ func (u *SystemServiceWeb) CreateSystem(ctx context.Context, payload CreateSyste
 		Code:        payload.SystemCode,
 		Description: payload.SystemDescription,
 		Status:      model.SystemOnline,
+		CreateBy:    payload.Operator,
 	}
 
 	if err := systemDao.Create(newSystem); err != nil {
@@ -52,6 +53,7 @@ func (u *SystemServiceWeb) CreateSystem(ctx context.Context, payload CreateSyste
 		ServiceID:   newSystem.Id,
 		Name:        fmt.Sprintf("%s系统管理员权限", newSystem.Name),
 		Code:        fmt.Sprintf("%s.admin", newSystem.Code),
+		Admin:       true,
 		Description: fmt.Sprintf("%s系统管理员权限", newSystem.Name),
 	}
 
