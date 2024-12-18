@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	bootstraper := bootstrap.CommonBootstrap("chatService")
+	bootstraper := bootstrap.CommonBootstrap("chat.nino.work")
 	dao.ConnectDB()
 
 	webService := bootstraper.InitWebService(http.NewRouter(bootstraper.Config.System.LoginPage))

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bootstraper := bootstrap.CommonBootstrap("ssoService")
+	bootstraper := bootstrap.CommonBootstrap("sso.nino.work")
 	dao.ConnectDB()
 
 	rpcService := bootstraper.InitRpcService()

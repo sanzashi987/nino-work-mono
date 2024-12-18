@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	bootstraper := bootstrap.CommonBootstrap("canvasService")
+	bootstraper := bootstrap.CommonBootstrap("canvas.nino.work")
 	dao.ConnectDB()
 
 	client := bootstraper.InitRpcClient()

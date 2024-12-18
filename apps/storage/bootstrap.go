@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	bootstraper := bootstrap.CommonBootstrap("storageService")
+	bootstraper := bootstrap.CommonBootstrap("storage.nino.work")
 
 	db.ConnectDB()
 	rpcService := bootstraper.InitRpcService()

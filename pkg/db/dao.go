@@ -36,24 +36,13 @@ func ConnectDB(names ...string) *gorm.DB {
 	return db
 }
 
-func NewDBSession(ctx context.Context) *gorm.DB {
-	return instance.WithContext(ctx)
-}
-
-func InitBaseDao[Model any](ctx context.Context) BaseDao[Model] {
-	return BaseDao[Model]{
-		db:  NewDBSession(ctx),
-		ctx: ctx,
-	}
-}
-
 func NewDao[T any](ctx context.Context, dao ...*BaseDao[T]) BaseDao[T] {
 	var baseDao BaseDao[T]
 	if len(dao) > 0 {
 		baseDao = *dao[0]
 	} else {
 		baseDao = BaseDao[T]{
-			db:  NewDBSession(ctx),
+			db:  instance.WithContext(ctx),
 			ctx: ctx,
 		}
 	}

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
@@ -15,6 +16,13 @@ func NewSystemDao(ctx context.Context, dao ...*db.BaseDao[model.SystemModel]) *S
 	return &SystemDao{BaseDao: db.NewDao[model.SystemModel](ctx, dao...)}
 }
 
-func (dao *SystemDao) CreatePermission(permission *model.PermissionModel) error {
-	return dao.GetOrm().Create(permission).Error
+func (dao *SystemDao) Create(system *model.SystemModel) error {
+	// 检查是否存在相同Code的系统
+	var existingSystem model.SystemModel
+	err := dao.GetOrm().Where("code = ?", system.Code).First(&existingSystem).Error
+	if err == nil {
+		return errors.New("system code already exists")
+	}
+	
+	return dao.GetOrm().Create(system).Error
 }

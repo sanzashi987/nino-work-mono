@@ -11,7 +11,8 @@ const (
 
 type SystemModel struct {
 	db.BaseModel
-	Name        string            `gorm:"column:name;type:varchar(255);uniqueIndex"`
+	Name        string
+	Code        string            `gorm:"column:name;type:varchar(255);uniqueIndex"`
 	Description string            `gorm:"column:description"`
 	Status      uint              `gorm:"column:status"`
 	Permissions []PermissionModel `gorm:"foreignKey:ServiceID"`

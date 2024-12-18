@@ -11,7 +11,7 @@ type ChatDao struct {
 	db.BaseDao[model.MessageModel]
 }
 
-func NewAssetDao(ctx context.Context, dao ...*db.BaseDao[model.MessageModel]) *ChatDao {
+func NewChatDao(ctx context.Context, dao ...*db.BaseDao[model.MessageModel]) *ChatDao {
 	return &ChatDao{BaseDao: db.NewDao[model.MessageModel](ctx, dao...)}
 }
 

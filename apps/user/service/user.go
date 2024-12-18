@@ -133,5 +133,6 @@ func (u *UserServiceWeb) ListServices(ctx context.Context, userId uint16) (res *
 	if userId == 0 {
 		return nil, errors.New("user id is required")
 	}
-	
+
+	return
 }

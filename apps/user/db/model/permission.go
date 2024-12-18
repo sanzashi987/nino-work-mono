@@ -6,7 +6,7 @@ import (
 
 type PermissionModel struct {
 	db.BaseModel
-	ServiceID   uint        `gorm:"column:service_id"`
+	ServiceID   uint64        `gorm:"column:service_id;index"`
 	Name        string      `gorm:"column:name;type:varchar(255)"`
 	Code        string      `gorm:"column:code;type:varchar(255);uniqueIndex"`
 	Description string      `gorm:"column:description"`
