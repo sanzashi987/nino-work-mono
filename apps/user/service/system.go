@@ -67,3 +67,15 @@ func (u *SystemServiceWeb) CreateSystem(ctx context.Context, payload CreateSyste
 	systemDao.CommitTransaction()
 	return nil
 }
+
+func (u *SystemServiceWeb) AddPermission(ctx context.Context, userId uint64) (err error) {
+	if userId == 0 {
+		return nil, errors.New("用户ID不能为空")
+	}
+	roles, err := UserServiceWebImpl.GetUserRoleWithPermissions(ctx, userId)
+
+
+
+
+	return
+}

@@ -12,6 +12,7 @@ type PermissionModel struct {
 	Admin       bool        `gorm:"column:admin;"`
 	Description string      `gorm:"column:description"`
 	Roles       []RoleModel `gorm:"many2many:role_permissions;"`
+	Menus       []MenuModel `gorm:"many2many:menu_permissions;"`
 }
 
 func (u PermissionModel) TableName() string {

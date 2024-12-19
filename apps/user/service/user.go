@@ -9,6 +9,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/proto/user"
 	"gorm.io/gorm"
 )
@@ -119,20 +120,38 @@ func (u *UserServiceWeb) UserInfo(ctx context.Context, userId uint64) (*UserInfo
 	}, nil
 }
 
-// func (u *UserServiceWeb) ListUsers(ctx context.Context, userId uint64) ([]*UserInfoResponse, error) {
-// 	db := dao.NewUserDao(ctx).FindUserById(userId)
-// }
-
-type ListServicesResponse struct {
-	ServiceId   uint64 `json:"service_id"`
-	ServiceName string `json:"service_name"`
-	Description string `json:"description"`
-}
-
-func (u *UserServiceWeb) ListServices(ctx context.Context, userId uint16) (res *[]ListServicesResponse, err error) {
+func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
 	if userId == 0 {
-		return nil, errors.New("user id is required")
+		return nil, errors.New("用户ID不能为空")
 	}
 
-	return
+	userDao := dao.NewUserDao(ctx)
+
+	user, err := userDao.FindUserWithRoles(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return user.Roles, nil
+}
+
+func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
+	if userId == 0 {
+		return nil, errors.New("用户ID不能为空")
+	}
+
+	userDao := dao.NewUserDao(ctx)
+	roleDao := dao.NewRoleDao(ctx, (*db.BaseDao[model.RoleModel])(&userDao.BaseDao))
+
+	user, err := userDao.FindUserWithRoles(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = roleDao.FindRolesWithPermissions(user.Roles)
+	if err != nil {
+		return nil, err
+	}
+
+	return user.Roles, nil
 }
