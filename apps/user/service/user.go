@@ -148,7 +148,7 @@ func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId 
 		return nil, err
 	}
 
-	err = roleDao.FindRolesWithPermissions(user.Roles)
+	err = roleDao.FindRolesWithPermissions(user.Roles...)
 	if err != nil {
 		return nil, err
 	}

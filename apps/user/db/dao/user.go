@@ -36,19 +36,12 @@ func (dao *UserDao) UpdateUser(nextUser *model.UserModel) (err error) {
 	return
 }
 
-func (dao *UserDao) FindAllAdmins(id uint64) (*model.UserModel, error) {
+func (dao *UserDao) FindUserWithRoles(id uint64) (*model.UserModel, error) {
 	user := model.UserModel{}
 	user.Id = id
 
 	if err := dao.GetOrm().Model(&user).Association("Roles").Find(&user.Roles); err != nil {
 		return nil, err
-	}
-
-	admins := []model.UserModel{}
-	for _, role := range user.Roles {
-		if role.Key == "admin" {
-			admins = append(admins, user)
-		}
 	}
 
 	return nil, nil

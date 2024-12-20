@@ -70,12 +70,9 @@ func (u *SystemServiceWeb) CreateSystem(ctx context.Context, payload CreateSyste
 
 func (u *SystemServiceWeb) AddPermission(ctx context.Context, userId uint64) (err error) {
 	if userId == 0 {
-		return nil, errors.New("用户ID不能为空")
+		return errors.New("用户ID不能为空")
 	}
-	roles, err := UserServiceWebImpl.GetUserRoleWithPermissions(ctx, userId)
+	_, err = UserServiceWebImpl.GetUserRoleWithPermissions(ctx, userId)
 
-
-
-
-	return
+	return err
 }

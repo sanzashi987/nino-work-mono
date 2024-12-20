@@ -17,6 +17,18 @@
       "program": "apps/user/bootstrap.go",
     },
     {
+      "name": "Launch user development service",
+      "type": "go",
+      "request": "launch",
+      "mode": "exec",
+      "cwd": ".",
+      "args": [
+        "fresh",
+        "-c"
+      ],
+      "program": "apps/user/runner.conf",
+    },
+    {
       "name": "Launch chat service",
       "type": "go",
       "request": "launch",
@@ -41,7 +53,7 @@
       "program": "apps/canvas-pro/bootstrap.go",
     },
     {
-      "name": "Launch tos service",
+      "name": "Launch storage service",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -50,7 +62,7 @@
         "go",
         "run"
       ],
-      "program": "apps/tos/bootstrap.go",
-    }
+      "program": "apps/storage/bootstrap.go",
+    },
   ]
 }

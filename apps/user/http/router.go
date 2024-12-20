@@ -1,8 +1,9 @@
 package http
 
 import (
-	// "github.com/gin-contrib/static"
+	"github.com/gin-contrib/static"
 
+	"fmt"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -11,25 +12,25 @@ import (
 )
 
 func NewRouter(loginPageUrl string) *gin.Engine {
-	router := gin.Default()
+	apiEngine := gin.Default()
 
 	userController := UserController{}
 
 	// router.Use(static.Serve("/", static.LocalFile("./static/dist", true)))
 	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
 
-	v1 := router.Group("backend/v1")
+	appRoot := utils.GetAppRoot()
+	feRoot := filepath.Join(appRoot, "./static/dist/")
+	fmt.Printf("static root: %s", feRoot)
+
+	apiEngine.Use(static.Serve("/", static.LocalFile(feRoot, true)))
+
+	v1 := apiEngine.Group("/backend/v1")
 	{
 		v1.POST("login", userController.UserLogin)
 		v1.POST("register", userController.UserRegister)
 		v1.GET("info", userController.UserInfo).Use(authMiddleware)
 	}
-	appRoot := utils.GetAppRoot()
-	feRoot := filepath.Join(appRoot, "./static/dist/")
-	router.Static("/", feRoot)
-	router.NoRoute(func(ctx *gin.Context) {
-		ctx.File(filepath.Join(feRoot, "index.html"))
-	})
 
-	return router
+	return apiEngine
 }

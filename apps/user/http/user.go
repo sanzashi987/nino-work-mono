@@ -62,6 +62,6 @@ func (controller *UserController) UserInfo(ctx *gin.Context) {
 }
 
 func (controller *UserController) ListServiceUsers(ctx *gin.Context) {
-	userId := ctx.GetUint64(auth.UserID)
+	_ = ctx.GetUint64(auth.UserID)
 
 }

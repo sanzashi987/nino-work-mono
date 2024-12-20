@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/http"
 	"github.com/sanzashi987/nino-work/apps/user/service"
@@ -9,8 +11,12 @@ import (
 )
 
 func main() {
+	runAsIndependentService()
+}
+
+func runAsMicroService() {
 	bootstraper := bootstrap.CommonBootstrap("sso.nino.work")
-	dao.ConnectDB()
+	dao.ConnectDB(bootstraper.Config.System.DbName)
 
 	rpcService := bootstraper.InitRpcService()
 
@@ -25,5 +31,12 @@ func main() {
 	}()
 
 	rpcService.Run()
+}
 
+func runAsIndependentService() {
+	conf, psmConf := bootstrap.ParseConfig("sso.nino.work")
+	dao.ConnectDB(psmConf.DbName)
+
+	router := http.NewRouter(conf.System.LoginPage)
+	router.Run(fmt.Sprintf(":%s", psmConf.WebPort))
 }

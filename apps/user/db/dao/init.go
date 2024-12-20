@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectDB() {
-	instance := db.ConnectDB()
+func ConnectDB(name ...string) {
+	instance := db.ConnectDB(name...)
 	migrateTable(instance)
 }
 

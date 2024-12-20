@@ -5,7 +5,7 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
-func ConnectDB() {
-	instance := db.ConnectDB()
+func ConnectDB(name ...string) {
+	instance := db.ConnectDB(name...)
 	instance.AutoMigrate(&model.File{}, &model.Bucket{})
 }

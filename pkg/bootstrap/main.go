@@ -31,15 +31,21 @@ type Bootstraper struct {
 	EtcdRegistry registry.Registry
 }
 
-func CommonBootstrap(psm string) Bootstraper {
+func ParseConfig(psm string) (*config.Config, *config.ServiceConfig) {
 	conf := config.GetConfig()
-	etcdRegistry := etcd.NewRegistry(
-		registry.Addrs(GetAddress(conf.System.EtcdHost, conf.System.EtcdPort)),
-	)
 	psmConf, ok := conf.Service[psm]
 	if !ok {
 		panic(psm + " is not configured")
 	}
+	return conf, psmConf
+}
+
+func CommonBootstrap(psm string) Bootstraper {
+	conf, psmConf := ParseConfig(psm)
+
+	etcdRegistry := etcd.NewRegistry(
+		registry.Addrs(GetAddress(conf.System.EtcdHost, conf.System.EtcdPort)),
+	)
 
 	return Bootstraper{
 		psm:          psm,
