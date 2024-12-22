@@ -12,5 +12,5 @@ func ConnectDB(name ...string) {
 }
 
 func migrateTable(db *gorm.DB) {
-	db.AutoMigrate(&model.UserModel{}, &model.PermissionModel{}, &model.RoleModel{}, &model.SystemModel{})
+	db.AutoMigrate(&model.UserModel{}, &model.PermissionModel{}, &model.RoleModel{}, &model.ApplicationModel{})
 }
