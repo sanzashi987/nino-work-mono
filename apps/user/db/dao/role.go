@@ -13,7 +13,7 @@ type RoleDao struct {
 }
 
 func NewRoleDao(ctx context.Context, dao ...*db.BaseDao[model.RoleModel]) *RoleDao {
-	return &RoleDao{BaseDao: db.NewDao[model.RoleModel](ctx, dao...)}
+	return &RoleDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
 func (dao *RoleDao) FindRolesWithPermissions(roles ...model.RoleModel) error {

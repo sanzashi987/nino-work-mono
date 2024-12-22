@@ -13,7 +13,7 @@ type SystemDao struct {
 }
 
 func NewSystemDao(ctx context.Context, dao ...*db.BaseDao[model.SystemModel]) *SystemDao {
-	return &SystemDao{BaseDao: db.NewDao[model.SystemModel](ctx, dao...)}
+	return &SystemDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
 func (dao *SystemDao) Create(system *model.SystemModel) error {
@@ -23,6 +23,6 @@ func (dao *SystemDao) Create(system *model.SystemModel) error {
 	if err == nil {
 		return errors.New("system code already exists")
 	}
-	
+
 	return dao.GetOrm().Create(system).Error
 }

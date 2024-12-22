@@ -12,7 +12,7 @@ type UserDao struct {
 }
 
 func NewUserDao(ctx context.Context, dao ...*db.BaseDao[model.UserModel]) *UserDao {
-	return &UserDao{BaseDao: db.NewDao[model.UserModel](ctx, dao...)}
+	return &UserDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
 func (dao *UserDao) FindUserById(id uint64) (user *model.UserModel, err error) {

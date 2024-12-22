@@ -1,7 +1,6 @@
 package config
 
 import (
-	"embed"
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
@@ -33,8 +32,7 @@ type Config struct {
 
 var conf *Config
 
-//go:embed config.ini
-var configFile embed.FS
+// var once *sync.Once
 
 func GetConfig() *Config {
 	return conf
@@ -44,9 +42,7 @@ func init() {
 	conf = &Config{
 		Service: make(map[string]*ServiceConfig),
 	}
-
-	file, err := ini.LoadSources(ini.LoadOptions{}, configFile.ReadFile("config.ini"))
-
+	file, err := ini.Load("./config/config.ini")
 	if err != nil {
 		fmt.Println("Fail to load ini file")
 	}

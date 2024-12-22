@@ -2,3 +2,6 @@ proto/**/
 go.sum
 *.db
 *.exe
+
+tmp/*
+runner-build-errors.log
