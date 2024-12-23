@@ -121,9 +121,6 @@ func (u *UserServiceWeb) UserInfo(ctx context.Context, userId uint64) (*UserInfo
 }
 
 func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
-	if userId == 0 {
-		return nil, errors.New("用户ID不能为空")
-	}
 
 	userDao := dao.NewUserDao(ctx)
 
@@ -136,22 +133,26 @@ func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]mod
 }
 
 func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
-	if userId == 0 {
-		return nil, errors.New("用户ID不能为空")
-	}
-
-	userDao := dao.NewUserDao(ctx)
-	roleDao := dao.NewRoleDao(ctx, (*db.BaseDao[model.RoleModel])(&userDao.BaseDao))
-
-	user, err := userDao.FindUserWithRoles(userId)
+	roles, _, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
+	}
+
+	return roles, nil
+}
+
+func getUserRolePermission(ctx context.Context, userId uint64) ([]model.RoleModel, *db.BaseDao[model.RoleModel], error) {
+	userDao := dao.NewUserDao(ctx)
+	roleDao := dao.NewRoleDao(ctx, (*db.BaseDao[model.RoleModel])(&userDao.BaseDao))
+	user, err := userDao.FindUserWithRoles(userId)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	err = roleDao.FindRolesWithPermissions(user.Roles...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return user.Roles, nil
+	return user.Roles, &roleDao.BaseDao, nil
 }

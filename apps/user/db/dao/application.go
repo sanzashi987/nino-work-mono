@@ -36,3 +36,21 @@ func (dao *ApplicationDao) InitPermissionForSystem(app *model.ApplicationModel, 
 	err := dao.GetOrm().Model(app).Updates(toUpdate).Error
 	return err
 }
+
+func (dao *ApplicationDao) FindApplicationById(id uint64) (application *model.ApplicationModel, err error) {
+	err = dao.GetOrm().Where("id = ?", id).First(application).Error
+	return
+}
+
+func (dao *ApplicationDao) FindApplicationByIdWithPermission(id uint64) (application *model.ApplicationModel, err error) {
+	err = dao.GetOrm().Preload("Permissions").Where("id = ?", id).First(application).Error
+	return
+}
+
+func (dao *ApplicationDao) AddApplicationPermission(app *model.ApplicationModel, permissions []model.PermissionModel) error {
+	return dao.GetOrm().Model(app).Association("Permissions").Append(permissions)
+}
+
+func (dao *ApplicationDao) RemoveApplicationPermission(app *model.ApplicationModel, permissions []model.PermissionModel) error {
+	return dao.GetOrm().Model(app).Association("Permissions").Delete(permissions)
+}

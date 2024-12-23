@@ -17,3 +17,6 @@ func NewPermissionDao(ctx context.Context, dao ...*db.BaseDao[model.PermissionMo
 func (dao *PermissionDao) CreatePermissions(permissions ...*model.PermissionModel) error {
 	return dao.GetOrm().Create(permissions).Error
 }
+
+
+// func (dao *PermissionDao) Get

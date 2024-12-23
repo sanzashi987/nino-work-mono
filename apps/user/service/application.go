@@ -22,11 +22,7 @@ type CreateAppRequest struct {
 	Description string
 }
 
-func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, payload CreateAppRequest) error {
-	if payload.Operator == 0 {
-		return errors.New("user id is required")
-	}
-
+func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, Operator uint64, payload CreateAppRequest) error {
 	if payload.Code == "" {
 		return errors.New("system code is required")
 	}
@@ -77,34 +73,100 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, payload C
 	return nil
 }
 
-type AddPermissionRequest struct {
-	SystemId   uint64                 `json:"system_id"`
-	OperatorId uint64                 `json:"operator_id"`
-	Permission *model.PermissionModel `json:"permission"`
+func userIsManager(ctx context.Context, userId, appId uint64) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
+	userRoles, roleDao, err := getUserRolePermission(ctx, userId)
+	if err != nil {
+		return
+	}
+	appDao = dao.NewApplicationDao(ctx, (*db.BaseDao[model.ApplicationModel])(roleDao))
+
+	app, err = appDao.FindApplicationByIdWithPermission(appId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var hasPermission = false
+topLoop:
+	for _, role := range userRoles {
+		for _, permission := range role.Permissions {
+
+			if permission.AppId == appId && (app.SuperAdmin == permission.Id || app.Admin == permission.Id) {
+				hasPermission = true
+				break topLoop
+			}
+
+		}
+	}
+
+	if !hasPermission {
+		return nil, nil, errors.New("no permission")
+	}
+
+	return app, appDao, nil
 }
 
-func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, payload AddPermissionRequest) (err error) {
-	if userId == 0 {
-		return errors.New("用户ID不能为空")
+type PermissionPayload struct {
+	Name        string `json:"name"`
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
+type AddPermissionRequest struct {
+	AppId       uint64              `json:"app_id"`
+	Permissions []PermissionPayload `json:"permissions"`
+}
+
+func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64, payload AddPermissionRequest) (err error) {
+	app, appDao, err := userIsManager(ctx, userId, payload.AppId)
+	if err != nil {
+		return
 	}
-	// 检查用户是否有编辑权限
-	userPermissions, err := UserServiceWebImpl.GetUserRoleWithPermissions(ctx, operatorId)
+
+	nextPermissionMap := map[string]bool{}
+	for _, permission := range payload.Permissions {
+		nextPermissionMap[permission.Code] = true
+	}
+
+	// 检查是否存在相同Code的权限
+	for _, p := range app.Permissions {
+		if _, ok := nextPermissionMap[p.Code]; ok {
+			return errors.New("permission code already exists")
+		}
+	}
+
+	permissionModels := []model.PermissionModel{}
+	for _, permission := range payload.Permissions {
+		permissionModels = append(permissionModels, model.PermissionModel{
+			AppId:       payload.AppId,
+			Name:        permission.Name,
+			Code:        permission.Code,
+			Description: permission.Description,
+		})
+	}
+
+	appDao.AddApplicationPermission(app, permissionModels)
+
+	return err
+}
+
+type RemovePermissionRequest struct {
+	AppId       uint64   `json:"app_id"`
+	Permissions []uint64 `json:"permissions"`
+}
+
+func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
+	app, appDao, err := userIsManager(ctx, userId, payload.AppId)
 	if err != nil {
 		return err
 	}
 
-	hasEditPermission := false
-	for _, permission := range userPermissions {
-		if permission.Authorize {
-			hasEditPermission = true
-			break
-		}
+	permissions := []model.PermissionModel{}
+	for _, id := range payload.Permissions {
+		p := model.PermissionModel{}
+		p.Id = id
+		permissions = append(permissions, p)
 	}
 
-	if !hasEditPermission {
-		return errors.New("用户无编辑权限")
-	}
-	_, err = UserServiceWebImpl.GetUserRoleWithPermissions(ctx, userId)
+	return appDao.RemoveApplicationPermission(app, permissions)
 
-	return err
 }
