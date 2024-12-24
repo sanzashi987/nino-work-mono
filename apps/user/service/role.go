@@ -21,7 +21,16 @@ type CreateRoleRequest struct {
 }
 
 // 创建角色
-func (r *RoleServiceWeb) CreateRole(ctx context.Context, payload CreateRoleRequest) error {
+func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
+	userAdmins, roleDao, err := getUserRolePermission(ctx, userId)
+	if err != nil {
+		return err
+	}
+
+	if len(userAdmins) == 0 {
+		return errors.New("user does not have any admin permission")
+	}
+
 	if payload.RoleName == "" {
 		return errors.New("角色编码不能为空")
 	}
@@ -30,7 +39,6 @@ func (r *RoleServiceWeb) CreateRole(ctx context.Context, payload CreateRoleReque
 		return errors.New("角色编码不能为空")
 	}
 
-	roleDao := dao.NewRoleDao(ctx)
 	roleDao.BeginTransaction()
 
 	// 创建角色
@@ -72,7 +80,7 @@ func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*mod
 	role := model.RoleModel{}
 	role.Id = roleId
 
-	if err := roleDao.FindRolesWithPermissions(role); err != nil {
+	if err := roleDao.FindRolesWithPermissions(&role); err != nil {
 		return nil, err
 	}
 

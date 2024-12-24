@@ -2,8 +2,10 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gopkg.in/ini.v1"
 )
 
@@ -42,7 +44,11 @@ func init() {
 	conf = &Config{
 		Service: make(map[string]*ServiceConfig),
 	}
-	file, err := ini.Load("./config/config.ini")
+	appRoot := utils.GetAppRoot()
+	initPath := filepath.Join(appRoot, "/config/config.ini")
+	fmt.Printf("config path is : %s", initPath)
+
+	file, err := ini.Load(initPath)
 	if err != nil {
 		fmt.Println("Fail to load ini file")
 	}

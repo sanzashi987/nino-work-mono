@@ -31,7 +31,7 @@ func (dao *ApplicationDao) InitPermissionForSystem(app *model.ApplicationModel, 
 
 	toUpdate := map[string]any{
 		"super_admin": super.Id,
-		"authorizer":  admin.Id,
+		"admin":       admin.Id,
 	}
 	err := dao.GetOrm().Model(app).Updates(toUpdate).Error
 	return err

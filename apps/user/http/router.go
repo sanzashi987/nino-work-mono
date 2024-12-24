@@ -20,7 +20,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
 
 	appRoot := utils.GetAppRoot()
-	feRoot := filepath.Join(appRoot, "./static/dist/")
+	feRoot := filepath.Join(appRoot, "./apps/user/static/dist/")
 	fmt.Printf("static root: %s", feRoot)
 
 	apiEngine.Use(static.Serve("/", static.LocalFile(feRoot, true)))

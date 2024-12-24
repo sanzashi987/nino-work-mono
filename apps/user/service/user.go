@@ -149,10 +149,54 @@ func getUserRolePermission(ctx context.Context, userId uint64) ([]model.RoleMode
 		return nil, nil, err
 	}
 
-	err = roleDao.FindRolesWithPermissions(user.Roles...)
+	userRoles := []*model.RoleModel{}
+	for _, role := range user.Roles {
+		userRoles = append(userRoles, &role)
+	}
+
+	err = roleDao.FindRolesWithPermissions(userRoles...)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	return user.Roles, &roleDao.BaseDao, nil
+}
+
+func getUserAdmins(ctx context.Context, userId uint64) (*[]model.ApplicationModel, *db.BaseDao[model.RoleModel], error) {
+	roles, roleDao, err := getUserRolePermission(ctx, userId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	applications := map[uint64]bool{}
+	permissions := map[uint64]bool{}
+	for _, role := range roles {
+		for _, permission := range role.Permissions {
+			applications[permission.AppId] = true
+			permissions[permission.Id] = true
+		}
+	}
+
+	appIds := []uint64{}
+	for appId := range applications {
+		appIds = append(appIds, appId)
+	}
+	apps := []model.ApplicationModel{}
+	err = roleDao.GetOrm().Table("applications").Where("id IN ?", appIds).Find(&apps).Error
+	if err != nil {
+		return nil, nil, err
+
+	}
+
+	res := []model.ApplicationModel{}
+
+	for _, app := range apps {
+		_, superExist := permissions[app.SuperAdmin]
+		_, adminExist := permissions[app.Admin]
+		if superExist || adminExist {
+			res = append(res, app)
+		}
+	}
+
+	return &res, roleDao, nil
 }

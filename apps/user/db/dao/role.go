@@ -16,7 +16,7 @@ func NewRoleDao(ctx context.Context, dao ...*db.BaseDao[model.RoleModel]) *RoleD
 	return &RoleDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
-func (dao *RoleDao) FindRolesWithPermissions(roles ...model.RoleModel) error {
+func (dao *RoleDao) FindRolesWithPermissions(roles ...*model.RoleModel) error {
 	if len(roles) == 0 {
 		return errors.New("roles is required")
 	}
@@ -26,11 +26,11 @@ func (dao *RoleDao) FindRolesWithPermissions(roles ...model.RoleModel) error {
 	roleMap := make(map[uint64]*model.RoleModel)
 	for i := range roles {
 		roleIds[i] = roles[i].Id
-		roleMap[roles[i].Id] = &roles[i]
+		roleMap[roles[i].Id] = roles[i]
 	}
 
 	// 一次性查询所有角色及其权限
-	var rolesWithPerms []model.RoleModel
+	rolesWithPerms := []model.RoleModel{}
 	err := dao.GetOrm().
 		Preload("Permissions").
 		Where("id IN ?", roleIds).
