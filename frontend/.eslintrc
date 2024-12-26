@@ -1,0 +1,123 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "react-hooks",
+    "import"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+    // "prettier/@typescript-eslint"
+  ],
+  "settings": {
+    "react": {
+      "version": "19.0"
+    }
+  },
+  "env": {
+    "browser": true,
+    "jest": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true,
+      "modules": true
+    }
+  },
+  "rules": {
+    "react/display-name": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-object-literal-type-assertion": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/ban-types": "off",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+    "react/jsx-indent-props": 0,
+    "react/jsx-uses-react": 1,
+    "@typescript-eslint/triple-slash-reference": "off",
+    "react/prop-types": 0,
+    "react/no-unknown-property": "off",
+    "semi": [
+      2,
+      "always"
+    ],
+    "import/no-self-import": [
+      2
+    ],
+    "import/no-cycle": [
+      2
+    ],
+    "import/no-duplicates": [
+      2
+    ],
+    "import/newline-after-import": [
+      2
+    ],
+    "lines-between-class-members": [
+      "warn",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
+    "padding-line-between-statements": [
+      "warn",
+      {
+        "blankLine": "always",
+        "prev": [
+          "*"
+        ],
+        "next": [
+          "function"
+        ]
+      },
+      {
+        "blankLine": "always",
+        "prev": [
+          "function"
+        ],
+        "next": [
+          "*"
+        ]
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
+        "groups": [
+          "external",
+          "builtin",
+          "internal",
+          "sibling",
+          "parent"
+        ]
+      }
+    ]
+  }
+}

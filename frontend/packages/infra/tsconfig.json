@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "exclude": [
+    "**/node_modules/**",
+    "**/lib/**",
+    "node_modules",
+    "**/dist/**",
+    "./config/webpack.config.js"
+  ]
+}
