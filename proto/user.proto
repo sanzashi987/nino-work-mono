@@ -2,7 +2,9 @@ syntax="proto3";
 package services;
 option go_package = "./proto/user;user";
 
+import "proto/error.proto"; // Ensure the file exists or update the path
 //protoc --micro_out=./proto/user --go_out=./proto/user proto/user.proto
+
 
 message UserLoginRequest {
   string username = 1;
@@ -23,7 +25,36 @@ message UserRegisterRequest {
   string password_confirm = 3;
 }
 
+
+message UserPermissionsRequest {
+  int64 user_id = 1;
+}
+
+message UserPermissionsResponse {
+  int64 user_id = 1;
+  repeated string permissions = 2;
+
+  ErrorCode error = 255;
+
+}
+
+message ApplicationPermissionsRequest{
+  int64 app_id = 1;
+}
+
+message ApplicationPermissionsResponse {
+  int64 app_id = 1;
+  repeated string permissions = 2;
+  string super_admin = 3;
+  string admin = 4;
+
+  ErrorCode error = 255;
+}
+
+
 service UserService {
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse){}
   rpc UserRegister(UserRegisterRequest) returns (UserLoginResponse){}
+  rpc GetApplicationPermissions(ApplicationPermissionsRequest) returns (ApplicationPermissionsResponse){}
+  rpc GetUserPermissions(UserPermissionsRequest) returns (UserPermissionsResponse){}
 }
