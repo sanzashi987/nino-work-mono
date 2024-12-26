@@ -6,8 +6,8 @@
     "@nino-work/infra": "workspace:*"
   },
   "scripts": {
-    "start": "npx infra-start",
-    "build": "npx infra-build"
+    "start": "infra-start",
+    "build": "infra-build"
   },
   "browserslist": {
     "production": [
