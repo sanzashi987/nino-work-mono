@@ -1,6 +1,11 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll": "explicit"
+    "source.fixAll.eslint": "always",
   },
+  "eslint.format.enable": true,
+  "eslint.options": {
+    
+    "overrideConfigFile": "./frontend/.eslintrc"
+  },
+  "eslint.run": "onType"
 }

@@ -1,22 +1,18 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "react-hooks",
-    "import"
-  ],
   "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-    // "prettier/@typescript-eslint"
+    "airbnb",
+    "airbnb-typescript"
   ],
   "settings": {
     "react": {
       "version": "19.0"
     }
   },
+  "plugins": [
+    "react",
+    "react-hooks"
+  ],
   "env": {
     "browser": true,
     "jest": true,
@@ -29,9 +25,12 @@
       "experimentalObjectRestSpread": true,
       "jsx": true,
       "modules": true
-    }
+    },
+    "project": true
   },
   "rules": {
+    "linebreak-style": "off",
+    "import/no-extraneous-dependencies": "off",
     "react/display-name": "warn",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
@@ -98,7 +97,7 @@
       }
     ],
     "import/order": [
-      "error",
+      "warn",
       {
         "pathGroups": [
           {
