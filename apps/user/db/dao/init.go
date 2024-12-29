@@ -19,12 +19,16 @@ func migrateTable(db *gorm.DB) {
 func defaultRecord(db *gorm.DB) {
 
 	var roles, apps int64
+
+	tx := db.Begin()
+
 	permission := model.PermissionModel{
 		Name: "Root SuperAdmin",
 		Code: "root.super_admin",
 	}
-	db.Model(&model.RoleModel{}).Count(&roles)
-	if roles == 0 {
+	tx.Model(&model.RoleModel{}).Count(&roles)
+	tx.Model(&model.ApplicationModel{}).Count(&apps)
+	if roles == 0 && apps == 0 {
 
 		// Create default user
 		user := model.UserModel{
@@ -40,23 +44,23 @@ func defaultRecord(db *gorm.DB) {
 			Users:       []model.UserModel{user},
 		}
 
-		db.Create(role)
-	}
+		tx.Create(role)
 
-	db.Model(&model.ApplicationModel{}).Count(&apps)
-	if apps == 0 {
 		// Create default application
 		application := &model.ApplicationModel{
 			Name:        "Root",
 			Code:        "root",
 			Description: "Root application",
 			Status:      model.SystemOnline,
-			CreateBy:    1,
+			CreateBy:    role.Id,
 			SuperAdmin:  permission.Id,
 			Admin:       permission.Id,
-			Permissions: []model.PermissionModel{permission},
 		}
-		db.Create(application)
+		tx.Create(application)
+		toUpdate := map[string]any{"app_id": application.Id}
+		tx.Model(permission).Updates(toUpdate)
 	}
+
+	tx.Commit()
 
 }

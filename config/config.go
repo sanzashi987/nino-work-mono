@@ -45,7 +45,7 @@ func init() {
 		Service: make(map[string]*ServiceConfig),
 	}
 	appRoot := utils.GetAppRoot()
-	initPath := filepath.Join(appRoot, "/config/config.ini")
+	initPath := filepath.Join(appRoot, "config.ini")
 	fmt.Printf("config path is : %s", initPath)
 
 	file, err := ini.Load(initPath)

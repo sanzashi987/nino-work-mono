@@ -1,0 +1,14 @@
+{
+  "name": "@nino-work/ui-components",
+  "version": "0.0.1",
+  "description": "The ui layout react component package",
+  "author": "ziao chen",
+  "main": "src/index",
+  "devDependencies": {
+    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^5.10.6",
+    "notistack": "^3.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

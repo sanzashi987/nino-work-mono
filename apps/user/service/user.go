@@ -106,26 +106,93 @@ type UserServiceWeb struct{}
 
 var UserServiceWebImpl *UserServiceWeb = &UserServiceWeb{}
 
-type UserInfoResponse struct {
-	UserId   uint64 `json:"user_id"`
-	Username string `json:"username"`
-	Features string `json:"features"`
+type CodeName struct {
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
+type MenuMeta struct {
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	Icon      string `json:"icon"`
+	Hyperlink bool   `json:"hyperlink"`
+	Path      string `json:"path"`
+	Type      uint8  `json:"type"`
 }
 
-func (u *UserServiceWeb) UserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
-	if userId == 0 {
-		return nil, errors.New("user id is equired")
-	}
+type UserInfoResponse struct {
+	UserId      uint64      `json:"user_id"`
+	Username    string      `json:"username"`
+	Menus       []*MenuMeta `json:"menus"`
+	Permissions []*CodeName `json:"permissions"`
+	Roles       []*CodeName `json:"roles"`
+}
 
-	user, err := dao.NewUserDao(ctx).FindUserById(userId)
+func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
+
+	user, d, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
+	resRoles := []*CodeName{}
+	resPermissions := []*CodeName{}
+	permissions := map[uint64]bool{}
+	for _, role := range user.Roles {
+		resRoles = append(resRoles, &CodeName{
+			Name: role.Name,
+			Code: role.Code,
+		})
+		for _, permission := range role.Permissions {
+			permissions[permission.Id] = true
+			resPermissions = append(resPermissions, &CodeName{
+				Name: permission.Name,
+				Code: permission.Code,
+			})
+		}
+	}
+
+	permissionModels := []*model.PermissionModel{}
+	for id := range permissions {
+		permission := &model.PermissionModel{}
+		permission.Id = id
+		permissionModels = append(permissionModels, permission)
+	}
+
+	menuDao := dao.NewMenuDao(ctx, (*db.BaseDao[model.MenuModel])(d))
+
+	menuDao.GetMenusByPermissions(permissionModels...)
+
+	menuMap := map[string]*MenuMeta{}
+	for _, permission := range permissionModels {
+		for _, menu := range permission.Menus {
+			code := menu.Code
+			if _, exist := menuMap[code]; exist {
+				continue
+			}
+			menuMap[code] = &MenuMeta{
+				Name:      menu.Name,
+				Code:      code,
+				Icon:      menu.Icon,
+				Hyperlink: menu.Hyperlink,
+				Path:      menu.Path,
+				Type:      uint8(menu.Type),
+			}
+
+		}
+	}
+
+	resMenus := []*MenuMeta{}
+	for _, menu := range menuMap {
+		resMenus = append(resMenus, menu)
+	}
 
 	return &UserInfoResponse{
-		UserId:   user.Id,
-		Username: user.Username,
+		UserId:      user.Id,
+		Username:    user.Username,
+		Permissions: resPermissions,
+		Menus:       resMenus,
+		Roles:       resRoles,
 	}, nil
+
 }
 
 func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
@@ -140,16 +207,16 @@ func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]mod
 	return user.Roles, nil
 }
 
-func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
-	roles, _, err := getUserRolePermission(ctx, userId)
+func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId uint64) (*model.UserModel, error) {
+	user, _, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	return roles, nil
+	return user, nil
 }
 
-func getUserRolePermission(ctx context.Context, userId uint64) ([]model.RoleModel, *db.BaseDao[model.RoleModel], error) {
+func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel, *db.BaseDao[model.RoleModel], error) {
 	userDao := dao.NewUserDao(ctx)
 	roleDao := dao.NewRoleDao(ctx, (*db.BaseDao[model.RoleModel])(&userDao.BaseDao))
 	user, err := userDao.FindUserWithRoles(userId)
@@ -167,18 +234,18 @@ func getUserRolePermission(ctx context.Context, userId uint64) ([]model.RoleMode
 		return nil, nil, err
 	}
 
-	return user.Roles, &roleDao.BaseDao, nil
+	return user, &roleDao.BaseDao, nil
 }
 
 func getUserAdmins(ctx context.Context, userId uint64) (*[]model.ApplicationModel, *db.BaseDao[model.RoleModel], error) {
-	roles, roleDao, err := getUserRolePermission(ctx, userId)
+	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	applications := map[uint64]bool{}
 	permissions := map[uint64]bool{}
-	for _, role := range roles {
+	for _, role := range user.Roles {
 		for _, permission := range role.Permissions {
 			applications[permission.AppId] = true
 			permissions[permission.Id] = true

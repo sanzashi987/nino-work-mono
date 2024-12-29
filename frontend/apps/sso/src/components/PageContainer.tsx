@@ -2,8 +2,8 @@ import React, { PropsWithChildren } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 type PageContainerProps = PropsWithChildren<{
-  title: string
-  description: string
+  title?: string
+  description?: string
 }>;
 
 const PageContainer: React.FC<PageContainerProps> = ({ title, description, children }) => (

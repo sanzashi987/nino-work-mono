@@ -91,7 +91,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
           <FormGroup>
             <FormControlLabel
               control={<Checkbox defaultChecked />}
-              label="Remeber this Device"
+              label="Remember me in 30 Days"
             />
           </FormGroup>
           {/* <Typography

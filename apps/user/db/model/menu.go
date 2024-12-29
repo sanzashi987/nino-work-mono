@@ -22,8 +22,7 @@ type MenuModel struct {
 	Hyperlink   bool              `gorm:"column:hyperlink"`
 	Path        string            `gorm:"column:path"`
 	Icon        string            `gorm:"column:icon"`
-	ParentID    uint64            `gorm:"column:parent_id"`
-	Children    []MenuModel       `gorm:"-"`
+	// ParentID    uint64            `gorm:"column:parent_id"`
 }
 
 func (m MenuModel) TableName() string {

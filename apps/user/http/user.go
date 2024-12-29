@@ -57,7 +57,14 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 func (controller *UserController) UserInfo(ctx *gin.Context) {
 
 	userId := ctx.GetUint64(auth.UserID)
-	service.UserServiceWebImpl.UserInfo(ctx, userId)
+	info, err := service.UserServiceWebImpl.GetUserInfo(ctx, userId)
+
+	if err != nil {
+		controller.AbortServerError(ctx, "[http] user info: Fail to read user info:"+err.Error())
+		return
+	}
+
+	controller.ResponseJson(ctx, info)
 
 }
 
