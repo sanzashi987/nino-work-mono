@@ -3,6 +3,9 @@
   "extends": [
     "airbnb",
     "airbnb-typescript"
+    // "eslint:recommended",
+    // "plugin:react/recommended",
+    // "plugin:@typescript-eslint/recommended",
   ],
   "settings": {
     "react": {
@@ -10,6 +13,7 @@
     }
   },
   "plugins": [
+    "import",
     "react",
     "react-hooks"
   ],
@@ -29,94 +33,53 @@
     "project": true
   },
   "rules": {
+    "indent": [
+      "warn",
+      2
+    ],
     "linebreak-style": "off",
+    "object-curly-newline": [
+      "warn",
+      {
+        "minProperties": 5,
+        "consistent": true
+        // "ObjectExpression": "always",
+        // "ObjectPattern": {
+        //   "minProperties": 5,
+        //   "multiline": true
+        // },
+        // "ImportDeclaration": {
+        //   "multiline": true,
+        //   "minProperties": 5
+        // },
+        // "ExportDeclaration": {
+        //   "multiline": true,
+        //   "minProperties": 5
+        // }
+      }
+    ],
+    "object-curly-spacing": "warn",
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
     "import/no-extraneous-dependencies": "off",
+    "import/extensions": "off",
     "react/display-name": "warn",
+    "react/self-closing-comp": [
+      "error",
+      {
+        "component": true,
+        "html": true
+      }
+    ],
+    "no-multi-spaces": "warn",
+    "react/jsx-space-before-closing": "warn",
+    "react/function-component-definition": "off",
+    "react/require-default-props": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "@typescript-eslint/no-var-requires": 0,
-    "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/no-object-literal-type-assertion": 0,
-    "@typescript-eslint/no-non-null-assertion": 0,
-    "@typescript-eslint/no-use-before-define": 0,
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/ban-types": "off",
-    "no-empty-function": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-this-alias": "off",
-    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
-    "react/jsx-indent-props": 0,
-    "react/jsx-uses-react": 1,
-    "@typescript-eslint/triple-slash-reference": "off",
-    "react/prop-types": 0,
-    "react/no-unknown-property": "off",
-    "semi": [
-      2,
-      "always"
-    ],
-    "import/no-self-import": [
-      2
-    ],
-    "import/no-cycle": [
-      2
-    ],
-    "import/no-duplicates": [
-      2
-    ],
-    "import/newline-after-import": [
-      2
-    ],
-    "lines-between-class-members": [
-      "warn",
-      "always",
-      {
-        "exceptAfterSingleLine": true
-      }
-    ],
-    "padding-line-between-statements": [
-      "warn",
-      {
-        "blankLine": "always",
-        "prev": [
-          "*"
-        ],
-        "next": [
-          "function"
-        ]
-      },
-      {
-        "blankLine": "always",
-        "prev": [
-          "function"
-        ],
-        "next": [
-          "*"
-        ]
-      }
-    ],
-    "import/order": [
-      "warn",
-      {
-        "pathGroups": [
-          {
-            "pattern": "react",
-            "group": "external",
-            "position": "before"
-          }
-        ],
-        "pathGroupsExcludedImportTypes": [
-          "builtin"
-        ],
-        "groups": [
-          "external",
-          "builtin",
-          "internal",
-          "sibling",
-          "parent"
-        ]
-      }
-    ]
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/no-unused-vars": "warn"
   }
 }

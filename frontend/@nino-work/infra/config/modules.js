@@ -1,4 +1,4 @@
-'use strict';
+
 
 const chalk = require('react-dev-utils/chalk');
 const resolve = require('resolve');
@@ -12,7 +12,7 @@ const paths = require('./paths');
  * @param {Object} options
  */
 function getAdditionalModulePaths(options = {}) {
-  const baseUrl = options.baseUrl;
+  const {baseUrl} = options;
 
   if (!baseUrl) {
     return '';
@@ -43,8 +43,8 @@ function getAdditionalModulePaths(options = {}) {
   // Otherwise, throw an error.
   throw new Error(
     chalk.red.bold(
-      "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
-        ' Create React App does not support other values at this time.'
+      "Your project's `baseUrl` can only be set to `src` or `node_modules`."
+      + ' Create React App does not support other values at this time.',
     )
   );
 }
@@ -55,7 +55,7 @@ function getAdditionalModulePaths(options = {}) {
  * @param {*} options
  */
 function getWebpackAliases(options = {}) {
-  const baseUrl = options.baseUrl;
+  const {baseUrl} = options;
 
   if (!baseUrl) {
     return {};
@@ -66,6 +66,7 @@ function getWebpackAliases(options = {}) {
   if (path.relative(paths.appPath, baseUrlResolved) === '') {
     return {
       src: paths.appSrc,
+      '@': paths.appSrc,
     };
   }
 }
@@ -76,7 +77,7 @@ function getWebpackAliases(options = {}) {
  * @param {*} options
  */
 function getJestAliases(options = {}) {
-  const baseUrl = options.baseUrl;
+  const {baseUrl} = options;
 
   if (!baseUrl) {
     return {};
@@ -98,7 +99,7 @@ function getModules() {
 
   if (hasTsConfig && hasJsConfig) {
     throw new Error(
-      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.'
+      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.',
     );
   }
 
@@ -124,7 +125,7 @@ function getModules() {
   const additionalModulePaths = getAdditionalModulePaths(options);
 
   return {
-    additionalModulePaths: additionalModulePaths,
+    additionalModulePaths,
     webpackAliases: getWebpackAliases(options),
     jestAliases: getJestAliases(options),
     hasTsConfig,

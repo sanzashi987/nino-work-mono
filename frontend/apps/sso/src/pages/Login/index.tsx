@@ -1,12 +1,11 @@
 import React from 'react';
-import {
-  Grid, Box, Card, Stack, Typography,
-} from '@mui/material';
+import { Box, Card, Grid2 } from '@mui/material';
 // components
+import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import AuthLogin from './Login';
-import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
+import PageContainer from '@/components/PageContainer';
 
-function Login2() {
+function Login() {
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -20,80 +19,40 @@ function Login2() {
             position: 'absolute',
             height: '100%',
             width: '100%',
-            opacity: '0.3',
-          },
+            opacity: '0.3'
+          }
         }}
       >
-        <Grid
+        <Grid2
           container
           spacing={0}
           justifyContent="center"
-          sx={{ height: '100vh' }}
+          sx={{
+            height: '100vh'
+          }}
         >
-          <Grid
-            item
-            xs={12}
-            sm={12}
-            lg={4}
-            xl={3}
+          <Box
             display="flex"
             justifyContent="center"
             alignItems="center"
+
           >
             <Card
               elevation={9}
               sx={{
-                p: 4, zIndex: 1, width: '100%', maxWidth: '500px',
+                p: 4, zIndex: 1, width: '100%', maxWidth: '500px'
               }}
             >
-              <Box display="flex" alignItems="center" justifyContent="center">
-                <Logo />
+              <Box display="flex" alignItems="center" justifyContent="center" mb="20px">
+                <Logo width="80" height="80" />
               </Box>
-              <AuthLogin
-                subtext={(
-                  <Typography
-                    variant="subtitle1"
-                    textAlign="center"
-                    color="textSecondary"
-                    mb={1}
-                  >
-                    Your Social Campaigns
-                  </Typography>
-                )}
-                subtitle={(
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    justifyContent="center"
-                    mt={3}
-                  >
-                    <Typography
-                      color="textSecondary"
-                      variant="h6"
-                      fontWeight="500"
-                    >
-                      New to Modernize?
-                    </Typography>
-                    <Typography
-                      component={Link}
-                      href="/authentication/register"
-                      fontWeight="500"
-                      sx={{
-                        textDecoration: 'none',
-                        color: 'primary.main',
-                      }}
-                    >
-                      Create an account
-                    </Typography>
-                  </Stack>
-                )}
-              />
+              <AuthLogin />
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Grid2>
       </Box>
     </PageContainer>
   );
 }
 
-export default Login2;
+export default Login;
