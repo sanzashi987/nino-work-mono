@@ -29,6 +29,7 @@ func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginReques
 	}
 
 	if valid := user.CheckPassowrd(in.Password); !valid {
+		err = errors.New("user password not match")
 		out.Reason = PasswordNotMatch
 		return
 	}

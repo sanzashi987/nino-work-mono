@@ -1,10 +1,9 @@
-import React, { JSX, useMemo } from 'react';
+import React, { JSX, useEffect, useMemo, useState } from 'react';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
   Typography,
-  FormGroup,
   FormControlLabel,
-  Button,
   Stack,
   Checkbox,
   Input
@@ -13,6 +12,10 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
+import Cookie from 'js-cookie';
+import { login } from '@/api';
 
 interface LoginProps {
   title?: string;
@@ -21,7 +24,30 @@ interface LoginProps {
 }
 
 const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const formik = useFormik({
+    initialValues: { username: '', password: '', remember: true },
+    onSubmit: ({ username, password, remember }) => {
+      const paylaod = { username, password, expiry: remember ? 30 : 1 };
+      setLoading(true);
+      login(paylaod).then(({ jwt_token }) => {
+        Cookie.set('login_token', jwt_token);
+        navigate('/dashboard');
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+  });
+
+  useEffect(() => {
+    const hasToken = Cookie.get('login_token');
+    if (hasToken) {
+      navigate('/dashboard');
+    }
+  }, []);
 
   const indornent = useMemo(
     () => (
@@ -48,72 +74,89 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
       ) : null}
 
       {subtext}
+      <form onSubmit={formik.handleSubmit}>
 
-      <Stack>
-        <Box>
-          <Typography
-            variant="subtitle1"
-            fontWeight={600}
-            component="label"
-            htmlFor="username"
-            mb="5px"
-            mr="5px"
-          >
-            Username
-          </Typography>
-          <Input id="username" fullWidth />
-        </Box>
-        <Box mt="25px">
-          <Typography
-            variant="subtitle1"
-            fontWeight={600}
-            component="label"
-            htmlFor="password"
-            mb="5px"
-            mr="5px"
-          >
-            Password
-          </Typography>
-          <Input
-            id="password"
-            fullWidth
-            type={showPassword ? 'text' : 'password'}
-            endAdornment={indornent}
-          />
-
-        </Box>
-        <Stack
-          justifyContent="space-between"
-          direction="row"
-          alignItems="center"
-          my={2}
-        >
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="Remember me in 30 Days"
+        <Stack>
+          <Box>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              component="label"
+              htmlFor="username"
+              mb="5px"
+              mr="5px"
+            >
+              Username
+            </Typography>
+            <Input
+              id="username"
+              name="username"
+              fullWidth
+              value={formik.values.username}
+              onChange={formik.handleChange}
             />
-          </FormGroup>
-          {/* <Typography
+          </Box>
+          <Box mt="25px">
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              component="label"
+              htmlFor="password"
+              mb="5px"
+              mr="5px"
+            >
+              Password
+            </Typography>
+            <Input
+              id="password"
+              name="password"
+              fullWidth
+              type={showPassword ? 'text' : 'password'}
+              endAdornment={indornent}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+            />
+
+          </Box>
+          <Stack
+            justifyContent="space-between"
+            direction="row"
+            alignItems="center"
+            my={2}
+          >
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  id="remember"
+                  name="remember"
+                  onChange={formik.handleChange}
+                  checked={formik.values.remember}
+                />
+              )}
+              label="Remember me in 30 days"
+            />
+            {/* <Typography
             component="a"
             href="/"
             fontWeight="500"
           >
             Forgot Password ?
           </Typography> */}
+          </Stack>
         </Stack>
-      </Stack>
-      <Box>
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          href="/"
-          type="submit"
-        >
-          Sign In
-        </Button>
-      </Box>
+        <Box>
+          <LoadingButton
+            loading={loading}
+            variant="contained"
+            size="large"
+            fullWidth
+            type="submit"
+          >
+            Sign In
+          </LoadingButton>
+        </Box>
+      </form>
+
       {subtitle}
     </>
   );

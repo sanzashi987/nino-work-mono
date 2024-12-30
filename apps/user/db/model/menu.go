@@ -6,6 +6,8 @@ const (
 	MenuTypeMenu    MenuType = 1
 	MenuTypeCatelog MenuType = 2
 	MenuTypeButton  MenuType = 3
+	MenuEnable      int      = 0
+	MenuDisable     int      = 1
 )
 
 type MenuType uint8

@@ -15,16 +15,28 @@ type UserController struct {
 	controller.BaseController
 }
 
+type UserLoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Expiry   int32  `json:"expiry" binding:"required"`
+}
+
 func (controller *UserController) UserLogin(ctx *gin.Context) {
-	var req = user.UserLoginRequest{}
+	var req = UserLoginRequest{}
 	var res = user.UserLoginResponse{}
-	if err := ctx.BindJSON(&req); err != nil {
-		controller.AbortClientError(ctx, "[http] user login: Fail to read required fields")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		controller.AbortClientError(ctx, "[http] user login: Fail to read required fields"+err.Error())
 		return
 	}
 
-	if err := service.GetUserServiceRpc().UserLogin(ctx, &req, &res); err != nil {
-		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error")
+	rpcReq := user.UserLoginRequest{
+		Username: req.Username,
+		Password: req.Password,
+		Expiry:   &req.Expiry,
+	}
+
+	if err := service.GetUserServiceRpc().UserLogin(ctx, &rpcReq, &res); err != nil {
+		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error "+err.Error())
 		return
 	}
 
@@ -71,4 +83,8 @@ func (controller *UserController) UserInfo(ctx *gin.Context) {
 func (controller *UserController) ListServiceUsers(ctx *gin.Context) {
 	_ = ctx.GetUint64(auth.UserID)
 
+}
+
+func (controller *UserController) TestToken(ctx *gin.Context) {
+	return
 }

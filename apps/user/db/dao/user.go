@@ -21,9 +21,13 @@ func (dao *UserDao) FindUserById(id uint64) (user *model.UserModel, err error) {
 
 }
 
-func (dao *UserDao) FindUserByUsername(username string) (user *model.UserModel, err error) {
-	err = dao.GetOrm().Where("username = ?", username).First(user).Error
-	return
+func (dao *UserDao) FindUserByUsername(username string) (*model.UserModel, error) {
+	user := &model.UserModel{}
+	err := dao.GetOrm().Model(&model.UserModel{}).Where("username = ?", username).First(user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (dao *UserDao) CreateUser(newUser *model.UserModel) (err error) {
@@ -40,9 +44,9 @@ func (dao *UserDao) FindUserWithRoles(id uint64) (*model.UserModel, error) {
 	user := model.UserModel{}
 	user.Id = id
 
-	if err := dao.GetOrm().Model(&user).Association("Roles").Find(&user.Roles); err != nil {
+	if err := dao.GetOrm().Model(&user).Preload("Roles").Find(&user).Error; err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return &user, nil
 }

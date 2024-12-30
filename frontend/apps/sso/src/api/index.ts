@@ -2,10 +2,13 @@ import { defineApi } from './lib';
 
 type LoginRequest = {
   username: string
-  password:string
+  password: string
+  expiry: number
 };
 
-type LoginResponse = {};
+type LoginResponse = {
+  jwt_token: string
+};
 
 const prefix = '/backend/v1';
 export const login = defineApi<LoginRequest, LoginResponse>({
@@ -17,4 +20,8 @@ type UserInfoResponse = {};
 
 export const getUserInfo = defineApi<{}, UserInfoResponse>({
   url: `${prefix}/info`
+});
+
+export const testToken = defineApi<{}, void>({
+  url: `${prefix}/token`
 });

@@ -11,7 +11,9 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
 
   return (
     <PageContainer title="Dashboard" description="user dashboard">
-      <Box />
+      <Box>
+        笑死
+      </Box>
     </PageContainer>
   );
 };

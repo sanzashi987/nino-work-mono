@@ -64,13 +64,13 @@ func ValidateMiddleware(loginPageUrl string) func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		jwtToken, err := ctx.Cookie(CookieName)
 		if err != nil {
-			ctx.Redirect(http.StatusSeeOther, loginPageUrl+"?redirect="+ctx.Request.URL.String())
+			ctx.Redirect(http.StatusFound, loginPageUrl+"?redirect="+ctx.Request.Referer())
 			return
 		}
 		// jwtToken := ctx.GetHeader("Authentication")
 		claim, err := ValidateToken(jwtToken)
 		if err != nil {
-			ctx.Redirect(http.StatusSeeOther, loginPageUrl+"?redirect="+ctx.Request.URL.String())
+			ctx.Redirect(http.StatusFound, loginPageUrl+"?redirect="+ctx.Request.Referer())
 			return
 		}
 		ctx.Set(UserID, claim.UserID)

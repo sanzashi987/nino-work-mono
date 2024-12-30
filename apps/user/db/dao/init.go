@@ -18,7 +18,7 @@ func migrateTable(db *gorm.DB) {
 
 func defaultRecord(db *gorm.DB) {
 
-	var roles, apps int64
+	var roles, apps, permissions int64
 
 	tx := db.Begin()
 
@@ -28,7 +28,8 @@ func defaultRecord(db *gorm.DB) {
 	}
 	tx.Model(&model.RoleModel{}).Count(&roles)
 	tx.Model(&model.ApplicationModel{}).Count(&apps)
-	if roles == 0 && apps == 0 {
+	tx.Model(&model.PermissionModel{}).Count(&permissions)
+	if roles == 0 && apps == 0 && permissions == 0 {
 
 		// Create default user
 		user := model.UserModel{
@@ -44,7 +45,17 @@ func defaultRecord(db *gorm.DB) {
 			Users:       []model.UserModel{user},
 		}
 
+		menu := &model.MenuModel{
+			Name:   "Admin System",
+			Code:   "system.super_admin",
+			Type:   model.MenuTypeMenu,
+			Status: model.MenuEnable,
+			Path:   "/dashboard/super",
+		}
+
 		tx.Create(role)
+		tx.Create(menu)
+		tx.Model(menu).Association("Permissions").Append(&permission)
 
 		// Create default application
 		application := &model.ApplicationModel{

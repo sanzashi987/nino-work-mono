@@ -22,12 +22,12 @@ type CreateRoleRequest struct {
 
 // 创建角色
 func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
-	userAdmins, roleDao, err := getUserRolePermission(ctx, userId)
+	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return err
 	}
 
-	if len(userAdmins) == 0 {
+	if len(user.Roles) == 0 {
 		return errors.New("user does not have any admin permission")
 	}
 

@@ -74,7 +74,7 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, Operator 
 }
 
 func userIsManager(ctx context.Context, userId, appId uint64) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
-	userRoles, roleDao, err := getUserRolePermission(ctx, userId)
+	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return
 	}
@@ -87,7 +87,7 @@ func userIsManager(ctx context.Context, userId, appId uint64) (app *model.Applic
 
 	var hasPermission = false
 topLoop:
-	for _, role := range userRoles {
+	for _, role := range user.Roles {
 		for _, permission := range role.Permissions {
 
 			if permission.AppId == appId && (app.SuperAdmin == permission.Id || app.Admin == permission.Id) {

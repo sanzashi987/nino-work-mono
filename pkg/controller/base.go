@@ -14,7 +14,7 @@ type BaseController struct {
 func (controler *BaseController) ResponseJson(ctx *gin.Context, data interface{}) {
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg":  "Success",
+		"msg":  "success",
 		"data": data,
 		"code": 0,
 	})
@@ -23,7 +23,7 @@ func (controler *BaseController) ResponseJson(ctx *gin.Context, data interface{}
 func (controler *BaseController) SuccessVoid(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg":  "Success",
+		"msg":  "success",
 		"data": nil,
 		"code": 0,
 	})
