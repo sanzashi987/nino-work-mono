@@ -16,7 +16,27 @@ export const login = defineApi<LoginRequest, LoginResponse>({
   method: 'POST'
 });
 
-type UserInfoResponse = {};
+type EnumType = {
+  name: string
+  code: string
+};
+
+type MenuMeta = {
+  Name: string
+  Code: string
+  Icon: string
+  Hyperlink: boolean
+  Path: string
+  Type: number
+};
+
+export type UserInfoResponse = {
+  user_id: number
+  username: string
+  menus: MenuMeta[]
+  permissions: EnumType[]
+  roles: EnumType[]
+};
 
 export const getUserInfo = defineApi<{}, UserInfoResponse>({
   url: `${prefix}/info`

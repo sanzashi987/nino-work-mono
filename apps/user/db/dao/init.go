@@ -3,6 +3,7 @@ package dao
 import (
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -22,10 +23,6 @@ func defaultRecord(db *gorm.DB) {
 
 	tx := db.Begin()
 
-	permission := model.PermissionModel{
-		Name: "Root SuperAdmin",
-		Code: "root.super_admin",
-	}
 	tx.Model(&model.RoleModel{}).Count(&roles)
 	tx.Model(&model.ApplicationModel{}).Count(&apps)
 	tx.Model(&model.PermissionModel{}).Count(&permissions)
@@ -37,39 +34,53 @@ func defaultRecord(db *gorm.DB) {
 			Password: "admin",
 		}
 
-		// Create default role
-		role := &model.RoleModel{
-			Name:        "Root SuperAdmin",
-			Code:        "root.super_admin",
-			Permissions: []model.PermissionModel{permission},
-			Users:       []model.UserModel{user},
+		adminRole, rootPermission := model.CreateRoleWithPermission("Root Super Admin", "root.admin.super")
+
+		codes := []string{"user", "app", "role", "permission"}
+		userRoles := []model.RoleModel{adminRole}
+		for _, code := range codes {
+			role, _ := model.CreateRoleWithPermission(
+				utils.Capitialize(code)+" Admin Role",
+				"root.admin."+code,
+			)
+			userRoles = append(userRoles, role)
 		}
 
-		menu := &model.MenuModel{
-			Name:   "Admin System",
-			Code:   "system.super_admin",
-			Type:   model.MenuTypeMenu,
-			Status: model.MenuEnable,
-			Path:   "/dashboard/super",
+		user.Roles = userRoles
+		tx.Create(&user)
+
+		menus := []*model.MenuModel{}
+		for _, code := range codes {
+			menu := &model.MenuModel{
+				Name:   utils.Capitialize(code) + " Management",
+				Code:   "root.management." + code,
+				Type:   model.MenuTypeMenu,
+				Order:  0,
+				Status: model.MenuEnable,
+				Path:   "/dashboard/manage/" + code,
+			}
+			menus = append(menus, menu)
 		}
 
-		tx.Create(role)
-		tx.Create(menu)
-		tx.Model(menu).Association("Permissions").Append(&permission)
+		tx.Create(&menus)
+		for index := range codes {
+			menu := menus[index]
+			tx.Model(menu).Association("Roles").Append(&user.Roles[index+1])
+		}
 
 		// Create default application
 		application := &model.ApplicationModel{
 			Name:        "Root",
-			Code:        "root",
+			Code:        "root.nino.work",
 			Description: "Root application",
 			Status:      model.SystemOnline,
-			CreateBy:    role.Id,
-			SuperAdmin:  permission.Id,
-			Admin:       permission.Id,
+			CreateBy:    user.Id,
+			SuperAdmin:  rootPermission.Id,
+			Admin:       rootPermission.Id,
 		}
 		tx.Create(application)
 		toUpdate := map[string]any{"app_id": application.Id}
-		tx.Model(permission).Updates(toUpdate)
+		tx.Model(rootPermission).Updates(toUpdate)
 	}
 
 	tx.Commit()

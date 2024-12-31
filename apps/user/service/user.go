@@ -151,20 +151,13 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 		}
 	}
 
-	permissionModels := []*model.PermissionModel{}
-	for id := range permissions {
-		permission := &model.PermissionModel{}
-		permission.Id = id
-		permissionModels = append(permissionModels, permission)
-	}
-
 	menuDao := dao.NewMenuDao(ctx, (*db.BaseDao[model.MenuModel])(d))
 
-	menuDao.GetMenusByPermissions(permissionModels...)
+	menuDao.GetMenusByRoles(&user.Roles)
 
 	menuMap := map[string]*MenuMeta{}
-	for _, permission := range permissionModels {
-		for _, menu := range permission.Menus {
+	for _, role := range user.Roles {
+		for _, menu := range role.Menus {
 			code := menu.Code
 			if _, exist := menuMap[code]; exist {
 				continue
@@ -231,9 +224,18 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 	}
 
 	err = roleDao.FindRolesWithPermissions(userRoles...)
+
 	if err != nil {
 		return nil, nil, err
 	}
+
+	res := []model.RoleModel{}
+
+	for _, role := range userRoles {
+		res = append(res, *role)
+	}
+
+	user.Roles = res
 
 	return user, &roleDao.BaseDao, nil
 }

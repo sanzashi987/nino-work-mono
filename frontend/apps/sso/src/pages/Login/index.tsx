@@ -8,49 +8,33 @@ import PageContainer from '@/components/PageContainer';
 function Login() {
   return (
     <PageContainer title="Login" description="this is Login page">
-      <Box
+      <Grid2
+        container
+        spacing={0}
+        justifyContent="center"
         sx={{
-          position: 'relative',
-          '&:before': {
-            content: '""',
-            background: 'radial-gradient(#d2f1df, #d3d7fa, #bad8f4)',
-            backgroundSize: '400% 400%',
-            animation: 'gradient 15s ease infinite',
-            position: 'absolute',
-            height: '100%',
-            width: '100%',
-            opacity: '0.3'
-          }
+          height: '100vh'
         }}
       >
-        <Grid2
-          container
-          spacing={0}
+        <Box
+          display="flex"
           justifyContent="center"
-          sx={{
-            height: '100vh'
-          }}
-        >
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
+          alignItems="center"
 
+        >
+          <Card
+            elevation={9}
+            sx={{
+              p: 4, zIndex: 1, width: '100%', maxWidth: '500px'
+            }}
           >
-            <Card
-              elevation={9}
-              sx={{
-                p: 4, zIndex: 1, width: '100%', maxWidth: '500px'
-              }}
-            >
-              <Box display="flex" alignItems="center" justifyContent="center" mb="20px">
-                <Logo width="80" height="80" />
-              </Box>
-              <AuthLogin />
-            </Card>
-          </Box>
-        </Grid2>
-      </Box>
+            <Box display="flex" alignItems="center" justifyContent="center" mb="20px">
+              <Logo width="80" height="80" />
+            </Box>
+            <AuthLogin />
+          </Card>
+        </Box>
+      </Grid2>
     </PageContainer>
   );
 }

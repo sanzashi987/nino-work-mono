@@ -15,6 +15,6 @@ func NewMenuDao(ctx context.Context, dao ...*db.BaseDao[model.MenuModel]) *MenuD
 	return &MenuDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
-func (dao *MenuDao) GetMenusByPermissions(permissions ...*model.PermissionModel) error {
-	return dao.GetOrm().Preload("Menus").Find(&permissions).Error
+func (dao *MenuDao) GetMenusByRoles(roles *[]model.RoleModel) error {
+	return dao.GetOrm().Preload("Menus").Find(roles).Error
 }

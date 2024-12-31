@@ -10,10 +10,24 @@ type PermissionModel struct {
 	Name        string      `gorm:"column:name;type:varchar(255)"`
 	Code        string      `gorm:"column:code;type:varchar(255);uniqueIndex"`
 	Description string      `gorm:"column:description"`
-	Roles       []RoleModel `gorm:"many2many:role_permissions;"`
-	Menus       []MenuModel `gorm:"many2many:menu_permissions;"`
+	Roles       []RoleModel `gorm:"many2many:role_permissions"`
+	Menus       []MenuModel `gorm:"many2many:menu_roles"`
 }
 
 func (u PermissionModel) TableName() string {
 	return "permissions"
+}
+
+func CreateRoleWithPermission(name, code string) (RoleModel, PermissionModel) {
+
+	permission := PermissionModel{
+		Name: name,
+		Code: code,
+	}
+	role := RoleModel{
+		Name:        name,
+		Code:        code,
+		Permissions: []PermissionModel{permission},
+	}
+	return role, permission
 }

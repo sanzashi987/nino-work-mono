@@ -1,21 +1,15 @@
 import { Box } from '@mui/material';
 import React from 'react';
 import PageContainer from '@/components/PageContainer';
-import { usePromise } from '@/utils';
-import { getUserInfo } from '@/api';
 
 type DashboardProps = {};
 
-const Dashboard: React.FC<DashboardProps> = (props) => {
-  const s = usePromise(() => getUserInfo());
-
-  return (
-    <PageContainer title="Dashboard" description="user dashboard">
-      <Box>
-        笑死
-      </Box>
-    </PageContainer>
-  );
-};
+const Dashboard: React.FC<DashboardProps> = (props) => (
+  <PageContainer title="Dashboard" description="user dashboard">
+    <Box>
+      笑死
+    </Box>
+  </PageContainer>
+);
 
 export default Dashboard;

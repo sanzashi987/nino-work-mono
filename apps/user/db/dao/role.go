@@ -22,15 +22,15 @@ func (dao *RoleDao) FindRolesWithPermissions(roles ...*model.RoleModel) error {
 	}
 
 	// 收集所有角色ID
-	roleIds := make([]uint64, len(roles))
-	roleMap := make(map[uint64]*model.RoleModel)
+	roleIds := []uint64{}
+	roleMap := map[uint64]*model.RoleModel{}
 	for i := range roles {
-		roleIds[i] = roles[i].Id
+		roleIds = append(roleIds, roles[i].Id)
 		roleMap[roles[i].Id] = roles[i]
 	}
 
 	// 一次性查询所有角色及其权限
-	rolesWithPerms := []model.RoleModel{}
+	rolesWithPerms := []*model.RoleModel{}
 	err := dao.GetOrm().
 		Preload("Permissions").
 		Where("id IN ?", roleIds).

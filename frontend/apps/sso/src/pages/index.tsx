@@ -12,7 +12,21 @@ const BrowserRouter = createBrowserRouter([
     children: [
       {
         path: 'dashboard',
-        Component: lazy(() => import('./Dashboard'))
+        Component: lazy(() => import('./Dashboard')),
+        children: [
+          {
+            path: 'manage/user'
+          },
+          {
+            path: 'manage/role'
+          },
+          {
+            path: 'manage/app'
+          },
+          {
+            path: 'manage/permission'
+          }
+        ]
       }
     ]
   }
