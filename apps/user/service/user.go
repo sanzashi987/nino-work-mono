@@ -118,6 +118,7 @@ type MenuMeta struct {
 	Hyperlink bool   `json:"hyperlink"`
 	Path      string `json:"path"`
 	Type      uint8  `json:"type"`
+	Order     int    `json:"order"`
 }
 
 type UserInfoResponse struct {
@@ -168,6 +169,7 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 				Icon:      menu.Icon,
 				Hyperlink: menu.Hyperlink,
 				Path:      menu.Path,
+				Order:     menu.Order,
 				Type:      uint8(menu.Type),
 			}
 

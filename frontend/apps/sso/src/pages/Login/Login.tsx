@@ -75,7 +75,6 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
 
       {subtext}
       <form onSubmit={formik.handleSubmit}>
-
         <Stack>
           <Box>
             <Typography

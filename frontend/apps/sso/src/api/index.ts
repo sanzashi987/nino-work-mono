@@ -21,13 +21,20 @@ type EnumType = {
   code: string
 };
 
-type MenuMeta = {
-  Name: string
-  Code: string
-  Icon: string
-  Hyperlink: boolean
-  Path: string
-  Type: number
+export enum MenuType {
+  Menu = 1,
+  Catelog = 2,
+  Button = 3,
+}
+
+export type MenuMeta = {
+  name: string
+  code: string
+  icon: string
+  hyperlink: boolean
+  path: string
+  type: MenuType
+  order: number
 };
 
 export type UserInfoResponse = {
