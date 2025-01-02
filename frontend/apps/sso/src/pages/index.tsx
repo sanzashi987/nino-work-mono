@@ -16,12 +16,14 @@ const BrowserRouter = createBrowserRouter([
         children: [
           {
             path: 'manage/user'
+
           },
           {
             path: 'manage/role'
           },
           {
-            path: 'manage/app'
+            path: 'manage/app',
+            Component: lazy(() => import('./Applications'))
           },
           {
             path: 'manage/permission'

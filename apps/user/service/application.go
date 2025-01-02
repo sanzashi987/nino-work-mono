@@ -12,20 +12,16 @@ import (
 
 type ApplicationServiceWeb struct{}
 
-var SystemServiceWebImpl *ApplicationServiceWeb = &ApplicationServiceWeb{}
+var AppServiceWebImpl *ApplicationServiceWeb = &ApplicationServiceWeb{}
 
 // CreateAppRequest 创建系统请求参数
 type CreateAppRequest struct {
-	Operator    uint64
-	Name        string
-	Code        string
-	Description string
+	Name        string `json:"name" binding:"required"`
+	Code        string `json:"code" binding:"required"`
+	Description string `json:"description"`
 }
 
-func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, Operator uint64, payload CreateAppRequest) error {
-	if payload.Code == "" {
-		return errors.New("system code is required")
-	}
+func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId uint64, payload CreateAppRequest) (*model.ApplicationModel, error) {
 
 	appDao := dao.NewApplicationDao(ctx)
 	appDao.BeginTransaction()
@@ -35,18 +31,18 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, Operator 
 		Code:        payload.Code,
 		Description: payload.Description,
 		Status:      model.SystemOnline,
-		CreateBy:    payload.Operator,
+		CreateBy:    userId,
 	}
 
 	if err := appDao.Create(application); err != nil {
 		appDao.RollbackTransaction()
-		return err
+		return nil, err
 	}
 
 	superAdminPermission := &model.PermissionModel{
 		AppId:       application.Id,
 		Name:        fmt.Sprintf("%s应用超级管理员权限", application.Name),
-		Code:        fmt.Sprintf("%s.super_admin", application.Code),
+		Code:        fmt.Sprintf("%s.admin.super", application.Code),
 		Description: fmt.Sprintf("%s应用超级管理员权限", application.Name),
 	}
 
@@ -61,16 +57,16 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, Operator 
 
 	if err := permissionDao.CreatePermissions(superAdminPermission, adminPermission); err != nil {
 		appDao.RollbackTransaction()
-		return err
+		return nil, err
 	}
 
 	if err := appDao.InitPermissionForSystem(application, superAdminPermission, adminPermission); err != nil {
 		appDao.RollbackTransaction()
-		return err
+		return nil, err
 	}
 
 	appDao.CommitTransaction()
-	return nil
+	return application, nil
 }
 
 func userIsManager(ctx context.Context, userId, appId uint64) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
@@ -169,4 +165,13 @@ func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uin
 
 	return appDao.RemoveApplicationPermission(app, permissions)
 
+}
+
+func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uint64) ([]*model.ApplicationModel, error) {
+	apps, _, err := getUserAdmins(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return apps, err
 }

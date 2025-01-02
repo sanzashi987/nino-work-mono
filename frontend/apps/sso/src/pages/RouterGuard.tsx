@@ -36,7 +36,9 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
   const location = useLocation();
 
   const authed = useMemo(() => {
-    if (!userInfo) return true;
+    if (!userInfo) {
+      return true;
+    }
     return menus.map((e) => e.path).some((e) => e.startsWith(location.pathname));
   }, [location.pathname, menus, userInfo]);
 

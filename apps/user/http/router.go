@@ -15,6 +15,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	apiEngine := gin.Default()
 
 	userController := UserController{}
+	appController := AppController{}
 
 	// router.Use(static.Serve("/", static.LocalFile("./static/dist", true)))
 	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
@@ -32,6 +33,9 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		authed := v1.Use(authMiddleware)
 		authed.GET("token", userController.TestToken)
 		authed.GET("info", userController.UserInfo)
+
+		authed.GET("apps/list", appController.ListApps)
+		authed.POST("apps/create", appController.ListApps)
 	}
 
 	return apiEngine

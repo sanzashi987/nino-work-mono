@@ -242,7 +242,7 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 	return user, &roleDao.BaseDao, nil
 }
 
-func getUserAdmins(ctx context.Context, userId uint64) (*[]model.ApplicationModel, *db.BaseDao[model.RoleModel], error) {
+func getUserAdmins(ctx context.Context, userId uint64) ([]*model.ApplicationModel, *db.BaseDao[model.RoleModel], error) {
 	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, nil, err
@@ -268,15 +268,15 @@ func getUserAdmins(ctx context.Context, userId uint64) (*[]model.ApplicationMode
 
 	}
 
-	res := []model.ApplicationModel{}
+	res := []*model.ApplicationModel{}
 
 	for _, app := range apps {
 		_, superExist := permissions[app.SuperAdmin]
 		_, adminExist := permissions[app.Admin]
 		if superExist || adminExist {
-			res = append(res, app)
+			res = append(res, &app)
 		}
 	}
 
-	return &res, roleDao, nil
+	return res, roleDao, nil
 }

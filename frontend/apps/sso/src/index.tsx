@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import router from './pages';
 
 const darkTheme = createTheme({
-  palette: { mode: 'dark' },
+  // palette: { mode: 'dark' },
   typography: {
     fontSize: 11
   }
