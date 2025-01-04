@@ -19,14 +19,14 @@ func migrateTable(db *gorm.DB) {
 
 func defaultRecord(db *gorm.DB) {
 
-	var roles, apps, permissions int64
+	var roleCounts, appCounts, permissionCounts int64
 
 	tx := db.Begin()
 
-	tx.Model(&model.RoleModel{}).Count(&roles)
-	tx.Model(&model.ApplicationModel{}).Count(&apps)
-	tx.Model(&model.PermissionModel{}).Count(&permissions)
-	if roles == 0 && apps == 0 && permissions == 0 {
+	tx.Model(&model.RoleModel{}).Count(&roleCounts)
+	tx.Model(&model.ApplicationModel{}).Count(&appCounts)
+	tx.Model(&model.PermissionModel{}).Count(&permissionCounts)
+	if roleCounts == 0 && appCounts == 0 && permissionCounts == 0 {
 
 		// Create default user
 		user := model.UserModel{
@@ -34,15 +34,18 @@ func defaultRecord(db *gorm.DB) {
 			Password: "admin",
 		}
 
+		permissionsToCreate := []*model.PermissionModel{}
 		adminRole, rootPermission := model.CreateRoleWithPermission("Root Super Admin", "root.admin.super")
+		// permissionsToCreate = append(permissionsToCreate, &rootPermission)
 
 		codes := []string{"user", "app", "role", "permission"}
 		userRoles := []model.RoleModel{adminRole}
 		for _, code := range codes {
-			role, _ := model.CreateRoleWithPermission(
+			role, permission := model.CreateRoleWithPermission(
 				utils.Capitialize(code)+" Admin Role",
 				"root.admin."+code,
 			)
+			permissionsToCreate = append(permissionsToCreate, permission)
 			userRoles = append(userRoles, role)
 		}
 
@@ -78,9 +81,9 @@ func defaultRecord(db *gorm.DB) {
 			SuperAdmin:  rootPermission.Id,
 			Admin:       rootPermission.Id,
 		}
+		
 		tx.Create(application)
-		toUpdate := map[string]any{"app_id": application.Id}
-		tx.Model(rootPermission).Updates(toUpdate)
+		tx.Model(application).Association("Permissions").Append(&permissionsToCreate)
 	}
 
 	tx.Commit()

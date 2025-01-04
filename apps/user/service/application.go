@@ -69,7 +69,7 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 	return application, nil
 }
 
-func userIsManager(ctx context.Context, userId, appId uint64) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
+func userIsManager(ctx context.Context, userId, appId uint64, superOnly bool) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
 	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return
@@ -81,14 +81,22 @@ func userIsManager(ctx context.Context, userId, appId uint64) (app *model.Applic
 		return nil, nil, err
 	}
 
+	testers := map[uint64]bool{}
+	testers[app.SuperAdmin] = true
+	if !superOnly {
+		testers[app.Admin] = true
+	}
+
 	var hasPermission = false
 topLoop:
 	for _, role := range user.Roles {
 		for _, permission := range role.Permissions {
 
-			if permission.AppId == appId && (app.SuperAdmin == permission.Id || app.Admin == permission.Id) {
-				hasPermission = true
-				break topLoop
+			if permission.AppId == appId {
+				if _, exsit := testers[permission.Id]; exsit {
+					hasPermission = true
+					break topLoop
+				}
 			}
 
 		}
@@ -113,7 +121,7 @@ type AddPermissionRequest struct {
 }
 
 func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64, payload AddPermissionRequest) (err error) {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId)
+	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
 	if err != nil {
 		return
 	}
@@ -151,7 +159,7 @@ type RemovePermissionRequest struct {
 }
 
 func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId)
+	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
 	if err != nil {
 		return err
 	}
@@ -168,7 +176,7 @@ func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uin
 }
 
 func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uint64) ([]*model.ApplicationModel, error) {
-	apps, _, err := getUserAdmins(ctx, userId)
+	apps, _, err := getUserAdmins(ctx, userId, true)
 	if err != nil {
 		return nil, err
 	}

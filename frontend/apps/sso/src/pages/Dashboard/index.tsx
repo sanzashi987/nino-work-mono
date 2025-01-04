@@ -1,5 +1,7 @@
 import {
-  AppBar, Box, Container, IconButton, Menu, MenuItem, Stack, Toolbar
+  AppBar, Box, Container, IconButton, Menu, MenuItem, Stack, Toolbar,
+  useColorScheme,
+  useTheme
 } from '@mui/material';
 import React from 'react';
 import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
@@ -13,6 +15,8 @@ type DashboardProps = {};
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const { mode } = useColorScheme();
+  const isLight = mode !== 'dark';
   const navigate = useNavigate();
   const openMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -36,7 +40,8 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
             <Logo width="35" height="35" />
             <div style={{ flexGrow: 1 }} />
             <IconButton onClick={openMenu}>
-              <AccountCircle fontSize="medium" />
+              { mode}
+              <AccountCircle fontSize="medium" style={{ color: isLight ? 'white' : 'grey' }} />
             </IconButton>
             <Menu
               id="menu-appbar"

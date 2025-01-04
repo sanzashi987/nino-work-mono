@@ -45,10 +45,34 @@ export type UserInfoResponse = {
   roles: EnumType[]
 };
 
-export const getUserInfo = defineApi<{}, UserInfoResponse>({
-  url: `${prefix}/info`
-});
+export const getUserInfo = defineApi<undefined, UserInfoResponse>({ url: `${prefix}/info` });
 
-export const testToken = defineApi<{}, void>({
-  url: `${prefix}/token`
-});
+export const testToken = defineApi<{}, void>({ url: `${prefix}/token` });
+
+export type PagninationRequest = {
+  page: number
+  size: number
+};
+
+type PaginationResponse<T> = {
+  data:T[]
+  pageIndex: number
+  pageSize: number
+  pageTotal: number
+  recordTotal: number
+};
+
+enum AppStatus {
+  ENABLE = 0,
+  DISABLE = 1,
+}
+
+export type AppListResponse = PaginationResponse<{
+  id: number
+  name: string
+  code: string
+  description: string
+  status: AppStatus
+}>;
+
+export const getAppList = defineApi<PagninationRequest, AppListResponse>({ url: `${prefix}/apps/list` });

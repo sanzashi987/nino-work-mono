@@ -2,6 +2,7 @@ package auth
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -64,13 +65,15 @@ func ValidateMiddleware(loginPageUrl string) func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		jwtToken, err := ctx.Cookie(CookieName)
 		if err != nil {
-			ctx.Redirect(http.StatusFound, loginPageUrl+"?redirect="+ctx.Request.Referer())
+			redirectURL := loginPageUrl + "?redirect=" + url.QueryEscape(ctx.Request.Referer())
+			ctx.Redirect(http.StatusFound, redirectURL)
 			return
 		}
 		// jwtToken := ctx.GetHeader("Authentication")
 		claim, err := ValidateToken(jwtToken)
 		if err != nil {
-			ctx.Redirect(http.StatusFound, loginPageUrl+"?redirect="+ctx.Request.Referer())
+			redirectURL := loginPageUrl + "?redirect=" + url.QueryEscape(ctx.Request.Referer())
+			ctx.Redirect(http.StatusFound, redirectURL)
 			return
 		}
 		ctx.Set(UserID, claim.UserID)

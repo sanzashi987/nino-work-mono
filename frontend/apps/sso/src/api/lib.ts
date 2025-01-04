@@ -10,20 +10,27 @@ type DefineApiOptions = {
 };
 
 const defaultHeaders = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json'
+  // Accept: 'application/json, text/html, */*'
+  // 'Content-Type': 'application/json'
 };
 
-export const defineApi = <Req extends Record<string, any>, Res>(options: DefineApiOptions) => {
+export const defineApi = <Req, Res>(options: DefineApiOptions) => {
   const { method = 'GET', url } = options;
 
-  return async (input?: Req, opts: RequestInit = {}) => {
+  type Requester = Req extends undefined
+    ? (input?: null, opts?: RequestInit) => Promise<Res>
+    : (input: Req, opts?: RequestInit) => Promise<Res>;
+
+  // @ts-ignore
+  const requester: Requester = async (input: any = {}, opts: RequestInit = {}) => {
     const { headers = defaultHeaders, ...others } = opts;
     let fullurl = url;
     const isGet = method === 'GET';
     if (isGet) {
       const search = new URLSearchParams(input);
-      fullurl += url.includes('?') ? search.toString() : `?${search.toString()}`;
+      if (search.size > 0) {
+        fullurl += url.includes('?') ? search.toString() : `?${search.toString()}`;
+      }
     }
     const res = await fetch(fullurl, {
       headers,
@@ -31,6 +38,11 @@ export const defineApi = <Req extends Record<string, any>, Res>(options: DefineA
       ...others,
       body: isGet ? undefined : JSON.stringify(input)
     });
+
+    if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
+      window.location.href = res.url;
+      return Promise.reject();
+    }
 
     if (!res.ok) {
       return Promise.reject(new Error(`Response Status Error:${res.status}`));
@@ -44,4 +56,5 @@ export const defineApi = <Req extends Record<string, any>, Res>(options: DefineA
 
     return data.data;
   };
+  return requester;
 };
