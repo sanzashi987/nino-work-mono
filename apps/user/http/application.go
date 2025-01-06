@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/apps/user/service"
 	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
@@ -35,6 +36,16 @@ type ListAppResponse struct {
 	request.PaginationResponse
 }
 
+func intoAppInfoMeta(app *model.ApplicationModel) AppInfoMeta {
+	return AppInfoMeta{
+		Id:          app.Id,
+		Name:        app.Name,
+		Code:        app.Code,
+		Status:      app.Status,
+		Description: app.Description,
+	}
+}
+
 func (c *AppController) ListApps(ctx *gin.Context) {
 	userId := ctx.GetUint64(auth.UserID)
 
@@ -53,13 +64,7 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 
 	metas := []AppInfoMeta{}
 	for _, app := range apps {
-		metas = append(metas, AppInfoMeta{
-			Id:          app.Id,
-			Name:        app.Name,
-			Code:        app.Code,
-			Status:      app.Status,
-			Description: app.Description,
-		})
+		metas = append(metas, intoAppInfoMeta(app))
 	}
 
 	total := len(metas)

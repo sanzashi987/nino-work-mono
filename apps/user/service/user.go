@@ -242,10 +242,15 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 	return user, &roleDao.BaseDao, nil
 }
 
-func getUserAdmins(ctx context.Context, userId uint64, superOnly bool) ([]*model.ApplicationModel, *db.BaseDao[model.RoleModel], error) {
+type UserAdminResult struct {
+	SuperAdminApps []*model.ApplicationModel
+	AdminApps      []*model.ApplicationModel
+}
+
+func getUserAdmins(ctx context.Context, userId uint64) (*UserAdminResult, error) {
 	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	applications := map[uint64]bool{}
@@ -264,29 +269,36 @@ func getUserAdmins(ctx context.Context, userId uint64, superOnly bool) ([]*model
 	apps := []model.ApplicationModel{}
 	err = roleDao.GetOrm().Table("applications").Where("id IN ?", appIds).Find(&apps).Error
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 
 	}
 
-	res := []*model.ApplicationModel{}
-	resMap := map[uint64]*model.ApplicationModel{}
-
+	superRes := []*model.ApplicationModel{}
+	adminRes := []*model.ApplicationModel{}
+	superResMap := map[uint64]*model.ApplicationModel{}
+	adminResMap := map[uint64]*model.ApplicationModel{}
 	for _, app := range apps {
 		if _, superExist := permissions[app.SuperAdmin]; superExist {
-			resMap[app.Id] = &app
-		}
-	}
-	if !superOnly {
-		for _, app := range apps {
-			if _, adminExist := permissions[app.Admin]; adminExist {
-				resMap[app.Id] = &app
-			}
+			superResMap[app.Id] = &app
 		}
 	}
 
-	for _, app := range resMap {
-		res = append(res, app)
+	for _, app := range apps {
+		if _, adminExist := permissions[app.Admin]; adminExist {
+			adminResMap[app.Id] = &app
+		}
 	}
 
-	return res, roleDao, nil
+	for _, app := range superResMap {
+		superRes = append(superRes, app)
+	}
+	for _, app := range adminResMap {
+		adminRes = append(adminRes, app)
+	}
+	result := UserAdminResult{
+		SuperAdminApps: superRes,
+		AdminApps:      adminRes,
+	}
+
+	return &result, nil
 }

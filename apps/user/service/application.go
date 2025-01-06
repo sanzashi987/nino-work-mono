@@ -69,14 +69,43 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 	return application, nil
 }
 
-func userIsManager(ctx context.Context, userId, appId uint64, superOnly bool) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
+func reoveRepeat(result *UserAdminResult) []*model.ApplicationModel {
+	apps := []*model.ApplicationModel{}
+	appMap := map[uint64]*model.ApplicationModel{}
+
+	for _, app := range result.SuperAdminApps {
+		appMap[app.Id] = app
+	}
+
+	for _, app := range result.AdminApps {
+		appMap[app.Id] = app
+	}
+
+	for _, app := range appMap {
+		apps = append(apps, app)
+
+	}
+
+	return apps
+}
+
+func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uint64) ([]*model.ApplicationModel, error) {
+	result, err := getUserAdmins(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	apps := reoveRepeat(result)
+	return apps, err
+}
+
+func userIsManager(ctx context.Context, userId uint64, appId *uint64, superOnly bool) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
 	user, roleDao, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return
 	}
 	appDao = dao.NewApplicationDao(ctx, (*db.BaseDao[model.ApplicationModel])(roleDao))
 
-	app, err = appDao.FindApplicationByIdWithPermission(appId)
+	app, err = appDao.FindApplicationByIdWithPermission(*appId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -92,7 +121,7 @@ topLoop:
 	for _, role := range user.Roles {
 		for _, permission := range role.Permissions {
 
-			if permission.AppId == appId {
+			if permission.AppId == *appId {
 				if _, exsit := testers[permission.Id]; exsit {
 					hasPermission = true
 					break topLoop
@@ -107,79 +136,4 @@ topLoop:
 	}
 
 	return app, appDao, nil
-}
-
-type PermissionPayload struct {
-	Name        string `json:"name"`
-	Code        string `json:"code"`
-	Description string `json:"description"`
-}
-
-type AddPermissionRequest struct {
-	AppId       uint64              `json:"app_id"`
-	Permissions []PermissionPayload `json:"permissions"`
-}
-
-func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64, payload AddPermissionRequest) (err error) {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
-	if err != nil {
-		return
-	}
-
-	nextPermissionMap := map[string]bool{}
-	for _, permission := range payload.Permissions {
-		nextPermissionMap[permission.Code] = true
-	}
-
-	// 检查是否存在相同Code的权限
-	for _, p := range app.Permissions {
-		if _, ok := nextPermissionMap[p.Code]; ok {
-			return errors.New("permission code already exists")
-		}
-	}
-
-	permissionModels := []model.PermissionModel{}
-	for _, permission := range payload.Permissions {
-		permissionModels = append(permissionModels, model.PermissionModel{
-			AppId:       payload.AppId,
-			Name:        permission.Name,
-			Code:        permission.Code,
-			Description: permission.Description,
-		})
-	}
-
-	appDao.AddApplicationPermission(app, permissionModels)
-
-	return err
-}
-
-type RemovePermissionRequest struct {
-	AppId       uint64   `json:"app_id"`
-	Permissions []uint64 `json:"permissions"`
-}
-
-func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
-	if err != nil {
-		return err
-	}
-
-	permissions := []model.PermissionModel{}
-	for _, id := range payload.Permissions {
-		p := model.PermissionModel{}
-		p.Id = id
-		permissions = append(permissions, p)
-	}
-
-	return appDao.RemoveApplicationPermission(app, permissions)
-
-}
-
-func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uint64) ([]*model.ApplicationModel, error) {
-	apps, _, err := getUserAdmins(ctx, userId, true)
-	if err != nil {
-		return nil, err
-	}
-
-	return apps, err
 }
