@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/sanzashi987/nino-work/apps/chat/http"
 	"github.com/sanzashi987/nino-work/apps/storage/db"
 	"github.com/sanzashi987/nino-work/apps/storage/service"
 	"github.com/sanzashi987/nino-work/pkg/bootstrap"
@@ -8,6 +11,10 @@ import (
 )
 
 func main() {
+	runAsIndependentService()
+}
+
+func runAsMicroService() {
 	bootstraper := bootstrap.CommonBootstrap("storage.nino.work")
 
 	db.ConnectDB()
@@ -31,4 +38,12 @@ func main() {
 	rpcService.Init()
 	rpcService.Run()
 
+}
+
+func runAsIndependentService() {
+	conf, psmConf := bootstrap.ParseConfig("storage.nino.work")
+	db.ConnectDB(psmConf.DbName)
+
+	router := http.NewRouter(conf.System.LoginPage)
+	router.Run(fmt.Sprintf(":%s", psmConf.WebPort))
 }

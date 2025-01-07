@@ -7,5 +7,5 @@ import (
 
 func ConnectDB(name ...string) {
 	instance := db.ConnectDB(name...)
-	instance.AutoMigrate(&model.File{}, &model.Bucket{})
+	instance.AutoMigrate(&model.Object{}, &model.Bucket{})
 }

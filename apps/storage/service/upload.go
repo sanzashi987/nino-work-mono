@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
@@ -38,7 +37,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	} else {
 		return fmt.Errorf("bucket information required")
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("bucket not found: %v", err)
 	}
@@ -91,9 +90,9 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	tempFilePath := tempFile.Name()
 	mimeType, err := mimetype.DetectFile(tempFilePath)
 
-	dt := time.Now().Format("2006/01/02")
+	// dt := time.Now().Format("2006/01/02")
 	mimeTypeSTr, ext := mimeType.String(), mimeType.Extension()
-	path := fmt.Sprintf("./uploads/%s/%s.%s", dt, uuidStr, ext)
+	path := fmt.Sprintf("./buckets/%s/%s.%s", bucket.Code, uuidStr, ext)
 	os.Rename(tempFilePath, path)
 
 	if err := dao.NewFileDao(ctx).CreateFile(
@@ -112,6 +111,13 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeTypeSTr, ext
 	return stream.SendMsg(&res)
 }
+
+/** http */
+type UploadServiceWeb struct{}
+
+var UploadServiceWebImpl = &UploadServiceWeb{}
+
+func (serv UploadServiceWeb) UploadFile() {}
 
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id

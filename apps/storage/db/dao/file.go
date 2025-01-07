@@ -8,15 +8,15 @@ import (
 )
 
 type FileDao struct {
-	db.BaseDao[model.File]
+	db.BaseDao[model.Object]
 }
 
-func NewFileDao(ctx context.Context, dao ...*db.BaseDao[model.File]) *FileDao {
-	return &FileDao{BaseDao: db.NewDao[model.File](ctx, dao...)}
+func NewFileDao(ctx context.Context, dao ...*db.BaseDao[model.Object]) *FileDao {
+	return &FileDao{BaseDao: db.NewDao[model.Object](ctx, dao...)}
 }
 
 func (dao FileDao) CreateFile(bucketId uint, name, mimeType, uri, fileId, extension string, size int64) error {
-	toInsert := model.File{
+	toInsert := model.Object{
 		FileId:    fileId,
 		URI:       uri,
 		BucketID:  bucketId,
@@ -28,8 +28,8 @@ func (dao FileDao) CreateFile(bucketId uint, name, mimeType, uri, fileId, extens
 	return dao.GetOrm().Create(&toInsert).Error
 }
 
-func (dao FileDao) QueryFile(fileId string) (*model.File, error) {
-	res := model.File{}
-	err := dao.GetOrm().Model(&model.File{}).Where("file_id = ?", fileId).Take(&res).Error
+func (dao FileDao) QueryFile(fileId string) (*model.Object, error) {
+	res := model.Object{}
+	err := dao.GetOrm().Model(&model.Object{}).Where("file_id = ?", fileId).Take(&res).Error
 	return &res, err
 }

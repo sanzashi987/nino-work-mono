@@ -1,23 +1,33 @@
 package model
 
 import (
+	"time"
+
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type Bucket struct {
 	db.BaseModel
-	Name  string `gorm:"uniqueIndex;not null"`
-	Files []File `gorm:"foreignKey:BucketID"`
+	Code        string `gorm:"uniqueIndex;not null"`
+	Description string
+	Objects     []Object `gorm:"foreignKey:BucketID"`
 }
 
-type File struct {
+type Object struct {
 	db.BaseModel
 	FileId    string `gorm:"unique;index"`
 	URI       string `gorm:"type:varchar(255);unique;index"`
 	BucketID  uint   `gorm:"not null"`
 	Name      string
-	Path      string
+	Key       string `gorm:"column:key"`
 	Size      int64
 	MimeType  string
 	Extension string
-} 
+}
+
+type Temps struct {
+	db.BaseModel
+	FileId    string `gorm:"unique;index"`
+	Done      bool
+	FinshedAt time.Time
+}
