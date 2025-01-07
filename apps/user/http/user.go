@@ -35,7 +35,7 @@ func (controller *UserController) UserLogin(ctx *gin.Context) {
 		Expiry:   &req.Expiry,
 	}
 
-	if err := service.GetUserServiceRpc().UserLogin(ctx, &rpcReq, &res); err != nil {
+	if err := service.UserServiceRpcImpl.UserLogin(ctx, &rpcReq, &res); err != nil {
 		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error "+err.Error())
 		return
 	}
@@ -58,7 +58,7 @@ func (controller *UserController) UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.GetUserServiceRpc().UserRegister(ctx, &req, &res); err != nil {
+	if err := service.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
 		controller.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
 		return
 	}

@@ -23,7 +23,7 @@ type AppController struct {
 	controller.BaseController
 }
 
-type AppInfoMeta struct {
+type AppInfo struct {
 	Id          uint64 `json:"id"`
 	Name        string `json:"name"`
 	Code        string `json:"code"`
@@ -32,12 +32,12 @@ type AppInfoMeta struct {
 }
 
 type ListAppResponse struct {
-	Data []AppInfoMeta `json:"data"`
+	Data []AppInfo `json:"data"`
 	request.PaginationResponse
 }
 
-func intoAppInfoMeta(app *model.ApplicationModel) AppInfoMeta {
-	return AppInfoMeta{
+func intoAppInfoMeta(app *model.ApplicationModel) AppInfo {
+	return AppInfo{
 		Id:          app.Id,
 		Name:        app.Name,
 		Code:        app.Code,
@@ -62,7 +62,7 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 		return
 	}
 
-	metas := []AppInfoMeta{}
+	metas := []AppInfo{}
 	for _, app := range apps {
 		metas = append(metas, intoAppInfoMeta(app))
 	}
