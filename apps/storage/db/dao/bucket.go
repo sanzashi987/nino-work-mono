@@ -15,9 +15,39 @@ func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *Bucket
 	return &BucketDao{BaseDao: db.NewDao[model.Bucket](ctx, dao...)}
 }
 
-func (dao BucketDao) CreateBucket(name string) (*model.Bucket, error) {
-	bucket := &model.Bucket{Name: name}
+type CreateBucketPayload struct {
+	Code string
+}
+
+func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
+	dao.BeginTransaction()
+	bucket := &model.Bucket{Code: code}
 	err := dao.GetOrm().Create(bucket).Error
+	if err != nil {
+		dao.RollbackTransaction()
+		return nil, err
+	}
+
+	// tableName := model.DynamicObjectTableName(code)
+	// err = dao.GetOrm().Table(tableName).AutoMigrate(&model.Object{})
+	// if err != nil {
+	// 	dao.RollbackTransaction()
+	// 	return nil, err
+	// }
+	// root folder
+	rootDir := model.Object{
+		BucketID:  bucket.Id,
+		Directory: true,
+		ParentId:  0,
+	}
+
+	err = dao.GetOrm().Create(&rootDir).Error
+	if err != nil {
+		dao.RollbackTransaction()
+		return nil, err
+	}
+
+	dao.CommitTransaction()
 	return bucket, err
 }
 
@@ -27,8 +57,8 @@ func (dao BucketDao) GetBucket(id uint) (*model.Bucket, error) {
 	return &bucket, err
 }
 
-func (dao BucketDao) GetBucketByName(name string) (*model.Bucket, error) {
+func (dao BucketDao) GetBucketByCode(code string) (*model.Bucket, error) {
 	var bucket model.Bucket
-	err := dao.GetOrm().Where("name = ?", name).First(&bucket).Error
+	err := dao.GetOrm().Where("code = ?", code).First(&bucket).Error
 	return &bucket, err
 }

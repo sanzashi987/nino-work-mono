@@ -95,7 +95,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	path := fmt.Sprintf("./buckets/%s/%s.%s", bucket.Code, uuidStr, ext)
 	os.Rename(tempFilePath, path)
 
-	if err := dao.NewFileDao(ctx).CreateFile(
+	if err := dao.NewFileDao(ctx).CreateObject(
 		uint(bucket.Id),
 		req.Filename,
 		mimeTypeSTr,
@@ -118,6 +118,8 @@ type UploadServiceWeb struct{}
 var UploadServiceWebImpl = &UploadServiceWeb{}
 
 func (serv UploadServiceWeb) UploadFile() {}
+
+func (serv UploadServiceWeb) UploadObject() {}
 
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id

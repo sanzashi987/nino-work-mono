@@ -15,11 +15,10 @@ func NewFileDao(ctx context.Context, dao ...*db.BaseDao[model.Object]) *FileDao 
 	return &FileDao{BaseDao: db.NewDao[model.Object](ctx, dao...)}
 }
 
-func (dao FileDao) CreateFile(bucketId uint, name, mimeType, uri, fileId, extension string, size int64) error {
+func (dao FileDao) CreateObject(bucketId uint, name, mimeType, uri, fileId, extension string, size int64) error {
 	toInsert := model.Object{
 		FileId:    fileId,
 		URI:       uri,
-		BucketID:  bucketId,
 		Name:      name,
 		MimeType:  mimeType,
 		Extension: extension,

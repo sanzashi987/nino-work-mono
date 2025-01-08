@@ -1,0 +1,10 @@
+{
+  "name": "@nino-work/hook-formik-model",
+  "version": "0.0.1",
+  "description": "The ui layout react component package",
+  "author": "ziao chen",
+  "main": "src/index",
+  "devDependencies": {
+    "react": "^19.0.0"
+  }
+}

@@ -1,47 +1,50 @@
 package http
 
 import (
-	"fmt"
-	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
-type BucketHandler struct{}
-
-func (h *BucketHandler) CreateBucket(c *gin.Context) {
-	var req struct {
-		Name string `json:"name" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	bucket, err := dao.NewBucketDao(c).CreateBucket(req.Name)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, bucket)
+type BucketController struct {
+	controller.BaseController
 }
 
-func (h *BucketHandler) GetBucket(c *gin.Context) {
-	id := c.Param("id")
-	var bucket uint
-	if _, err := fmt.Sscanf(id, "%d", &bucket); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bucket id"})
+func (c *BucketController) CreateBucket(ctx *gin.Context) {
+	var req struct {
+		Name string `json:"name" binding:"required"`
+		Code string `json:"code" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, ""+err.Error())
 		return
 	}
 
-	result, err := dao.NewBucketDao(c).GetBucket(bucket)
+	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "bucket not found"})
+		c.AbortServerError(ctx, ""+err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
-} 
+	c.ResponseJson(ctx, bucket)
+}
+
+func (c *BucketController) GetBucket(ctx *gin.Context) {
+	id := ctx.Param("id")
+	bucketid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil || bucketid == 0 {
+		c.AbortClientError(ctx, "[http]: get bucket params error id is not allowed")
+		return
+	}
+
+	result, err := dao.NewBucketDao(ctx).GetBucket(uint(bucketid))
+	if err != nil {
+		c.AbortServerError(ctx, "[http]: get bucket service error: "+ err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, result)
+}

@@ -1,33 +1,38 @@
 package model
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type Bucket struct {
 	db.BaseModel
-	Code        string `gorm:"uniqueIndex;not null"`
-	Description string
-	Objects     []Object `gorm:"foreignKey:BucketID"`
+	Code    string   `gorm:"uniqueIndex;not null"`
+	AK      string   `gorm:"column:access_key"`
+	SK      string   `gorm:"column:secret_key"`
+	Objects []Object `gorm:"foreignKey:BucketID"`
 }
 
 type Object struct {
 	db.BaseModel
-	FileId    string `gorm:"unique;index"`
-	URI       string `gorm:"type:varchar(255);unique;index"`
-	BucketID  uint   `gorm:"not null"`
-	Name      string
-	Key       string `gorm:"column:key"`
-	Size      int64
-	MimeType  string
-	Extension string
+	BucketID  uint64 `gorm:"not null"`
+	Directory bool   `gorm:"column:directory"`
+	ParentId  uint64 `gorm:"column:parent_id;index"`
+	FileId    string `gorm:"unique;index;column:file_id"`
+	URI       string `gorm:"type:varchar(255);unique;index;column:uri"`
+	Name      string `gorm:"column:name"`
+	Size      int64  `gorm:"column:size"`
+	MimeType  string `gorm:"column:mime_type"`
+	Extension string `gorm:"column:extension"`
 }
 
-type Temps struct {
+type User struct {
 	db.BaseModel
-	FileId    string `gorm:"unique;index"`
-	Done      bool
-	FinshedAt time.Time
+	UserId uint64 `gorm:"column:user_id;index"`
+	AppId  uint64 `gorm:"column:app_id;index"`
+}
+
+func DynamicObjectTableName(bucketCode string) string {
+	return fmt.Sprintf("objects_%s", bucketCode)
 }

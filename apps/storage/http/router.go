@@ -6,7 +6,7 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	bucketHandler := &BucketHandler{}
+	bucketHandler := &BucketController{}
 	
 	storage := r.Group("/storage")
 	storage.Use(auth.ValidateMiddleware("/login"))
