@@ -1,10 +1,15 @@
 package http
 
 import (
+	"math"
+	"sort"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
+	"github.com/sanzashi987/nino-work/apps/storage/db/model"
+	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
@@ -42,9 +47,53 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 
 	result, err := dao.NewBucketDao(ctx).GetBucket(uint(bucketid))
 	if err != nil {
-		c.AbortServerError(ctx, "[http]: get bucket service error: "+ err.Error())
+		c.AbortServerError(ctx, "[http]: get bucket service error: "+err.Error())
 		return
 	}
 
 	c.ResponseJson(ctx, result)
+}
+
+func (c *BucketController) ListBuckets(ctx *gin.Context) {
+	user := ctx.GetUint64(auth.UserID)
+
+	pagination := request.PaginationRequest{}
+	if err := ctx.ShouldBindJSON(&pagination); err != nil {
+		c.AbortClientError(ctx, "[http] list bucket request payload error: "+err.Error())
+		return
+	}
+
+	offset := (pagination.Page - 1) * pagination.Size
+	offset = int(math.Max(0, float64(offset)))
+
+	bucketDao := dao.NewBucketDao(ctx)
+	u := model.User{
+		UserId: user,
+		Type:   model.USER,
+	}
+	err := bucketDao.GetOrm().Preload("Buckets").Limit(pagination.Size).Offset(offset).Find(&u).Error
+	if err != nil {
+		c.AbortServerError(ctx, "[http] list bucket service error: "+err.Error())
+		return
+	}
+
+	type Res struct {
+		Code       string `json:"code"`
+		UpdateTime int64  `json:"update_time"`
+		CreateTime int64  `json:"create_time"`
+	}
+
+	res := make([]Res, len(u.Buckets))
+
+	for i, bucket := range u.Buckets {
+		res[i] = Res{
+			Code:       bucket.Code,
+			UpdateTime: bucket.UpdateTime.Unix(),
+			CreateTime: bucket.CreateTime.Unix(),
+		}
+	}
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].UpdateTime > res[j].UpdateTime
+	})
+	c.ResponseJson(ctx, res)
 }

@@ -5,17 +5,21 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/auth"
 )
 
-func RegisterRoutes(r *gin.Engine) {
+func RegisterRoutes(loginPageUrl string) {
+	apiEngine := gin.Default()
+
 	bucketHandler := &BucketController{}
-	
-	storage := r.Group("/storage")
-	storage.Use(auth.ValidateMiddleware("/login"))
+
+	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
+	v1 := apiEngine.Group("/backend/v1")
+
 	{
+		authed := v1.Use(authMiddleware)
 		// Bucket 管理
-		storage.POST("/buckets", bucketHandler.CreateBucket)
-		storage.GET("/buckets/:id", bucketHandler.GetBucket)
-		
+		authed.POST("/bucket/list", bucketHandler.ListBuckets)
+		authed.GET("/bucket/:id", bucketHandler.GetBucket)
+
 		// 文件上传（这部分应该通过RPC处理）
-		storage.POST("/upload/:bucket", uploadHandler.Upload)
+		authed.POST("/upload/:bucket", bucketHandler.Upload)
 	}
-} 
+}

@@ -23,6 +23,7 @@ type ServiceConfig struct {
 	WebPort string
 	Feature bool
 	DbName  string
+	Raw     map[string]string
 }
 
 type SerivceConfigMap = map[string]*ServiceConfig
@@ -59,7 +60,7 @@ func init() {
 		if name == "system" {
 			conf.System = loadSystemConfig(section)
 		} else {
-			stringMap := make(map[string]any)
+			stringMap := make(map[string]string)
 
 			for _, key := range section.Keys() {
 				stringMap[key.Name()] = section.Key(key.Name()).String()
@@ -68,6 +69,7 @@ func init() {
 				Name: name,
 			}
 			mapstructure.Decode(stringMap, &result)
+			result.Raw = stringMap
 			conf.Service[name] = result
 		}
 	}

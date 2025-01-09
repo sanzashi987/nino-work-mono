@@ -119,8 +119,6 @@ var UploadServiceWebImpl = &UploadServiceWeb{}
 
 func (serv UploadServiceWeb) UploadFile() {}
 
-func (serv UploadServiceWeb) UploadObject() {}
-
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
 	if record, err := dao.NewFileDao(ctx).QueryFile(fileId); err != nil {

@@ -28,11 +28,17 @@ type Object struct {
 	Extension string `gorm:"column:extension"`
 }
 
+const (
+	USER uint = 0
+	APP  uint = 1
+)
+
 type User struct {
 	db.BaseModel
 	UserId  uint64    `gorm:"column:user_id;index"`
 	AppId   uint64    `gorm:"column:app_id;index"`
 	Buckets []*Bucket `gorm:"many2many:bucket_user"`
+	Type    uint      `gorm:"column:type"`
 }
 
 /** No used **/
