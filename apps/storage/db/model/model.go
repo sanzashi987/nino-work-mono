@@ -8,10 +8,11 @@ import (
 
 type Bucket struct {
 	db.BaseModel
-	Code    string   `gorm:"uniqueIndex;not null"`
-	AK      string   `gorm:"column:access_key"`
-	SK      string   `gorm:"column:secret_key"`
-	Objects []Object `gorm:"foreignKey:BucketID"`
+	Code    string    `gorm:"uniqueIndex;not null"`
+	AK      string    `gorm:"column:access_key"`
+	SK      string    `gorm:"column:secret_key"`
+	Objects []*Object `gorm:"foreignKey:BucketID"`
+	Users   []*User   `gorm:"many2many:bucket_user"`
 }
 
 type Object struct {
@@ -29,10 +30,12 @@ type Object struct {
 
 type User struct {
 	db.BaseModel
-	UserId uint64 `gorm:"column:user_id;index"`
-	AppId  uint64 `gorm:"column:app_id;index"`
+	UserId  uint64    `gorm:"column:user_id;index"`
+	AppId   uint64    `gorm:"column:app_id;index"`
+	Buckets []*Bucket `gorm:"many2many:bucket_user"`
 }
 
+/** No used **/
 func DynamicObjectTableName(bucketCode string) string {
 	return fmt.Sprintf("objects_%s", bucketCode)
 }

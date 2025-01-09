@@ -62,12 +62,10 @@ func (c *DataSourceController) create(ctx *gin.Context) {
 	c.ResponseJson(ctx, dataSource)
 }
 
-type ReadDataSourceQuery struct {
-	SourceId string `uri:"sourceId" binding:"required"`
-}
-
 func (c *DataSourceController) read(ctx *gin.Context) {
-	query := ReadDataSourceQuery{}
+	var query struct {
+		SourceId string `uri:"sourceId" binding:"required"`
+	}
 	if err := ctx.ShouldBindUri(&query); err != nil {
 		c.AbortClientError(ctx, readPreix+err.Error())
 		return
@@ -98,12 +96,10 @@ func (c *DataSourceController) update(ctx *gin.Context) {
 	c.ResponseJson(ctx, dataSource)
 }
 
-type DeleteDataSourceRequest struct {
-	SourceId []string `json:"sourceId" binding:"required"`
-}
-
 func (c *DataSourceController) delete(ctx *gin.Context) {
-	reqBody := DeleteDataSourceRequest{}
+	var reqBody struct {
+		SourceId []string `json:"sourceId" binding:"required"`
+	}
 	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "delete")
 	if err != nil {
 		return
@@ -118,27 +114,23 @@ func (c *DataSourceController) delete(ctx *gin.Context) {
 	c.SuccessVoid(ctx)
 }
 
-type ReplaceIpRequest struct {
-	Search   string   `json:"search"`
-	Target   string   `json:"target"`
-	SourceId []string `json:"sourceId"`
-}
-
 func (c *DataSourceController) replaceIp(ctx *gin.Context) {
-	reqBody := ReplaceIpRequest{}
+	var reqBody struct {
+		Search   string   `json:"search"`
+		Target   string   `json:"target"`
+		SourceId []string `json:"sourceId"`
+	}
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "replaceIp"); err != nil {
 		return
 	}
 
 }
 
-type SearchByIpRequest struct {
-	SourceTypes []string `json:"sourceType"`
-	Search      string   `json:"search"`
-}
-
 func (c *DataSourceController) search(ctx *gin.Context) {
-	reqBody := SearchByIpRequest{}
+	var reqBody struct {
+		SourceTypes []string `json:"sourceType"`
+		Search      string   `json:"search"`
+	}
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "search"); err != nil {
 		return
 	}

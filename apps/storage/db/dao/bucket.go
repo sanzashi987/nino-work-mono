@@ -15,10 +15,6 @@ func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *Bucket
 	return &BucketDao{BaseDao: db.NewDao[model.Bucket](ctx, dao...)}
 }
 
-type CreateBucketPayload struct {
-	Code string
-}
-
 func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
 	dao.BeginTransaction()
 	bucket := &model.Bucket{Code: code}
