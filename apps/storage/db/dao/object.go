@@ -11,7 +11,7 @@ type FileDao struct {
 	db.BaseDao[model.Object]
 }
 
-func NewFileDao(ctx context.Context, dao ...*db.BaseDao[model.Object]) *FileDao {
+func NewObjectDao(ctx context.Context, dao ...*db.BaseDao[model.Object]) *FileDao {
 	return &FileDao{BaseDao: db.NewDao[model.Object](ctx, dao...)}
 }
 

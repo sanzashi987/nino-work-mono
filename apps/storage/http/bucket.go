@@ -3,7 +3,6 @@ package http
 import (
 	"math"
 	"sort"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
@@ -15,6 +14,12 @@ import (
 
 type BucketController struct {
 	controller.BaseController
+}
+
+var bucketController BucketController = BucketController{
+	controller.BaseController{
+		ErrorPrefix: "[http]: bucket controller ",
+	},
 }
 
 func (c *BucketController) CreateBucket(ctx *gin.Context) {
@@ -38,16 +43,18 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 }
 
 func (c *BucketController) GetBucket(ctx *gin.Context) {
-	id := ctx.Param("id")
-	bucketid, err := strconv.ParseUint(id, 10, 64)
-	if err != nil || bucketid == 0 {
-		c.AbortClientError(ctx, "[http]: get bucket params error id is not allowed")
+	var uri struct {
+		Id uint64 `uri:"id" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		c.AbortClientError(ctx, "GetBucket payload error: "+err.Error())
 		return
 	}
 
-	result, err := dao.NewBucketDao(ctx).GetBucket(uint(bucketid))
+	result, err := dao.NewBucketDao(ctx).GetBucket(uri.Id)
 	if err != nil {
-		c.AbortServerError(ctx, "[http]: get bucket service error: "+err.Error())
+		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
 		return
 	}
 
@@ -59,7 +66,7 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 
 	pagination := shared.PaginationRequest{}
 	if err := ctx.ShouldBindJSON(&pagination); err != nil {
-		c.AbortClientError(ctx, "[http] list bucket request payload error: "+err.Error())
+		c.AbortClientError(ctx, "ListBuckets payload error: "+err.Error())
 		return
 	}
 
@@ -75,7 +82,7 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 	}
 	err := bucketDao.GetOrm().Preload("Buckets").Scopes(paginationScope).Find(&u).Error
 	if err != nil {
-		c.AbortServerError(ctx, "[http] list bucket service error: "+err.Error())
+		c.AbortServerError(ctx, "ListBuckets internal error: "+err.Error())
 		return
 	}
 
@@ -98,4 +105,8 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		return res[i].UpdateTime > res[j].UpdateTime
 	})
 	c.ResponseJson(ctx, res)
+}
+
+func (c *BucketController) ListBucketDir(ctx *gin.Context) {
+
 }

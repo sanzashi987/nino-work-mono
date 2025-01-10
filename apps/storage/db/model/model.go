@@ -26,6 +26,7 @@ type Object struct {
 	Size      int64  `gorm:"column:size"`
 	MimeType  string `gorm:"column:mime_type"`
 	Extension string `gorm:"column:extension"`
+	Tmp       bool   `gorm:"column:tmp"`
 }
 
 const (
@@ -39,6 +40,15 @@ type User struct {
 	AppId   uint64    `gorm:"column:app_id;index"`
 	Buckets []*Bucket `gorm:"many2many:bucket_user"`
 	Type    uint      `gorm:"column:type"`
+}
+
+type LargeFile struct {
+	BucketID       uint64 `gorm:"not null"`
+	Hash           string `gorm:"uniqueIndex"`
+	Chunks         int    `gorm:"column:chunks"`
+	UploadedChunks string `gorm:"column:uploaded_chunks"`
+	FileId         string `gorm:"column:file_id"`
+	Done           bool   `gorm:"done"`
 }
 
 /** No used **/

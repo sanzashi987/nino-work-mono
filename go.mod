@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/gabriel-vasile/mimetype v1.4.7
+	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/gin-gonic/gin v1.10.0
 	github.com/glebarez/sqlite v1.10.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
@@ -18,7 +18,7 @@ require (
 	golang.org/x/crypto v0.31.0
 	google.golang.org/protobuf v1.36.0
 	gopkg.in/ini.v1 v1.67.0
-	gorm.io/gorm v1.25.5
+	gorm.io/gorm v1.25.12
 )
 
 require (

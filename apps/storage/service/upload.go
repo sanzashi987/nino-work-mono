@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/gabriel-vasile/mimetype"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/sanzashi987/nino-work/apps/storage/consts"
 	dao "github.com/sanzashi987/nino-work/apps/storage/db/dao"
 	model "github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/proto/storage"
@@ -19,6 +22,15 @@ type UploadServiceRpc struct{}
 var UploadServiceRpcImpl = &UploadServiceRpc{}
 
 const chunkSize = 1024 * 1024 / 2
+
+func GenUUID() (*string, error) {
+	uid, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+	uuidStr := uid.String()
+	return &uuidStr, nil
+}
 
 func GetUploadServiceRpc() storage.StorageServiceHandler {
 	return UploadServiceRpcImpl
@@ -43,12 +55,11 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	}
 
 	res := storage.FileDetailResponse{}
-	uid, err := uuid.NewRandom()
+	uuidStr, err := GenUUID()
 	if err != nil {
 		return
 	}
-	uuidStr := uid.String()
-	tempFile, err := os.CreateTemp("", uuidStr)
+	tempFile, err := os.CreateTemp("", *uuidStr)
 	writer := bufio.NewWriter(tempFile)
 	if err != nil {
 		return
@@ -91,24 +102,27 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	mimeType, err := mimetype.DetectFile(tempFilePath)
 
 	// dt := time.Now().Format("2006/01/02")
-	mimeTypeSTr, ext := mimeType.String(), mimeType.Extension()
+	mimeTypeStr, ext := mimeType.String(), mimeType.Extension()
 	path := fmt.Sprintf("./buckets/%s/%s.%s", bucket.Code, uuidStr, ext)
 	os.Rename(tempFilePath, path)
 
-	if err := dao.NewFileDao(ctx).CreateObject(
-		uint(bucket.Id),
-		req.Filename,
-		mimeTypeSTr,
-		path,
-		uuidStr,
-		ext,
-		size,
-	); err != nil {
+	toInsert := model.Object{
+		BucketID:  uint64(bucket.Id),
+		FileId:    *uuidStr,
+		URI:       path,
+		Name:      req.Filename,
+		MimeType:  mimeTypeStr,
+		Extension: ext,
+		Size:      size,
+	}
+
+	err = dao.NewObjectDao(ctx).GetOrm().Create(&toInsert).Error
+	if err != nil {
 		return err
 	}
 
 	res.Size = size
-	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeTypeSTr, ext
+	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeTypeStr, ext
 	return stream.SendMsg(&res)
 }
 
@@ -117,11 +131,71 @@ type UploadServiceWeb struct{}
 
 var UploadServiceWebImpl = &UploadServiceWeb{}
 
-func (serv UploadServiceWeb) UploadFile() {}
+type UploadFilePayload struct {
+	BucketCode string `form:"bucket_code" binding:"required"`
+	Path       string `form:"path"`
+}
+
+func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload *UploadFilePayload) (*string, error) {
+	bucketPath := ctx.GetString(consts.BucketPath)
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		return nil, err
+	}
+
+	uuidStr, err := GenUUID()
+	if err != nil {
+		return nil, err
+	}
+
+	ext := filepath.Ext(file.Filename)
+	fileName := filepath.Base(file.Filename)
+
+	path := fmt.Sprintf("%s/%s/%s", bucketPath, payload.BucketCode, uuidStr)
+	if ext != "" {
+		path = fmt.Sprintf("%s.%s", path, ext)
+	}
+
+	if err = ctx.SaveUploadedFile(file, path); err != nil {
+		return nil, err
+	}
+
+	mimeType, err := mimetype.DetectFile(path)
+	tx := dao.NewObjectDao(ctx).GetOrm()
+
+	bucket, err := dao.GetBucketByCode(tx, payload.BucketCode)
+	if err != nil {
+		return nil, err
+	}
+
+	toInsert := model.Object{
+		BucketID:  bucket.Id,
+		FileId:    *uuidStr,
+		URI:       path,
+		Name:      fileName,
+		MimeType:  mimeType.String(),
+		Extension: ext,
+		Size:      file.Size,
+	}
+
+	if err = tx.Create(&toInsert).Error; err != nil {
+		return nil, err
+	}
+
+	return uuidStr, nil
+}
+
+func ParsePath(ctx context.Context) {
+
+}
+
+func (serv UploadServiceWeb) UploadLargeFile(ctx context.Context) {
+
+}
 
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
-	if record, err := dao.NewFileDao(ctx).QueryFile(fileId); err != nil {
+	if record, err := dao.NewObjectDao(ctx).QueryFile(fileId); err != nil {
 		return err
 	} else {
 		out.Extension, out.Id, out.Path, out.Size = record.Extension, record.FileId, record.URI, record.Size

@@ -5,6 +5,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type BucketDao struct {
@@ -47,14 +48,26 @@ func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
 	return bucket, err
 }
 
-func (dao BucketDao) GetBucket(id uint) (*model.Bucket, error) {
+func (dao BucketDao) GetBucket(id uint64) (*model.Bucket, error) {
 	var bucket model.Bucket
 	err := dao.GetOrm().First(&bucket, id).Error
 	return &bucket, err
 }
 
-func (dao BucketDao) GetBucketByCode(code string) (*model.Bucket, error) {
+func GetBucketByCode(tx *gorm.DB, code string) (*model.Bucket, error) {
 	var bucket model.Bucket
-	err := dao.GetOrm().Where("code = ?", code).First(&bucket).Error
-	return &bucket, err
+	err := tx.Where("code = ?", code).First(&bucket).Error
+	if err != nil {
+		return nil, err
+	}
+	return &bucket, nil
+}
+
+func GetBucketWithUsers(tx *gorm.DB, code string) (*model.Bucket, error) {
+	var bucket model.Bucket
+	err := tx.Preload("Users").Where("code = ?", code).First(&bucket).Error
+	if err != nil {
+		return nil, err
+	}
+	return &bucket, nil
 }

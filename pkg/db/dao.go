@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/glebarez/sqlite"
-	"github.com/sanzashi987/nino-work/config"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -18,12 +17,9 @@ type BaseDao[Model any] struct {
 }
 
 func ConnectDB(names ...string) *gorm.DB {
-	fallbackName := ""
+	fallbackName := "nino-mono"
 	if len(names) >= 1 {
 		fallbackName = names[0]
-	} else {
-		conf := config.GetConfig()
-		fallbackName = conf.System.DbName
 	}
 
 	db, err := gorm.Open(sqlite.Open(fallbackName+".db"), &gorm.Config{
