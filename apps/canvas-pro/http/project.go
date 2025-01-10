@@ -2,9 +2,9 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const project_prefix = "screen-operation"
@@ -20,7 +20,7 @@ var projectController = &ProjectController{
 }
 
 type GetProjectListRequest struct {
-	request.PaginationRequest
+	shared.PaginationRequest
 	// Workspace string
 	Name  *string
 	Group *string

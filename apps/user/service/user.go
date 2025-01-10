@@ -7,7 +7,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
-	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/proto/user"
 	"gorm.io/gorm"
@@ -43,7 +43,7 @@ func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginReques
 		days = 1
 	}
 
-	token, err = auth.GenerateToken(user.Username, user.Id, time.Hour*24*time.Duration(days))
+	token, err = controller.GenerateToken(user.Username, user.Id, time.Hour*24*time.Duration(days))
 	if err != nil {
 		out.Reason = FailToCreateToken
 		return

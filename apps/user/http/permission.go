@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/apps/user/service"
-	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
@@ -39,7 +38,7 @@ type ListPermissionResponse struct {
 }
 
 func (c *PermissionController) ListPermissionsByApps(ctx *gin.Context) {
-	userId := ctx.GetUint64(auth.UserID)
+	userId := ctx.GetUint64(controller.UserID)
 
 	req := ListPermissionRequest{}
 	if err := ctx.ShouldBindQuery(&req); err != nil {

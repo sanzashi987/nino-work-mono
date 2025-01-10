@@ -7,7 +7,7 @@ import (
 	// "path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 	// "github.com/sanzashi987/nino-work/pkg/utils"
 )
 
@@ -18,7 +18,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	appController := AppController{}
 
 	// router.Use(static.Serve("/", static.LocalFile("./static/dist", true)))
-	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
+	authMiddleware := controller.ValidateMiddleware(loginPageUrl)
 
 	// appRoot := utils.GetAppRoot()
 	// feRoot := filepath.Join(appRoot, "./apps/user/static/dist/")

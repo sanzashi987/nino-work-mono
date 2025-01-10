@@ -4,11 +4,10 @@ import (
 	"math"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/apps/user/service"
-	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 func ceil(num float64) int {
@@ -33,7 +32,7 @@ type AppInfo struct {
 
 type ListAppResponse struct {
 	Data []AppInfo `json:"data"`
-	request.PaginationResponse
+	shared.PaginationResponse
 }
 
 func intoAppInfoMeta(app *model.ApplicationModel) AppInfo {
@@ -47,9 +46,9 @@ func intoAppInfoMeta(app *model.ApplicationModel) AppInfo {
 }
 
 func (c *AppController) ListApps(ctx *gin.Context) {
-	userId := ctx.GetUint64(auth.UserID)
+	userId := ctx.GetUint64(controller.UserID)
 
-	pagination := request.PaginationRequest{}
+	pagination := shared.PaginationRequest{}
 
 	if err := ctx.ShouldBindQuery(&pagination); err != nil {
 		c.AbortClientError(ctx, "[http] list apps: Fail to read required fields "+err.Error())
@@ -110,7 +109,7 @@ func (c *AppController) CreateApp(ctx *gin.Context) {
 		return
 	}
 
-	userId := ctx.GetUint64(auth.UserID)
+	userId := ctx.GetUint64(controller.UserID)
 	app, err := service.AppServiceWebImpl.CreateApplication(ctx, userId, req)
 	if err != nil {
 		c.AbortServerError(ctx, "[http] create app: Fail to create app "+err.Error())

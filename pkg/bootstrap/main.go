@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-micro/plugins/v4/registry/etcd"
-	"github.com/sanzashi987/nino-work/config"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
@@ -26,13 +25,13 @@ func GetAddress(host, port string) string {
 
 type Bootstraper struct {
 	psm          string
-	Config       *config.Config
-	PsmConf      *config.ServiceConfig
+	Config       *Config
+	PsmConf      *ServiceConfig
 	EtcdRegistry registry.Registry
 }
 
-func ParseConfig(psm string) (*config.Config, *config.ServiceConfig) {
-	conf := config.GetConfig()
+func ParseConfig(psm string) (*Config, *ServiceConfig) {
+	conf := GetConfig()
 	psmConf, ok := conf.Service[psm]
 	if !ok {
 		panic(psm + " is not configured")

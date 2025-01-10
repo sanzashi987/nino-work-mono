@@ -2,9 +2,9 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type ThemeController struct {
@@ -23,7 +23,7 @@ type ThemeItem struct {
 	Name  string `json:"name"`
 	Theme string `json:"theme"`
 	Id    uint64 `json:"id"`
-	request.DBTime
+	shared.DBTime
 }
 
 func (c *ThemeController) list(ctx *gin.Context) {
@@ -38,7 +38,7 @@ func (c *ThemeController) list(ctx *gin.Context) {
 
 	for _, model := range models {
 		res = append(res, ThemeItem{
-			DBTime: request.DBTime{
+			DBTime: shared.DBTime{
 				CreateTime: model.GetCreatedDate(),
 				UpdateTime: model.GetUpdatedDate(),
 			},

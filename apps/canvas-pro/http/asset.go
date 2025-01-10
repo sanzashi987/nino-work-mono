@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const asset_prefix = "assets"
@@ -23,12 +23,12 @@ var assetController = &AssetController{
 type ListAssetReq struct {
 	GroupCode string `json:"groupCode"`
 	// Name      string `json:"fileName"`
-	request.PaginationRequest
+	shared.PaginationRequest
 }
 
 type ListAssetResponse struct {
 	Data []service.ListAssetRes `json:"data"`
-	request.PaginationResponse
+	shared.PaginationResponse
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
@@ -45,7 +45,7 @@ func (c *AssetController) list(ctx *gin.Context) {
 
 		c.ResponseJson(ctx, ListAssetResponse{
 			Data: res,
-			PaginationResponse: request.PaginationResponse{
+			PaginationResponse: shared.PaginationResponse{
 				PageIndex:   reqBody.Page,
 				PageSize:    reqBody.Size,
 				PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),

@@ -2,13 +2,13 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
 func NewRouter(loginPageUrl string) *gin.Engine {
 	router := gin.Default()
 
-	router.Use(auth.ValidateMiddleware(loginPageUrl))
+	router.Use(controller.ValidateMiddleware(loginPageUrl))
 
 	controller := &ChatController{}
 

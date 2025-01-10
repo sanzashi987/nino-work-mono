@@ -8,7 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type DataSourceService struct{}
@@ -21,7 +21,7 @@ type DataSourceDetail struct {
 	SourceInfo string `json:"sourceInfo"`
 	SourceId   string `json:"sourceId"`
 	Creator    string `json:"userIdentify"`
-	request.DBTime
+	shared.DBTime
 }
 
 func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
@@ -31,7 +31,7 @@ func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
 		SourceInfo: input.SourceInfo,
 		SourceId:   strconv.FormatUint(input.Id, 10),
 		Creator:    strconv.FormatUint(input.Creator, 10),
-		DBTime: request.DBTime{
+		DBTime: shared.DBTime{
 			CreateTime: input.GetCreatedDate(),
 			UpdateTime: input.GetUpdatedDate(),
 		},

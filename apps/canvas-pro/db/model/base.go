@@ -7,7 +7,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/utils"
 	"github.com/sanzashi987/nino-work/pkg/db"
-	"github.com/sanzashi987/nino-work/pkg/filter"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -55,13 +55,13 @@ func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 }
 
 func FilterRecordsInUse[T db.GetDeleteTime](records []T) []T {
-	return filter.Filter(records, func(e T) bool {
+	return utils.Filter(records, func(e T) bool {
 		return e.GetDeleteTime() == nil
 	})
 }
 
 func FilterRecordsByTypeTag[T GetTypeTag](records []T, typeTag string) []T {
-	return filter.Filter(records, func(e T) bool {
+	return utils.Filter(records, func(e T) bool {
 		return e.GetTypeTag() == typeTag
 	})
 }

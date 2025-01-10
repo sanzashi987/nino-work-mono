@@ -2,8 +2,8 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const data_source_prefix = "jdbc-connect-template"
@@ -23,7 +23,7 @@ type QueryDataSourceSearchRequest struct {
 }
 
 type QueryDataSourceRequest struct {
-	request.PaginationRequest
+	shared.PaginationRequest
 	QueryDataSourceSearchRequest
 }
 

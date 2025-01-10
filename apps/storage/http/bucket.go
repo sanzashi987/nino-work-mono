@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
-	"github.com/sanzashi987/nino-work/pkg/auth"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type BucketController struct {
@@ -55,9 +55,9 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 }
 
 func (c *BucketController) ListBuckets(ctx *gin.Context) {
-	user := ctx.GetUint64(auth.UserID)
+	user := ctx.GetUint64(controller.UserID)
 
-	pagination := request.PaginationRequest{}
+	pagination := shared.PaginationRequest{}
 	if err := ctx.ShouldBindJSON(&pagination); err != nil {
 		c.AbortClientError(ctx, "[http] list bucket request payload error: "+err.Error())
 		return
@@ -66,12 +66,14 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 	offset := (pagination.Page - 1) * pagination.Size
 	offset = int(math.Max(0, float64(offset)))
 
+	paginationScope := db.Paginate(pagination.Page, pagination.Size)
+
 	bucketDao := dao.NewBucketDao(ctx)
 	u := model.User{
 		UserId: user,
 		Type:   model.USER,
 	}
-	err := bucketDao.GetOrm().Preload("Buckets").Limit(pagination.Size).Offset(offset).Find(&u).Error
+	err := bucketDao.GetOrm().Preload("Buckets").Scopes(paginationScope).Find(&u).Error
 	if err != nil {
 		c.AbortServerError(ctx, "[http] list bucket service error: "+err.Error())
 		return

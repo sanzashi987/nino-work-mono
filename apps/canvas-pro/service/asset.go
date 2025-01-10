@@ -8,7 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
@@ -195,7 +195,7 @@ type AssetDetailResponse struct {
 	Size     int64  `json:"size"`
 	Suffix   string `json:"suffix"`
 
-	request.DBTime
+	shared.DBTime
 }
 
 func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
@@ -225,7 +225,7 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.S
 		MimeType: rpcRes.MimeType,
 		Size:     rpcRes.Size,
 		Suffix:   rpcRes.Extension,
-		DBTime: request.DBTime{
+		DBTime: shared.DBTime{
 			CreateTime: record.GetCreatedDate(),
 			UpdateTime: record.GetUpdatedDate(),
 		},

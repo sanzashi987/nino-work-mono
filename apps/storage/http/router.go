@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
 func RegisterRoutes(loginPageUrl string) {
@@ -10,7 +10,7 @@ func RegisterRoutes(loginPageUrl string) {
 
 	bucketHandler := &BucketController{}
 
-	authMiddleware := auth.ValidateMiddleware(loginPageUrl)
+	authMiddleware := controller.ValidateMiddleware(loginPageUrl)
 	v1 := apiEngine.Group("/backend/v1")
 
 	{

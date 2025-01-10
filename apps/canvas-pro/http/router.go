@@ -7,7 +7,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/middleware"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
-	"github.com/sanzashi987/nino-work/pkg/auth"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
@@ -20,7 +20,7 @@ func getWorkspaceCode(ctx *gin.Context) (string, uint64) {
 }
 
 func getCurrentUser(ctx *gin.Context) uint64 {
-	userId, _ := ctx.Get(auth.UserID)
+	userId, _ := ctx.Get(controller.UserID)
 	return userId.(uint64)
 }
 

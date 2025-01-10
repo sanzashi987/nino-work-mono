@@ -6,7 +6,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http/request"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type ProjectService struct{}
@@ -84,7 +84,7 @@ type ProjectDetail struct {
 	Code      string `json:"code"`
 	Name      string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
-	request.DBTime
+	shared.DBTime
 }
 
 func (serv ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
@@ -117,7 +117,7 @@ type ProjectInfo struct {
 	Name      string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
 	// Group     string
-	request.DBTime
+	shared.DBTime
 }
 
 // type ProjectInfoList = []ProjectInfo
