@@ -17,13 +17,13 @@ func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *Bucket
 }
 
 func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
-	dao.BeginTransaction()
+	// dao.BeginTransaction()
 	bucket := &model.Bucket{Code: code}
 	err := dao.GetOrm().Create(bucket).Error
-	if err != nil {
-		dao.RollbackTransaction()
-		return nil, err
-	}
+	// if err != nil {
+	// 	dao.RollbackTransaction()
+	// 	return nil, err
+	// }
 
 	// tableName := model.DynamicObjectTableName(code)
 	// err = dao.GetOrm().Table(tableName).AutoMigrate(&model.Object{})
@@ -32,19 +32,18 @@ func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
 	// 	return nil, err
 	// }
 	// root folder
-	rootDir := model.Object{
-		BucketID:  bucket.Id,
-		Directory: true,
-		ParentId:  0,
-	}
+	// rootDir := model.Object{
+	// 	BucketID:  bucket.Id,
+	// 	Directory: true,
+	// }
 
-	err = dao.GetOrm().Create(&rootDir).Error
-	if err != nil {
-		dao.RollbackTransaction()
-		return nil, err
-	}
+	// err = dao.GetOrm().Create(&rootDir).Error
+	// if err != nil {
+	// 	dao.RollbackTransaction()
+	// 	return nil, err
+	// }
 
-	dao.CommitTransaction()
+	// dao.CommitTransaction()
 	return bucket, err
 }
 

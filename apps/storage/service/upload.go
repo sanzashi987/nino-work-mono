@@ -168,10 +168,16 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 		return nil, err
 	}
 
+	dir := "/"
+	if payload.Path != "" {
+		dir = payload.Path
+	}
+
 	toInsert := model.Object{
 		BucketID:  bucket.Id,
 		FileId:    *uuidStr,
 		URI:       path,
+		Dir:       dir,
 		Name:      fileName,
 		MimeType:  mimeType.String(),
 		Extension: ext,
@@ -183,10 +189,6 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	}
 
 	return uuidStr, nil
-}
-
-func ParsePath(ctx context.Context) {
-
 }
 
 func (serv UploadServiceWeb) UploadLargeFile(ctx context.Context) {

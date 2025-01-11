@@ -18,15 +18,13 @@ type Bucket struct {
 type Object struct {
 	db.BaseModel
 	BucketID  uint64 `gorm:"not null"`
-	Directory bool   `gorm:"column:directory"`
-	ParentId  uint64 `gorm:"column:parent_id;index"`
+	Dir       string `gorm:"column:dir"`
 	FileId    string `gorm:"unique;index;column:file_id"`
 	URI       string `gorm:"type:varchar(255);unique;index;column:uri"`
 	Name      string `gorm:"column:name"`
 	Size      int64  `gorm:"column:size"`
 	MimeType  string `gorm:"column:mime_type"`
 	Extension string `gorm:"column:extension"`
-	Tmp       bool   `gorm:"column:tmp"`
 }
 
 const (
