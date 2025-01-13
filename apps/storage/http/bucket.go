@@ -3,6 +3,7 @@ package http
 import (
 	"math"
 	"sort"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/consts"
@@ -36,7 +37,7 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 
 	bucketPath := ctx.GetString(consts.BucketPath)
 
-	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name,bucketPath)
+	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name, bucketPath)
 	if err != nil {
 		c.AbortServerError(ctx, ""+err.Error())
 		return
@@ -114,10 +115,34 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 
 	var req struct {
 		BucketID uint64 `uri:"id" binding:"required"`
+		Path     string `form:"path"`
 	}
 
-	if err:= ctx.ShouldBindUri(&req); err !=nil {
-		
+	if err := ctx.ShouldBind(&req); err != nil {
+		c.AbortClientError(ctx, "ListBucketDir params not passed: "+err.Error())
+		return
 	}
+
+	path := req.Path
+	if !strings.HasPrefix(path, "/") {
+		path = "/"
+	}
+
+	if path[len(path)-1:] != "/" {
+		path += "/"
+	}
+
+	tx := dao.NewBucketDao(ctx).GetOrm()
+	data, err := dao.ListFilesByDir(tx, req.BucketID, path)
+	if err != nil {
+		c.AbortServerError(ctx, "ListBucketDir service error: "+err.Error())
+		return
+	}
+
+	type BucketDirInfo struct {
+		Directory bool `json:"directory"`
+	}
+
+	c.ResponseJson(ctx, data)
 
 }

@@ -78,3 +78,20 @@ func GetBucketWithUsers(tx *gorm.DB, code string) (*model.Bucket, error) {
 	}
 	return &bucket, nil
 }
+
+func ListFilesByDir(tx *gorm.DB, bucketId uint64, path string) ([]*model.Bucket, error) {
+
+	res := []*model.Bucket{}
+	var err error = nil
+	if path == "/" {
+		err = tx.Where("bucket_id = ? AND dir =  ?", bucketId, "/").Find(&res).Error
+	} else {
+		err = tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%", path).Find(&res).Error
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+
+}
