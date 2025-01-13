@@ -2,6 +2,9 @@ package dao
 
 import (
 	"context"
+	"io/fs"
+	"os"
+	"path/filepath"
 
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
@@ -13,12 +16,17 @@ type BucketDao struct {
 }
 
 func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *BucketDao {
-	return &BucketDao{BaseDao: db.NewDao[model.Bucket](ctx, dao...)}
+	return &BucketDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
-func (dao BucketDao) CreateBucket(code string) (*model.Bucket, error) {
+func (dao BucketDao) CreateBucket(code, bucketpath string) (*model.Bucket, error) {
 	// dao.BeginTransaction()
 	bucket := &model.Bucket{Code: code}
+	bucketFullpath := filepath.Join(bucketpath, code)
+	if err := os.MkdirAll(bucketFullpath, fs.ModePerm); err != nil {
+		return nil, nil
+	}
+
 	err := dao.GetOrm().Create(bucket).Error
 	// if err != nil {
 	// 	dao.RollbackTransaction()

@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/storage/consts"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/pkg/controller"
@@ -33,7 +34,9 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 		return
 	}
 
-	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name)
+	bucketPath := ctx.GetString(consts.BucketPath)
+
+	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name,bucketPath)
 	if err != nil {
 		c.AbortServerError(ctx, ""+err.Error())
 		return
@@ -108,5 +111,13 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 }
 
 func (c *BucketController) ListBucketDir(ctx *gin.Context) {
+
+	var req struct {
+		BucketID uint64 `uri:"id" binding:"required"`
+	}
+
+	if err:= ctx.ShouldBindUri(&req); err !=nil {
+		
+	}
 
 }

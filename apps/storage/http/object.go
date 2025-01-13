@@ -36,8 +36,9 @@ func (c *ObjectController) UploadFile(ctx *gin.Context) {
 }
 
 func (c *ObjectController) GetAsset(ctx *gin.Context) {
-	user := ctx.GetUint64(controller.UserID)
-	authed := user == 0
+	// user := ctx.GetUint64(controller.UserID)
+	// // if the api is called not authed
+	// authed := user == 0
 
 	var req struct {
 		BucketID uint64 `uri:"bucket" binding:"required"`
