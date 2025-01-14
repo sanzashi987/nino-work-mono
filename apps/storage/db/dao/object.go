@@ -12,7 +12,7 @@ type FileDao struct {
 }
 
 func NewObjectDao(ctx context.Context, dao ...*db.BaseDao[model.Object]) *FileDao {
-	return &FileDao{BaseDao: db.NewDao[model.Object](ctx, dao...)}
+	return &FileDao{BaseDao: db.NewDao(ctx, dao...)}
 }
 
 func (dao FileDao) CreateObject(bucketId uint, name, mimeType, uri, fileId, extension string, size int64) error {

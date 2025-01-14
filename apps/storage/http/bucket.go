@@ -135,14 +135,45 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 	tx := dao.NewBucketDao(ctx).GetOrm()
 	data, err := dao.ListFilesByDir(tx, req.BucketID, path)
 	if err != nil {
-		c.AbortServerError(ctx, "ListBucketDir service error: "+err.Error())
+		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())
 		return
 	}
 
-	type BucketDirInfo struct {
-		Directory bool `json:"directory"`
+	dirs, err := dao.ListChildrenDirs(tx, req.BucketID, path)
+	if err != nil {
+		c.AbortServerError(ctx, "ListBucketDir query dirs error: "+err.Error())
+		return
 	}
 
-	c.ResponseJson(ctx, data)
+	type FileInfo struct {
+		FileId     string `json:"file_id"`
+		Name       string `json:"name"`
+		URI        string `json:"uri"`
+		UpdateTime int64  `json:"update_time"`
+		CreateTime int64  `json:"create_time"`
+	}
+
+	files := []*FileInfo{}
+	for _, file := range data {
+		files = append(files, &FileInfo{
+			FileId:     file.FileId,
+			Name:       file.Name,
+			URI:        file.URI,
+			UpdateTime: file.UpdateTime.Unix(),
+			CreateTime: file.CreateTime.Unix(),
+		})
+	}
+
+	type Response struct {
+		File      []*FileInfo `json:"files"`
+		Directory []string    `json:"dirs"`
+	}
+
+	res := Response{
+		File:      files,
+		Directory: dirs,
+	}
+
+	c.ResponseJson(ctx, res)
 
 }

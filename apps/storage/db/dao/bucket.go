@@ -79,14 +79,14 @@ func GetBucketWithUsers(tx *gorm.DB, code string) (*model.Bucket, error) {
 	return &bucket, nil
 }
 
-func ListFilesByDir(tx *gorm.DB, bucketId uint64, path string) ([]*model.Bucket, error) {
+func ListFilesByDir(tx *gorm.DB, bucketId uint64, path string) ([]*model.Object, error) {
 
-	res := []*model.Bucket{}
+	res := []*model.Object{}
 	var err error = nil
 	if path == "/" {
 		err = tx.Where("bucket_id = ? AND dir =  ?", bucketId, "/").Find(&res).Error
 	} else {
-		err = tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%", path).Find(&res).Error
+		err = tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%/", path+"/%/%/").Find(&res).Error
 	}
 
 	if err != nil {
@@ -94,4 +94,18 @@ func ListFilesByDir(tx *gorm.DB, bucketId uint64, path string) ([]*model.Bucket,
 	}
 	return res, nil
 
+}
+
+func ListChildrenDirs(tx *gorm.DB, bucketId uint64, path string) ([]string, error) {
+	models := []*model.Object{}
+	if err := tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%/%/", path+"/%/%/%/").Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	res := []string{}
+	for _, m := range models {
+		res = append(res, m.Dir)
+	}
+
+	return res, nil
 }

@@ -45,7 +45,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	bucketDao := dao.NewBucketDao(ctx)
 	var bucket *model.Bucket
 	if req.BucketId > 0 {
-		bucket, err = bucketDao.GetBucket(uint(req.BucketId))
+		bucket, err = bucketDao.GetBucket(req.BucketId)
 	} else {
 		return fmt.Errorf("bucket information required")
 	}
@@ -122,7 +122,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 	}
 
 	res.Size = size
-	res.Id, res.Path, res.MimeType, res.Extension = uuidStr, path, mimeTypeStr, ext
+	res.Id, res.Path, res.MimeType, res.Extension = *uuidStr, path, mimeTypeStr, ext
 	return stream.SendMsg(&res)
 }
 
