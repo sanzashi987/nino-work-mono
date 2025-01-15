@@ -1,9 +1,7 @@
 package http
 
 import (
-	"math"
 	"sort"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/consts"
@@ -74,9 +72,6 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		return
 	}
 
-	offset := (pagination.Page - 1) * pagination.Size
-	offset = int(math.Max(0, float64(offset)))
-
 	paginationScope := db.Paginate(pagination.Page, pagination.Size)
 
 	bucketDao := dao.NewBucketDao(ctx)
@@ -115,7 +110,7 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 
 	var req struct {
 		BucketID uint64 `uri:"id" binding:"required"`
-		Path     string `form:"path"`
+		PathId   uint64 `form:"path"`
 	}
 
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -123,25 +118,10 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 		return
 	}
 
-	path := req.Path
-	if !strings.HasPrefix(path, "/") {
-		path = "/"
-	}
-
-	if path[len(path)-1:] != "/" {
-		path += "/"
-	}
-
 	tx := dao.NewBucketDao(ctx).GetOrm()
-	data, err := dao.ListFilesByDir(tx, req.BucketID, path)
+	data, err := dao.ListObjectsByDir(tx, req.BucketID, req.PathId)
 	if err != nil {
 		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())
-		return
-	}
-
-	dirs, err := dao.ListChildrenDirs(tx, req.BucketID, path)
-	if err != nil {
-		c.AbortServerError(ctx, "ListBucketDir query dirs error: "+err.Error())
 		return
 	}
 
@@ -153,20 +133,34 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 		CreateTime int64  `json:"create_time"`
 	}
 
+	type DirInfo struct {
+		Id   uint64 `json:"id"`
+		Name string `json:"name"`
+	}
+
 	files := []*FileInfo{}
-	for _, file := range data {
-		files = append(files, &FileInfo{
-			FileId:     file.FileId,
-			Name:       file.Name,
-			URI:        file.URI,
-			UpdateTime: file.UpdateTime.Unix(),
-			CreateTime: file.CreateTime.Unix(),
-		})
+	dirs := []*DirInfo{}
+	for _, d := range data {
+		if d.Dir {
+			dirs = append(dirs, &DirInfo{
+				Id:   d.Id,
+				Name: d.Name,
+			})
+		} else {
+
+			files = append(files, &FileInfo{
+				FileId:     d.FileId,
+				Name:       d.Name,
+				URI:        d.URI,
+				UpdateTime: d.UpdateTime.Unix(),
+				CreateTime: d.CreateTime.Unix(),
+			})
+		}
 	}
 
 	type Response struct {
 		File      []*FileInfo `json:"files"`
-		Directory []string    `json:"dirs"`
+		Directory []*DirInfo  `json:"dirs"`
 	}
 
 	res := Response{
@@ -175,5 +169,4 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 	}
 
 	c.ResponseJson(ctx, res)
-
 }

@@ -20,18 +20,17 @@ func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *Bucket
 }
 
 func (dao BucketDao) CreateBucket(code, bucketpath string) (*model.Bucket, error) {
-	// dao.BeginTransaction()
+	dao.BeginTransaction()
 	bucket := &model.Bucket{Code: code}
 	bucketFullpath := filepath.Join(bucketpath, code)
 	if err := os.MkdirAll(bucketFullpath, fs.ModePerm); err != nil {
 		return nil, nil
 	}
 
-	err := dao.GetOrm().Create(bucket).Error
-	// if err != nil {
-	// 	dao.RollbackTransaction()
-	// 	return nil, err
-	// }
+	if err := dao.GetOrm().Create(bucket).Error; err != nil {
+		dao.RollbackTransaction()
+		return nil, err
+	}
 
 	// tableName := model.DynamicObjectTableName(code)
 	// err = dao.GetOrm().Table(tableName).AutoMigrate(&model.Object{})
@@ -39,20 +38,23 @@ func (dao BucketDao) CreateBucket(code, bucketpath string) (*model.Bucket, error
 	// 	dao.RollbackTransaction()
 	// 	return nil, err
 	// }
+
 	// root folder
-	// rootDir := model.Object{
-	// 	BucketID:  bucket.Id,
-	// 	Directory: true,
-	// }
+	rootDir := model.Object{
+		BucketID: bucket.Id,
+		Dir:      true,
+		Name:     "/",
+		ParentId: 0,
+	}
 
 	// err = dao.GetOrm().Create(&rootDir).Error
-	// if err != nil {
-	// 	dao.RollbackTransaction()
-	// 	return nil, err
-	// }
+	if err := dao.GetOrm().Create(&rootDir).Error; err != nil {
+		dao.RollbackTransaction()
+		return nil, err
+	}
 
-	// dao.CommitTransaction()
-	return bucket, err
+	dao.CommitTransaction()
+	return bucket, nil
 }
 
 func (dao BucketDao) GetBucket(id uint64) (*model.Bucket, error) {
@@ -79,33 +81,13 @@ func GetBucketWithUsers(tx *gorm.DB, code string) (*model.Bucket, error) {
 	return &bucket, nil
 }
 
-func ListFilesByDir(tx *gorm.DB, bucketId uint64, path string) ([]*model.Object, error) {
+func ListObjectsByDir(tx *gorm.DB, bucketId, parentPathId uint64) ([]*model.Object, error) {
 
-	res := []*model.Object{}
-	var err error = nil
-	if path == "/" {
-		err = tx.Where("bucket_id = ? AND dir =  ?", bucketId, "/").Find(&res).Error
-	} else {
-		err = tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%/", path+"/%/%/").Find(&res).Error
-	}
-
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-
-}
-
-func ListChildrenDirs(tx *gorm.DB, bucketId uint64, path string) ([]string, error) {
 	models := []*model.Object{}
-	if err := tx.Where("bucket_id = ? AND dir LIKE ? AND dir NOT LIKE ?", bucketId, path+"/%/%/", path+"/%/%/%/").Find(&models).Error; err != nil {
+	if err := tx.Where("bucket_id = ? AND parent_id = ? ", bucketId, parentPathId).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
-	res := []string{}
-	for _, m := range models {
-		res = append(res, m.Dir)
-	}
+	return models, nil
 
-	return res, nil
 }

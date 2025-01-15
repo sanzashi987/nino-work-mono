@@ -132,8 +132,8 @@ type UploadServiceWeb struct{}
 var UploadServiceWebImpl = &UploadServiceWeb{}
 
 type UploadFilePayload struct {
-	BucketCode string `form:"bucket_code" binding:"required"`
-	Path       string `form:"path"`
+	BuckeID uint64 `uri:"bucket" binding:"required"`
+	PathId  uint64 `form:"path_id" `
 }
 
 func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload *UploadFilePayload) (*string, error) {
@@ -151,7 +151,7 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	ext := filepath.Ext(file.Filename)
 	fileName := filepath.Base(file.Filename)
 
-	path := fmt.Sprintf("%s/%s/%s", bucketPath, payload.BucketCode, uuidStr)
+	path := fmt.Sprintf("%s/%d/%s", bucketPath, payload.BuckeID, *uuidStr)
 	if ext != "" {
 		path = fmt.Sprintf("%s.%s", path, ext)
 	}
@@ -161,23 +161,21 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	}
 
 	mimeType, err := mimetype.DetectFile(path)
+	if err != nil {
+		return nil, err
+	}
 	tx := dao.NewObjectDao(ctx).GetOrm()
 
-	bucket, err := dao.GetBucketByCode(tx, payload.BucketCode)
 	if err != nil {
 		return nil, err
 	}
 
-	dir := "/"
-	if payload.Path != "" {
-		dir = payload.Path
-	}
-
 	toInsert := model.Object{
-		BucketID:  bucket.Id,
+		BucketID:  payload.BuckeID,
+		ParentId:  payload.PathId,
 		FileId:    *uuidStr,
 		URI:       path,
-		Dir:       dir,
+		Dir:       false,
 		Name:      fileName,
 		MimeType:  mimeType.String(),
 		Extension: ext,
