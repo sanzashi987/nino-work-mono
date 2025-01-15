@@ -195,7 +195,8 @@ func (serv UploadServiceWeb) UploadLargeFile(ctx context.Context) {
 
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
-	if record, err := dao.NewObjectDao(ctx).QueryFile(fileId); err != nil {
+	record := model.Object{}
+	if err := dao.NewObjectDao(ctx).GetOrm().Where("file_id = ?", fileId).Find(&record).Error; err != nil {
 		return err
 	} else {
 		out.Extension, out.Id, out.Path, out.Size = record.Extension, record.FileId, record.URI, record.Size

@@ -1,19 +1,29 @@
 import {
   Box,
-  Button, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer,
+  Button, Dialog, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer,
   TableHead,
   TableRow
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { getAppList, PagninationRequest } from '@/api';
 import { usePromise } from '@/utils';
 import loading from '@/components/Loading';
+import CreateAppDialog from './CreateAppDialog';
 
 type AppsManagementProps = {};
 
 const AppsManagement: React.FC<AppsManagementProps> = (props) => {
+  const [open, setOpen] = React.useState(false);
   const [pagination, setPagination] = useState<PagninationRequest>({ page: 1, size: 10 });
-  const data = usePromise(() => getAppList(pagination));
+  const { data, refetch } = usePromise(() => getAppList(pagination));
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+  const handleSuccess = useCallback(() => {
+    refetch();
+    setOpen(false);
+  }, []);
 
   const content = useMemo(() => {
     if (!data) {
@@ -48,7 +58,7 @@ const AppsManagement: React.FC<AppsManagementProps> = (props) => {
 
   return (
     <Stack>
-      <Button color="info" variant="contained" sx={{ width: 'fit-content' }}>
+      <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
         + Create Application
       </Button>
       {!data
@@ -77,6 +87,9 @@ const AppsManagement: React.FC<AppsManagementProps> = (props) => {
             <Pagination sx={{ mt: 2, '.MuiPagination-ul': { justifyContent: 'end' } }} shape="rounded" size="small" />
           </>
         )}
+      <Dialog open={open}>
+        <CreateAppDialog onSuccess={handleSuccess} close={handleClose} />
+      </Dialog>
     </Stack>
   );
 };

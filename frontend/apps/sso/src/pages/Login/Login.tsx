@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { login } from '@/api';
+import FormLabel from '@/components/FormLabel';
 
 interface LoginProps {
   title?: string;
@@ -30,10 +31,10 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
 
   const { register, handleSubmit } = useForm();
 
-  const onSubmit = ({ username, password, remember }:any) => {
-    const paylaod = { username, password, expiry: remember ? 30 : 1 };
+  const onSubmit = ({ username, password, remember }: any) => {
+    const payload = { username, password, expiry: remember ? 30 : 1 };
     setLoading(true);
-    login(paylaod).then(({ jwt_token }) => {
+    login(payload).then(({ jwt_token }) => {
       Cookie.set('login_token', jwt_token);
       navigate('/dashboard');
     }).finally(() => {
@@ -76,29 +77,11 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <Box>
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              component="label"
-              htmlFor="username"
-              mb="5px"
-              mr="5px"
-            >
-              Username
-            </Typography>
-            <Input fullWidth {...register('username')} />
+            <FormLabel title="Username" field="username" />
+            <Input id="username" fullWidth {...register('username')} />
           </Box>
           <Box mt="25px">
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              component="label"
-              htmlFor="password"
-              mb="5px"
-              mr="5px"
-            >
-              Password
-            </Typography>
+            <FormLabel title="Password" field="password" />
             <Input
               id="password"
               {...register('password')}

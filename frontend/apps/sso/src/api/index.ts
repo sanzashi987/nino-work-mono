@@ -55,24 +55,35 @@ export type PagninationRequest = {
 };
 
 type PaginationResponse<T> = {
-  data:T[]
+  data: T[]
   pageIndex: number
   pageSize: number
   pageTotal: number
   recordTotal: number
 };
 
-enum AppStatus {
+export enum AppStatus {
   ENABLE = 0,
   DISABLE = 1,
 }
 
-export type AppListResponse = PaginationResponse<{
+type AppModel = {
   id: number
   name: string
   code: string
   description: string
   status: AppStatus
-}>;
+};
+
+export type AppListResponse = PaginationResponse<AppModel>;
 
 export const getAppList = defineApi<PagninationRequest, AppListResponse>({ url: `${prefix}/apps/list` });
+
+export type CreateAppRequest = Pick<AppModel, 'code' | 'name' | 'description'>;
+
+export type CreateAppResponse = AppModel;
+
+export const createApp = defineApi<CreateAppRequest, CreateAppResponse>({
+  url: `${prefix}/apps/create`,
+  method: 'POST'
+});

@@ -1,10 +1,6 @@
 import React, { createContext, useMemo } from 'react';
-import {
-  Navigate, Outlet, useLocation
-} from 'react-router-dom';
-import {
-  getUserInfo, MenuMeta, MenuType, UserInfoResponse
-} from '@/api';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { getUserInfo, MenuMeta, MenuType, UserInfoResponse } from '@/api';
 import { usePromise } from '@/utils';
 import loading from '@/components/Loading';
 
@@ -21,7 +17,7 @@ export const UserContext = createContext<UserContextType>({
 });
 
 const AuthGuard: React.FC<AuthGuardProps> = (props) => {
-  const userInfo = usePromise(() => getUserInfo());
+  const { data: userInfo } = usePromise(() => getUserInfo());
   const menus = useMemo(
     () => {
       if (!userInfo) {

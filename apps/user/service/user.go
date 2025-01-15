@@ -79,7 +79,7 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 
 		dbSession.CreateUser(&user)
 		var token string
-		token, err = auth.GenerateToken(user.Username, user.Id)
+		token, err = controller.GenerateToken(user.Username, user.Id)
 		if err != nil {
 			out.Reason = FailToCreateToken
 			return
