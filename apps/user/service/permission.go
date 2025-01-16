@@ -127,7 +127,7 @@ func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64
 }
 
 type RemovePermissionRequest struct {
-	AppId       *uint64  `json:"app_id" biniding:"required"`
+	AppId       *uint64  `json:"app_id" binding:"required"`
 	Permissions []uint64 `json:"permissions"`
 }
 
