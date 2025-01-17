@@ -1,22 +1,13 @@
 package dao
 
 import (
-	"context"
 	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
-	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
-type RoleDao struct {
-	db.BaseDao[model.RoleModel]
-}
-
-func NewRoleDao(ctx context.Context, dao ...*db.BaseDao[model.RoleModel]) *RoleDao {
-	return &RoleDao{BaseDao: db.NewDao(ctx, dao...)}
-}
-
-func (dao *RoleDao) FindRolesWithPermissions(roles ...*model.RoleModel) error {
+func FindRolesWithPermissions(tx *gorm.DB, roles ...*model.RoleModel) error {
 	if len(roles) == 0 {
 		return errors.New("roles is required")
 	}
@@ -31,7 +22,7 @@ func (dao *RoleDao) FindRolesWithPermissions(roles ...*model.RoleModel) error {
 
 	// 一次性查询所有角色及其权限
 	rolesWithPerms := []*model.RoleModel{}
-	err := dao.GetOrm().
+	err := tx.
 		Preload("Permissions").
 		Where("id IN ?", roleIds).
 		Find(&rolesWithPerms).Error

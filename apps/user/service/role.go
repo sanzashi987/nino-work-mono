@@ -6,6 +6,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type RoleServiceWeb struct{}
@@ -14,15 +15,15 @@ var RoleServiceWebImpl *RoleServiceWeb = &RoleServiceWeb{}
 
 // CreateRoleRequest 创建角色请求参数
 type CreateRoleRequest struct {
-	RoleName        string   `json:"role_name"`
-	RoleCode        string   `json:"role_code"`
+	RoleName        string   `json:"role_name" binding:"required"`
+	RoleCode        string   `json:"role_code" binding:"required"`
 	RoleDescription string   `json:"role_description"`
 	PermissionIds   []uint64 `json:"permission_ids"`
 }
 
 // 创建角色
 func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
-	user, roleDao, err := getUserRolePermission(ctx, userId)
+	user, tx, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -30,16 +31,11 @@ func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload 
 	if len(user.Roles) == 0 {
 		return errors.New("user does not have any admin permission")
 	}
-
-	if payload.RoleName == "" {
-		return errors.New("角色编码不能为空")
+	if len(payload.PermissionIds) == 0 {
+		return errors.New("no permission to bind")
 	}
 
-	if payload.RoleCode == "" {
-		return errors.New("角色编码不能为空")
-	}
-
-	roleDao.BeginTransaction()
+	tx = tx.Begin()
 
 	// 创建角色
 	newRole := &model.RoleModel{
@@ -48,39 +44,35 @@ func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload 
 		Description: payload.RoleDescription,
 	}
 
-	if err := roleDao.Create(newRole); err != nil {
-		roleDao.RollbackTransaction()
+	if err := tx.Create(newRole).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	// 关联权限
-	if len(payload.PermissionIds) > 0 {
-		permissions := make([]model.PermissionModel, 0)
+	permissions := []*model.PermissionModel{}
 
-		for _, pid := range payload.PermissionIds {
-			permission := model.PermissionModel{}
-			permission.Id = pid
-			permissions = append(permissions, permission)
-		}
-
-		if err := roleDao.GetOrm().Model(newRole).Association("Permissions").Replace(permissions); err != nil {
-			roleDao.RollbackTransaction()
-			return err
-		}
+	for _, pid := range payload.PermissionIds {
+		permission := &model.PermissionModel{}
+		permission.Id = pid
+		permissions = append(permissions, permission)
 	}
 
-	roleDao.CommitTransaction()
+	if err := tx.Model(newRole).Association("Permissions").Replace(permissions); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 
 // 获取角色详情
 func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*model.RoleModel, error) {
 
-	roleDao := dao.NewRoleDao(ctx)
 	role := model.RoleModel{}
 	role.Id = roleId
 
-	if err := roleDao.FindRolesWithPermissions(&role); err != nil {
+	if err := dao.FindRolesWithPermissions(db.NewTx(ctx), &role); err != nil {
 		return nil, err
 	}
 
@@ -89,10 +81,7 @@ func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*mod
 
 // 更新角色
 func (r *RoleServiceWeb) UpdateRole(ctx context.Context, roleId uint64, payload CreateRoleRequest) error {
-
-	roleDao := dao.NewRoleDao(ctx)
-	roleDao.BeginTransaction()
-
+	tx := db.NewTx(ctx).Begin()
 	role := &model.RoleModel{
 		Name:        payload.RoleName,
 		Code:        payload.RoleCode,
@@ -100,8 +89,8 @@ func (r *RoleServiceWeb) UpdateRole(ctx context.Context, roleId uint64, payload 
 	}
 	role.Id = roleId
 
-	if err := roleDao.GetOrm().Updates(role).Error; err != nil {
-		roleDao.RollbackTransaction()
+	if err := tx.Updates(role).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -114,46 +103,48 @@ func (r *RoleServiceWeb) UpdateRole(ctx context.Context, roleId uint64, payload 
 			permissions = append(permissions, permission)
 		}
 
-		if err := roleDao.GetOrm().Model(role).Association("Permissions").Replace(permissions); err != nil {
-			roleDao.RollbackTransaction()
+		if err := tx.Model(role).Association("Permissions").Replace(permissions); err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
 
-	roleDao.CommitTransaction()
+	tx.Commit()
 	return nil
 }
 
 // 删除角色
 func (r *RoleServiceWeb) DeleteRole(ctx context.Context, roleId uint64) error {
-	roleDao := dao.NewRoleDao(ctx)
-	roleDao.BeginTransaction()
+	tx := db.NewTx(ctx).Begin()
+
+	tx.Begin()
 
 	role := &model.RoleModel{}
 	role.Id = roleId
 
 	// 先清除角色关联的权限
-	if err := roleDao.GetOrm().Model(role).Association("Permissions").Clear(); err != nil {
-		roleDao.RollbackTransaction()
+	if err := tx.Model(role).Association("Permissions").Clear(); err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	// 再删除角色本身
-	if err := roleDao.GetOrm().Delete(role).Error; err != nil {
-		roleDao.RollbackTransaction()
+	if err := tx.Delete(role).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	roleDao.CommitTransaction()
+	tx.Commit()
 	return nil
 }
 
 // 模糊搜索角色
 func (r *RoleServiceWeb) SuggestRoles(ctx context.Context, keyword string) ([]model.RoleModel, error) {
-	roleDao := dao.NewRoleDao(ctx)
+	tx := db.NewTx(ctx)
+
 	var roles []model.RoleModel
 
-	if err := roleDao.GetOrm().
+	if err := tx.
 		Where("name LIKE ? OR code LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
 		Find(&roles).Error; err != nil {
 		return nil, err

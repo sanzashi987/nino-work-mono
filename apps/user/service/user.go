@@ -22,7 +22,7 @@ func GetUserServiceRpc() user.UserServiceHandler {
 }
 
 func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
-	user, err := dao.NewUserDao(ctx).FindUserByUsername(in.Username)
+	user, err := dao.FindUserByUsername(db.NewTx(ctx), in.Username)
 	if err != nil {
 		out.Reason = UsernameNotExist
 		return
@@ -56,8 +56,9 @@ func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginReques
 }
 
 func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegisterRequest, out *user.UserLoginResponse) (err error) {
-	dbSession := dao.NewUserDao(ctx)
-	user, err := dbSession.FindUserByUsername(in.Username)
+	tx := db.NewTx(ctx)
+
+	user, err := dao.FindUserByUsername(tx, in.Username)
 	if user != nil {
 		out.Reason = UsernameExisted
 		err = errors.New("Username existed")
@@ -77,7 +78,7 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 			Fobidden: false,
 		}
 
-		dbSession.CreateUser(&user)
+		dao.CreateUser(tx, &user)
 		var token string
 		token, err = controller.GenerateToken(user.Username, user.Id)
 		if err != nil {
@@ -131,7 +132,7 @@ type UserInfoResponse struct {
 
 func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
 
-	user, d, err := getUserRolePermission(ctx, userId)
+	user, tx, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -152,9 +153,9 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 		}
 	}
 
-	menuDao := dao.NewMenuDao(ctx, (*db.BaseDao[model.MenuModel])(d))
-
-	menuDao.GetMenusByRoles(&user.Roles)
+	if err := tx.Preload("Menus").Find(&user.Roles).Error; err != nil {
+		return nil, err
+	}
 
 	menuMap := map[string]*MenuMeta{}
 	for _, role := range user.Roles {
@@ -193,9 +194,7 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 
 func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
 
-	userDao := dao.NewUserDao(ctx)
-
-	user, err := userDao.FindUserWithRoles(userId)
+	user, err := dao.FindUserWithRoles(db.NewTx(ctx), userId)
 	if err != nil {
 		return nil, err
 	}
@@ -212,10 +211,9 @@ func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId 
 	return user, nil
 }
 
-func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel, *db.BaseDao[model.RoleModel], error) {
-	userDao := dao.NewUserDao(ctx)
-	roleDao := dao.NewRoleDao(ctx, (*db.BaseDao[model.RoleModel])(&userDao.BaseDao))
-	user, err := userDao.FindUserWithRoles(userId)
+func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel, *gorm.DB, error) {
+	tx := db.NewTx(ctx)
+	user, err := dao.FindUserWithRoles(tx, userId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -225,7 +223,7 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 		userRoles = append(userRoles, &role)
 	}
 
-	err = roleDao.FindRolesWithPermissions(userRoles...)
+	err = dao.FindRolesWithPermissions(tx, userRoles...)
 
 	if err != nil {
 		return nil, nil, err
@@ -239,7 +237,7 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 
 	user.Roles = res
 
-	return user, &roleDao.BaseDao, nil
+	return user, tx, nil
 }
 
 type UserAdminResult struct {
@@ -248,7 +246,7 @@ type UserAdminResult struct {
 }
 
 func getUserAdmins(ctx context.Context, userId uint64) (*UserAdminResult, error) {
-	user, roleDao, err := getUserRolePermission(ctx, userId)
+	user, tx, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +265,7 @@ func getUserAdmins(ctx context.Context, userId uint64) (*UserAdminResult, error)
 		appIds = append(appIds, appId)
 	}
 	apps := []model.ApplicationModel{}
-	err = roleDao.GetOrm().Table("applications").Where("id IN ?", appIds).Find(&apps).Error
+	err = tx.Table("applications").Where("id IN ?", appIds).Find(&apps).Error
 	if err != nil {
 		return nil, err
 

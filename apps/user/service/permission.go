@@ -6,6 +6,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type PermissionServiceWeb struct{}
@@ -65,9 +66,9 @@ func (s *PermissionServiceWeb) ListPermissionByApp(ctx context.Context, userId u
 		return nil, nil
 	}
 
-	dao := dao.NewApplicationDao(ctx)
+	tx := db.NewTx(ctx)
 
-	app, err := dao.FindApplicationByIdWithPermission(*toQuery)
+	app, err := dao.FindApplicationByIdWithPermission(tx, *toQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ type AddPermissionRequest struct {
 }
 
 func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64, payload AddPermissionRequest) (err error) {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
+	app, tx, err := userIsManager(ctx, userId, payload.AppId, false)
 	if err != nil {
 		return
 	}
@@ -111,9 +112,9 @@ func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64
 		}
 	}
 
-	permissionModels := []model.PermissionModel{}
+	permissionModels := []*model.PermissionModel{}
 	for _, permission := range payload.Permissions {
-		permissionModels = append(permissionModels, model.PermissionModel{
+		permissionModels = append(permissionModels, &model.PermissionModel{
 			AppId:       *payload.AppId,
 			Name:        permission.Name,
 			Code:        permission.Code,
@@ -121,9 +122,8 @@ func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64
 		})
 	}
 
-	appDao.AddApplicationPermission(app, permissionModels)
-
-	return err
+	err = tx.Model(app).Association("Permissions").Append(permissionModels)
+	return
 }
 
 type RemovePermissionRequest struct {
@@ -132,18 +132,18 @@ type RemovePermissionRequest struct {
 }
 
 func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
-	app, appDao, err := userIsManager(ctx, userId, payload.AppId, false)
+	app, tx, err := userIsManager(ctx, userId, payload.AppId, false)
 	if err != nil {
 		return err
 	}
 
-	permissions := []model.PermissionModel{}
+	permissions := []*model.PermissionModel{}
 	for _, id := range payload.Permissions {
 		p := model.PermissionModel{}
 		p.Id = id
-		permissions = append(permissions, p)
+		permissions = append(permissions, &p)
 	}
 
-	return appDao.RemoveApplicationPermission(app, permissions)
+	return tx.Model(app).Association("Permissions").Delete(permissions)
 
 }

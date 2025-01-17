@@ -8,6 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type ApplicationServiceWeb struct{}
@@ -23,8 +24,8 @@ type CreateAppRequest struct {
 
 func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId uint64, payload CreateAppRequest) (*model.ApplicationModel, error) {
 
-	appDao := dao.NewApplicationDao(ctx)
-	appDao.BeginTransaction()
+	tx := db.NewTx(ctx)
+	tx = tx.Begin()
 
 	application := &model.ApplicationModel{
 		Name:        payload.Name,
@@ -34,8 +35,8 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 		CreateBy:    userId,
 	}
 
-	if err := appDao.Create(application); err != nil {
-		appDao.RollbackTransaction()
+	if err := dao.CreateApp(tx, application); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
@@ -53,19 +54,17 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 		Description: fmt.Sprintf("%s应用管理员权限", application.Name),
 	}
 
-	permissionDao := dao.NewPermissionDao(ctx, (*db.BaseDao[model.PermissionModel])(&appDao.BaseDao))
-
-	if err := permissionDao.CreatePermissions(superAdminPermission, adminPermission); err != nil {
-		appDao.RollbackTransaction()
+	if err := tx.Create([]*model.PermissionModel{superAdminPermission, adminPermission}).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	if err := appDao.InitPermissionForSystem(application, superAdminPermission, adminPermission); err != nil {
-		appDao.RollbackTransaction()
+	if err := dao.InitPermissionForApp(tx, application, superAdminPermission, adminPermission); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	appDao.CommitTransaction()
+	tx.Commit()
 	return application, nil
 }
 
@@ -98,14 +97,13 @@ func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uin
 	return apps, err
 }
 
-func userIsManager(ctx context.Context, userId uint64, appId *uint64, superOnly bool) (app *model.ApplicationModel, appDao *dao.ApplicationDao, err error) {
-	user, roleDao, err := getUserRolePermission(ctx, userId)
+func userIsManager(ctx context.Context, userId uint64, appId *uint64, superOnly bool) (app *model.ApplicationModel, tx *gorm.DB, err error) {
+	user, tx, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return
 	}
-	appDao = dao.NewApplicationDao(ctx, (*db.BaseDao[model.ApplicationModel])(roleDao))
 
-	app, err = appDao.FindApplicationByIdWithPermission(*appId)
+	app, err = dao.FindApplicationByIdWithPermission(tx, *appId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -135,5 +133,5 @@ topLoop:
 		return nil, nil, errors.New("no permission")
 	}
 
-	return app, appDao, nil
+	return app, tx, nil
 }

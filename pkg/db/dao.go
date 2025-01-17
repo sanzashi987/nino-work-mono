@@ -45,6 +45,12 @@ func NewDao[T any](ctx context.Context, dao ...*BaseDao[T]) BaseDao[T] {
 	return baseDao
 }
 
+func NewTx(ctx context.Context) *gorm.DB {
+	return instance.WithContext(ctx)
+}
+
+
+
 func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		pageNumber, pageSize := page, size

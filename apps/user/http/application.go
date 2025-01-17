@@ -71,7 +71,7 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 	pageSize := pagination.Size
 	pageTotal := ceil(float64(total) / float64(pageSize))
 
-	println(pagination.Page, pagination.Size, pageTotal)
+	// println(pagination.Page, pagination.Size, pageTotal)
 	// Ensure pageIndex is within valid range
 	if pageIndex < 1 {
 		pageIndex = 1
