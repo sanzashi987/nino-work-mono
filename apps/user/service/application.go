@@ -69,7 +69,7 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 	return application, nil
 }
 
-func reoveRepeat(result *UserAdminResult) []*model.ApplicationModel {
+func removeRepeat(result *UserAdminResult) []*model.ApplicationModel {
 	apps := []*model.ApplicationModel{}
 	appMap := map[uint64]*model.ApplicationModel{}
 
@@ -94,7 +94,7 @@ func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uin
 	if err != nil {
 		return nil, err
 	}
-	apps := reoveRepeat(result)
+	apps := removeRepeat(result)
 	return apps, err
 }
 

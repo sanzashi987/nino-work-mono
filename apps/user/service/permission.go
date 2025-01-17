@@ -27,7 +27,7 @@ func (s *PermissionServiceWeb) ListPermissionByApp(ctx context.Context, userId u
 	}
 	var toQuery *uint64 = nil
 
-	appList := reoveRepeat(result)
+	appList := removeRepeat(result)
 
 	fromSuper, fromAdmin := false, false
 
