@@ -1,41 +1,32 @@
 package dao
 
 import (
-	"context"
 	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
-	"github.com/sanzashi987/nino-work/pkg/db"
 	"gorm.io/gorm"
 )
 
-type BucketDao struct {
-	db.BaseDao[model.Bucket]
-}
 
-func NewBucketDao(ctx context.Context, dao ...*db.BaseDao[model.Bucket]) *BucketDao {
-	return &BucketDao{BaseDao: db.NewDao(ctx, dao...)}
-}
-
-func (dao BucketDao) CreateBucket(code, bucketpath string) (*model.Bucket, error) {
-	dao.BeginTransaction()
+func CreateBucket(tx *gorm.DB, code, bucketpath string) (*model.Bucket, error) {
+	tx.Begin()
 	bucket := &model.Bucket{Code: code}
 	bucketFullpath := filepath.Join(bucketpath, code)
 	if err := os.MkdirAll(bucketFullpath, fs.ModePerm); err != nil {
 		return nil, nil
 	}
 
-	if err := dao.GetOrm().Create(bucket).Error; err != nil {
-		dao.RollbackTransaction()
+	if err := tx.Create(bucket).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
 	// tableName := model.DynamicObjectTableName(code)
-	// err = dao.GetOrm().Table(tableName).AutoMigrate(&model.Object{})
+	// err = tx.Table(tableName).AutoMigrate(&model.Object{})
 	// if err != nil {
-	// 	dao.RollbackTransaction()
+	// 	tx.Rollback()
 	// 	return nil, err
 	// }
 
@@ -47,19 +38,19 @@ func (dao BucketDao) CreateBucket(code, bucketpath string) (*model.Bucket, error
 		ParentId: 0,
 	}
 
-	// err = dao.GetOrm().Create(&rootDir).Error
-	if err := dao.GetOrm().Create(&rootDir).Error; err != nil {
-		dao.RollbackTransaction()
+	// err = tx.Create(&rootDir).Error
+	if err := tx.Create(&rootDir).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	dao.CommitTransaction()
+	tx.Commit()
 	return bucket, nil
 }
 
-func (dao BucketDao) GetBucket(id uint64) (*model.Bucket, error) {
+func GetBucket(tx *gorm.DB, id uint64) (*model.Bucket, error) {
 	var bucket model.Bucket
-	err := dao.GetOrm().First(&bucket, id).Error
+	err := tx.First(&bucket, id).Error
 	return &bucket, err
 }
 

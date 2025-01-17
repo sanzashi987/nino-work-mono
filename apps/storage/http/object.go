@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
 	"github.com/sanzashi987/nino-work/apps/storage/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type ObjectController struct {
@@ -49,7 +49,7 @@ func (c *ObjectController) GetAsset(ctx *gin.Context) {
 		return
 	}
 
-	tx := dao.NewObjectDao(ctx).GetOrm()
+	tx := db.NewTx(ctx)
 	object := model.Object{}
 	if err := tx.Where("bucket_id = ? AND file_id = ?", req.BucketID, req.FileId).Find(&object).Error; err != nil {
 		c.AbortServerError(ctx, "GetAsset internal error "+err.Error())

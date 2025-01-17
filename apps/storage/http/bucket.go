@@ -35,7 +35,7 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 
 	bucketPath := ctx.GetString(consts.BucketPath)
 
-	bucket, err := dao.NewBucketDao(ctx).CreateBucket(req.Name, bucketPath)
+	bucket, err := dao.CreateBucket(db.NewTx(ctx), req.Name, bucketPath)
 	if err != nil {
 		c.AbortServerError(ctx, ""+err.Error())
 		return
@@ -54,7 +54,7 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 		return
 	}
 
-	result, err := dao.NewBucketDao(ctx).GetBucket(uri.Id)
+	result, err := dao.GetBucket(db.NewTx(ctx), uri.Id)
 	if err != nil {
 		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
 		return
@@ -74,12 +74,12 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 
 	paginationScope := db.Paginate(pagination.Page, pagination.Size)
 
-	bucketDao := dao.NewBucketDao(ctx)
+	tx := db.NewTx(ctx)
 	u := model.User{
 		UserId: user,
 		Type:   model.USER,
 	}
-	err := bucketDao.GetOrm().Preload("Buckets").Scopes(paginationScope).Find(&u).Error
+	err := tx.Preload("Buckets").Scopes(paginationScope).Find(&u).Error
 	if err != nil {
 		c.AbortServerError(ctx, "ListBuckets internal error: "+err.Error())
 		return
@@ -118,7 +118,7 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 		return
 	}
 
-	tx := dao.NewBucketDao(ctx).GetOrm()
+	tx := db.NewTx(ctx)
 	data, err := dao.ListObjectsByDir(tx, req.BucketID, req.PathId)
 	if err != nil {
 		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())

@@ -14,6 +14,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/storage/consts"
 	dao "github.com/sanzashi987/nino-work/apps/storage/db/dao"
 	model "github.com/sanzashi987/nino-work/apps/storage/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
 
@@ -42,10 +43,11 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 		return err
 	}
 
-	bucketDao := dao.NewBucketDao(ctx)
+	tx := db.NewTx(ctx)
+
 	var bucket *model.Bucket
 	if req.BucketId > 0 {
-		bucket, err = bucketDao.GetBucket(req.BucketId)
+		bucket, err = dao.GetBucket(tx, req.BucketId)
 	} else {
 		return fmt.Errorf("bucket information required")
 	}
@@ -116,8 +118,7 @@ func (serv UploadServiceRpc) UploadFile(ctx context.Context, stream storage.Stor
 		Size:      size,
 	}
 
-	err = dao.NewObjectDao(ctx).GetOrm().Create(&toInsert).Error
-	if err != nil {
+	if err := tx.Create(&toInsert).Error; err != nil {
 		return err
 	}
 
@@ -164,7 +165,7 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	if err != nil {
 		return nil, err
 	}
-	tx := dao.NewObjectDao(ctx).GetOrm()
+	tx := db.NewTx(ctx)
 
 	if err != nil {
 		return nil, err
@@ -196,7 +197,8 @@ func (serv UploadServiceWeb) UploadLargeFile(ctx context.Context) {
 func (serv UploadServiceRpc) GetFileDetail(ctx context.Context, in *storage.FileQueryRequest, out *storage.FileDetailResponse) error {
 	fileId := in.Id
 	record := model.Object{}
-	if err := dao.NewObjectDao(ctx).GetOrm().Where("file_id = ?", fileId).Find(&record).Error; err != nil {
+
+	if err := db.NewTx(ctx).Where("file_id = ?", fileId).Find(&record).Error; err != nil {
 		return err
 	} else {
 		out.Extension, out.Id, out.Path, out.Size = record.Extension, record.FileId, record.URI, record.Size
