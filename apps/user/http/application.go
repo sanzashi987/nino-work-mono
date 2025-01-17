@@ -110,7 +110,7 @@ func (c *AppController) CreateApp(ctx *gin.Context) {
 	}
 
 	userId := ctx.GetUint64(controller.UserID)
-	app, err := service.AppServiceWebImpl.CreateApplication(ctx, userId, req)
+	app, err := service.AppServiceWebImpl.CreateApp(ctx, userId, req)
 	if err != nil {
 		c.AbortServerError(ctx, "[http] create app: Fail to create app "+err.Error())
 		return

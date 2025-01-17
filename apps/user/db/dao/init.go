@@ -39,7 +39,7 @@ func defaultRecord(db *gorm.DB) {
 		// permissionsToCreate = append(permissionsToCreate, &rootPermission)
 
 		codes := []string{"user", "app", "role", "permission"}
-		userRoles := []model.RoleModel{adminRole}
+		userRoles := []*model.RoleModel{adminRole}
 		for _, code := range codes {
 			role, permission := model.CreateRoleWithPermission(
 				utils.Capitialize(code)+" Admin Role",
@@ -81,7 +81,7 @@ func defaultRecord(db *gorm.DB) {
 			SuperAdmin:  rootPermission.Id,
 			Admin:       rootPermission.Id,
 		}
-		
+
 		tx.Create(application)
 		tx.Model(application).Association("Permissions").Append(&permissionsToCreate)
 	}

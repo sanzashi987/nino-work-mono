@@ -192,7 +192,7 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 
 }
 
-func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]model.RoleModel, error) {
+func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]*model.RoleModel, error) {
 
 	user, err := dao.FindUserWithRoles(db.NewTx(ctx), userId)
 	if err != nil {
@@ -220,7 +220,7 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 
 	userRoles := []*model.RoleModel{}
 	for _, role := range user.Roles {
-		userRoles = append(userRoles, &role)
+		userRoles = append(userRoles, role)
 	}
 
 	err = dao.FindRolesWithPermissions(tx, userRoles...)
@@ -229,10 +229,10 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 		return nil, nil, err
 	}
 
-	res := []model.RoleModel{}
+	res := []*model.RoleModel{}
 
 	for _, role := range userRoles {
-		res = append(res, *role)
+		res = append(res, role)
 	}
 
 	user.Roles = res

@@ -22,7 +22,7 @@ type CreateAppRequest struct {
 	Description string `json:"description"`
 }
 
-func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId uint64, payload CreateAppRequest) (*model.ApplicationModel, error) {
+func (u *ApplicationServiceWeb) CreateApp(ctx context.Context, userId uint64, payload CreateAppRequest) (*model.ApplicationModel, error) {
 
 	tx := db.NewTx(ctx)
 	tx = tx.Begin()
@@ -40,26 +40,32 @@ func (u *ApplicationServiceWeb) CreateApplication(ctx context.Context, userId ui
 		return nil, err
 	}
 
-	superAdminPermission := &model.PermissionModel{
-		AppId:       application.Id,
-		Name:        fmt.Sprintf("%s应用超级管理员权限", application.Name),
-		Code:        fmt.Sprintf("%s.admin.super", application.Code),
-		Description: fmt.Sprintf("%s应用超级管理员权限", application.Name),
-	}
+	superAdminRole, superAdminPermission := model.CreateRoleWithPermission(
+		fmt.Sprintf("%s应用超级管理员权限", application.Name),
+		fmt.Sprintf("%s.admin.super", application.Code),
+	)
 
-	adminPermission := &model.PermissionModel{
-		AppId:       application.Id,
-		Name:        fmt.Sprintf("%s应用管理员权限", application.Name),
-		Code:        fmt.Sprintf("%s.admin", application.Code),
-		Description: fmt.Sprintf("%s应用管理员权限", application.Name),
-	}
+	adminRole, adminPermission := model.CreateRoleWithPermission(
+		fmt.Sprintf("%s应用管理员权限", application.Name),
+		fmt.Sprintf("%s.admin.super", application.Code),
+	)
 
-	if err := tx.Create([]*model.PermissionModel{superAdminPermission, adminPermission}).Error; err != nil {
+	superAdminPermission.AppId, adminPermission.AppId = application.Id, application.Id
+
+	rolesToCreate := []*model.RoleModel{superAdminRole, adminRole}
+	if err := tx.Create(&rolesToCreate).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
 	if err := dao.InitPermissionForApp(tx, application, superAdminPermission, adminPermission); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	user := model.UserModel{}
+	user.Id = userId
+	if err := tx.Model(&user).Association("Roles").Append(&rolesToCreate); err != nil {
 		tx.Rollback()
 		return nil, err
 	}

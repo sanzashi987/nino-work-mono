@@ -18,7 +18,7 @@ func (u PermissionModel) TableName() string {
 	return "permissions"
 }
 
-func CreateRoleWithPermission(name, code string) (RoleModel, *PermissionModel) {
+func CreateRoleWithPermission(name, code string) (*RoleModel, *PermissionModel) {
 
 	permission := PermissionModel{
 		Name: name,
@@ -29,5 +29,5 @@ func CreateRoleWithPermission(name, code string) (RoleModel, *PermissionModel) {
 		Code:        code,
 		Permissions: []*PermissionModel{&permission},
 	}
-	return role, &permission
+	return &role, &permission
 }
