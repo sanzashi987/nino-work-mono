@@ -11,6 +11,8 @@ type PermissionController struct {
 	controller.BaseController
 }
 
+var permissionController = PermissionController{}
+
 type BasicInfo struct {
 	Id          uint64 `json:"id"`
 	Name        string `json:"name"`
@@ -69,7 +71,7 @@ func (c *PermissionController) ListPermissionsByApps(ctx *gin.Context) {
 		}
 		permissions := []BasicInfo{}
 		for _, app := range result.App.Permissions {
-			permissions = append(permissions, intoPermissionInfo(&app))
+			permissions = append(permissions, intoPermissionInfo(app))
 		}
 		response.Permissions, response.Apps = permissions, apps
 	}

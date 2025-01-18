@@ -7,6 +7,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type PermissionServiceWeb struct{}
@@ -14,7 +15,7 @@ type PermissionServiceWeb struct{}
 var PermissionServiceWebImpl *PermissionServiceWeb = &PermissionServiceWeb{}
 
 type ListPermissionResult struct {
-	*UserAdminResult
+	*AppAdminResult
 	AppList   []*model.ApplicationModel
 	App       *model.ApplicationModel
 	FromSuper bool
@@ -74,11 +75,11 @@ func (s *PermissionServiceWeb) ListPermissionByApp(ctx context.Context, userId u
 	}
 
 	listResult := ListPermissionResult{
-		UserAdminResult: result,
-		AppList:         appList,
-		App:             app,
-		FromSuper:       fromSuper,
-		FromAdmin:       fromAdmin,
+		AppAdminResult: result,
+		AppList:        appList,
+		App:            app,
+		FromSuper:      fromSuper,
+		FromAdmin:      fromAdmin,
 	}
 	return &listResult, nil
 }
@@ -146,4 +147,100 @@ func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uin
 
 	return tx.Model(app).Association("Permissions").Delete(permissions)
 
+}
+
+type AdminResult struct {
+	IsAdmin bool `json:"is_admin"`
+	IsSuper bool `json:"is_super"`
+}
+
+func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *AdminResult, error) {
+	tx := db.NewTx(ctx)
+	user, err := dao.FindUserWithRoles(tx, userId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	userRolesMap := map[uint64]*model.RoleModel{}
+	for _, role := range user.Roles {
+		userRolesMap[role.Id] = role
+	}
+
+	app := model.ApplicationModel{}
+	if err := tx.Where("id = ?", *appId).Find(&app).Error; err != nil {
+		return nil, nil, err
+	}
+
+	result := AdminResult{}
+
+	superRoles, err := dao.GetRolesByPermission(tx, app.SuperAdmin)
+	if err != nil {
+		return nil, nil, err
+	}
+	roles, err := dao.GetRolesByPermission(tx, app.Admin)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for _, role := range superRoles {
+		if _, exist := userRolesMap[role.Id]; exist {
+			result.IsSuper = true
+			break
+		}
+	}
+	for _, role := range roles {
+		if _, exist := userRolesMap[role.Id]; exist {
+			result.IsAdmin = true
+			break
+		}
+	}
+
+	return tx, &result, nil
+}
+
+type PermissionRecord struct {
+	id   uint64
+	name string
+	code string
+}
+
+type PermissionsOfApp struct {
+	Permissions []*PermissionRecord `json:"permissions"`
+	Admin       uint64              `json:"admin"`
+	SuperAdmin  uint64              `json:"super_admin"`
+	*AdminResult
+}
+
+func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsOfApp, error) {
+	tx, adminResult, err := userIsAdmin(ctx, userId, appId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !adminResult.IsAdmin && !adminResult.IsSuper {
+		return nil, errors.New("user is not the admin of this app")
+
+	}
+
+	app := model.ApplicationModel{}
+
+	if err := tx.Preload("Permissions", "app_id = ?", *appId).Where("id  = ?", *appId).Find(&app).Error; err != nil {
+		return nil, err
+	}
+
+	res := &PermissionsOfApp{
+		AdminResult: adminResult,
+	}
+
+	for _, p := range app.Permissions {
+		res.Permissions = append(res.Permissions, &PermissionRecord{
+			id:   p.Id,
+			name: p.Name,
+			code: p.Code,
+		})
+		res.Admin = app.Admin
+		res.SuperAdmin = app.SuperAdmin
+	}
+
+	return res, nil
 }

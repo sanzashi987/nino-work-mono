@@ -1,19 +1,38 @@
 package dao
 
 import (
-	"context"
-
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
-	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
-type PermissionDao struct {
-	db.BaseDao[model.PermissionModel]
+func GetRolesFromPermissions(tx *gorm.DB, permissionIds []uint64) ([]*model.RoleModel, error) {
+
+	permissions := []*model.PermissionModel{}
+
+	for _, id := range permissionIds {
+		permission := &model.PermissionModel{}
+		permission.Id = id
+		permissions = append(permissions, permission)
+	}
+
+	err := tx.Preload("Roles").Find(&permissions).Error
+
+	roles := []*model.RoleModel{}
+
+	for _, p := range permissions {
+		roles = append(roles, p.Roles...)
+	}
+
+	return roles, err
+
 }
 
-func NewPermissionDao(ctx context.Context, dao ...*db.BaseDao[model.PermissionModel]) *PermissionDao {
-	return &PermissionDao{BaseDao: db.NewDao(ctx, dao...)}
+func GetRolesByPermission(tx *gorm.DB, permissionId uint64) ([]*model.RoleModel, error) {
+	roles := []*model.RoleModel{}
+	err := tx.Table("role_permissions").
+		Where("permission_model_id = ? ", permissionId).
+		Joins("INNER JOIN roles ON role_permissions.role_model_id = roles.id").
+		Scan(&roles).Error
+
+	return roles, err
 }
-
-
-// func (dao *PermissionDao) Get

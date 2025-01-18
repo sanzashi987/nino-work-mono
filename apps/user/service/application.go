@@ -74,7 +74,7 @@ func (u *ApplicationServiceWeb) CreateApp(ctx context.Context, userId uint64, pa
 	return application, nil
 }
 
-func removeRepeat(result *UserAdminResult) []*model.ApplicationModel {
+func removeRepeat(result *AppAdminResult) []*model.ApplicationModel {
 	apps := []*model.ApplicationModel{}
 	appMap := map[uint64]*model.ApplicationModel{}
 
@@ -140,4 +140,8 @@ topLoop:
 	}
 
 	return app, tx, nil
+}
+
+func (u *ApplicationServiceWeb) RemoveApp(ctx context.Context, userId uint64) {
+
 }

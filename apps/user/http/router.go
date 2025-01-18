@@ -14,9 +14,6 @@ import (
 func NewRouter(loginPageUrl string) *gin.Engine {
 	apiEngine := gin.Default()
 
-	userController := UserController{}
-	appController := AppController{}
-
 	// router.Use(static.Serve("/", static.LocalFile("./static/dist", true)))
 	authMiddleware := controller.ValidateMiddleware(loginPageUrl)
 
@@ -36,6 +33,8 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 
 		authed.GET("apps/list", appController.ListApps)
 		authed.POST("apps/create", appController.CreateApp)
+
+		authed.POST("apps/list-permission", permissionController.ListPermissionsByApps)
 	}
 
 	return apiEngine

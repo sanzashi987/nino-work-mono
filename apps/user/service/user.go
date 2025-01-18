@@ -61,14 +61,14 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 	user, err := dao.FindUserByUsername(tx, in.Username)
 	if user != nil {
 		out.Reason = UsernameExisted
-		err = errors.New("Username existed")
+		err = errors.New("username existed")
 		return
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 
 		if in.Password != in.PasswordConfirm {
 			out.Reason = PasswordNotMatch
-			err = errors.New("Password does not match")
+			err = errors.New("password does not match")
 			return
 		}
 
@@ -90,7 +90,7 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 	}
 
 	out.Reason = InternalServerError
-	err = errors.New("Unknown edge case in user service")
+	err = errors.New("unknown edge case in user service")
 	return
 }
 
@@ -192,25 +192,6 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 
 }
 
-func (u *UserServiceWeb) GetUserRoles(ctx context.Context, userId uint64) ([]*model.RoleModel, error) {
-
-	user, err := dao.FindUserWithRoles(db.NewTx(ctx), userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return user.Roles, nil
-}
-
-func (u *UserServiceWeb) GetUserRoleWithPermissions(ctx context.Context, userId uint64) (*model.UserModel, error) {
-	user, _, err := getUserRolePermission(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
 func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel, *gorm.DB, error) {
 	tx := db.NewTx(ctx)
 	user, err := dao.FindUserWithRoles(tx, userId)
@@ -219,9 +200,7 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 	}
 
 	userRoles := []*model.RoleModel{}
-	for _, role := range user.Roles {
-		userRoles = append(userRoles, role)
-	}
+	userRoles = append(userRoles, user.Roles...)
 
 	err = dao.FindRolesWithPermissions(tx, userRoles...)
 
@@ -229,23 +208,17 @@ func getUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 		return nil, nil, err
 	}
 
-	res := []*model.RoleModel{}
-
-	for _, role := range userRoles {
-		res = append(res, role)
-	}
-
-	user.Roles = res
+	user.Roles = userRoles
 
 	return user, tx, nil
 }
 
-type UserAdminResult struct {
+type AppAdminResult struct {
 	SuperAdminApps []*model.ApplicationModel
 	AdminApps      []*model.ApplicationModel
 }
 
-func getUserAdmins(ctx context.Context, userId uint64) (*UserAdminResult, error) {
+func getUserAdmins(ctx context.Context, userId uint64) (*AppAdminResult, error) {
 	user, tx, err := getUserRolePermission(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -293,7 +266,7 @@ func getUserAdmins(ctx context.Context, userId uint64) (*UserAdminResult, error)
 	for _, app := range adminResMap {
 		adminRes = append(adminRes, app)
 	}
-	result := UserAdminResult{
+	result := AppAdminResult{
 		SuperAdminApps: superRes,
 		AdminApps:      adminRes,
 	}

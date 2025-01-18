@@ -19,7 +19,18 @@ const BrowserRouter = createBrowserRouter([
           { path: 'manage/role' },
           {
             path: 'manage/app',
-            Component: lazy(() => import('./Applications'))
+            Component: lazy(() => import('./Applications')),
+            children: [
+              {
+                Component: lazy(() => import('./Applications/AppsManagement')),
+                index: true
+              },
+              {
+                path: 'permission/:appId',
+                Component: lazy(() => import('./Applications/Permission')),
+                index: true
+              }
+            ]
           },
           { path: 'manage/permission' }
         ]
