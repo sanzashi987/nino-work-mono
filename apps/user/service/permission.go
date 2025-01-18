@@ -14,76 +14,6 @@ type PermissionServiceWeb struct{}
 
 var PermissionServiceWebImpl *PermissionServiceWeb = &PermissionServiceWeb{}
 
-type ListPermissionResult struct {
-	*AppAdminResult
-	AppList   []*model.ApplicationModel
-	App       *model.ApplicationModel
-	FromSuper bool
-	FromAdmin bool
-}
-
-func (s *PermissionServiceWeb) ListPermissionByApp(ctx context.Context, userId uint64, appId *uint64) (*ListPermissionResult, error) {
-	result, err := getUserAdmins(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-	var toQuery *uint64 = nil
-
-	appList := removeRepeat(result)
-
-	fromSuper, fromAdmin := false, false
-
-	if len(result.SuperAdminApps) > 0 {
-		if appId == nil {
-			toQuery = &result.SuperAdminApps[0].Id
-			fromSuper = true
-		} else {
-			for _, app := range result.SuperAdminApps {
-				if app.Id == *appId {
-					toQuery = appId
-					fromSuper = true
-					break
-				}
-			}
-
-		}
-	} else if len(result.AdminApps) > 0 {
-		if appId == nil {
-			toQuery = &result.AdminApps[0].Id
-			fromAdmin = true
-		} else {
-			for _, app := range result.AdminApps {
-				if app.Id == *appId {
-					toQuery = appId
-					fromAdmin = true
-					break
-				}
-			}
-
-		}
-	}
-
-	if toQuery == nil {
-		return nil, nil
-	}
-
-	tx := db.NewTx(ctx)
-
-	app, err := dao.FindApplicationByIdWithPermission(tx, *toQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	listResult := ListPermissionResult{
-		AppAdminResult: result,
-		AppList:        appList,
-		App:            app,
-		FromSuper:      fromSuper,
-		FromAdmin:      fromAdmin,
-	}
-	return &listResult, nil
-}
-
 type PermissionPayload struct {
 	Name        string `json:"name"`
 	Code        string `json:"code"`
@@ -204,14 +134,14 @@ type PermissionRecord struct {
 	code string
 }
 
-type PermissionsOfApp struct {
+type PermissionsResult struct {
 	Permissions []*PermissionRecord `json:"permissions"`
 	Admin       uint64              `json:"admin"`
 	SuperAdmin  uint64              `json:"super_admin"`
 	*AdminResult
 }
 
-func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsOfApp, error) {
+func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsResult, error) {
 	tx, adminResult, err := userIsAdmin(ctx, userId, appId)
 	if err != nil {
 		return nil, err
@@ -228,7 +158,7 @@ func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId 
 		return nil, err
 	}
 
-	res := &PermissionsOfApp{
+	res := &PermissionsResult{
 		AdminResult: adminResult,
 	}
 
