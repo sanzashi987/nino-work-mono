@@ -129,15 +129,16 @@ func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *
 }
 
 type PermissionRecord struct {
-	id   uint64
-	name string
-	code string
+	Id   uint64 `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
 }
 
 type PermissionsResult struct {
 	Permissions []*PermissionRecord `json:"permissions"`
-	Admin       uint64              `json:"admin"`
-	SuperAdmin  uint64              `json:"super_admin"`
+	Admin       uint64              `json:"admin_id"`
+	SuperAdmin  uint64              `json:"super_admin_id"`
+	AppName     string              `json:"app_name"`
 	*AdminResult
 }
 
@@ -160,16 +161,17 @@ func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId 
 
 	res := &PermissionsResult{
 		AdminResult: adminResult,
+		Admin:       app.Admin,
+		SuperAdmin:  app.SuperAdmin,
+		AppName:     app.Name,
 	}
 
 	for _, p := range app.Permissions {
 		res.Permissions = append(res.Permissions, &PermissionRecord{
-			id:   p.Id,
-			name: p.Name,
-			code: p.Code,
+			Id:   p.Id,
+			Name: p.Name,
+			Code: p.Code,
 		})
-		res.Admin = app.Admin
-		res.SuperAdmin = app.SuperAdmin
 	}
 
 	return res, nil

@@ -20,7 +20,7 @@ type ApplicationModel struct {
 	SuperAdmin uint64 `gorm:"column:super_admin;"`
 	// store permission Id here
 	Admin       uint64            `gorm:"column:admin;"`
-	Permissions []PermissionModel `gorm:"foreignKey:AppId"`
+	Permissions []*PermissionModel `gorm:"foreignKey:AppId"`
 }
 
 func (f ApplicationModel) TableName() string {

@@ -13,7 +13,7 @@ type PermissionController struct {
 var permissionController = PermissionController{}
 
 type ListPermissionRequest struct {
-	AppId *uint64 `json:"app_id"`
+	AppId *uint64 `form:"app_id" binding:"required"`
 }
 
 func (c *PermissionController) ListPermissionsByApp(ctx *gin.Context) {

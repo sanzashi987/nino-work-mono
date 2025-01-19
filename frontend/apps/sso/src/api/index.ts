@@ -87,3 +87,23 @@ export const createApp = defineApi<CreateAppRequest, CreateAppResponse>({
   url: `${prefix}/apps/create`,
   method: 'POST'
 });
+
+export type ListPermissionsRequest = {
+  app_id: number
+};
+export type ListPermissionsResponse = {
+  permissions: {
+    id: number
+    name: string
+    code: string
+  }[]
+  super_admin_id: number
+  admin_id: number
+  is_admin: boolean,
+  is_super: boolean
+  app_name: string
+};
+
+export const listPermissions = defineApi<ListPermissionsRequest, ListPermissionsResponse>(
+  { url: `${prefix}/apps/list-permission` }
+);
