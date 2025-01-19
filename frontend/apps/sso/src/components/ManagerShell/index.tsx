@@ -1,22 +1,17 @@
 import React, { useMemo, useState } from 'react';
-import { Settings, Delete } from '@mui/icons-material';
 import {
-  TableCell, Stack, TableRow, IconButton, TableBody,
-  TableHead,
-  TableContainer,
-  Box,
-  Pagination,
-  Paper,
-  Table
+  TableCell, Stack, TableRow, TableBody,
+  TableHead, TableContainer, Box, Pagination,
+  Paper, Table
 } from '@mui/material';
-import { PagninationRequest } from '@/api';
+import { PaginationResponse, PagninationRequest } from '@/api';
 import { Model } from './defineModel';
 import { usePromise } from '@/utils';
 import loading from '../Loading';
 
 type ManagerShellProps<Res, T = any> = {
   schema: Model<T>[],
-  requester: (parms: PagninationRequest) => Promise<Res>
+  requester: (parms: PagninationRequest) => Promise<PaginationResponse<Res>>
   ActionNode: React.ReactNode
 };
 
@@ -44,7 +39,7 @@ const ManagerShell = <Res extends any[], T>({
     if (!data) {
       return null;
     }
-    if (data.length === 0) {
+    if (data.data.length === 0) {
       return (
         <TableCell colSpan={6}>
           <Stack sx={{ width: '100%' }} py={1} alignItems="center" justifyContent="center">
@@ -54,13 +49,13 @@ const ManagerShell = <Res extends any[], T>({
       );
     }
 
-    const inner = data.map((row, i) => (
+    const inner = data.data.map((row, i) => (
       <TableRow
-        key={row.name}
+        key={i as any}
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
       >
-        {schema.map((e, schemaIdx) => {
-          const val = typeof e.dataCellProps?.render === 'function' ? e.dataCellProps.render(row, i) : row[e.field];
+        {schema.map((e) => {
+          const val = typeof e.dataCellProps?.render === 'function' ? e.dataCellProps.render(row, i) : row[e.field as any];
           return (
             <TableCell key={e.field} {...e.dataCellProps ?? {}}>
               {val}

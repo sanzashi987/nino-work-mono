@@ -6,19 +6,13 @@ type PaginationRequest struct {
 }
 
 type PaginationResponse struct {
-	PageIndex   int `json:"pageIndex"`
-	PageSize    int `json:"pageSize"`
-	PageTotal   int `json:"pageTotal"`
-	RecordTotal int `json:"recordTotal"`
-}
-
-type BaseResponse[T any] struct {
-	Data          T      `json:"data"`
-	ResultCode    int    `json:"resultCode"`
-	ResultMessage string `json:"resultMessage"`
+	PageIndex   int `json:"page_index"`
+	PageSize    int `json:"page_size"`
+	PageTotal   int `json:"page_total"`
+	RecordTotal int `json:"record_total"`
 }
 
 type DBTime struct {
-	CreateTime string `json:"createTime"`
-	UpdateTime string `json:"updateTime"`
+	CreateTime string `json:"create_time"`
+	UpdateTime string `json:"update_time"`
 }

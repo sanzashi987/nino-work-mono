@@ -1,4 +1,4 @@
-export type StandartResponse<T> = {
+export type StandardResponse<T> = {
   msg: string
   data: T
   code: number
@@ -48,7 +48,7 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
       return Promise.reject(new Error(`Response Status Error:${res.status}`));
     }
 
-    const data = await res.json() as StandartResponse<Res>;
+    const data = await res.json() as StandardResponse<Res>;
 
     if (data.code !== 0) {
       return Promise.reject(data);

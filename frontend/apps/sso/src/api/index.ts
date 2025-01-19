@@ -54,12 +54,12 @@ export type PagninationRequest = {
   size: number
 };
 
-type PaginationResponse<T> = {
+export type PaginationResponse<T> = {
   data: T[]
-  pageIndex: number
-  pageSize: number
-  pageTotal: number
-  recordTotal: number
+  page_index: number
+  page_size: number
+  page_total: number
+  record_total: number
 };
 
 export enum AppStatus {
