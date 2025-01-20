@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   TableCell, Stack, TableRow, TableBody,
   TableHead, TableContainer, Box, Pagination,
@@ -9,19 +9,29 @@ import { Model } from './defineModel';
 import { usePromise } from '@/utils';
 import loading from '../Loading';
 
+export const useDeps = () => {
+  const [key, setKey] = useState(0);
+
+  const refresh = useCallback(() => setKey((k) => k + 1), []);
+
+  return [useMemo(() => [key], [key]), refresh] as const;
+};
+
 type ManagerShellProps<Res, T = any> = {
   schema: Model<T>[],
   requester: (parms: PagninationRequest) => Promise<PaginationResponse<Res>>
-  ActionNode?: React.ReactNode
+  ActionNode?: React.ReactNode,
+  deps?: any[]
 };
 
 const ManagerShell = <Res, T>({
   requester,
   schema,
+  deps,
   ActionNode
 }: ManagerShellProps<Res, T>) => {
   const [pagination, setPagination] = useState<PagninationRequest>({ page: 1, size: 10 });
-  const { data, refetch } = usePromise(() => requester(pagination));
+  const { data, refetch } = usePromise(() => requester(pagination), { deps });
 
   const tableHeader = useMemo(() => (
     <TableHead>

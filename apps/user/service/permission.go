@@ -15,32 +15,32 @@ type PermissionServiceWeb struct{}
 var PermissionServiceWebImpl *PermissionServiceWeb = &PermissionServiceWeb{}
 
 type PermissionPayload struct {
-	Name        string `json:"name"`
-	Code        string `json:"code"`
+	Name        string `json:"name" binding:"required"`
+	Code        string `json:"code" binding:"required"`
 	Description string `json:"description"`
 }
 
-type AddPermissionRequest struct {
-	AppId       *uint64             `json:"app_id" binding:"required"`
-	Permissions []PermissionPayload `json:"permissions"`
+type CreatePermissionRequest struct {
+	AppId       *uint64              `json:"app_id" binding:"required"`
+	Permissions []*PermissionPayload `json:"permissions" binding:"required"`
 }
 
-func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64, payload AddPermissionRequest) (err error) {
-	app, tx, err := userIsManager(ctx, userId, payload.AppId, false)
-	if err != nil {
-		return
+func (u *PermissionServiceWeb) CreatePermission(ctx context.Context, userId uint64, payload CreatePermissionRequest) error {
+	tx, result, err := userIsAdmin(ctx, userId, payload.AppId)
+	if err != nil || !result.Admin() {
+		return errors.New("user is not the admin of this app")
 	}
 
-	nextPermissionMap := map[string]bool{}
+	var codes []string
 	for _, permission := range payload.Permissions {
-		nextPermissionMap[permission.Code] = true
+		codes = append(codes, permission.Code)
 	}
-
-	// 检查是否存在相同Code的权限
-	for _, p := range app.Permissions {
-		if _, ok := nextPermissionMap[p.Code]; ok {
-			return errors.New("permission code already exists")
-		}
+	var count int64
+	if err := tx.Model(&model.PermissionModel{}).Where("app_id = ? AND code IN ?", *payload.AppId, codes).Count(&count).Error; err != nil {
+		return err
+	}
+	if count > 0 {
+		return errors.New("one or more permission codes already exist")
 	}
 
 	permissionModels := []*model.PermissionModel{}
@@ -53,8 +53,10 @@ func (u *ApplicationServiceWeb) AddPermission(ctx context.Context, userId uint64
 		})
 	}
 
-	err = tx.Model(app).Association("Permissions").Append(permissionModels)
-	return
+	app := model.ApplicationModel{}
+	app.Id = *payload.AppId
+
+	return tx.Model(app).Association("Permissions").Append(permissionModels)
 }
 
 type RemovePermissionRequest struct {
@@ -82,6 +84,10 @@ func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uin
 type AdminResult struct {
 	IsAdmin bool `json:"is_admin"`
 	IsSuper bool `json:"is_super"`
+}
+
+func (a AdminResult) Admin() bool {
+	return a.IsAdmin || a.IsSuper
 }
 
 func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *AdminResult, error) {
@@ -148,7 +154,7 @@ func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId 
 		return nil, err
 	}
 
-	if !adminResult.IsAdmin && !adminResult.IsSuper {
+	if !adminResult.Admin() {
 		return nil, errors.New("user is not the admin of this app")
 
 	}

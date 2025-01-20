@@ -1,19 +1,20 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { IconButton, Stack, Typography } from '@mui/material';
+import { Delete, Settings } from '@mui/icons-material';
 import { listPermissions, ListPermissionsResponse } from '@/api';
-import ManagerShell from '@/components/ManagerShell';
-import { Typography } from '@mui/material';
+import ManagerShell, { useDeps } from '@/components/ManagerShell';
 
-const schema = [
+const staticSchema = [
   { label: 'Id', field: 'id' },
   { label: 'Name', field: 'name' },
-  { label: 'Code', field: 'code' },
-  { label: 'Operation', field: 'id' }
+  { label: 'Code', field: 'code' }
 ];
 
 const PermissionManagement: React.FC = () => {
   const { appId } = useParams();
   const [res, setRes] = useState<ListPermissionsResponse | null>(null);
+  const [deps, refresh] = useDeps();
   const requester = useCallback(
     () => listPermissions({ app_id: Number(appId) }).then((response) => {
       setRes(response);
@@ -29,12 +30,37 @@ const PermissionManagement: React.FC = () => {
     [appId]
   );
 
+  const handleDeletePermission = useCallback((row: ListPermissionsResponse['permissions'][number]) => {
+    refresh();
+  }, []);
+
+  const schema = useMemo(() => [
+    ...staticSchema,
+    {
+      label: 'Operation',
+      field: 'id',
+      dataCellProps: {
+        render(row: any) {
+          return (
+            <IconButton onClick={() => handleDeletePermission(row)}>
+              <Delete />
+            </IconButton>
+          );
+        }
+      }
+    }
+  ], []);
+
   return (
     <>
-      <Typography variant='h4' gutterBottom>
-        {res?.app_name}
-      </Typography>
+      <Stack direction="row" alignItems="center">
+        <Settings />
+        <Typography variant="h5" gutterBottom m={0} ml={1}>
+          {res?.app_name}
+        </Typography>
+      </Stack>
       <ManagerShell
+        deps={deps}
         schema={schema}
         requester={requester}
       />

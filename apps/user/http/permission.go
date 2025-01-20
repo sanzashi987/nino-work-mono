@@ -34,3 +34,21 @@ func (c *PermissionController) ListPermissionsByApp(ctx *gin.Context) {
 
 	c.ResponseJson(ctx, result)
 }
+
+func (c *PermissionController) CreatePermission(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	req := service.CreatePermissionRequest{}
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.AbortClientError(ctx, "[http] list permissions: Fail to read required fields "+err.Error())
+		return
+	}
+
+	if err := service.PermissionServiceWebImpl.CreatePermission(ctx, userId, req); err != nil {
+		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
+}

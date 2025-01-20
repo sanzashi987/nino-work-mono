@@ -1,52 +1,45 @@
-import {
-  Box,
-  Button, Dialog, IconButton, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer,
-  TableHead,
-  TableRow
-} from '@mui/material';
+import { Button, Dialog, IconButton } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Delete, Details, Link, Settings } from '@mui/icons-material';
+import { Delete, Settings } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAppList, PagninationRequest } from '@/api';
-import { usePromise } from '@/utils';
-import loading from '@/components/Loading';
 import CreateAppDialog from './CreateAppDialog';
-import ManagerShell from '@/components/ManagerShell';
-
+import ManagerShell, { useDeps } from '@/components/ManagerShell';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
   { label: 'Name', field: 'name' },
   { label: 'Code', field: 'code' },
   { label: 'Description', field: 'description' },
-  { label: 'Status', field: 'status' },
-]
-
-
-
+  { label: 'Status', field: 'status' }
+];
 
 const AppsManagement: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+
+  const [deps, refresh] = useDeps();
+
   const naviagte = useNavigate();
 
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
   const handleSuccess = useCallback(() => {
-    // refetch();
+    refresh();
     setOpen(false);
   }, []);
 
-  const schema = useMemo(() => {
-    return [
-      ...staticSchema,
-      {
-        label: 'Operation', field: 'id',
-        headerCellProps: { align: 'center' as const },
-        dataCellProps: {
-          align: 'center' as const,
-          render: (row: any) => <>
+  const schema = useMemo(() => [
+    ...staticSchema,
+    {
+      label: 'Operation',
+      field: 'id',
+      headerCellProps: { align: 'center' as const },
+      dataCellProps: {
+        align: 'center' as const,
+        render: (row: any) => (
+          <>
             <IconButton onClick={() => {
               naviagte(`${pathname}/permission/${row.id}`);
             }}
@@ -57,17 +50,24 @@ const AppsManagement: React.FC = () => {
               <Delete />
             </IconButton>
           </>
-        }
-      }]
-  }, [pathname, naviagte])
+        )
+      }
+    }], [pathname, naviagte]);
 
-  const requester = useCallback((req: PagninationRequest) => {
-    return getAppList(req)
-  }, [])
+  const requester = useCallback((req: PagninationRequest) => getAppList(req), []);
 
   return (
     <>
-      <ManagerShell schema={schema} requester={requester} />
+      <ManagerShell
+        deps={deps}
+        schema={schema}
+        requester={requester}
+        ActionNode={(
+          <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
+            + Create Application
+          </Button>
+        )}
+      />
       <Dialog open={open}>
         <CreateAppDialog onSuccess={handleSuccess} close={handleClose} />
       </Dialog>
