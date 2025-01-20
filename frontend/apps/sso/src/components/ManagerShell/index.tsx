@@ -12,10 +12,10 @@ import loading from '../Loading';
 type ManagerShellProps<Res, T = any> = {
   schema: Model<T>[],
   requester: (parms: PagninationRequest) => Promise<PaginationResponse<Res>>
-  ActionNode: React.ReactNode
+  ActionNode?: React.ReactNode
 };
 
-const ManagerShell = <Res extends any[], T>({
+const ManagerShell = <Res, T>({
   requester,
   schema,
   ActionNode
@@ -55,7 +55,7 @@ const ManagerShell = <Res extends any[], T>({
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
       >
         {schema.map((e) => {
-          const val = typeof e.dataCellProps?.render === 'function' ? e.dataCellProps.render(row, i) : row[e.field as any];
+          const val = typeof e.dataCellProps?.render === 'function' ? e.dataCellProps.render(row, i) : (row as any)[e.field as any];
           return (
             <TableCell key={e.field} {...e.dataCellProps ?? {}}>
               {val}
