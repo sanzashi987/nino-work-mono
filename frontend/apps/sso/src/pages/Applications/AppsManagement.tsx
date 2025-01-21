@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Delete, Settings } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAppList, PagninationRequest } from '@/api';
-import CreateAppDialog from './CreateAppDialog';
+import { CreateAppDialog } from './Dialogs';
 import ManagerShell, { useDeps } from '@/components/ManagerShell';
 
 const staticSchema = [

@@ -1,9 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { IconButton, Stack, Typography } from '@mui/material';
+import {
+  Button, Dialog, IconButton, Stack, Typography
+} from '@mui/material';
 import { Delete, Settings } from '@mui/icons-material';
 import { listPermissions, ListPermissionsResponse } from '@/api';
 import ManagerShell, { useDeps } from '@/components/ManagerShell';
+import { CreatePermissionDialog } from './Dialogs';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -12,6 +15,15 @@ const staticSchema = [
 ];
 
 const PermissionManagement: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+  const handleSuccess = useCallback(() => {
+    // refresh();
+    setOpen(false);
+  }, []);
+
   const { appId } = useParams();
   const [res, setRes] = useState<ListPermissionsResponse | null>(null);
   const [deps, refresh] = useDeps();
@@ -63,7 +75,15 @@ const PermissionManagement: React.FC = () => {
         deps={deps}
         schema={schema}
         requester={requester}
+        ActionNode={(
+          <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
+            + Create Permission
+          </Button>
+        )}
       />
+      <Dialog open={open}>
+        <CreatePermissionDialog onSuccess={handleSuccess} close={handleClose} />
+      </Dialog>
     </>
   );
 };
