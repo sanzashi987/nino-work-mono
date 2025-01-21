@@ -11,7 +11,6 @@ type PermissionModel struct {
 	Code        string       `gorm:"column:code;type:varchar(255);uniqueIndex"`
 	Description string       `gorm:"column:description"`
 	Roles       []*RoleModel `gorm:"many2many:role_permissions"`
-	Menus       []MenuModel  `gorm:"many2many:menu_roles"`
 }
 
 func (u PermissionModel) TableName() string {

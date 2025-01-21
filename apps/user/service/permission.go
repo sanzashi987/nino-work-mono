@@ -26,8 +26,8 @@ type CreatePermissionRequest struct {
 }
 
 func (u *PermissionServiceWeb) CreatePermission(ctx context.Context, userId uint64, payload CreatePermissionRequest) error {
-	tx, result, err := userIsAdmin(ctx, userId, payload.AppId)
-	if err != nil || !result.Admin() {
+	data, err := userIsAdmin(ctx, userId, payload.AppId)
+	if err != nil || !data.result.Admin() {
 		return errors.New("user is not the admin of this app")
 	}
 
@@ -36,7 +36,7 @@ func (u *PermissionServiceWeb) CreatePermission(ctx context.Context, userId uint
 		codes = append(codes, permission.Code)
 	}
 	var count int64
-	if err := tx.Model(&model.PermissionModel{}).Where("app_id = ? AND code IN ?", *payload.AppId, codes).Count(&count).Error; err != nil {
+	if err := data.tx.Model(&model.PermissionModel{}).Where("app_id = ? AND code IN ?", *payload.AppId, codes).Count(&count).Error; err != nil {
 		return err
 	}
 	if count > 0 {
@@ -56,7 +56,7 @@ func (u *PermissionServiceWeb) CreatePermission(ctx context.Context, userId uint
 	app := model.ApplicationModel{}
 	app.Id = *payload.AppId
 
-	return tx.Model(app).Association("Permissions").Append(permissionModels)
+	return data.tx.Model(app).Association("Permissions").Append(permissionModels)
 }
 
 type RemovePermissionRequest struct {
@@ -90,11 +90,17 @@ func (a AdminResult) Admin() bool {
 	return a.IsAdmin || a.IsSuper
 }
 
-func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *AdminResult, error) {
+type AdminData struct {
+	result *AdminResult
+	app    *model.ApplicationModel
+	tx     *gorm.DB
+}
+
+func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*AdminData, error) {
 	tx := db.NewTx(ctx)
 	user, err := dao.FindUserWithRoles(tx, userId)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	userRolesMap := map[uint64]*model.RoleModel{}
@@ -104,18 +110,18 @@ func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *
 
 	app := model.ApplicationModel{}
 	if err := tx.Where("id = ?", *appId).Find(&app).Error; err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	result := AdminResult{}
 
 	superRoles, err := dao.GetRolesByPermission(tx, app.SuperAdmin)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	roles, err := dao.GetRolesByPermission(tx, app.Admin)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	for _, role := range superRoles {
@@ -131,7 +137,13 @@ func userIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*gorm.DB, *
 		}
 	}
 
-	return tx, &result, nil
+	data := AdminData{
+		tx:     tx,
+		result: &result,
+		app:    &app,
+	}
+
+	return &data, nil
 }
 
 type PermissionRecord struct {
@@ -149,30 +161,28 @@ type PermissionsResult struct {
 }
 
 func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsResult, error) {
-	tx, adminResult, err := userIsAdmin(ctx, userId, appId)
+	data, err := userIsAdmin(ctx, userId, appId)
 	if err != nil {
 		return nil, err
 	}
 
-	if !adminResult.Admin() {
+	if !data.result.Admin() {
 		return nil, errors.New("user is not the admin of this app")
 
 	}
 
-	app := model.ApplicationModel{}
-
-	if err := tx.Preload("Permissions", "app_id = ?", *appId).Where("id  = ?", *appId).Find(&app).Error; err != nil {
+	if err := data.tx.Preload("Permissions", "app_id = ?", *appId).Where("id  = ?", *appId).Find(data.app).Error; err != nil {
 		return nil, err
 	}
 
 	res := &PermissionsResult{
-		AdminResult: adminResult,
-		Admin:       app.Admin,
-		SuperAdmin:  app.SuperAdmin,
-		AppName:     app.Name,
+		AdminResult: data.result,
+		Admin:       data.app.Admin,
+		SuperAdmin:  data.app.SuperAdmin,
+		AppName:     data.app.Name,
 	}
 
-	for _, p := range app.Permissions {
+	for _, p := range data.app.Permissions {
 		res.Permissions = append(res.Permissions, &PermissionRecord{
 			Id:   p.Id,
 			Name: p.Name,
@@ -181,4 +191,32 @@ func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId 
 	}
 
 	return res, nil
+}
+
+type DeletePermissionRequest struct {
+	Id    uint64 `json:"id"`
+	AppId uint64 `json:"app_id"`
+}
+
+func (s *PermissionServiceWeb) DeletePermission(ctx context.Context, userId uint64, payload DeletePermissionRequest) error {
+	data, err := userIsAdmin(ctx, userId, &payload.AppId)
+	if err != nil {
+		return err
+	}
+
+	if !data.result.Admin() {
+		return errors.New("user is not the admin of this app")
+	}
+
+	app := data.app
+
+	if app.SuperAdmin == payload.Id || app.Admin == payload.Id {
+		return errors.New("cannot delete a admin permission, replace it with another one before delete it")
+	}
+
+	if err := data.tx.Delete(&model.PermissionModel{}, "id = ? ", payload.Id).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

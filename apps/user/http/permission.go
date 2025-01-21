@@ -52,3 +52,20 @@ func (c *PermissionController) CreatePermission(ctx *gin.Context) {
 
 	c.SuccessVoid(ctx)
 }
+
+func (c *PermissionController) DeletePermission(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+	req := service.DeletePermissionRequest{}
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.AbortClientError(ctx, "[http] list permissions: Fail to read required fields "+err.Error())
+		return
+	}
+
+	if err := service.PermissionServiceWebImpl.DeletePermission(ctx, userId, req); err != nil {
+		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
+}

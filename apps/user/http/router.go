@@ -37,7 +37,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 		authed.GET("apps/list-permission", permissionController.ListPermissionsByApp)
 
 		authed.POST("permission/create", permissionController.CreatePermission)
-		authed.POST("permission/delete", permissionController.ListPermissionsByApp)
+		authed.POST("permission/delete", permissionController.DeletePermission)
 	}
 
 	return apiEngine
