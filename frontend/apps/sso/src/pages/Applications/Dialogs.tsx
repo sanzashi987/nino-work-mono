@@ -11,6 +11,7 @@ import FormLabel from '@/components/FormLabel';
 type UseForm = typeof useForm;
 
 type CreateDialogProps<Payload extends object> = {
+  title: string
   close: VoidFunction
   onSuccess: VoidFunction
   register: ReturnType<typeof useForm<Payload>>['register']
@@ -44,10 +45,10 @@ abstract class BasicCreateDialog<T extends CreateDialogProps<any>>
 
   render(): React.ReactNode {
     const { loading } = this.state;
-    const { handleSubmit, register, close } = this.props;
+    const { handleSubmit, register, close, title } = this.props;
     return (
       <Box minWidth={600}>
-        <DialogTitle>Create Application</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent dividers>
           <form onSubmit={handleSubmit(this.onSubmit)}>
             <Box>
