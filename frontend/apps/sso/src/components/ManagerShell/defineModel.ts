@@ -5,7 +5,7 @@ export type Model<T = string> = {
   field: string,
   headerCellProps?: TableCellProps
   dataCellProps?: TableCellProps & {
-    render: (row: any, i: number) => React.ReactNode
+    render?: (row: any, i: number) => React.ReactNode
   }
 };
 

@@ -26,6 +26,16 @@ And you should be able to use following command to generate pb.go & micro.pb.go
 protoc --micro_out=. --go_out=. -I=./proto
 ```
 
+#### Install `fresh` (golang hot reload dev server)
+Run the config locates at the `apps` directories
+```bash
+go install github.com/gravityblast/fresh@latest
+```
+
+Start the dev server (make sure the repo directory root is the working directory)
+```
+fresh -c ./user/app/runner.conf
+```
 
 #### Install `etcd`
 [Etcd release page](https://github.com/etcd-io/etcd/releases/)
