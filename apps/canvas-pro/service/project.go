@@ -49,17 +49,21 @@ func (serv ProjectService) Create(ctx context.Context, name, jsonConfig string, 
 	return newProject.Code, nil
 }
 
-func (serv ProjectService) Update(ctx context.Context, code string, name, config, thumbnail, group *string) (err error) {
-	projectDao := dao.NewProjectDao(ctx)
+func (serv ProjectService) Update(ctx context.Context, code string, name, config, thumbnail, group *string) error {
+	// projectDao := dao.NewProjectDao(ctx)
+	tx := db.NewTx(ctx)
 
 	toUpdate, idProject := model.ProjectModel{}, model.ProjectModel{}
-	var id uint64
-	if id, _, err = consts.GetIdFromCode(code); err != nil {
-		return
+
+	id, _, err := consts.GetIdFromCode(code)
+	if err != nil {
+		return err
 	}
 
 	idProject.Id, toUpdate.Id = id, id
-	projectDao.GetOrm().First(&idProject)
+	if err := tx.First(&idProject).Error; err != nil {
+		return err
+	}
 
 	if name != nil {
 		toUpdate.Name = *name
@@ -73,14 +77,15 @@ func (serv ProjectService) Update(ctx context.Context, code string, name, config
 	}
 
 	if group != nil {
-		var groupId uint64
-		if groupId, _, err = consts.GetIdFromCode(*group); err != nil {
-			return
+		groupId, _, err := consts.GetIdFromCode(*group)
+		if err != nil {
+			return err
 		}
 		toUpdate.GroupId = groupId
 	}
 
-	return projectDao.UpdateById(toUpdate)
+	return tx.Model(&idProject).Updates(&toUpdate).Error
+
 }
 
 type ProjectDetail struct {
@@ -201,10 +206,9 @@ func commonMoveGroup(codes []string, groupCode string) (groupId uint64, ids []ui
 
 func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint64, projectCodes []string, groupName, groupCode string) error {
 	code := groupCode
-	projectDao := dao.NewProjectDao(ctx)
-	projectDao.BeginTransaction()
+	tx := db.NewTx(ctx).Begin()
 
-	if newGroup, err := createGroup(ctx, (*dao.AnyDao[model.ProjectModel])(projectDao), workspaceId, groupName, consts.PROJECT); err != nil {
+	if newGroup, err := createGroup(tx, workspaceId, groupName, consts.PROJECT); err != nil {
 		return err
 	} else if newGroup != nil {
 		code = newGroup.Code
@@ -215,11 +219,11 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 		return err
 	}
 
-	if err := projectDao.BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
+	if err := tx.Model(&model.ProjectModel{}).Where(" workspace = ? AND id IN ? ", workspaceId, projectIds).Update("group_id", groupId).Error; err != nil {
 		return err
 	}
 
-	projectDao.CommitTransaction()
+	tx.Commit()
 	return nil
 
 }

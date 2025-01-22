@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
-	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const data_source_prefix = "jdbc-connect-template"
@@ -16,25 +15,14 @@ var dataSourceController = &DataSourceController{
 	CanvasController: createCanvasController("[http] canvas data-source handler "),
 }
 
-type QueryDataSourceSearchRequest struct {
-	SourceName string   `json:"sourceName"`
-	SourceType []string `json:"sourceType"`
-	Search     string   `json:"search"`
-}
-
-type QueryDataSourceRequest struct {
-	shared.PaginationRequest
-	QueryDataSourceSearchRequest
-}
-
 func (c *DataSourceController) list(ctx *gin.Context) {
 
-	reqBody := QueryDataSourceRequest{}
+	reqBody := service.QueryDataSourceRequest{}
 	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list")
 	if err != nil {
 		return
 	}
-	dataSourceList, err := service.DataSourceServiceImpl.ListDataSources(ctx, workspaceId, reqBody.Page, reqBody.Size, reqBody.SourceName, reqBody.SourceType)
+	dataSourceList, err := service.DataSourceServiceImpl.ListDataSources(ctx, workspaceId, &reqBody)
 	if err != nil {
 		c.AbortServerError(ctx, "list "+err.Error())
 		return

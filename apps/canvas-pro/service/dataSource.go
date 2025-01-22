@@ -8,6 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
@@ -24,8 +25,8 @@ type DataSourceDetail struct {
 	shared.DBTime
 }
 
-func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
-	return DataSourceDetail{
+func intoDataSourceDetail(input *model.DataSourceModel) *DataSourceDetail {
+	return &DataSourceDetail{
 		SourceName: input.Name,
 		SourceType: input.SourceType,
 		SourceInfo: input.SourceInfo,
@@ -38,15 +39,26 @@ func intoDataSourceDetail(input model.DataSourceModel) DataSourceDetail {
 	}
 }
 
-func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId uint64, page, size int, sourceName string, sourceType []string) ([]DataSourceDetail, error) {
-	dataSourceDao := dao.NewDataSourceDao(ctx)
+type QueryDataSourceSearchRequest struct {
+	SourceName string   `json:"sourceName"`
+	SourceType []string `json:"sourceType"`
+	Search     string   `json:"search"`
+}
 
-	records, err := dataSourceDao.FindByNameOrType(page, size, workspaceId, sourceName, sourceType)
+type QueryDataSourceRequest struct {
+	shared.PaginationRequest
+	QueryDataSourceSearchRequest
+}
+
+func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId uint64, payload *QueryDataSourceRequest) ([]*DataSourceDetail, error) {
+	tx := db.NewTx(ctx)
+
+	records, err := dao.FindByNameOrType(tx, workspaceId, payload.SourceName, payload.SourceType, payload.PaginationRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	response := []DataSourceDetail{}
+	response := []*DataSourceDetail{}
 	for _, source := range records {
 		temp := intoDataSourceDetail(source)
 
@@ -56,49 +68,47 @@ func (serv *DataSourceService) ListDataSources(ctx context.Context, workspaceId 
 	return response, nil
 }
 
-func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceId uint64, sourceIdCode string) (res DataSourceDetail, err error) {
-	dataSourceDao := dao.NewDataSourceDao(ctx)
+func (serv *DataSourceService) GetDataSourceById(ctx context.Context, workspaceId uint64, sourceIdCode string) (*DataSourceDetail, error) {
+	tx := db.NewTx(ctx)
 
-	var id uint64
-	if id, _, err = consts.GetIdFromCode(sourceIdCode); err != nil {
-		return
-	}
-
-	record, err := dataSourceDao.GetDataSourceById(id)
+	id, _, err := consts.GetIdFromCode(sourceIdCode)
 	if err != nil {
-		return
+		return nil, err
 	}
-	res = intoDataSourceDetail(record)
 
-	return
+	result := model.DataSourceModel{}
+
+	if err := tx.Where("id = ?", id).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return intoDataSourceDetail(&result), nil
 }
 
 type UpdateDataSourceRequest struct {
-	SourceName string `json:"sourceName"`
-	SourceInfo string `json:"sourceInfo"`
-	SourceId   string `json:"sourceId" binding:"required"`
+	SourceName *string `json:"sourceName"`
+	SourceInfo *string `json:"sourceInfo"`
+	SourceId   string  `json:"sourceId" binding:"required"`
 }
 
-func (serv *DataSourceService) Update(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (res DataSourceDetail, err error) {
-	dataSourceDao := dao.NewDataSourceDao(ctx)
+func (serv *DataSourceService) Update(ctx context.Context, workspaceId uint64, payload *UpdateDataSourceRequest) (*DataSourceDetail, error) {
+	tx := db.NewTx(ctx)
 
-	var id uint64
-	if id, _, err = consts.GetIdFromCode(payload.SourceId); err != nil {
-		return
-	}
-
-	if payload.SourceName == "" && payload.SourceInfo == "" {
-		err = errors.New("sourceName and sourceInfo are both empty")
-		return
-	}
-
-	record, err := dataSourceDao.Update(workspaceId, id, payload.SourceName, payload.SourceInfo)
+	id, _, err := consts.GetIdFromCode(payload.SourceId)
 	if err != nil {
-		return
+		return nil, err
 	}
-	res = intoDataSourceDetail(record)
 
-	return
+	if payload.SourceName == nil && payload.SourceInfo == nil {
+		return nil, errors.New("sourceName and sourceInfo are both empty")
+	}
+
+	record, err := dao.UpdateProject(tx, workspaceId, id, payload.SourceName, payload.SourceInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return intoDataSourceDetail(record), nil
 }
 
 type CreateDataSourceRequest struct {
@@ -107,25 +117,30 @@ type CreateDataSourceRequest struct {
 	SourceInfo string `json:"sourceInfo" binding:"required"`
 }
 
-func (serv *DataSourceService) Create(ctx context.Context, workspaceId uint64, payload *CreateDataSourceRequest) (res DataSourceDetail, err error) {
-	dataSourceDao := dao.NewDataSourceDao(ctx)
+func (serv *DataSourceService) Create(ctx context.Context, workspaceId uint64, payload *CreateDataSourceRequest) (*DataSourceDetail, error) {
+	tx := db.NewTx(ctx)
+
 	sourceTypeEnum, exist := model.SourceTypeStringToEnum[payload.SourceType]
 	if !exist {
-		err = errors.New("source type not found")
-		return
+		return nil, errors.New("source type not found")
 	}
 
-	record, err := dataSourceDao.Create(workspaceId, sourceTypeEnum, payload.SourceName, payload.SourceInfo)
-	if err != nil {
-		return
+	toCreate := model.DataSourceModel{
+		Version:    consts.DefaultVersion,
+		SourceType: sourceTypeEnum,
+		SourceInfo: payload.SourceInfo,
 	}
-	res = intoDataSourceDetail(record)
+	toCreate.Workspace, toCreate.TypeTag, toCreate.Name = workspaceId, consts.DATASOURCE, payload.SourceName
 
-	return
+	if err := tx.Create(&toCreate).Error; err != nil {
+		return nil, err
+	}
+
+	return intoDataSourceDetail(&toCreate), nil
 }
 
 func (serv *DataSourceService) Delete(ctx context.Context, workspaceId uint64, codes []string) error {
-	dataSourceDao := dao.NewDataSourceDao(ctx)
+	tx := db.NewTx(ctx)
 
 	ids := []uint64{}
 	for _, code := range codes {
@@ -139,5 +154,5 @@ func (serv *DataSourceService) Delete(ctx context.Context, workspaceId uint64, c
 		ids = append(ids, id)
 	}
 
-	return dataSourceDao.Delete(workspaceId, ids)
+	return tx.Model(&model.DataSourceModel{}).Where("workspace = ? and id in ?", workspaceId, ids).Delete(&model.DataSourceModel{}).Error
 }

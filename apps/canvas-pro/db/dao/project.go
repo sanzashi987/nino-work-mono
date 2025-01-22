@@ -31,11 +31,4 @@ func BatchLogicalDelete(tx *gorm.DB, ids []uint64) error {
 func ProjectDeleleGroupEffect(tx *gorm.DB, groupId, workspace uint64) error {
 	return tx.Table(projectTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
 }
-
-func ProjectBatchMoveGroup(tx *gorm.DB, groupId, workspace uint64, projectIds []uint64) error {
-
-	orm := tx.Table(projectTableName)
-
-	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
-
-}
+ 

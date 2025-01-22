@@ -1,21 +1,11 @@
 package dao
 
 import (
-	"context"
 	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
-	"github.com/sanzashi987/nino-work/pkg/db"
 	"gorm.io/gorm"
 )
-
-type GroupDao struct {
-	db.BaseDao[model.GroupModel]
-}
-
-func NewGroupDao(ctx context.Context, dao ...*db.BaseDao[model.GroupModel]) *GroupDao {
-	return &GroupDao{BaseDao: db.NewDao[model.GroupModel](ctx, dao...)}
-}
 
 func FindByNameAndWorkspace(tx *gorm.DB, name string, workspace uint64, groupTypeTag string) ([]*model.GroupModel, error) {
 

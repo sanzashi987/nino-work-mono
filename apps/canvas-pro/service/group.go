@@ -33,26 +33,18 @@ func delete(tx *gorm.DB, id uint64) (err error) {
 
 }
 
-type DeleteGroupEffect interface {
-	DeleleGroupEffect(uint64, uint64) error
-}
+type DeleleGroupEffect = func(*gorm.DB, uint64, uint64) error
 
-type GetChainedDao = func(context.Context, *db.BaseDao[model.GroupModel]) DeleteGroupEffect
-
-var typeTagToChainedHandler = map[string]GetChainedDao{
-	consts.PROJECT: func(ctx context.Context, baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
-		return dao.NewProjectDao(ctx, (*db.BaseDao[model.ProjectModel])(baseDao))
-	},
-	consts.DESIGN: func(ctx context.Context, baseDao *db.BaseDao[model.GroupModel]) DeleteGroupEffect {
-		return dao.NewAssetDao(ctx, (*db.BaseDao[model.AssetModel])(baseDao))
-	},
+var typeTagToChainedHandler = map[string]DeleleGroupEffect{
+	consts.PROJECT: dao.ProjectDeleleGroupEffect,
+	consts.DESIGN:  dao.AssetDeleleGroupEffect,
 }
 
 func (serv GroupService) Delete(ctx context.Context, workspaceId uint64, groupCode, typeTag string) (err error) {
 	tx := db.NewTx(ctx).Begin()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
 
-	chain, exist := typeTagToChainedHandler[typeTag]
+	deleteEffect, exist := typeTagToChainedHandler[typeTag]
 	if !exist {
 		return errors.New("not a supported type tag")
 	}
@@ -61,7 +53,7 @@ func (serv GroupService) Delete(ctx context.Context, workspaceId uint64, groupCo
 		tx.Rollback()
 		return
 	}
-	if err = chainDao.DeleleGroupEffect(groupId, workspaceId); err != nil {
+	if err = deleteEffect(tx, groupId, workspaceId); err != nil {
 		tx.Rollback()
 		return
 	}
@@ -93,7 +85,7 @@ func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCo
 	id, _, _ := consts.GetIdFromCode(groupCode)
 	toUpdate := model.GroupModel{}
 	toUpdate.Id = id
-	if err := tx.Model(&toUpdate).Update(map[string]any{"name": groupName}).Error; err != nil {
+	if err := tx.Model(&toUpdate).Update("name", groupName).Error; err != nil {
 		return err
 	}
 	return nil
@@ -165,7 +157,7 @@ func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, gro
 
 	groupIds := []uint64{}
 
-	idToRecord := map[uint64]model.GroupModel{}
+	idToRecord := map[uint64]*model.GroupModel{}
 	for _, record := range records {
 		groupIds = append(groupIds, record.Id)
 		idToRecord[record.Id] = record
