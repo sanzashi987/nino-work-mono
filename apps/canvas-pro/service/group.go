@@ -9,6 +9,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type GroupService struct{}
@@ -18,20 +19,18 @@ var GroupServiceImpl *GroupService = &GroupService{}
 var ErrorNameExisted = errors.New("error group name is exist")
 
 func (serv GroupService) Create(ctx context.Context, workspaceId uint64, name, typeTag string) (*model.GroupModel, error) {
-	if err := consts.IsLegalName(name); err != nil {
-		return nil, err
-	}
-
-	groupDao := dao.NewGroupDao(ctx)
-
-	return groupDao.Create(workspaceId, name, typeTag)
+	tx := db.NewTx(ctx)
+	return createGroup(tx, workspaceId, name, typeTag)
 }
 
 // var ErrorGroupNotFound = errors.New("error group is not exist")
 
-func delete(groupDao *dao.GroupDao, id uint64) (err error) {
-	err = groupDao.Delete(id)
-	return
+func delete(tx *gorm.DB, id uint64) (err error) {
+	toDelete := model.GroupModel{}
+	toDelete.Id = id
+
+	return tx.Delete(&toDelete).Error
+
 }
 
 type DeleteGroupEffect interface {
@@ -50,39 +49,37 @@ var typeTagToChainedHandler = map[string]GetChainedDao{
 }
 
 func (serv GroupService) Delete(ctx context.Context, workspaceId uint64, groupCode, typeTag string) (err error) {
-	groupDao := dao.NewGroupDao(ctx)
-	groupDao.BeginTransaction()
+	tx := db.NewTx(ctx).Begin()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
 
 	chain, exist := typeTagToChainedHandler[typeTag]
 	if !exist {
-		return errors.New("Not a supported type tag")
+		return errors.New("not a supported type tag")
 	}
 
-	chainDao := chain(ctx, &groupDao.BaseDao)
-	if err = delete(groupDao, groupId); err != nil {
-		groupDao.RollbackTransaction()
+	if err = delete(tx, groupId); err != nil {
+		tx.Rollback()
 		return
 	}
 	if err = chainDao.DeleleGroupEffect(groupId, workspaceId); err != nil {
-		groupDao.RollbackTransaction()
+		tx.Rollback()
 		return
 	}
-	groupDao.CommitTransaction()
+	tx.Commit()
 	return
 }
 
 var ErrorFailToRename = errors.New("Fail to rename group")
 
-func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCode, groupName, typeTag string) (err error) {
+func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCode, groupName, typeTag string) error {
 
-	if err = consts.IsLegalName(groupName); err != nil {
-		return
+	if err := consts.IsLegalName(groupName); err != nil {
+		return err
 	}
 
-	groupDao := dao.NewGroupDao(ctx)
+	tx := db.NewTx(ctx)
 
-	groups, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId, typeTag)
+	groups, err := dao.FindByNameAndWorkspace(tx, groupName, workspaceId, typeTag)
 	if err != nil {
 		return err
 	}
@@ -95,25 +92,24 @@ func (serv GroupService) Rename(ctx context.Context, workspaceId uint64, groupCo
 
 	id, _, _ := consts.GetIdFromCode(groupCode)
 	toUpdate := model.GroupModel{}
-	toUpdate.Id, toUpdate.Name = id, groupName
-	if err = groupDao.UpdateById(toUpdate); err != nil {
-		return
+	toUpdate.Id = id
+	if err := tx.Model(&toUpdate).Update(map[string]any{"name": groupName}).Error; err != nil {
+		return err
 	}
-	return
+	return nil
 }
 
-func createGroup[T any](ctx context.Context, chainedDao *dao.AnyDao[T], workspaceId uint64, groupName, typeTag string) (*model.GroupModel, error) {
+func createGroup(tx *gorm.DB, workspaceId uint64, groupName, typeTag string) (*model.GroupModel, error) {
 
 	if groupName != "" {
 		if err := consts.IsLegalName(groupName); err != nil {
-			chainedDao.RollbackTransaction()
+			tx.Rollback()
 			return nil, err
 		}
 
-		groupDao := dao.NewGroupDao(ctx, (*db.BaseDao[model.GroupModel])(&chainedDao.BaseDao))
-		newGroup, err := groupDao.Create(workspaceId, groupName, typeTag)
+		newGroup, err := dao.Create(tx, workspaceId, groupName, typeTag)
 		if err != nil {
-			chainedDao.RollbackTransaction()
+			tx.Rollback()
 			return nil, err
 		}
 		return newGroup, nil
@@ -143,7 +139,7 @@ func (p ListGroupOutputs) Swap(i, j int) {
 }
 
 type GetGroupCount interface {
-	GetCountFromGroupId(context.Context, uint64, []uint64) ([]dao.GroupCount, error)
+	GetCountFromGroupId(context.Context, uint64, []uint64) ([]*GroupCount, error)
 }
 
 var typeTagToGroupCountHandler = map[string]GetGroupCount{
@@ -154,9 +150,9 @@ var typeTagToGroupCountHandler = map[string]GetGroupCount{
 func (serv GroupService) ListGroups(ctx context.Context, workspaceId uint64, groupName, typeTag string) (output ListGroupOutputs, err error) {
 	groupTypeTage, err := consts.GetGroupTypeTagFromBasic(typeTag)
 
-	groupDao := dao.NewGroupDao(ctx)
+	tx := db.NewTx(ctx)
 
-	records, err := groupDao.FindByNameAndWorkspace(groupName, workspaceId, groupTypeTage)
+	records, err := dao.FindByNameAndWorkspace(tx, groupName, workspaceId, groupTypeTage)
 	if err != nil {
 		return
 	}

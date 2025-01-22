@@ -14,9 +14,9 @@ import (
 type BaseModel struct {
 	db.BaseModel
 	TypeTag   string `gorm:"index"`
-	Name      string
+	Name      string `gorm:"column:type_tag"`
 	Workspace uint64 `gorm:"default:0;index"`
-	Creator   uint64
+	Creator   uint64 `gorm:"column:creator"`
 	Code      string `gorm:"index"`
 }
 

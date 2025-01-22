@@ -2,12 +2,11 @@ package service
 
 import (
 	"context"
-	"io"
-	"mime/multipart"
 
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
@@ -28,32 +27,39 @@ type ListAssetRes struct {
 	UpdateTime string  `json:"updateTime"`
 }
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, page, size int, typeTag, groupCode string) (recordTotal int64, res []ListAssetRes, err error) {
+type ListAssetReq struct {
+	GroupCode string `json:"groupCode"`
+	// Name      string `json:"fileName"`
+	shared.PaginationRequest
+}
+
+func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, payload *ListAssetReq) (int64, []*ListAssetRes, error) {
 
 	var groupId *uint64
-	if groupCode != "" {
+	if payload.GroupCode != "" {
 
-		if id, _, e := consts.GetIdFromCode(groupCode); e != nil {
-			err = e
-			return
+		if id, _, err := consts.GetIdFromCode(payload.GroupCode); err != nil {
+			return 0, nil, err
 		} else {
 			groupId = &id
 		}
 	}
 
-	assetDao := dao.NewAssetDao(ctx)
-	records, err := assetDao.ListAssets(workspaceId, groupId, page, size, typeTag)
+	tx := db.NewTx(ctx)
+
+	records, err := dao.ListAssets(tx, workspaceId, groupId, payload.Page, payload.Size, typeTag)
 	if err != nil {
-		return
+		return 0, nil, err
 	}
 
-	recordTotal, err = assetDao.GetAssetCount(workspaceId, groupId, page, size, typeTag)
+	recordTotal, err := dao.GetAssetCount(tx, workspaceId, groupId, typeTag)
 	if err != nil {
-		return
+		return 0, nil, err
 	}
 
+	res := []*ListAssetRes{}
 	for _, record := range records {
-		res = append(res, ListAssetRes{
+		res = append(res, &ListAssetRes{
 			FileCode:   record.Code,
 			Name:       record.Name,
 			CreateTime: record.GetCreatedDate(),
@@ -61,22 +67,28 @@ func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint6
 		})
 	}
 
-	return
+	return recordTotal, res, nil
 
 }
 
-func (serv AssetService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]dao.GroupCount, error) {
-	assetDao := dao.NewAssetDao(ctx)
+type GroupCount struct {
+	Id    uint64 `gorm:"column:id"`
+	Count uint64 `gorm:"column:count"`
+}
 
-	return assetDao.GetAssetCountByGroup(workspaceId, groupId)
+func (serv AssetService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]*GroupCount, error) {
+	tx := db.NewTx(ctx)
+	res := []*GroupCount{}
+	var assetTableName = model.ProjectModel{}.TableName()
+	err := tx.Table(assetTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupId).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
+	return res, err
 }
 
 func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
 	code := groupCode
-	assetDao := dao.NewAssetDao(ctx)
-	assetDao.BeginTransaction()
+	tx := db.NewTx(ctx).Begin()
 
-	if newGroup, err := createGroup(ctx, (*dao.AnyDao[model.AssetModel])(assetDao), workspaceId, groupName, consts.DESIGN); err != nil {
+	if newGroup, err := createGroup(tx, workspaceId, groupName, consts.DESIGN); err != nil {
 		return err
 	} else if newGroup != nil {
 		code = newGroup.Code
@@ -87,102 +99,27 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 		return err
 	}
 
-	if assetDao.BatchMoveGroup(groupId, workspaceId, projectIds); err != nil {
-		assetDao.RollbackTransaction()
+	if dao.AssetBatchMoveGroup(tx, groupId, workspaceId, projectIds); err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	assetDao.CommitTransaction()
+	tx.Commit()
 
 	return nil
 }
 
 const chunkSize = 1024 * 1024 / 2
 
-type UploadAssetResponse struct {
-	FileId   string `json:"fileId"`
-	MimeType string `json:"mimeType"`
-	Name     string `json:"name"`
-	Size     int64  `json:"size"`
-	Suffix   string `json:"suffix"`
-}
-
-func (serv *AssetService) UploadFile(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, groupName, groupCode, filename, typeTag string, file *multipart.FileHeader) (res *UploadAssetResponse, err error) {
-	stream, err := uploadRpc.UploadFile(ctx)
-	if err != nil {
-		return
-	}
-
-	reader, _ := file.Open()
-	defer reader.Close()
-	defer stream.Close()
-	for {
-		var n int
-		buf := make([]byte, chunkSize)
-		n, err = reader.Read(buf)
-		if err = stream.Send(&storage.FileUploadRequest{
-			Filename: filename,
-			Data:     buf[:n],
-		}); err != nil {
-			return
-		}
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return
-		}
-	}
-
-	if err = stream.CloseSend(); err != nil {
-		return
-	}
-	rpcResponse := storage.FileDetailResponse{}
-	if err = stream.RecvMsg(&rpcResponse); err != nil {
-		return
-	}
-
-	assetDao := dao.NewAssetDao(ctx)
-	assetDao.BeginTransaction()
-	code := groupCode
-	if newGroup, err := createGroup(ctx, (*dao.AnyDao[model.AssetModel])(assetDao), workspaceId, groupName, consts.DESIGN); err != nil {
-		return nil, err
-	} else if newGroup != nil {
-		code = newGroup.Code
-	}
-
-	groupId, typeTag, err := consts.GetIdFromCode(code)
-	if !consts.IsGroup(typeTag) {
-		return //nil, errors.New("not a group tag")
-	}
-
-	if err != nil {
-		return
-	}
-
-	asset, err := assetDao.CreateAsset(workspaceId, groupId, filename, rpcResponse.Id, typeTag)
-
-	if err != nil {
-		assetDao.RollbackTransaction()
-		return
-	}
-
-	assetDao.CommitTransaction()
-	res.Size, res.FileId = rpcResponse.Size, asset.Code
-	res.Suffix, res.Name, res.MimeType = rpcResponse.Extension, asset.Name, rpcResponse.MimeType
-	return
-}
-
 func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, assetName, assetCode string) error {
 	if err := consts.IsLegalName(assetName); err != nil {
 		return err
 	}
-
 	assetId, _, _ := consts.GetIdFromCode(assetCode)
 
-	assetDao := dao.NewAssetDao(ctx)
+	tx := db.NewTx(ctx)
 
-	return assetDao.UpdateAssetName(workspaceId, assetId, assetName)
+	return dao.UpdateAssetName(tx, workspaceId, assetId, assetName)
 
 }
 
@@ -200,12 +137,14 @@ type AssetDetailResponse struct {
 
 func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
 
-	assetDao := dao.NewAssetDao(ctx)
+	tx := db.NewTx(ctx)
 	assetId, _, _ := consts.GetIdFromCode(assetCode)
 
-	record, err := assetDao.GetSingleAsset(workspaceId, assetId)
-	if err != nil {
+	record := model.AssetModel{}
+
+	if err := tx.Where("id = ? AND workspace = ?", assetId, workspaceId).Find(&record).Error; err != nil {
 		return nil, err
+
 	}
 
 	rpcReq := storage.FileQueryRequest{}

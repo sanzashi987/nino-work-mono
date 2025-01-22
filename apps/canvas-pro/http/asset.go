@@ -20,24 +20,18 @@ var assetController = &AssetController{
 	CanvasController: createCanvasController("[http] canvas asset handler "),
 }
 
-type ListAssetReq struct {
-	GroupCode string `json:"groupCode"`
-	// Name      string `json:"fileName"`
-	shared.PaginationRequest
-}
-
 type ListAssetResponse struct {
-	Data []service.ListAssetRes `json:"data"`
+	Data []*service.ListAssetRes `json:"data"`
 	shared.PaginationResponse
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
-	reqBody := ListAssetReq{}
+	reqBody := service.ListAssetReq{}
 
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
 		return
 	} else {
-		recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, reqBody.Page, reqBody.Size, consts.DATASOURCE, reqBody.GroupCode)
+		recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &reqBody)
 		if err != nil {
 			c.AbortServerError(ctx, "list: "+err.Error())
 			return
@@ -123,16 +117,9 @@ func (c *AssetController) upload(ctx *gin.Context) {
 		return
 	}
 
-	uploadRpc := getUploadRpcService(ctx)
-
-	_, workspaceId := getWorkspaceCode(ctx)
-	res, err := service.AssetServiceImpl.UploadFile(ctx, uploadRpc, workspaceId, form.GroupCode, form.GroupName, form.File.Filename, form.Type, form.File)
-	if err != nil {
-		c.AbortServerError(ctx, "upload: "+err.Error())
-		return
-	}
-
-	c.ResponseJson(ctx, res)
+	// uploadRpc := getUploadRpcService(ctx)
+	panic("unimplemented")
+	c.SuccessVoid(ctx)
 
 }
 func (c *AssetController) replace(ctx *gin.Context) {

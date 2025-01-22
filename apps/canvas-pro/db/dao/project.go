@@ -1,23 +1,14 @@
 package dao
 
 import (
-	"context"
-
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
-type ProjectDao struct {
-	db.BaseDao[model.ProjectModel]
-}
+func GetList(tx *gorm.DB, page, size int, workspace uint64, name *string, groupId *uint64) (projects *[]model.ProjectModel, err error) {
 
-func NewProjectDao(ctx context.Context, dao ...*db.BaseDao[model.ProjectModel]) *ProjectDao {
-	return &ProjectDao{BaseDao: db.NewDao[model.ProjectModel](ctx, dao...)}
-}
-
-func (dao *ProjectDao) GetList(page, size int, workspace uint64, name *string, groupId *uint64) (projects *[]model.ProjectModel, err error) {
-
-	query := dao.GetOrm().Scopes(db.Paginate(page, size)).Model(&model.ProjectModel{}).Where("workspace = ?", workspace)
+	query := tx.Scopes(db.Paginate(page, size)).Model(&model.ProjectModel{}).Where("workspace = ?", workspace)
 
 	if groupId != nil {
 		query = query.Where(" group_id = ?", *groupId)
@@ -32,26 +23,19 @@ func (dao *ProjectDao) GetList(page, size int, workspace uint64, name *string, g
 
 var projectTableName = model.ProjectModel{}.TableName()
 
-func (dao *ProjectDao) BatchLogicalDelete(ids []uint64) error {
-	return dao.GetOrm().Table(projectTableName).Where("id IN ?", ids).Delete(&model.ProjectModel{}).Error
+func BatchLogicalDelete(tx *gorm.DB, ids []uint64) error {
+	return tx.Table(projectTableName).Where("id IN ?", ids).Delete(&model.ProjectModel{}).Error
 
 }
 
-func (dao *ProjectDao) DeleleGroupEffect(groupId, workspace uint64) error {
-	return dao.GetOrm().Table(projectTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
+func ProjectDeleleGroupEffect(tx *gorm.DB, groupId, workspace uint64) error {
+	return tx.Table(projectTableName).Where("group_id = ? AND workspace = ?", groupId, workspace).Updates(map[string]any{"group_id": 0}).Error
 }
 
-func (dao *ProjectDao) BatchMoveGroup(groupId, workspace uint64, projectIds []uint64) error {
+func ProjectBatchMoveGroup(tx *gorm.DB, groupId, workspace uint64, projectIds []uint64) error {
 
-	orm := dao.GetOrm().Table(projectTableName)
+	orm := tx.Table(projectTableName)
 
 	return orm.Where("id IN ? AND workspace = ?", projectIds, workspace).Update("group_id", groupId).Error
-
-}
-
-func (dao ProjectDao) GetProjectCountByGroup(workspaceId uint64, groupIds []uint64) (res []GroupCount, err error) {
-
-	err = dao.GetOrm().Table(projectTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupIds).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
-	return
 
 }

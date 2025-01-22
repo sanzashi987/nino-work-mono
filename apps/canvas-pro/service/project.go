@@ -6,25 +6,28 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
+
+var projectTableName = model.ProjectModel{}.TableName()
 
 type ProjectService struct{}
 
 var ProjectServiceImpl *ProjectService = &ProjectService{}
 
 func (serv ProjectService) Create(ctx context.Context, name, jsonConfig string, groupCode, useTemplate *string) (string, error) {
-	projectDao := dao.NewProjectDao(ctx)
+	tx := db.NewTx(ctx)
 
 	newProject := &model.ProjectModel{}
 	newProject.TypeTag, newProject.Name, newProject.Version, newProject.Config = consts.PROJECT, name, consts.DefaultVersion, jsonConfig
 
 	if useTemplate != nil {
-		templateDao := dao.NewTemplateDao(ctx)
 		templateId, _, _ := consts.GetIdFromCode(*useTemplate)
 
-		template, e := templateDao.FindByKey("id", templateId)
-		if e != nil {
+		template := model.TemplateModel{}
+
+		if e := tx.Where("id = ?", templateId).Find(&template).Error; e != nil {
 			return "", e
 		}
 		newProject.Config = template.Config
@@ -39,7 +42,7 @@ func (serv ProjectService) Create(ctx context.Context, name, jsonConfig string, 
 
 	}
 
-	if err := projectDao.Create(newProject); err != nil {
+	if err := tx.Create(newProject).Error; err != nil {
 		return "", err
 	}
 
@@ -87,21 +90,22 @@ type ProjectDetail struct {
 	shared.DBTime
 }
 
-func (serv ProjectService) GetInfoById(ctx context.Context, code string) (result *ProjectDetail, err error) {
-	projectDao := dao.NewProjectDao(ctx)
-	project, e := projectDao.FindByKey("code", code)
-	if e != nil {
-		err = e
-		return
+func (serv ProjectService) GetInfoById(ctx context.Context, code string) (*ProjectDetail, error) {
+
+	result, project := ProjectDetail{}, model.ProjectModel{}
+	tx := db.NewTx(ctx)
+
+	if err := tx.Where("code = ? ", code).Find(&project).Error; err != nil {
+		return nil, err
 	}
 
 	result.Code, result.Name, result.Thumbnail = code, project.Name, project.Thumbnail
 	result.CreateTime, result.UpdateTime = project.GetCreatedDate(), project.GetUpdatedDate()
-	return
+	return &result, nil
 }
 
 func (serv ProjectService) LogicalDeletion(ctx context.Context, codes []string) (err error) {
-	projectDao := dao.NewProjectDao(ctx)
+	tx := db.NewTx(ctx)
 
 	intIds := []uint64{}
 
@@ -110,7 +114,7 @@ func (serv ProjectService) LogicalDeletion(ctx context.Context, codes []string) 
 		intIds = append(intIds, id)
 	}
 
-	return projectDao.BatchLogicalDelete(intIds)
+	return tx.Table(projectTableName).Where("id IN ?", intIds).Delete(&model.ProjectModel{}).Error
 }
 
 type ProjectInfo struct {
@@ -123,7 +127,7 @@ type ProjectInfo struct {
 // type ProjectInfoList = []ProjectInfo
 
 func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page, size int, name, group *string) ([]ProjectInfo, error) {
-	projectDao := dao.NewProjectDao(ctx)
+	tx := db.NewTx(ctx)
 
 	var groupId *uint64
 
@@ -135,7 +139,7 @@ func (serv ProjectService) GetList(ctx context.Context, workspaceId uint64, page
 		groupId = &id
 	}
 
-	infos, err := projectDao.GetList(page, size, workspaceId, name, groupId)
+	infos, err := dao.GetList(tx, page, size, workspaceId, name, groupId)
 	if err != nil {
 		return nil, err
 	}
@@ -157,12 +161,16 @@ func (serv ProjectService) PublishProject(ctx context.Context, code string, puli
 }
 
 func (serv ProjectService) Duplicate(ctx context.Context, code string) (string, error) {
-	projectDao := dao.NewProjectDao(ctx)
+	tx := db.NewTx(ctx)
+
 	copyFromId, _, err := consts.GetIdFromCode(code)
 	if err != nil {
 		return "", err
 	}
-	copyFrom, err := projectDao.FindByKey("id", copyFromId)
+	copyFrom := model.ProjectModel{}
+	if err := tx.Where("id = ?", copyFromId).Find(&copyFrom).Error; err != nil {
+		return "", err
+	}
 	name := copyFrom.Name + "_copied"
 	hasGroupCode := copyFrom.GroupId == 0
 	var groupCode *string = nil
@@ -216,8 +224,11 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 
 }
 
-func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]dao.GroupCount, error) {
-	projectDao := dao.NewProjectDao(ctx)
+func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]*GroupCount, error) {
+	res := []*GroupCount{}
+	tx := db.NewTx(ctx)
+	err := tx.Table(projectTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupId).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
 
-	return projectDao.GetProjectCountByGroup(workspaceId, groupId)
+	return res, err
+
 }

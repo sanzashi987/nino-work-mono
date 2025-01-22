@@ -6,6 +6,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"gorm.io/gorm"
 )
 
 type GroupDao struct {
@@ -16,39 +17,31 @@ func NewGroupDao(ctx context.Context, dao ...*db.BaseDao[model.GroupModel]) *Gro
 	return &GroupDao{BaseDao: db.NewDao[model.GroupModel](ctx, dao...)}
 }
 
-func (dao *GroupDao) FindByNameAndWorkspace(name string, workspace uint64, groupTypeTag string) (res []model.GroupModel, err error) {
+func FindByNameAndWorkspace(tx *gorm.DB, name string, workspace uint64, groupTypeTag string) ([]*model.GroupModel, error) {
 
-	orm := dao.GetOrm().Where(" workspace = ? AND type_tag = ?", workspace, groupTypeTag)
+	orm := tx.Where("workspace = ? AND type_tag = ?", workspace, groupTypeTag)
 	if name != "" {
 		orm = orm.Where("name = ?", name)
 	}
-
-	err = orm.Find(&res).Error
-	return
-}
-
-func (dao *GroupDao) Delete(id uint64) (err error) {
-	toDelete := model.GroupModel{}
-	toDelete.Id = id
-
-	if err = dao.GetOrm().Delete(&toDelete).Error; err != nil {
-		return
+	res := []*model.GroupModel{}
+	if err := orm.Find(&res).Error; err != nil {
+		return nil, err
 	}
-	return
+	return res, nil
 }
 
 var ErrorNameExisted = errors.New("error group name is exist")
 
-func (dao *GroupDao) Create(workspaceId uint64, name, typeTag string) (record *model.GroupModel, err error) {
-	records, err := dao.FindByNameAndWorkspace(name, workspaceId, typeTag)
+func Create(tx *gorm.DB, workspaceId uint64, name, typeTag string) (*model.GroupModel, error) {
+	records, err := FindByNameAndWorkspace(tx, name, workspaceId, typeTag)
 	if records != nil && err == nil {
 		if len(records) > 0 {
 			err = ErrorNameExisted
-			return
+			return nil, err
 		}
 	}
-	record = &model.GroupModel{}
+	record := &model.GroupModel{}
 	record.Name, record.Workspace, record.TypeTag = name, workspaceId, typeTag
-	err = dao.GetOrm().Create(record).Error
-	return
+	err = tx.Create(record).Error
+	return record, err
 }
