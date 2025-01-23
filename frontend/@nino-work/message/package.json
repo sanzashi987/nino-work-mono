@@ -1,0 +1,21 @@
+{
+  "name": "@nino-work/message",
+  "version": "0.0.1",
+  "author": "ziao chen",
+  "main": "src/index",
+  "dependencies": {
+    "notistack": "^3.0.1"
+  },
+  "devDependencies": {
+    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^5.10.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "peerDependencies": {
+    "@mui/material": "^5.10.6",
+    "@mui/icons-material": "^5.10.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
