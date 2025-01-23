@@ -1,0 +1,37 @@
+{
+  "name": "storage.nino.work",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@nino-work/assets": "workspace:*",
+    "@nino-work/infra": "workspace:*"
+  },
+  "scripts": {
+    "start": "infra-start",
+    "build": "infra-build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.3.0",
+    "@mui/lab": "6.0.0-beta.21",
+    "@mui/material": "^6.3.0",
+    "react": "^19.0.0",
+    "react-app-polyfill": "^3.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-router-dom": "^7.1.1"
+  }
+}

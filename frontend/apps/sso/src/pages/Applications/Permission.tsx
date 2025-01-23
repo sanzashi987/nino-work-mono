@@ -8,6 +8,8 @@ import { listPermissions, ListPermissionsResponse } from '@/api';
 import ManagerShell, { useDeps } from '@/components/ManagerShell';
 import { CreatePermissionDialog } from './Dialogs';
 
+type PermissionMeta = ListPermissionsResponse['permissions'][number];
+
 const staticSchema = [
   { label: 'Id', field: 'id' },
   { label: 'Name', field: 'name' },
@@ -16,6 +18,10 @@ const staticSchema = [
 
 const PermissionManagement: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const { appId } = useParams();
+  const [res, setRes] = useState<ListPermissionsResponse | null>(null);
+  const [deps, refresh] = useDeps();
+
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
@@ -24,9 +30,6 @@ const PermissionManagement: React.FC = () => {
     setOpen(false);
   }, []);
 
-  const { appId } = useParams();
-  const [res, setRes] = useState<ListPermissionsResponse | null>(null);
-  const [deps, refresh] = useDeps();
   const requester = useCallback(
     () => listPermissions({ app_id: Number(appId) }).then((response) => {
       setRes(response);
@@ -42,7 +45,7 @@ const PermissionManagement: React.FC = () => {
     [appId]
   );
 
-  const handleDeletePermission = useCallback((row: ListPermissionsResponse['permissions'][number]) => {
+  const handleDeletePermission = useCallback((row: PermissionMeta) => {
     refresh();
   }, []);
 
@@ -52,7 +55,7 @@ const PermissionManagement: React.FC = () => {
       label: 'Operation',
       field: 'id',
       dataCellProps: {
-        render(row: any) {
+        render(row: PermissionMeta) {
           return (
             <IconButton onClick={() => handleDeletePermission(row)}>
               <Delete />
@@ -65,7 +68,7 @@ const PermissionManagement: React.FC = () => {
 
   return (
     <>
-      <Stack direction="row" alignItems="center">
+      <Stack direction="row" alignItems="center" mb={2}>
         <Settings />
         <Typography variant="h5" gutterBottom m={0} ml={1}>
           {res?.app_name}
@@ -82,7 +85,7 @@ const PermissionManagement: React.FC = () => {
         )}
       />
       <Dialog open={open}>
-        <CreatePermissionDialog onSuccess={handleSuccess} close={handleClose} />
+        <CreatePermissionDialog onSuccess={handleSuccess} close={handleClose} appId={appId!} />
       </Dialog>
     </>
   );

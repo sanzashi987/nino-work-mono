@@ -29,7 +29,7 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		c.AbortClientError(ctx, ""+err.Error())
+		c.AbortClientError(ctx, " "+err.Error())
 		return
 	}
 
@@ -37,7 +37,7 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 
 	bucket, err := dao.CreateBucket(db.NewTx(ctx), req.Name, bucketPath)
 	if err != nil {
-		c.AbortServerError(ctx, ""+err.Error())
+		c.AbortServerError(ctx, " "+err.Error())
 		return
 	}
 

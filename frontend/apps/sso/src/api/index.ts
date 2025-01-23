@@ -107,3 +107,19 @@ export type ListPermissionsResponse = {
 export const listPermissions = defineApi<ListPermissionsRequest, ListPermissionsResponse>(
   { url: `${prefix}/apps/list-permission` }
 );
+
+export type CreateMeta = {
+  name: string
+  code: string
+  description: string
+};
+
+export type CreatePermissionRequest = {
+  app_id: number | string
+  permissions: CreateMeta[]
+};
+
+export const createPermission = defineApi<CreatePermissionRequest, void>({
+  url: `${prefix}/permission/create`,
+  method: 'POST'
+});

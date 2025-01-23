@@ -13,7 +13,7 @@ import SideBar from './SideBar';
 
 type DashboardProps = {};
 
-const Dashboard: React.FC<DashboardProps> = (props) => {
+const Dashboard: React.FC<DashboardProps> = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { mode } = useColorScheme();
   const isLight = mode !== 'dark';
@@ -40,7 +40,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
             <Logo width="35" height="35" />
             <div style={{ flexGrow: 1 }} />
             <IconButton onClick={openMenu}>
-              { mode}
+              {mode}
               <AccountCircle fontSize="medium" style={{ color: isLight ? 'white' : 'grey' }} />
             </IconButton>
             <Menu

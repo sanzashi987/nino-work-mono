@@ -29,5 +29,5 @@
     "noEmit": true,
     "jsx": "react",
     "declaration": true,
-  }
+  },
 }
