@@ -1,17 +1,11 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/no-unused-class-component-methods */
-import React, { FC } from 'react';
+import React, { CSSProperties, FC } from 'react';
 import { CircularProgress, ClickAwayListener } from '@mui/material';
-import { withSnackbar, ProviderContext } from 'notistack';
-import classNames from 'classnames';
+import { styled } from '@mui/material/styles';
+import { enqueueSnackbar, closeSnackbar } from 'notistack';
 import { CheckCircleOutline, ErrorOutline, WarningAmber, InfoOutlined } from '@mui/icons-material';
-import styles from './index.module.scss';
 import type { BasicConfigWithType } from '../type';
-
-const {
-  'canvas-message-content': contentClass,
-  'canvas-message-wrapper': snackbarClass
-} = styles;
 
 const messageIcon: Record<MessageKey, React.ElementType> = {
   success: CheckCircleOutline,
@@ -21,21 +15,42 @@ const messageIcon: Record<MessageKey, React.ElementType> = {
   loading: CircularProgress
 };
 
+const messageStyle: Record<MessageKey, CSSProperties> = {
+  loading: { width: 16, height: 16 },
+  error: { color: '' },
+  info: { color: '' },
+  warning: { color: '' },
+  success: { color: '' }
+};
+
 type MessageContentProps = {
   content: React.ReactNode;
   type: MessageKey;
   className?: string;
   onClickAway?: BasicConfigWithType['onClickAway'];
 };
+
+const MessageContentDiv = styled('div')({
+  fontSize: 12,
+  padding: '6px 16px',
+  width: '100%',
+  '& div': {
+    minHeight: 24,
+    '& .message-icon': { marginRight: 8 }
+  }
+});
+
 const MessageContent: FC<MessageContentProps> = ({ content, type, onClickAway, className }) => {
   const Icon = messageIcon[type];
+  const style = messageStyle[type];
+
   const Content = (
-    <div className={classNames(className, contentClass, 'frnc')}>
+    <MessageContentDiv className={`frnc ${className ?? ''}`}>
       <div className="frnc">
-        <Icon className={`canvas-message-icon --${type}`} />
+        <Icon style={style} />
         {content}
       </div>
-    </div>
+    </MessageContentDiv>
   );
   return onClickAway ? (
     <ClickAwayListener onClickAway={onClickAway!}>
@@ -44,21 +59,23 @@ const MessageContent: FC<MessageContentProps> = ({ content, type, onClickAway, c
   ) : Content;
 };
 
-type SnackbarProps = ProviderContext;
-class Message extends React.Component<SnackbarProps> {
+class Message extends React.Component {
+  // eslint-disable-next-line class-methods-use-this
   public showMessage = (config: BasicConfigWithType) => {
     const { type, content, duration = 2000, onClickAway, variant = 'default', className = '', ...reset } = config;
-    const Content = <MessageContent type={type} content={content} className={contentClass} onClickAway={onClickAway} />;
-    return this.props.enqueueSnackbar?.(Content, {
+    const Content = <MessageContent type={type} content={content} onClickAway={onClickAway} />;
+
+    return enqueueSnackbar?.(Content, {
       ...reset,
       variant,
-      className: `${snackbarClass} variant-${variant} ${className}`,
+      className: `variant-${variant} ${className}`,
       autoHideDuration: duration
     });
   };
 
+  // eslint-disable-next-line class-methods-use-this
   destroyMessage = (configKey?: string | number) => {
-    this.props.closeSnackbar?.(configKey);
+    closeSnackbar?.(configKey);
   };
 
   render() {
@@ -66,11 +83,10 @@ class Message extends React.Component<SnackbarProps> {
   }
 }
 
-const MessageCtx = withSnackbar(Message);
 const typeList = ['success', 'error', 'info', 'loading', 'warning'] as const;
 type MessageKey = typeof typeList[number];
 type MessageInstance = InstanceType<typeof Message>;
 
 export { MessageContent, typeList };
 export type { MessageKey, MessageInstance };
-export default MessageCtx;
+export default Message;

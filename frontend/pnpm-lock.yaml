@@ -182,12 +182,17 @@ importers:
       '@mui/material':
         specifier: ^5.10.6
         version: 5.16.13(@types/react@19.0.2)(react-dom@19.0.0)(react@19.0.0)
+      '@nino-work/shared':
+        specifier: workspace:*
+        version: link:../shared
       react:
         specifier: ^19.0.0
         version: 19.0.0
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+
+  '@nino-work/shared': {}
 
   '@nino-work/ui-components':
     devDependencies:
@@ -224,6 +229,12 @@ importers:
       '@mui/material':
         specifier: ^6.3.0
         version: 6.3.0(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react-dom@19.0.0)(react@19.0.0)
+      '@nino-work/assets':
+        specifier: workspace:*
+        version: link:../../@nino-work/assets
+      '@nino-work/shared':
+        specifier: workspace:*
+        version: link:../../@nino-work/shared
       js-cookie:
         specifier: ^3.0.5
         version: 3.0.5
@@ -249,9 +260,6 @@ importers:
         specifier: ^7.1.1
         version: 7.1.1(react-dom@19.0.0)(react@19.0.0)
     devDependencies:
-      '@nino-work/assets':
-        specifier: workspace:*
-        version: link:../../@nino-work/assets
       '@nino-work/infra':
         specifier: workspace:*
         version: link:../../@nino-work/infra
@@ -276,6 +284,9 @@ importers:
       '@mui/material':
         specifier: ^6.3.0
         version: 6.3.0(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react-dom@19.0.0)(react@19.0.0)
+      '@nino-work/shared':
+        specifier: workspace:*
+        version: link:../../@nino-work/shared
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -292,9 +303,6 @@ importers:
         specifier: ^7.1.1
         version: 7.1.1(react-dom@19.0.0)(react@19.0.0)
     devDependencies:
-      '@nino-work/assets':
-        specifier: workspace:*
-        version: link:../../@nino-work/assets
       '@nino-work/infra':
         specifier: workspace:*
         version: link:../../@nino-work/infra

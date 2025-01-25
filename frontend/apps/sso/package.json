@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@nino-work/assets": "workspace:*",
     "@nino-work/infra": "workspace:*",
     "@types/js-cookie": "^3.0.6"
   },
@@ -29,6 +28,8 @@
     "@mui/icons-material": "^6.3.0",
     "@mui/lab": "6.0.0-beta.21",
     "@mui/material": "^6.3.0",
+    "@nino-work/assets": "workspace:*",
+    "@nino-work/shared": "workspace:*",
     "js-cookie": "^3.0.5",
     "notistack": "^3.0.1",
     "react": "^19.0.0",

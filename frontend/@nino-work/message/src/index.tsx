@@ -1,13 +1,29 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { ThemeProvider } from '@mui/material';
-import { GEN_UID } from '@canvas/utilities';
+import { createTheme, styled, ThemeProvider } from '@mui/material';
+import { theme, nanoid } from '@nino-work/shared';
 import Message, { typeList, MessageInstance } from './Message';
-import styles from './index.module.scss';
 import type { BasicConfigWithType, MessageType, MessageConfig, MessageContent } from './type';
 import { formatConfig } from './utils';
 import StyledSnackbarProvider from './styled';
-import { defaultTheme } from '../theme';
+
+const StyledTheme = styled(ThemeProvider)({
+  '.frnc': {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  '.SnackbarContainer-bottom.SnackbarContainer-right': {
+    bottom: 24,
+    right: 8
+  },
+  '.SnackbarItem - contentRoot.SnackbarContent - root': {
+    padding: 0,
+    '.SnackbarItem-message': {
+      padding: 0,
+      width: '100%'
+    }
+  }
+});
 
 class EncMessage {
   private maxSnack = 5;
@@ -19,23 +35,24 @@ class EncMessage {
     this.initMethod();
   }
 
+  theme = createTheme(theme);
+
   initRoot = () => {
     const dom = document.createElement('div');
     document.body.appendChild(dom);
     dom.id = 'canvas-message-container';
     const root = createRoot(dom);
     const Content = (
-      <ThemeProvider theme={defaultTheme}>
+      <StyledTheme theme={this.theme}>
         <StyledSnackbarProvider
           preventDuplicate
           maxSnack={this.maxSnack}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           hideIconVariant
-          classes={{ containerRoot: styles['canvas-message-root'] }}
         >
           <Message ref={this.messageRef} />
         </StyledSnackbarProvider>
-      </ThemeProvider>
+      </StyledTheme>
     );
     root.render(Content);
   };
@@ -59,7 +76,7 @@ class EncMessage {
   handleMessage = (message: BasicConfigWithType) => { };
 
   showMessage = (config: BasicConfigWithType) => {
-    const key = config.key ?? `message_${GEN_UID()}`;
+    const key = config.key ?? `message_${nanoid()}`;
     const newConfig: BasicConfigWithType = {
       ...config,
       key
