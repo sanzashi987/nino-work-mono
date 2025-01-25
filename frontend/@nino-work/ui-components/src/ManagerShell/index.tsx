@@ -4,9 +4,8 @@ import {
   TableHead, TableContainer, Box, Pagination,
   Paper, Table
 } from '@mui/material';
-import { PaginationResponse, PagninationRequest } from '@/api';
+import { noop, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import { Model } from './defineModel';
-import { usePromise } from '@/utils';
 import loading from '../Loading';
 
 export const useDeps = () => {
@@ -31,7 +30,12 @@ const ManagerShell = <Res, T>({
   ActionNode
 }: ManagerShellProps<Res, T>) => {
   const [pagination, setPagination] = useState<PagninationRequest>({ page: 1, size: 10 });
-  const { data, refetch } = usePromise(() => requester(pagination), { deps });
+  const [data, setData] = useState<PaginationResponse<Res> | null>(null);
+
+  useEffect(() => {
+    setData(null);
+    requester(pagination).then(setData).catch(noop);
+  }, deps);
 
   const tableHeader = useMemo(() => (
     <TableHead>
@@ -88,7 +92,7 @@ const ManagerShell = <Res, T>({
         )
         : (
           <>
-            <TableContainer component={Paper} elevation={10} sx={{ mt: 3 }}>
+            <TableContainer component={Paper} elevation={10} sx={{ my: 3 }}>
               <Table>
                 {tableHeader}
                 {content}

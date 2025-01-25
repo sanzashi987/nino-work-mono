@@ -57,7 +57,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         </AppBar>
         <Stack minHeight={0} flexGrow={1} direction="row">
           <SideBar />
-          <Box p={2} flexGrow={1} overflow="auto">
+          <Box p={3} flexGrow={1} overflow="auto">
             <Outlet />
           </Box>
         </Stack>

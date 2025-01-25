@@ -1,3 +1,4 @@
+import type { PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
 type LoginRequest = {
@@ -48,19 +49,6 @@ export type UserInfoResponse = {
 export const getUserInfo = defineApi<undefined, UserInfoResponse>({ url: `${prefix}/info` });
 
 export const testToken = defineApi<{}, void>({ url: `${prefix}/token` });
-
-export type PagninationRequest = {
-  page: number
-  size: number
-};
-
-export type PaginationResponse<T> = {
-  data: T[]
-  page_index: number
-  page_size: number
-  page_total: number
-  record_total: number
-};
 
 export enum AppStatus {
   ENABLE = 0,

@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button, Dialog, IconButton, Stack, Typography
 } from '@mui/material';
-import { Delete, Settings } from '@mui/icons-material';
+import { ArrowBack, Delete } from '@mui/icons-material';
+import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import { listPermissions, ListPermissionsResponse } from '@/api';
-import ManagerShell, { useDeps } from '@/components/ManagerShell';
 import { CreatePermissionDialog } from './Dialogs';
 
 type PermissionMeta = ListPermissionsResponse['permissions'][number];
@@ -21,12 +21,13 @@ const PermissionManagement: React.FC = () => {
   const { appId } = useParams();
   const [res, setRes] = useState<ListPermissionsResponse | null>(null);
   const [deps, refresh] = useDeps();
+  const naviagte = useNavigate();
 
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
   const handleSuccess = useCallback(() => {
-    // refresh();
+    refresh();
     setOpen(false);
   }, []);
 
@@ -68,10 +69,12 @@ const PermissionManagement: React.FC = () => {
 
   return (
     <>
-      <Stack direction="row" alignItems="center" mb={2}>
-        <Settings />
+      <Stack direction="row" alignItems="center">
+        <IconButton onClick={() => { naviagte('..'); }}>
+          <ArrowBack />
+        </IconButton>
         <Typography variant="h5" gutterBottom m={0} ml={1}>
-          {res?.app_name}
+          {res?.app_name ?? '...'}
         </Typography>
       </Stack>
       <ManagerShell

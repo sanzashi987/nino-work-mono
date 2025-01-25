@@ -1,8 +1,8 @@
 import React, { createContext, useMemo } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { loading } from '@nino-work/ui-components';
 import { getUserInfo, MenuMeta, MenuType, UserInfoResponse } from '@/api';
 import { usePromise } from '@/utils';
-import loading from '@/components/Loading';
 
 type AuthGuardProps = {};
 

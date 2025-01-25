@@ -2,9 +2,10 @@ import { Button, Dialog, IconButton } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Delete, Settings } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getAppList, PagninationRequest } from '@/api';
+import { useDeps, ManagerShell } from '@nino-work/ui-components';
+import { PagninationRequest } from '@nino-work/shared';
+import { getAppList } from '@/api';
 import { CreateAppDialog } from './Dialogs';
-import ManagerShell, { useDeps } from '@/components/ManagerShell';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -41,7 +42,8 @@ const AppsManagement: React.FC = () => {
         render: (row: any) => (
           <>
             <IconButton onClick={() => {
-              naviagte(`${pathname}/permission/${row.id}`);
+              const p = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+              naviagte(`${p}/permission/${row.id}`);
             }}
             >
               <Settings />
