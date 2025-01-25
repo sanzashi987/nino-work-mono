@@ -17,10 +17,10 @@ const messageIcon: Record<MessageKey, React.ElementType> = {
 
 const messageStyle: Record<MessageKey, CSSProperties> = {
   loading: { width: 16, height: 16 },
-  error: { color: '' },
-  info: { color: '' },
-  warning: { color: '' },
-  success: { color: '' }
+  error: { color: '#d32f2f' },
+  success: { color: '#2e7d32' },
+  info: { color: '#0288d1' },
+  warning: { color: '#2e7d32' }
 };
 
 type MessageContentProps = {
@@ -47,7 +47,7 @@ const MessageContent: FC<MessageContentProps> = ({ content, type, onClickAway, c
   const Content = (
     <MessageContentDiv className={`frnc ${className ?? ''}`}>
       <div className="frnc">
-        <Icon style={style} />
+        <Icon className="message-icon" style={style} />
         {content}
       </div>
     </MessageContentDiv>

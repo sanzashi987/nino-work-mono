@@ -1,9 +1,10 @@
 import { OptionsObject, SnackbarKey } from 'notistack';
 import type { ClickAwayListenerProps } from '@mui/material';
-import type { CanceledError } from '@canvas/utilities';
+// import type { CanceledError } from '@canvas/utilities';
 import type { MessageKey } from './Message';
 
-export type MessageContent = React.ReactNode | CanceledError<any> | Error;
+// export type MessageContent = React.ReactNode | CanceledError<any> | Error;
+export type MessageContent = React.ReactNode | Error;
 export interface BasicConfig extends OptionsObject {
   content: React.ReactNode;
   /**

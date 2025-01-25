@@ -15,6 +15,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
+import { noop } from '@nino-work/shared';
 import { login } from '@/api';
 import FormLabel from '@/components/FormLabel';
 
@@ -37,7 +38,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
     login(payload).then(({ jwt_token }) => {
       Cookie.set('login_token', jwt_token);
       navigate('/dashboard');
-    }).finally(() => {
+    }).catch(noop).finally(() => {
       setLoading(false);
     });
   };

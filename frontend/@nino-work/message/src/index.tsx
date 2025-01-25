@@ -40,7 +40,7 @@ class EncMessage {
   initRoot = () => {
     const dom = document.createElement('div');
     document.body.appendChild(dom);
-    dom.id = 'canvas-message-container';
+    dom.id = 'message-container';
     const root = createRoot(dom);
     const Content = (
       <StyledMessageContainer>
