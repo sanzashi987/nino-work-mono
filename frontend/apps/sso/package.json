@@ -33,7 +33,6 @@
     "@nino-work/requester": "workspace:*",
     "@nino-work/ui-components": "workspace:*",
     "js-cookie": "^3.0.5",
-    "notistack": "^3.0.1",
     "react": "^19.0.0",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^19.0.0",
