@@ -4,6 +4,9 @@
   "description": "The ui layout react component package",
   "author": "ziao chen",
   "main": "src/index",
+  "dependencies": {
+    "notistack": "^3.0.1"
+  },
   "devDependencies": {
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.10.6",

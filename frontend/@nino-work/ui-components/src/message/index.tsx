@@ -16,7 +16,7 @@ const StyledMessageContainer = styled('div')({
     bottom: 24,
     right: 8
   },
-  '.SnackbarItem - contentRoot.SnackbarContent - root': {
+  '.SnackbarItem-contentRoot.SnackbarContent-root': {
     padding: 0,
     '.SnackbarItem-message': {
       padding: 0,

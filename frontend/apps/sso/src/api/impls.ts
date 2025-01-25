@@ -1,5 +1,5 @@
 import { defineApi as _d, DefineApiOptions } from '@nino-work/requester';
-import message from '@nino-work/message';
+import { message } from '@nino-work/ui-components';
 
 const showErrorNotification = async (input?: any) => {
   message.error(input, 7000);

@@ -31,7 +31,7 @@
     "@nino-work/assets": "workspace:*",
     "@nino-work/shared": "workspace:*",
     "@nino-work/requester": "workspace:*",
-    "@nino-work/message": "workspace:*",
+    "@nino-work/ui-components": "workspace:*",
     "js-cookie": "^3.0.5",
     "notistack": "^3.0.1",
     "react": "^19.0.0",

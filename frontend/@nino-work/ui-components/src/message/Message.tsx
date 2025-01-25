@@ -5,7 +5,7 @@ import { CircularProgress, ClickAwayListener } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { enqueueSnackbar, closeSnackbar } from 'notistack';
 import { CheckCircleOutline, ErrorOutline, WarningAmber, InfoOutlined } from '@mui/icons-material';
-import type { BasicConfigWithType } from '../type';
+import type { BasicConfigWithType } from './type';
 
 const messageIcon: Record<MessageKey, React.ElementType> = {
   success: CheckCircleOutline,
