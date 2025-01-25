@@ -1,4 +1,4 @@
-import { defineApi } from './lib';
+import defineApi from './impls';
 
 type LoginRequest = {
   username: string

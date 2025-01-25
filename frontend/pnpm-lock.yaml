@@ -192,6 +192,8 @@ importers:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
 
+  '@nino-work/requester': {}
+
   '@nino-work/shared': {}
 
   '@nino-work/ui-components':
@@ -232,6 +234,12 @@ importers:
       '@nino-work/assets':
         specifier: workspace:*
         version: link:../../@nino-work/assets
+      '@nino-work/message':
+        specifier: workspace:*
+        version: link:../../@nino-work/message
+      '@nino-work/requester':
+        specifier: workspace:*
+        version: link:../../@nino-work/requester
       '@nino-work/shared':
         specifier: workspace:*
         version: link:../../@nino-work/shared
@@ -284,6 +292,9 @@ importers:
       '@mui/material':
         specifier: ^6.3.0
         version: 6.3.0(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react-dom@19.0.0)(react@19.0.0)
+      '@nino-work/requester':
+        specifier: workspace:*
+        version: link:../../@nino-work/requester
       '@nino-work/shared':
         specifier: workspace:*
         version: link:../../@nino-work/shared

@@ -1,13 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { createTheme, styled, ThemeProvider } from '@mui/material';
+import { createTheme, styled, ThemeOptions, ThemeProvider } from '@mui/material';
 import { theme, nanoid } from '@nino-work/shared';
 import Message, { typeList, MessageInstance } from './Message';
 import type { BasicConfigWithType, MessageType, MessageConfig, MessageContent } from './type';
 import { formatConfig } from './utils';
 import StyledSnackbarProvider from './styled';
 
-const StyledTheme = styled(ThemeProvider)({
+const StyledMessageContainer = styled('div')({
   '.frnc': {
     display: 'flex',
     alignItems: 'center'
@@ -35,7 +35,7 @@ class EncMessage {
     this.initMethod();
   }
 
-  theme = createTheme(theme);
+  theme = createTheme(theme as ThemeOptions);
 
   initRoot = () => {
     const dom = document.createElement('div');
@@ -43,16 +43,18 @@ class EncMessage {
     dom.id = 'canvas-message-container';
     const root = createRoot(dom);
     const Content = (
-      <StyledTheme theme={this.theme}>
-        <StyledSnackbarProvider
-          preventDuplicate
-          maxSnack={this.maxSnack}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          hideIconVariant
-        >
-          <Message ref={this.messageRef} />
-        </StyledSnackbarProvider>
-      </StyledTheme>
+      <StyledMessageContainer>
+        <ThemeProvider theme={this.theme}>
+          <StyledSnackbarProvider
+            preventDuplicate
+            maxSnack={this.maxSnack}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            hideIconVariant
+          >
+            <Message ref={this.messageRef} />
+          </StyledSnackbarProvider>
+        </ThemeProvider>
+      </StyledMessageContainer>
     );
     root.render(Content);
   };

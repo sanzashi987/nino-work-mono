@@ -78,7 +78,7 @@ const ManagerShell = <Res, T>({
   }, [data, schema]);
 
   return (
-    <Stack>
+    <Stack p={3}>
       {ActionNode}
       {!data
         ? (
@@ -88,7 +88,7 @@ const ManagerShell = <Res, T>({
         )
         : (
           <>
-            <TableContainer component={Paper} elevation={10} sx={{ mt: 2 }}>
+            <TableContainer component={Paper} elevation={10} sx={{ mt: 3 }}>
               <Table>
                 {tableHeader}
                 {content}

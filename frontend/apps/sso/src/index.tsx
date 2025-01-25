@@ -3,11 +3,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeOptions, ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { theme as themeConfig } from '@nino-work/shared';
 import router from './pages';
 
-const theme = createTheme({ typography: { fontSize: 11 } });
+const theme = createTheme(themeConfig as ThemeOptions);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

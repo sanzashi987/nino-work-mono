@@ -28,6 +28,7 @@
     "@mui/lab": "6.0.0-beta.21",
     "@mui/material": "^6.3.0",
     "@nino-work/shared": "workspace:*",
+    "@nino-work/requester": "workspace:*",
     "react": "^19.0.0",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^19.0.0",

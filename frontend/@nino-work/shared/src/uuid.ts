@@ -11,4 +11,4 @@ export const nanoid = (size = 6) => {
   return id;
 };
 
-export const createComponentId = (type: string): string => `${type}_${nanoid()}`;
+export const createComponentId = (type) => `${type}_${nanoid()}`;

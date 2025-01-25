@@ -4,9 +4,10 @@ export type StandardResponse<T> = {
   code: number
 };
 
-type DefineApiOptions = {
+export type DefineApiOptions = {
   method?: 'GET' | 'POST',
   url: string
+  onError?(input?: any): Promise<any>
 };
 
 const defaultHeaders = {
@@ -15,7 +16,7 @@ const defaultHeaders = {
 };
 
 export const defineApi = <Req, Res>(options: DefineApiOptions) => {
-  const { method = 'GET', url } = options;
+  const { method = 'GET', url, onError = Promise.reject } = options;
 
   type Requester = Req extends undefined
     ? (input?: null, opts?: RequestInit) => Promise<Res>
@@ -41,17 +42,18 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
 
     if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
       window.location.href = res.url;
-      return Promise.reject();
+      return onError();
     }
 
     if (!res.ok) {
-      return Promise.reject(new Error(`Response Status Error:${res.status}`));
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return onError(`Response Status Error:${res.status}`);
     }
 
     const data = await res.json() as StandardResponse<Res>;
 
     if (data.code !== 0) {
-      return Promise.reject(data);
+      return onError(data?.msg);
     }
 
     return data.data;
