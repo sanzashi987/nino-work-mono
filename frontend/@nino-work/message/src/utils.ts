@@ -4,6 +4,7 @@ import type { MessageKey } from './Message';
 
 const isObject = (input: any) => Object.prototype.toString.call(input) === '[object Object]';
 const isError = (input: any) => Object.prototype.toString.call(input) === '[object Error]';
+const isCancel = (input: any) => false;
 
 /**
  * 格式化消息内容
@@ -19,7 +20,7 @@ export const formatConfig = (
   duration?: number
 ): BasicConfigWithType | false => {
   // config不存在或者CanceledError时，返回false
-  if (!config) return false;
+  if (!config || isCancel(config)) return false;
 
   // Error，content字段取resultMessage或者message字段
   if (isError(config)) {
@@ -33,14 +34,13 @@ export const formatConfig = (
   // 第一个配置项为普通对象
   if (isObject(config)) {
     const { content, ...other } = config as MessageConfig;
-    if (!content) return false;
-    // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-    const _content = isError(content)
+    if (!content || isCancel(content)) return false;
+    const nextContent = isError(content)
       ? (content as any)?.resultMessage || (content as any)?.message
       : content;
     return {
       ...other,
-      content: _content as React.ReactNode,
+      content: nextContent as React.ReactNode,
       type
     };
   }
