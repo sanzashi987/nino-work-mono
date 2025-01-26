@@ -22,10 +22,9 @@ import FormLabel from '@/components/FormLabel';
 interface LoginProps {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
-  subtext?: JSX.Element | JSX.Element[];
 }
 
-const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
+const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -73,24 +72,21 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle, subtext }) => {
           {title}
         </Typography>
       ) : null}
-
-      {subtext}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <Box>
             <FormLabel title="Username" field="username" />
-            <Input id="username" fullWidth {...register('username')} />
+            <Input id="username" fullWidth {...register('username', { required: true })} />
           </Box>
           <Box mt="25px">
             <FormLabel title="Password" field="password" />
             <Input
               id="password"
-              {...register('password')}
+              {...register('password', { required: true })}
               fullWidth
               type={showPassword ? 'text' : 'password'}
               endAdornment={indornent}
             />
-
           </Box>
           <Stack
             justifyContent="space-between"

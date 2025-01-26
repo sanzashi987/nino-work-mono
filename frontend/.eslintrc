@@ -11,7 +11,7 @@
     "**/webpack.config.js",
     "**/rollup.config.js",
     "**/canvas-icons.js",
-    "./@nino-work/infra/**",
+    "**/@nino-work/infra/**",
     "**/infra.config.js",
   ],
   "extends": [

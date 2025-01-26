@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "@nino-work/infra": "workspace:*",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

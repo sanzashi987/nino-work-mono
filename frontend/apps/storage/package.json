@@ -2,12 +2,9 @@
   "name": "storage.nino.work",
   "version": "0.1.0",
   "private": true,
-  "devDependencies": {
-    "@nino-work/infra": "workspace:*"
-  },
   "scripts": {
-    "start": "infra-start",
-    "build": "infra-build"
+    "start": "npx infra-start",
+    "build": "npx infra-build"
   },
   "browserslist": {
     "production": [

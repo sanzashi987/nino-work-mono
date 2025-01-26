@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@nino-work/infra": "workspace:*",
     "@types/js-cookie": "^3.0.6"
   },
   "scripts": {
-    "start": "infra-start",
-    "build": "infra-build"
+    "start": "npx infra-start",
+    "build": "npx infra-build"
   },
   "browserslist": {
     "production": [
