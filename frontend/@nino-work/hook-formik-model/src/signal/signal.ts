@@ -1,127 +1,73 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-param-reassign */
-let activeConsumer: ReactiveNode | null = null;
-let inNotificationPhase = false;
+import { defaultEquals, ValueEqualityFn } from './equality';
+import { throwInvalidWriteToSignalError } from './errors';
+import {
+  accessProducer, producerIncrementEpoch, producerNotifyConsumers, producerUpdatesAllowed, REACTIVE_NODE, ReactiveNode, SIGNAL
+} from './reactive';
 
-type Version = number & { __brand: 'Version' };
-
-let epoch: Version = 1 as Version;
-export function producerIncrementEpoch(): void {
-  // eslint-disable-next-line no-plusplus
-  epoch++;
-}
-
-export const SIGNAL = /* @__PURE__ */Symbol('SIGNAL');
-
-export function setActiveConsumer(consumer: ReactiveNode | null): ReactiveNode | null {
-  const prev = activeConsumer;
-  activeConsumer = consumer;
+let postSignalSetFn: (() => void) | null = null;
+export function setPostSignalSetFn(fn: (() => void) | null): (() => void) | null {
+  const prev = postSignalSetFn;
+  postSignalSetFn = fn;
   return prev;
 }
 
-export function getActiveConsumer(): ReactiveNode | null {
-  return activeConsumer;
-}
-export function isInNotificationPhase(): boolean {
-  return inNotificationPhase;
+export function runPostSignalSetFn(): void {
+  postSignalSetFn?.();
 }
 
-export interface Reactive {
-  [SIGNAL]: ReactiveNode;
+export interface SignalNode<T> extends ReactiveNode {
+  value: T;
+  equal: ValueEqualityFn<T>;
 }
 
-export function isReactive(value: unknown): value is Reactive {
-  return (value as Partial<Reactive>)[SIGNAL] !== undefined;
+type SignalBaseGetter<T> = (() => T) & { readonly [SIGNAL]: unknown };
+
+export interface SignalGetter<T> extends SignalBaseGetter<T> {
+  readonly [SIGNAL]: SignalNode<T>;
 }
 
-interface ReactiveNode {
-  version: Version
-  lastCleanEpoch: Version;
-  dirty: boolean;
+export const SIGNAL_NODE: SignalNode<unknown> = /* @__PURE__ */ (() => ({
+  ...REACTIVE_NODE,
+  equal: defaultEquals,
+  value: undefined,
+  kind: 'signal'
+}))();
 
-  producerNode?: ReactiveNode[];
-  indexInThoseProducer?: number[]
-  producerLastReadVersion?: Version[];
-  nextProducerIndex: number;
-
-  consumerNode?: ReactiveNode[];
-  indexInThoseConsumer?: number[];
-
-  consumerAllowSignalWrites: boolean;
-
-  readonly consumerIsAlwaysLive: boolean;
-
-  consumerMarkedDirty?(node: unknown): void
-
-  /**
- * Called when a signal is read within this consumer.
- */
-  consumerOnSignalRead(node: unknown): void;
-
-  kind: string;
+export function createSignal<T>(value: T): SignalGetter<T> {
+  const node: SignalNode<T> = Object.create(SIGNAL_NODE);
+  node.value = value;
+  const getter = (() => {
+    accessProducer(node);
+    return node.value;
+  }) as SignalGetter<T>;
+  (getter as any)[SIGNAL] = node;
+  return getter;
 }
 
-interface ConsumerNode extends ReactiveNode {
-  producerNode: NonNullable<ReactiveNode['producerNode']>;
-  indexInThoseProducer: NonNullable<ReactiveNode['indexInThoseProducer']>;
-  producerLastReadVersion: NonNullable<ReactiveNode['producerLastReadVersion']>;
-}
-
-interface ProducerNode extends ReactiveNode {
-  consumerNode: NonNullable<ReactiveNode['consumerNode']>;
-  indexInThoseConsumer: NonNullable<ReactiveNode['indexInThoseConsumer']>;
-}
-
-export function producerNotifyConsumers(node: ReactiveNode): void {
-  if (node.consumerNode === undefined) {
-    return;
-  }
-
-  // Prevent signal reads when we're updating the graph
-  const prev = inNotificationPhase;
-  inNotificationPhase = true;
-  try {
-    for (const consumer of node.consumerNode) {
-      if (!consumer.dirty) {
-        consumerMarkDirty(consumer);
-      }
-    }
-  } finally {
-    inNotificationPhase = prev;
-  }
-}
-
-export function consumerMarkDirty(node: ReactiveNode): void {
-  node.dirty = true;
+function signalValueChanged<T>(node: SignalNode<T>): void {
+  // eslint-disable-next-line no-plusplus
+  node.version++;
+  producerIncrementEpoch();
   producerNotifyConsumers(node);
-  node.consumerMarkedDirty?.(node);
+  postSignalSetFn?.();
 }
 
-export function assertConsumer(node: ReactiveNode): asserts node is ConsumerNode {
-  node.producerNode ??= [];
-  node.indexInThoseProducer ??= [];
-  node.producerLastReadVersion ??= [];
-}
-export function assertProducer(node: ReactiveNode): asserts node is ProducerNode {
-  node.consumerNode ??= [];
-  node.indexInThoseConsumer ??= [];
-}
-
-function consumerIsLive(node: ReactiveNode): boolean {
-  return node.consumerIsAlwaysLive || (node?.consumerNode?.length ?? 0) > 0;
-}
-
-function isConsumer(node: ReactiveNode): node is ConsumerNode {
-  return node.producerNode !== undefined;
-}
-
-function produceRemoveConsumer(producer: ReactiveNode, idx: number): void {
-  assertProducer(producer);
-
-  if (producer.consumerNode.length === 1 && isConsumer(producer)) {
-    // if last active consumer is remove , producer itself is not active any more,
-    // so remove itself from its producers' consumer list
-
+export function signalSetFn<T>(node: SignalNode<T>, newValue: T) {
+  if (!producerUpdatesAllowed()) {
+    throwInvalidWriteToSignalError();
   }
+
+  if (!node.equal(node.value, newValue)) {
+    node.value = newValue;
+    signalValueChanged(node);
+  }
+}
+
+export function signalUpdateFn<T>(node: SignalNode<T>, updater: (value: T) => T): void {
+  if (!producerUpdatesAllowed()) {
+    throwInvalidWriteToSignalError();
+  }
+
+  signalSetFn(node, updater(node.value));
 }
