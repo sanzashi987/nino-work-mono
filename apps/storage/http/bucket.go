@@ -60,6 +60,11 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 		return
 	}
 
+	var res struct {
+		Id   uint64 `json:"id"`
+		Code string `json:"code"`
+	}
+
 	c.ResponseJson(ctx, result)
 }
 
@@ -86,6 +91,7 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 	}
 
 	type Res struct {
+		Id         string `json:"id"`
 		Code       string `json:"code"`
 		UpdateTime int64  `json:"update_time"`
 		CreateTime int64  `json:"create_time"`
@@ -95,6 +101,7 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 
 	for i, bucket := range u.Buckets {
 		res[i] = Res{
+			Id:         bucket.Id,
 			Code:       bucket.Code,
 			UpdateTime: bucket.UpdateTime.Unix(),
 			CreateTime: bucket.CreateTime.Unix(),
