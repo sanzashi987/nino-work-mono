@@ -21,7 +21,7 @@ const AppsManagement: React.FC = () => {
 
   const [deps, refresh] = useDeps();
 
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -43,7 +43,7 @@ const AppsManagement: React.FC = () => {
           <>
             <IconButton onClick={() => {
               const p = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-              naviagte(`${p}/permission/${row.id}`);
+              navigate(`${p}/permission/${row.id}`);
             }}
             >
               <Settings />
@@ -54,16 +54,14 @@ const AppsManagement: React.FC = () => {
           </>
         )
       }
-    }], [pathname, naviagte]);
-
-  const requester = useCallback((req: PagninationRequest) => getAppList(req), []);
+    }], [pathname, navigate]);
 
   return (
     <>
       <ManagerShell
         deps={deps}
         schema={schema}
-        requester={requester}
+        requester={getAppList}
         ActionNode={(
           <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
             + Create Application

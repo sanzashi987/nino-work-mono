@@ -44,28 +44,53 @@ func (c *BucketController) CreateBucket(ctx *gin.Context) {
 	c.ResponseJson(ctx, bucket)
 }
 
+type BucketInfo struct {
+	Id         uint64 `json:"id"`
+	Code       string `json:"code"`
+	UpdateTime int64  `json:"update_time"`
+	CreateTime int64  `json:"create_time"`
+}
+
 func (c *BucketController) GetBucket(ctx *gin.Context) {
 	var uri struct {
 		Id uint64 `uri:"id" binding:"required"`
 	}
-
+	tx := db.NewTx(ctx)
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		c.AbortClientError(ctx, "GetBucket payload error: "+err.Error())
 		return
 	}
 
-	result, err := dao.GetBucket(db.NewTx(ctx), uri.Id)
+	result, err := dao.GetBucket(tx, uri.Id)
 	if err != nil {
 		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
 		return
 	}
 
-	var res struct {
-		Id   uint64 `json:"id"`
-		Code string `json:"code"`
+	rootDir := model.Object{}
+
+	if err := tx.Where("bucket_id ? AND dir = ? AND parent_id", result.Id, true, 0).Find(&rootDir).Error; err != nil {
+		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
+		return
 	}
 
-	c.ResponseJson(ctx, result)
+	data, err := dao.ListObjectsByDir(tx, result.Id, rootDir.Id)
+	if err != nil {
+		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())
+		return
+	}
+	files, dirs := ClusterObjects(data)
+
+	type InfoWithRootDir struct {
+		BucketInfo
+		DirContents DirResponse `json:"dir_contents"`
+	}
+
+	res := InfoWithRootDir{}
+	res.Id, res.Code, res.UpdateTime, res.CreateTime = result.Id, result.Code, result.UpdateTime.Unix(), result.CreateTime.Unix()
+	res.DirContents.File, res.DirContents.Directory = files, dirs
+
+	c.ResponseJson(ctx, res)
 }
 
 func (c *BucketController) ListBuckets(ctx *gin.Context) {
@@ -90,17 +115,10 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		return
 	}
 
-	type Res struct {
-		Id         string `json:"id"`
-		Code       string `json:"code"`
-		UpdateTime int64  `json:"update_time"`
-		CreateTime int64  `json:"create_time"`
-	}
-
-	res := make([]Res, len(u.Buckets))
+	res := make([]BucketInfo, len(u.Buckets))
 
 	for i, bucket := range u.Buckets {
-		res[i] = Res{
+		res[i] = BucketInfo{
 			Id:         bucket.Id,
 			Code:       bucket.Code,
 			UpdateTime: bucket.UpdateTime.Unix(),
@@ -113,38 +131,24 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 	c.ResponseJson(ctx, res)
 }
 
-func (c *BucketController) ListBucketDir(ctx *gin.Context) {
+type FileInfo struct {
+	FileId     string `json:"file_id"`
+	Name       string `json:"name"`
+	URI        string `json:"uri"`
+	UpdateTime int64  `json:"update_time"`
+	CreateTime int64  `json:"create_time"`
+}
 
-	var req struct {
-		BucketID uint64 `uri:"id" binding:"required"`
-		PathId   uint64 `form:"path"`
-	}
+type DirInfo struct {
+	Id   uint64 `json:"id"`
+	Name string `json:"name"`
+}
+type DirResponse struct {
+	File      []*FileInfo `json:"files"`
+	Directory []*DirInfo  `json:"dirs"`
+}
 
-	if err := ctx.ShouldBind(&req); err != nil {
-		c.AbortClientError(ctx, "ListBucketDir params not passed: "+err.Error())
-		return
-	}
-
-	tx := db.NewTx(ctx)
-	data, err := dao.ListObjectsByDir(tx, req.BucketID, req.PathId)
-	if err != nil {
-		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())
-		return
-	}
-
-	type FileInfo struct {
-		FileId     string `json:"file_id"`
-		Name       string `json:"name"`
-		URI        string `json:"uri"`
-		UpdateTime int64  `json:"update_time"`
-		CreateTime int64  `json:"create_time"`
-	}
-
-	type DirInfo struct {
-		Id   uint64 `json:"id"`
-		Name string `json:"name"`
-	}
-
+func ClusterObjects(data []*model.Object) ([]*FileInfo, []*DirInfo) {
 	files := []*FileInfo{}
 	dirs := []*DirInfo{}
 	for _, d := range data {
@@ -165,6 +169,28 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 		}
 	}
 
+	return files, dirs
+}
+
+func (c *BucketController) ListBucketDir(ctx *gin.Context) {
+
+	var req struct {
+		BucketID uint64 `uri:"id" binding:"required"`
+		PathId   uint64 `form:"path"`
+	}
+
+	if err := ctx.ShouldBind(&req); err != nil {
+		c.AbortClientError(ctx, "ListBucketDir params not passed: "+err.Error())
+		return
+	}
+
+	tx := db.NewTx(ctx)
+	data, err := dao.ListObjectsByDir(tx, req.BucketID, req.PathId)
+	if err != nil {
+		c.AbortServerError(ctx, "ListBucketDir query files error: "+err.Error())
+		return
+	}
+	files, dirs := ClusterObjects(data)
 	type Response struct {
 		File      []*FileInfo `json:"files"`
 		Directory []*DirInfo  `json:"dirs"`

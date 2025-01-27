@@ -18,9 +18,26 @@ export const listBucket = defineApi<PagninationRequest, PaginationResponse<Bucke
 type GetBucketRequest = {
   id :number
 };
+type FileInfo = {
+  file_id: string,
+  name: string,
+  uri: string,
+  update_time: number,
+  create_time: number
+};
 
+type DirInfo = {
+  id: number,
+  name :string
+};
+
+type DirResponse = {
+  file: FileInfo[]
+  dir: DirInfo[]
+};
 type BucketInfo = {
   id: number
   code: string
+  dir_contents: DirResponse
 };
 export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: `${prefix}/bucket/info/:id` });

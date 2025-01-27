@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 export type StandardResponse<T> = {
   msg: string
   data: T
@@ -15,8 +16,28 @@ const defaultHeaders = {
   // 'Content-Type': 'application/json'
 };
 
+type PathMeta = {
+  dynamic: boolean
+  name: string
+  optional:boolean
+};
+
 export const defineApi = <Req, Res>(options: DefineApiOptions) => {
   const { method = 'GET', url, onError = Promise.reject } = options;
+  const pathMetas = url.split('/').map((param) => {
+    const meta: PathMeta = { dynamic: false, optional: false, name: param };
+    let name = param;
+    if (param.startsWith(':')) {
+      name = name.slice(1);
+      meta.dynamic = true;
+    }
+    if (param.endsWith('?')) {
+      name = name.slice(0, -1);
+      meta.optional = true;
+    }
+    meta.name = name;
+    return meta;
+  });
 
   type Requester = Req extends undefined
     ? (input?: null, opts?: RequestInit) => Promise<Res>
@@ -25,7 +46,25 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
   // @ts-ignore
   const requester: Requester = async (input: any = {}, opts: RequestInit = {}) => {
     const { headers = defaultHeaders, ...others } = opts;
-    let fullurl = url;
+    const inputNext = { ...input };
+
+    const dynamicPaths:string[] = [];
+    for (const meta of pathMetas) {
+      if (!meta.dynamic) {
+        dynamicPaths.push(meta.name);
+      } else {
+        const val = inputNext[meta.name];
+        if (val) {
+          delete inputNext[meta.name];
+          dynamicPaths.push(val);
+        } else if (!meta.optional) {
+          throw new Error('required params not given');
+        }
+      }
+    }
+
+    let fullurl = dynamicPaths.join('/');
+
     const isGet = method === 'GET';
     if (isGet) {
       const search = new URLSearchParams(input);
