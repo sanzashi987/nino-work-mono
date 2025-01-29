@@ -52,7 +52,7 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 
 	pagination := shared.PaginationRequest{}
 
-	if err := ctx.ShouldBindQuery(&pagination); err != nil {
+	if err := ctx.ShouldBindBodyWithJSON(&pagination); err != nil {
 		c.AbortClientError(ctx, "[http] list apps: Fail to read required fields "+err.Error())
 		return
 	}

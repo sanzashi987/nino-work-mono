@@ -1,11 +1,10 @@
-import { Button, Dialog, IconButton } from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
+import { Button, IconButton } from '@mui/material';
+import React, { useMemo } from 'react';
 import { Delete, Settings } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
-import { PagninationRequest } from '@nino-work/shared';
 import { getAppList } from '@/api';
-import { CreateAppDialog } from './Dialogs';
+import { openCreateApp } from './Dialogs';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -16,20 +15,11 @@ const staticSchema = [
 ];
 
 const AppsManagement: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
   const [deps, refresh] = useDeps();
 
   const navigate = useNavigate();
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-  }, []);
-  const handleSuccess = useCallback(() => {
-    refresh();
-    setOpen(false);
-  }, []);
 
   const schema = useMemo(() => [
     ...staticSchema,
@@ -57,21 +47,16 @@ const AppsManagement: React.FC = () => {
     }], [pathname, navigate]);
 
   return (
-    <>
-      <ManagerShell
-        deps={deps}
-        schema={schema}
-        requester={getAppList}
-        ActionNode={(
-          <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
-            + Create Application
-          </Button>
-        )}
-      />
-      <Dialog open={open}>
-        <CreateAppDialog onSuccess={handleSuccess} close={handleClose} />
-      </Dialog>
-    </>
+    <ManagerShell
+      deps={deps}
+      schema={schema}
+      requester={getAppList}
+      ActionNode={(
+        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openCreateApp(refresh)}>
+          + Create Application
+        </Button>
+      )}
+    />
   );
 };
 

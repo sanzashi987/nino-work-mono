@@ -23,7 +23,7 @@ type MenuModel struct {
 	Hyperlink   bool        `gorm:"column:hyperlink"`
 	Path        string      `gorm:"column:path"`
 	Icon        string      `gorm:"column:icon"`
-	Roles       []RoleModel `gorm:"many2many:menu_roles"`
+	Roles       []*RoleModel `gorm:"many2many:menu_roles"`
 
 	// ParentID    uint64            `gorm:"column:parent_id"`
 }

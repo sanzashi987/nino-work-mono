@@ -13,7 +13,7 @@ export type DefineApiOptions = {
 
 const defaultHeaders = {
   // Accept: 'application/json, text/html, */*'
-  // 'Content-Type': 'application/json'
+  'Content-Type': 'application/json'
 };
 
 type PathMeta = {
@@ -30,10 +30,10 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     if (param.startsWith(':')) {
       name = name.slice(1);
       meta.dynamic = true;
-    }
-    if (param.endsWith('?')) {
-      name = name.slice(0, -1);
-      meta.optional = true;
+      if (param.endsWith('?')) {
+        name = name.slice(0, -1);
+        meta.optional = true;
+      }
     }
     meta.name = name;
     return meta;
@@ -66,11 +66,10 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     let fullurl = dynamicPaths.join('/');
 
     const isGet = method === 'GET';
+
     if (isGet) {
       const search = new URLSearchParams(input);
-      if (search.size > 0) {
-        fullurl += url.includes('?') ? search.toString() : `?${search.toString()}`;
-      }
+      fullurl += url.includes('?') ? search.toString() : `?${search.toString()}`;
     }
     const res = await fetch(fullurl, {
       headers,

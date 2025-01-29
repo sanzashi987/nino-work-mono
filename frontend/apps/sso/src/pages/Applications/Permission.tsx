@@ -1,12 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Button, Dialog, IconButton, Stack, Typography
-} from '@mui/material';
+import { Button, IconButton, Stack, Typography } from '@mui/material';
 import { ArrowBack, Delete } from '@mui/icons-material';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import { listPermissions, ListPermissionsResponse } from '@/api';
-import { CreatePermissionDialog } from './Dialogs';
+import { openCreatePermission } from './Dialogs';
 
 type PermissionMeta = ListPermissionsResponse['permissions'][number];
 
@@ -17,19 +15,10 @@ const staticSchema = [
 ];
 
 const PermissionManagement: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const { appId } = useParams();
   const [res, setRes] = useState<ListPermissionsResponse | null>(null);
   const [deps, refresh] = useDeps();
   const naviagte = useNavigate();
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-  }, []);
-  const handleSuccess = useCallback(() => {
-    refresh();
-    setOpen(false);
-  }, []);
 
   const requester = useCallback(
     () => listPermissions({ app_id: Number(appId) }).then((response) => {
@@ -82,14 +71,19 @@ const PermissionManagement: React.FC = () => {
         schema={schema}
         requester={requester}
         ActionNode={(
-          <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
+          <Button
+            color="info"
+            variant="contained"
+            sx={{ width: 'fit-content' }}
+            onClick={() => {
+              openCreatePermission(Number(appId!), refresh);
+            }}
+          >
             + Create Permission
           </Button>
         )}
       />
-      <Dialog open={open}>
-        <CreatePermissionDialog onSuccess={handleSuccess} close={handleClose} appId={appId!} />
-      </Dialog>
+
     </>
   );
 };

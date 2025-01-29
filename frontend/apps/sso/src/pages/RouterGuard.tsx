@@ -35,6 +35,10 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
     if (!userInfo) {
       return true;
     }
+    if (location.pathname === '/dashboard') {
+      return true;
+    }
+
     return menus.map((e) => e.path).some((e) => location.pathname.startsWith(e) || e.startsWith(location.pathname));
   }, [location.pathname, menus, userInfo]);
 

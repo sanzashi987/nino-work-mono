@@ -1,8 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-type AppsPageProps = {};
-
-const AppsPage: React.FC<AppsPageProps> = () => <Outlet />;
+const AppsPage: React.FC = () => <Outlet />;
 
 export default AppsPage;

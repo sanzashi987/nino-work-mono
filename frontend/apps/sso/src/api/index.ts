@@ -65,7 +65,7 @@ type AppModel = {
 
 export type AppListResponse = PaginationResponse<AppModel>;
 
-export const getAppList = defineApi<PagninationRequest, AppListResponse>({ url: `${prefix}/apps/list` });
+export const getAppList = defineApi<PagninationRequest, AppListResponse>({ url: `${prefix}/apps/list`, method: 'POST' });
 
 export type CreateAppRequest = Pick<AppModel, 'code' | 'name' | 'description'>;
 
