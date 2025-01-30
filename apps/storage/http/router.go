@@ -21,8 +21,10 @@ func NewRouter(loginPageUrl, bucketPath, tmpPath string) *gin.Engine {
 		authed := v1.Use(authMiddleware)
 		// Bucket 管理
 		authed.POST("/bucket/list", bucketController.ListBuckets)
-		authed.GET("/bucket/info/:id", bucketController.GetBucket)
-		authed.GET("/bucket/list/:id", bucketController.ListBucketDir)
+		authed.POST("/bucket/create", bucketController.CreateBucket)
+		authed.POST("/bucket/create-dir", bucketController.CreateDir)
+		authed.GET("/bucket/info", bucketController.GetBucket)
+		authed.GET("/bucket/list-dir", bucketController.ListBucketDir)
 
 	}
 	v1.POST("/asset/upload/:bucket_id", objectController.UploadFile)

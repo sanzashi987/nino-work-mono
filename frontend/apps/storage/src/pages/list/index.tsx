@@ -8,8 +8,8 @@ import openCreateBucket from './openCreateBucket';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
-  { label: 'Name', field: 'name' },
-  { label: 'Code', field: 'code' }
+  { label: 'Code', field: 'code' },
+  { label: 'Description', field: 'description' }
 ];
 
 const BucketList: React.FC = () => {
@@ -29,8 +29,7 @@ const BucketList: React.FC = () => {
         render: (row: any) => (
           <>
             <IconButton onClick={() => {
-              const p = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-              navigate(`${p}/detail/${row.id}`);
+              navigate(`../detail/${row.id}`);
             }}
             >
               <Settings />

@@ -1,28 +1,25 @@
-import {
-  Box, Button, Stack,
-  TextField
-} from '@mui/material';
+import { Box, Button, Stack, TextField } from '@mui/material';
 import React, { useCallback, useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
-import { openModal, OpenModalContext } from '@nino-work/ui-components';
-import { createApp, CreateMeta, createPermission } from '@/api';
-import FormLabel from '@/components/FormLabel';
+import { openModal, OpenModalContext, FormLabel } from '@nino-work/ui-components';
+import { ModelMeta } from '@nino-work/shared';
+import { createApp, createPermission } from '@/api';
 
 type CreateProps = {
   onSuccess: VoidFunction
-  requester:(params:CreateMeta)=>Promise<any>
+  requester:(params:ModelMeta)=>Promise<any>
 };
 
 const BasicCreate = ({ onSuccess, requester }: CreateProps) => {
-  const [loading, setLaoding] = useState(false);
-  const { register, handleSubmit } = useForm<CreateMeta>();
+  const [loading, setLoading] = useState(false);
+  const { register, handleSubmit } = useForm<ModelMeta>();
   const { close } = useContext(OpenModalContext);
 
-  const onSubmit = useCallback((payload: CreateMeta) => {
-    setLaoding(true);
-    requester(payload).then(onSuccess).finally(() => {
-      setLaoding(false);
+  const onSubmit = useCallback((payload: ModelMeta) => {
+    setLoading(true);
+    requester(payload).then(onSuccess).then(close).finally(() => {
+      setLoading(false);
     });
   }, []);
 
@@ -63,7 +60,7 @@ export const openCreateApp = (onSuccess: VoidFunction) => {
 };
 
 export const openCreatePermission = (appId:number, onSuccess: VoidFunction) => {
-  const requester = (payload: CreateMeta) => createPermission({ app_id: appId, permissions: [payload] });
+  const requester = (payload: ModelMeta) => createPermission({ app_id: appId, permissions: [payload] });
 
   openModal({
     title: 'Create Permission',

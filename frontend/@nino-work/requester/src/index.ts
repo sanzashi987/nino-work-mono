@@ -39,6 +39,8 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     return meta;
   });
 
+  const hasQuery = pathMetas.at(-1).name.includes('?');
+
   type Requester = Req extends undefined
     ? (input?: null, opts?: RequestInit) => Promise<Res>
     : (input: Req, opts?: RequestInit) => Promise<Res>;
@@ -69,7 +71,7 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
 
     if (isGet) {
       const search = new URLSearchParams(input);
-      fullurl += url.includes('?') ? search.toString() : `?${search.toString()}`;
+      fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
     }
     const res = await fetch(fullurl, {
       headers,

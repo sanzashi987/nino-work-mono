@@ -32,8 +32,7 @@ const AppsManagement: React.FC = () => {
         render: (row: any) => (
           <>
             <IconButton onClick={() => {
-              const p = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-              navigate(`${p}/permission/${row.id}`);
+              navigate(`./permission/${row.id}`);
             }}
             >
               <Settings />

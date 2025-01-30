@@ -1,4 +1,4 @@
-import { PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
 const prefix = '/backend/v1';
@@ -16,7 +16,7 @@ export const listBucket = defineApi<PagninationRequest, PaginationResponse<Bucke
 });
 
 type GetBucketRequest = {
-  id :number
+  bucket_id :number | string
 };
 type FileInfo = {
   file_id: string,
@@ -26,18 +26,33 @@ type FileInfo = {
   create_time: number
 };
 
-type DirInfo = {
+export type DirInfo = {
   id: number,
   name :string
 };
 
-type DirResponse = {
-  file: FileInfo[]
-  dir: DirInfo[]
+export type DirResponse = {
+  files: FileInfo[]
+  dirs: DirInfo[]
 };
-type BucketInfo = {
+export type BucketInfo = {
   id: number
   code: string
   dir_contents: DirResponse
+  root_path_id: number
 };
-export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: `${prefix}/bucket/info/:id` });
+export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: `${prefix}/bucket/info` });
+
+type ListBucketDirRequest = {
+  bucket_id: number | string
+  path_id: number
+};
+
+export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({ url: `${prefix}/bucket/list` });
+
+export type BucketMeta = Omit<ModelMeta, 'name'>;
+
+export const createBucket = defineApi<{ code: string }, { id: number }>({
+  url: `${prefix}/bucket/create`,
+  method: 'POST'
+});

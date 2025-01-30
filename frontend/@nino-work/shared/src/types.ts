@@ -9,3 +9,9 @@ export type PaginationResponse<T> = {
   page_size: number
   record_total: number
 };
+
+export type ModelMeta = {
+  name: string
+  code: string
+  description: string
+};

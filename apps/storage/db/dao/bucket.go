@@ -9,9 +9,43 @@ import (
 	"gorm.io/gorm"
 )
 
+// Requires `tx` is a beganned transaction
+func AddUsersToBucket(tx *gorm.DB, bucketId uint64, userIds []uint64) error {
+	// test if user is in the table
+	var existingUsers []*model.User
+	if err := tx.Where("user_id IN ?", userIds).Find(&existingUsers).Error; err != nil {
+		return err
+	}
+
+	existingIDMap := make(map[uint64]bool)
+	for _, user := range existingUsers {
+		existingIDMap[user.Id] = true
+	}
+
+	var missingUsers []*model.User
+	for _, id := range userIds {
+		if !existingIDMap[id] {
+			missingUsers = append(missingUsers, &model.User{UserId: id})
+		}
+	}
+
+	if len(missingUsers) > 0 {
+		if err := tx.Create(&missingUsers).Error; err != nil {
+			return err
+		}
+	}
+
+	// add user to bucket
+	bucket := &model.Bucket{}
+	bucket.Id = bucketId
+
+	toAppend := append([]*model.User{}, existingUsers...)
+	toAppend = append(toAppend, missingUsers...)
+	return tx.Model(bucket).Association("Users").Append(toAppend)
+
+}
 
 func CreateBucket(tx *gorm.DB, code, bucketpath string) (*model.Bucket, error) {
-	tx.Begin()
 	bucket := &model.Bucket{Code: code}
 	bucketFullpath := filepath.Join(bucketpath, code)
 	if err := os.MkdirAll(bucketFullpath, fs.ModePerm); err != nil {
@@ -19,7 +53,6 @@ func CreateBucket(tx *gorm.DB, code, bucketpath string) (*model.Bucket, error) {
 	}
 
 	if err := tx.Create(bucket).Error; err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -34,17 +67,15 @@ func CreateBucket(tx *gorm.DB, code, bucketpath string) (*model.Bucket, error) {
 	rootDir := model.Object{
 		BucketID: bucket.Id,
 		Dir:      true,
-		Name:     "/",
+		Name:     "Root",
 		ParentId: 0,
 	}
 
 	// err = tx.Create(&rootDir).Error
 	if err := tx.Create(&rootDir).Error; err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
-	tx.Commit()
 	return bucket, nil
 }
 

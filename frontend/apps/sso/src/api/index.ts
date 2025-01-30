@@ -1,4 +1,4 @@
-import type { PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import type { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
 type LoginRequest = {
@@ -96,15 +96,9 @@ export const listPermissions = defineApi<ListPermissionsRequest, ListPermissions
   { url: `${prefix}/apps/list-permission` }
 );
 
-export type CreateMeta = {
-  name: string
-  code: string
-  description: string
-};
-
 export type CreatePermissionRequest = {
   app_id: number | string
-  permissions: CreateMeta[]
+  permissions: ModelMeta[]
 };
 
 export const createPermission = defineApi<CreatePermissionRequest, void>({

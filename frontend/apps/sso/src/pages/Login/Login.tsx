@@ -16,8 +16,8 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { noop } from '@nino-work/shared';
+import { FormLabel } from '@nino-work/ui-components';
 import { login } from '@/api';
-import FormLabel from '@/components/FormLabel';
 
 interface LoginProps {
   title?: string;

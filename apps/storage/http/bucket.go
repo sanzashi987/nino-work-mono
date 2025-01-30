@@ -22,39 +22,76 @@ var bucketController BucketController = BucketController{
 
 func (c *BucketController) CreateBucket(ctx *gin.Context) {
 	var req struct {
-		Name string `json:"name" binding:"required"`
-		Code string `json:"code" binding:"required"`
+		Code        string `json:"code" binding:"required"`
+		Description string `json:"description"`
 	}
 
+	userId := ctx.GetUint64(controller.UserID)
+	// TODO validate the user has create authority
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		c.AbortClientError(ctx, " "+err.Error())
+		c.AbortClientError(ctx, "CreateBucket "+err.Error())
 		return
 	}
 
 	bucketPath := ctx.GetString(consts.BucketPath)
 
-	bucket, err := dao.CreateBucket(db.NewTx(ctx), req.Name, bucketPath)
+	tx := db.NewTx(ctx).Begin()
+
+	bucket, err := dao.CreateBucket(tx, req.Code, bucketPath)
 	if err != nil {
-		c.AbortServerError(ctx, " "+err.Error())
+		tx.Rollback()
+		c.AbortServerError(ctx, "CreateBucket "+err.Error())
 		return
 	}
+
+	if err := dao.AddUsersToBucket(tx, bucket.Id, []uint64{userId}); err != nil {
+		tx.Rollback()
+		c.AbortServerError(ctx, "CreateBucket "+err.Error())
+		return
+	}
+
+	tx.Commit()
 
 	c.ResponseJson(ctx, bucket)
 }
 
+func (c *BucketController) AddUsersToBucket(ctx *gin.Context) {
+	var req struct {
+		BucketID uint64   `json:"bucket_id" binding:"required"`
+		Users    []uint64 `json:"users" binding:"required"`
+	}
+
+	if err := ctx.ShouldBind(&req); err != nil {
+		c.AbortClientError(ctx, "AddUsersToBucket params not passed: "+err.Error())
+		return
+	}
+
+	tx := db.NewTx(ctx).Begin()
+	if err := dao.AddUsersToBucket(tx, req.BucketID, req.Users); err != nil {
+		tx.Rollback()
+		c.AbortServerError(ctx, "AddUsersToBucket internal error: "+err.Error())
+		return
+	}
+	tx.Commit()
+
+	c.ResponseJson(ctx, nil)
+}
+
 type BucketInfo struct {
-	Id         uint64 `json:"id"`
-	Code       string `json:"code"`
-	UpdateTime int64  `json:"update_time"`
-	CreateTime int64  `json:"create_time"`
+	Id          uint64 `json:"id"`
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	UpdateTime  int64  `json:"update_time"`
+	CreateTime  int64  `json:"create_time"`
 }
 
 func (c *BucketController) GetBucket(ctx *gin.Context) {
 	var uri struct {
-		Id uint64 `uri:"id" binding:"required"`
+		Id uint64 `form:"bucket_id" binding:"required"`
 	}
 	tx := db.NewTx(ctx)
-	if err := ctx.ShouldBindUri(&uri); err != nil {
+	if err := ctx.ShouldBind(&uri); err != nil {
 		c.AbortClientError(ctx, "GetBucket payload error: "+err.Error())
 		return
 	}
@@ -67,7 +104,7 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 
 	rootDir := model.Object{}
 
-	if err := tx.Where("bucket_id ? AND dir = ? AND parent_id", result.Id, true, 0).Find(&rootDir).Error; err != nil {
+	if err := tx.Where("bucket_id = ? AND dir = ? AND parent_id = ?", result.Id, true, 0).Find(&rootDir).Error; err != nil { 
 		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
 		return
 	}
@@ -82,11 +119,13 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 	type InfoWithRootDir struct {
 		BucketInfo
 		DirContents DirResponse `json:"dir_contents"`
+		RootPathId  uint64      `json:"root_path_id"`
 	}
 
 	res := InfoWithRootDir{}
 	res.Id, res.Code, res.UpdateTime, res.CreateTime = result.Id, result.Code, result.UpdateTime.Unix(), result.CreateTime.Unix()
-	res.DirContents.File, res.DirContents.Directory = files, dirs
+	res.Description = result.Description
+	res.DirContents.File, res.DirContents.Directory, res.RootPathId = files, dirs, rootDir.Id
 
 	c.ResponseJson(ctx, res)
 }
@@ -197,8 +236,8 @@ func ClusterObjects(data []*model.Object) ([]*FileInfo, []*DirInfo) {
 func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 
 	var req struct {
-		BucketID uint64 `uri:"id" binding:"required"`
-		PathId   uint64 `form:"path"`
+		BucketID uint64 `form:"bucket_id" binding:"required"`
+		PathId   uint64 `form:"path_id" binding:"required"`
 	}
 
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -224,4 +263,40 @@ func (c *BucketController) ListBucketDir(ctx *gin.Context) {
 	}
 
 	c.ResponseJson(ctx, res)
+}
+
+func (c BucketController) CreateDir(ctx *gin.Context) {
+	var req struct {
+		BucketID uint64 `json:"bucket_id" binding:"required"`
+		ParentID uint64 `json:"parent_id" binding:"required"`
+		Name     string `json:"name" binding:"required"`
+	}
+
+	if err := ctx.ShouldBind(&req); err != nil {
+		c.AbortClientError(ctx, "CreateDir params not passed: "+err.Error())
+		return
+	}
+
+	tx := db.NewTx(ctx)
+
+	// add deduplicate validate
+	var existing model.Object
+	if err := tx.Where("bucket_id = ? AND parent_id = ? AND name = ?", req.BucketID, req.ParentID, req.Name).First(&existing).Error; err == nil {
+		c.AbortClientError(ctx, "CreateDir directory already exists")
+		return
+	}
+
+	toCreate := model.Object{
+		BucketID: req.BucketID,
+		ParentId: req.ParentID,
+		Name:     req.Name,
+		Dir:      true,
+	}
+
+	if err := tx.Create(&toCreate).Error; err != nil {
+		c.AbortServerError(ctx, "CreateDir internal error: "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, nil)
 }

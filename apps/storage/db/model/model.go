@@ -8,11 +8,12 @@ import (
 
 type Bucket struct {
 	db.BaseModel
-	Code    string    `gorm:"uniqueIndex;not null"`
-	AK      string    `gorm:"column:access_key"`
-	SK      string    `gorm:"column:secret_key"`
-	Objects []*Object `gorm:"foreignKey:BucketID"`
-	Users   []*User   `gorm:"many2many:bucket_user"`
+	Code        string    `gorm:"uniqueIndex;not null"`
+	Description string    `gorm:"column:description"`
+	AK          string    `gorm:"column:access_key"`
+	SK          string    `gorm:"column:secret_key"`
+	Objects     []*Object `gorm:"foreignKey:BucketID"`
+	Users       []*User   `gorm:"many2many:bucket_user"`
 }
 
 type Object struct {
@@ -20,8 +21,8 @@ type Object struct {
 	BucketID  uint64 `gorm:"not null;primaryKey;autoIncrement:false"`
 	ParentId  uint64 `gorm:"column:parent_id;primaryKey;autoIncrement:false"`
 	Dir       bool   `gorm:"column:dir;index"`
-	FileId    string `gorm:"unique;index;column:file_id"`
-	URI       string `gorm:"type:varchar(255);unique;index;column:uri"`
+	FileId    string `gorm:"index;column:file_id"`
+	URI       string `gorm:"type:varchar(255);index;column:uri"`
 	Name      string `gorm:"column:name"`
 	Size      int64  `gorm:"column:size"`
 	MimeType  string `gorm:"column:mime_type"`
@@ -35,10 +36,8 @@ const (
 
 type User struct {
 	db.BaseModel
-	UserId  uint64    `gorm:"column:user_id;index"`
-	AppId   uint64    `gorm:"column:app_id;index"`
+	UserId  uint64    `gorm:"column:user_id;index;unique"`
 	Buckets []*Bucket `gorm:"many2many:bucket_user"`
-	Type    uint      `gorm:"column:type"`
 }
 
 type LargeFile struct {
