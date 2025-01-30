@@ -51,7 +51,6 @@ const BasicCreate = ({ onSuccess, requester }: CreateProps) => {
         </Stack>
       </form>
     </Box>
-
   );
 };
 

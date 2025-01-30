@@ -8,7 +8,6 @@ type PaginationRequest struct {
 type PaginationResponse struct {
 	PageIndex   int `json:"page_index"`
 	PageSize    int `json:"page_size"`
-	PageTotal   int `json:"page_total"`
 	RecordTotal int `json:"record_total"`
 }
 

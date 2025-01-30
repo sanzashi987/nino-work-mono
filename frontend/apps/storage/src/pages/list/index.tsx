@@ -4,8 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, IconButton } from '@mui/material';
 import { Settings, Delete } from '@mui/icons-material';
 import { listBucket } from '@/api';
-
-type StorageListProps = {};
+import openCreateBucket from './openCreateBucket';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -13,9 +12,7 @@ const staticSchema = [
   { label: 'Code', field: 'code' }
 ];
 
-const BucketList: React.FC<StorageListProps> = (props) => {
-  const [open, setOpen] = useState(false);
-
+const BucketList: React.FC = () => {
   const { pathname } = useLocation();
   const [deps, refresh] = useDeps();
 
@@ -52,8 +49,15 @@ const BucketList: React.FC<StorageListProps> = (props) => {
       deps={deps}
       requester={listBucket}
       ActionNode={(
-        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => setOpen(true)}>
-          + Create Application
+        <Button
+          color="info"
+          variant="contained"
+          sx={{ width: 'fit-content' }}
+          onClick={() => {
+            openCreateBucket(refresh);
+          }}
+        >
+          + Create Bucket
         </Button>
       )}
     />

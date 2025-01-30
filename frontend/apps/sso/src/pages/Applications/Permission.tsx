@@ -28,7 +28,6 @@ const PermissionManagement: React.FC = () => {
         data: response.permissions,
         page_index: 1,
         page_size: len,
-        page_total: len,
         record_total: len
       };
     }),

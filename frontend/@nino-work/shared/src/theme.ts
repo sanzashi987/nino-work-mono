@@ -15,6 +15,6 @@ const theme = {
     htmlFontSize: 14,
     button: { textTransform: 'none' }
   }
-};
+} as const;
 
 export default theme;

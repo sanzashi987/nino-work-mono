@@ -1,8 +1,6 @@
 package http
 
 import (
-	"sort"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/consts"
 	"github.com/sanzashi987/nino-work/apps/storage/db/dao"
@@ -102,33 +100,57 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		return
 	}
 
-	paginationScope := db.Paginate(pagination.Page, pagination.Size)
-
+	var total int64
 	tx := db.NewTx(ctx)
-	u := model.User{
-		UserId: user,
-		Type:   model.USER,
-	}
-	err := tx.Preload("Buckets").Scopes(paginationScope).Find(&u).Error
-	if err != nil {
+	// TODO many2many delete may cause problem
+	if err := tx.Table("bucket_user").Where("user_id = ?", user).Count(&total).Error; err != nil {
 		c.AbortServerError(ctx, "ListBuckets internal error: "+err.Error())
 		return
 	}
 
-	res := make([]BucketInfo, len(u.Buckets))
+	if total < int64(pagination.Page*pagination.Size) {
+		pagination.Page = 1
+		pagination.Size = int(total)
+	}
 
-	for i, bucket := range u.Buckets {
-		res[i] = BucketInfo{
+	paginationScope := db.Paginate(pagination.Page, pagination.Size)
+
+	buckets := []*model.Bucket{}
+
+	if err := tx.Table("buckets").
+		Joins("INNER JOIN bucket_user ON bucket_user.bucket_id = buckets.id").
+		Where("user_id = ? ", user).
+		Scopes(paginationScope).Order("update_time DESC").Find(&buckets).Error; err != nil {
+		c.AbortServerError(ctx, "ListBuckets internal error: "+err.Error())
+		return
+	}
+
+	res := make([]*BucketInfo, len(buckets))
+
+	for i, bucket := range buckets {
+		res[i] = &BucketInfo{
 			Id:         bucket.Id,
 			Code:       bucket.Code,
 			UpdateTime: bucket.UpdateTime.Unix(),
 			CreateTime: bucket.CreateTime.Unix(),
 		}
 	}
-	sort.Slice(res, func(i, j int) bool {
-		return res[i].UpdateTime > res[j].UpdateTime
-	})
-	c.ResponseJson(ctx, res)
+
+	paginationResponse := shared.PaginationResponse{
+		PageIndex:   pagination.Page,
+		PageSize:    pagination.Size,
+		RecordTotal: int(total),
+	}
+
+	var r struct {
+		Data []*BucketInfo `json:"data"`
+		*shared.PaginationResponse
+	}
+	r.PaginationResponse = &paginationResponse
+	r.Data = res
+
+	c.ResponseJson(ctx, r)
+
 }
 
 type FileInfo struct {
