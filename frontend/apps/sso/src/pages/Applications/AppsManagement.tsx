@@ -1,7 +1,7 @@
 import { Button, IconButton } from '@mui/material';
 import React, { useMemo } from 'react';
 import { Delete, Settings } from '@mui/icons-material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import { getAppList } from '@/api';
 import { openCreateApp } from './Dialogs';
@@ -15,8 +15,6 @@ const staticSchema = [
 ];
 
 const AppsManagement: React.FC = () => {
-  const { pathname } = useLocation();
-
   const [deps, refresh] = useDeps();
 
   const navigate = useNavigate();
@@ -43,7 +41,7 @@ const AppsManagement: React.FC = () => {
           </>
         )
       }
-    }], [pathname, navigate]);
+    }], [navigate]);
 
   return (
     <ManagerShell

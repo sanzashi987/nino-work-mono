@@ -22,9 +22,9 @@ func NewRouter(loginPageUrl, bucketPath, tmpPath string) *gin.Engine {
 		// Bucket 管理
 		authed.POST("/bucket/list", bucketController.ListBuckets)
 		authed.POST("/bucket/create", bucketController.CreateBucket)
-		authed.POST("/bucket/create-dir", bucketController.CreateDir)
 		authed.GET("/bucket/info", bucketController.GetBucket)
-		authed.GET("/bucket/list-dir", bucketController.ListBucketDir)
+		authed.POST("/bucket/dir/create", bucketController.CreateDir)
+		authed.GET("/bucket/dir/list", bucketController.ListBucketDir)
 
 	}
 	v1.POST("/asset/upload/:bucket_id", objectController.UploadFile)

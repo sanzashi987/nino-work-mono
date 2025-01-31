@@ -48,11 +48,16 @@ type ListBucketDirRequest = {
   path_id: number
 };
 
-export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({ url: `${prefix}/bucket/list` });
+export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({ url: `${prefix}/bucket/dir/list` });
 
 export type BucketMeta = Omit<ModelMeta, 'name'>;
 
 export const createBucket = defineApi<{ code: string }, { id: number }>({
   url: `${prefix}/bucket/create`,
+  method: 'POST'
+});
+
+export const createDir = defineApi<{ bucket_id: number, parent_id: number, name: string }, void >({
+  url: `${prefix}/bucket/dir/create`,
   method: 'POST'
 });

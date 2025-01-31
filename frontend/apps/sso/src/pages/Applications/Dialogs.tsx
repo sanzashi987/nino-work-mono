@@ -1,7 +1,6 @@
 import { Box, Button, Stack, TextField } from '@mui/material';
 import React, { useCallback, useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { LoadingButton } from '@mui/lab';
 import { openModal, OpenModalContext, FormLabel } from '@nino-work/ui-components';
 import { ModelMeta } from '@nino-work/shared';
 import { createApp, createPermission } from '@/api';
@@ -39,9 +38,9 @@ const BasicCreate = ({ onSuccess, requester }: CreateProps) => {
           <TextField id="description" fullWidth {...register('description')} multiline minRows={3} />
         </Box>
         <Stack flexDirection="row-reverse">
-          <LoadingButton loading={loading} variant="contained" size="medium" type="submit">
+          <Button loading={loading} variant="contained" size="medium" type="submit">
             Create
-          </LoadingButton>
+          </Button>
           <Box mr={1}>
             <Button variant="outlined" onClick={close}>Cancel</Button>
           </Box>

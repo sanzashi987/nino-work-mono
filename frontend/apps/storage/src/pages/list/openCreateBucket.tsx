@@ -1,6 +1,5 @@
 import { openModal, FormLabel, OpenModalContext } from '@nino-work/ui-components';
 import React, { useState, useContext, useCallback } from 'react';
-import { LoadingButton } from '@mui/lab';
 import { Box, TextField, Stack, Button } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { createBucket, BucketMeta } from '@/api';
@@ -34,9 +33,9 @@ const CreateBucket = ({ onSuccess, requester }: CreateProps) => {
           <TextField id="description" fullWidth {...register('description')} multiline minRows={3} />
         </Box>
         <Stack flexDirection="row-reverse">
-          <LoadingButton loading={loading} variant="contained" size="medium" type="submit">
+          <Button loading={loading} variant="contained" size="medium" type="submit">
             Create
-          </LoadingButton>
+          </Button>
           <Box mr={1}>
             <Button variant="outlined" onClick={close}>Cancel</Button>
           </Box>

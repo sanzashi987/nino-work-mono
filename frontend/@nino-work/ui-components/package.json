@@ -8,15 +8,15 @@
     "notistack": "^3.0.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "^5.10.6",
-    "@mui/material": "^5.10.6",
+    "@mui/icons-material": "^6.4.0",
+    "@mui/material": "^6.4.0",
     "@nino-work/shared": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "peerDependencies": {
-    "@mui/material": "^5.10.6",
-    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^6.4.0",
+    "@mui/icons-material": "^6.4.0",
     "@nino-work/shared": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

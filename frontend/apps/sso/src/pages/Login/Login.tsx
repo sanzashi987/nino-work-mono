@@ -1,12 +1,12 @@
 import React, { JSX, useEffect, useMemo, useState } from 'react';
-import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
   Typography,
   FormControlLabel,
   Stack,
   Checkbox,
-  Input
+  Input,
+  Button
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -114,7 +114,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
           </Stack>
         </Stack>
         <Box>
-          <LoadingButton
+          <Button
             loading={loading}
             variant="contained"
             size="large"
@@ -122,7 +122,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
             type="submit"
           >
             Sign In
-          </LoadingButton>
+          </Button>
         </Box>
       </form>
 

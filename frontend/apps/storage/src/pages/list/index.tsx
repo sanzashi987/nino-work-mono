@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ManagerShell, useDeps } from '@nino-work/ui-components';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, IconButton } from '@mui/material';
 import { Settings, Delete } from '@mui/icons-material';
 import { listBucket } from '@/api';
@@ -13,7 +13,6 @@ const staticSchema = [
 ];
 
 const BucketList: React.FC = () => {
-  const { pathname } = useLocation();
   const [deps, refresh] = useDeps();
 
   const navigate = useNavigate();
@@ -40,7 +39,7 @@ const BucketList: React.FC = () => {
           </>
         )
       }
-    }], [pathname, navigate]);
+    }], [navigate]);
 
   return (
     <ManagerShell
