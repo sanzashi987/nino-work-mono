@@ -92,6 +92,8 @@
       }
     ],
     "no-multi-spaces": "warn",
+    "react/state-in-constructor": "off",
+    "react/static-property-placement": "off",
     "react/jsx-space-before-closing": "warn",
     "react/function-component-definition": "off",
     "react/require-default-props": "off",
@@ -109,6 +111,9 @@
         "ignoreUrls": true,
         "ignoreTemplateLiterals": true
       }
-    ]
+    ],
+    "jsx-a11y/control-has-associated-label": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/click-events-have-key-events": "off"
   }
 }

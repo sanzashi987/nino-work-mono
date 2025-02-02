@@ -31,7 +31,13 @@ func (c *ObjectController) UploadFile(ctx *gin.Context) {
 		return
 	}
 
-	service.UploadServiceWebImpl.UploadFile(ctx, user, &req)
+	uid, err := service.UploadServiceWebImpl.UploadFile(ctx, user, &req)
+	if err != nil {
+		c.AbortServerError(ctx, "upload file error: "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, gin.H{"file_id": uid})
 
 }
 

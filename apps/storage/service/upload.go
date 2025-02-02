@@ -133,7 +133,7 @@ type UploadServiceWeb struct{}
 var UploadServiceWebImpl = &UploadServiceWeb{}
 
 type UploadFilePayload struct {
-	BuckeID uint64 `uri:"bucket" binding:"required"`
+	BuckeID uint64 `form:"bucket_id" binding:"required"`
 	PathId  uint64 `form:"path_id" `
 }
 
@@ -166,10 +166,6 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 		return nil, err
 	}
 	tx := db.NewTx(ctx)
-
-	if err != nil {
-		return nil, err
-	}
 
 	toInsert := model.Object{
 		BucketID:  payload.BuckeID,

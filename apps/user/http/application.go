@@ -97,7 +97,6 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 	res := ListAppResponse{}
 	res.PageIndex = pageIndex
 	res.PageSize = pageSize
-	res.PageTotal = pageTotal
 	res.RecordTotal = total
 	res.Data = pagedMetas
 

@@ -4,7 +4,7 @@ import defineApi from './impls';
 const prefix = '/backend/v1';
 
 type BucketData = {
-  id:number,
+  id: number,
   code: string,
   update_time: number
   create_time: number
@@ -16,7 +16,7 @@ export const listBucket = defineApi<PagninationRequest, PaginationResponse<Bucke
 });
 
 type GetBucketRequest = {
-  bucket_id :number | string
+  bucket_id: number | string
 };
 type FileInfo = {
   file_id: string,
@@ -28,7 +28,7 @@ type FileInfo = {
 
 export type DirInfo = {
   id: number,
-  name :string
+  name: string
 };
 
 export type DirResponse = {
@@ -57,7 +57,19 @@ export const createBucket = defineApi<{ code: string }, { id: number }>({
   method: 'POST'
 });
 
-export const createDir = defineApi<{ bucket_id: number, parent_id: number, name: string }, void >({
+export const createDir = defineApi<{ bucket_id: number, parent_id: number, name: string }, void>({
   url: `${prefix}/bucket/dir/create`,
   method: 'POST'
+});
+
+export type UploadFileRequest = {
+  bucekt_id: number
+  path_id: number
+  file: File[]
+};
+
+export const uploadFiles = defineApi<UploadFileRequest, { file_id: string }>({
+  url: `${prefix}/bucket/upload`,
+  method: 'POST',
+  headers: { 'Content-Type': 'multipart/form-data' }
 });

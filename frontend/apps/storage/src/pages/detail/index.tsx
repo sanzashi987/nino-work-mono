@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  ArrowBack, Check, Close, CreateNewFolder, HomeRounded, UploadFile
+  ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded, UploadFile
 } from '@mui/icons-material';
 import {
   Stack, IconButton, Typography, Breadcrumbs, Link,
@@ -14,13 +14,23 @@ import {
   Paper,
   Box,
   Input,
-  TableHead
+  TableHead,
+  styled
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import { loading } from '@nino-work/ui-components';
+import Badge, { badgeClasses } from '@mui/material/Badge';
+import { loading, Uploader } from '@nino-work/ui-components';
 import {
-  BucketInfo, createDir, DirInfo, DirResponse, getBucketInfo, listBucketDir
+  BucketInfo, createDir, DirInfo, DirResponse, getBucketInfo, listBucketDir,
+  uploadFiles
 } from '@/api';
+
+const CartBadge = styled(Badge)`
+  & .${badgeClasses.badge} {
+    top: -12px;
+    right: -6px;
+  }
+`;
 
 const BucketDetail: React.FC = () => {
   const { id } = useParams();
@@ -33,6 +43,7 @@ const BucketDetail: React.FC = () => {
   const [dirContents, setDirContents] = useState<DirResponse | null>(null);
   const [paths, setPaths] = useState<DirInfo[] | undefined>(undefined);
   const [folderDraft, setFolderDraft] = useState<{ pending: boolean } | null>(null);
+  const [toUpload, setToUpload] = useState<File[]>([]);
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,12 +76,25 @@ const BucketDetail: React.FC = () => {
     setFolderDraft({ pending: true });
   }, [getBucketDirContent, id, paths]);
 
+  const onSelectFile = useCallback((files: File[]) => {
+    setToUpload((last) => [...last, ...files]);
+  }, []);
+
+  const uploadFilesToBucket = useCallback(() => {
+    const currentPathId = paths?.at(-1)?.id;
+    if (!currentPathId || toUpload.length === 0) {
+      return;
+    }
+    uploadFiles({ bucekt_id: Number(id), path_id: currentPathId, file: toUpload });
+  }, [id, paths, toUpload]);
+
   return (
     <Box p={2}>
-      <Stack direction="row" alignItems="center">
+      <Stack direction="row" alignItems="center" mb={1}>
         <IconButton onClick={() => { naviagte('../list'); }}>
           <ArrowBack />
         </IconButton>
+
         <Typography variant="h5" gutterBottom m={0} ml={1}>
           {info?.code ?? '...'}
         </Typography>
@@ -80,6 +104,7 @@ const BucketDetail: React.FC = () => {
         ? (
           <Stack direction="row" alignItems="center">
             <HomeRounded fontSize="small" />
+
             <Breadcrumbs maxItems={3}>
               {paths.slice(0, -1).map((p, i) => (
                 <Link
@@ -95,6 +120,7 @@ const BucketDetail: React.FC = () => {
                   {p.name}
                 </Link>
               ))}
+
               <Typography sx={{ color: 'text.primary' }}>
                 {paths.at(-1)?.name}
               </Typography>
@@ -112,10 +138,15 @@ const BucketDetail: React.FC = () => {
               >
                 <CreateNewFolder />
               </IconButton>
-              <IconButton>
-                <UploadFile />
-              </IconButton>
+              <Uploader onChange={onSelectFile}>
+                <IconButton>
+                  <Badge badgeContent={toUpload.length} color="primary">
+                    <CloudUpload />
+                  </Badge>
+                </IconButton>
+              </Uploader>
             </Stack>
+
             <TableContainer component={Paper} elevation={10}>
               <Table size="small">
                 <TableHead>
@@ -158,6 +189,7 @@ const BucketDetail: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ))}
+
                   {dirContents.files.map((e) => (
                     <TableRow key={`f${e.file_id}`}>
                       <TableCell>{e.name}</TableCell>
@@ -166,11 +198,11 @@ const BucketDetail: React.FC = () => {
                   ))}
 
                   {dirContents.dirs.length + dirContents.files.length === 0 && folderDraft === null
-                && (
-                  <Stack justifyContent="center" textAlign="center" minHeight="200px">
-                    No Data
-                  </Stack>
-                )}
+                    && (
+                      <Stack justifyContent="center" textAlign="center" minHeight="200px">
+                        No Data
+                      </Stack>
+                    )}
                 </TableBody>
               </Table>
             </TableContainer>

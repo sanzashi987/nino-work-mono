@@ -9,6 +9,7 @@ export type DefineApiOptions = {
   method?: 'GET' | 'POST',
   url: string
   onError?(input?: any): Promise<any>
+  headers?: Record<string, string>
 };
 
 const defaultHeaders = {
@@ -19,11 +20,11 @@ const defaultHeaders = {
 type PathMeta = {
   dynamic: boolean
   name: string
-  optional:boolean
+  optional: boolean
 };
 
 export const defineApi = <Req, Res>(options: DefineApiOptions) => {
-  const { method = 'GET', url, onError = Promise.reject } = options;
+  const { method = 'GET', url, onError = Promise.reject, headers = defaultHeaders } = options;
   const pathMetas = url.split('/').map((param) => {
     const meta: PathMeta = { dynamic: false, optional: false, name: param };
     let name = param;
@@ -46,11 +47,11 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     : (input: Req, opts?: RequestInit) => Promise<Res>;
 
   // @ts-ignore
-  const requester: Requester = async (input: any = {}, opts: RequestInit = {}) => {
-    const { headers = defaultHeaders, ...others } = opts;
+  const requester: Requester = async (input: Record<string, any> = {}, opts: RequestInit = {}) => {
+    const { headers: overrideHeaders, ...others } = opts;
     const inputNext = { ...input };
 
-    const dynamicPaths:string[] = [];
+    const dynamicPaths: string[] = [];
     for (const meta of pathMetas) {
       if (!meta.dynamic) {
         dynamicPaths.push(meta.name);
@@ -66,18 +67,33 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     }
 
     let fullurl = dynamicPaths.join('/');
-
+    let body: BodyInit;
     const isGet = method === 'GET';
 
     if (isGet) {
       const search = new URLSearchParams(input);
       fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
+    } else if (headers['Content-Type'] === 'multipart/form-data') {
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(inputNext)) {
+        if (Array.isArray(value) && value[0] instanceof File) {
+          for (const file of value) {
+            formData.append(`${key}[]`, file, file.name);
+          }
+        }
+        if (value !== undefined) {
+          formData.append(key, value);
+        }
+      }
+    } else {
+      body = JSON.stringify(inputNext);
     }
+
     const res = await fetch(fullurl, {
-      headers,
+      headers: { ...headers, ...overrideHeaders },
       method,
       ...others,
-      body: isGet ? undefined : JSON.stringify(input)
+      body
     });
 
     if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
