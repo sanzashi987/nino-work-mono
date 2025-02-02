@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"os"
 	"path/filepath"
 
@@ -132,18 +133,7 @@ type UploadServiceWeb struct{}
 
 var UploadServiceWebImpl = &UploadServiceWeb{}
 
-type UploadFilePayload struct {
-	BuckeID uint64 `form:"bucket_id" binding:"required"`
-	PathId  uint64 `form:"path_id" `
-}
-
-func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload *UploadFilePayload) (*string, error) {
-	bucketPath := ctx.GetString(consts.BucketPath)
-	file, err := ctx.FormFile("file")
-	if err != nil {
-		return nil, err
-	}
-
+func parseFile(ctx *gin.Context, payload *UploadFilePayload, bucketPath string, file *multipart.FileHeader) (*model.Object, error) {
 	uuidStr, err := GenUUID()
 	if err != nil {
 		return nil, err
@@ -152,9 +142,9 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	ext := filepath.Ext(file.Filename)
 	fileName := filepath.Base(file.Filename)
 
-	path := fmt.Sprintf("%s/%d/%s", bucketPath, payload.BuckeID, *uuidStr)
+	path := fmt.Sprintf("%s/%d/%s", bucketPath, payload.BucketID, *uuidStr)
 	if ext != "" {
-		path = fmt.Sprintf("%s.%s", path, ext)
+		path = fmt.Sprintf("%s%s", path, ext)
 	}
 
 	if err = ctx.SaveUploadedFile(file, path); err != nil {
@@ -165,10 +155,9 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 	if err != nil {
 		return nil, err
 	}
-	tx := db.NewTx(ctx)
 
 	toInsert := model.Object{
-		BucketID:  payload.BuckeID,
+		BucketID:  payload.BucketID,
 		ParentId:  payload.PathId,
 		FileId:    *uuidStr,
 		URI:       path,
@@ -179,11 +168,54 @@ func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload
 		Size:      file.Size,
 	}
 
-	if err = tx.Create(&toInsert).Error; err != nil {
+	return &toInsert, nil
+}
+
+type UploadFilePayload struct {
+	BucketID uint64
+	PathId   uint64
+	Files    []*multipart.FileHeader
+}
+
+func (serv UploadServiceWeb) UploadFile(ctx *gin.Context, userId uint64, payload *UploadFilePayload) ([]string, error) {
+	bucketPath := ctx.GetString(consts.BucketPath)
+
+	tx := db.NewTx(ctx).Begin()
+
+	toInsert := []*model.Object{}
+	res := []string{}
+
+	existFiles := []*model.Object{}
+
+	if err := tx.Where("bucket_id = ? AND parent_id = ? AND dir = ?", payload.BucketID, payload.PathId, false).Find(&existFiles).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	return uuidStr, nil
+	existFileNames := make(map[string]any)
+	for _, file := range existFiles {
+		existFileNames[file.Name] = true
+	}
+
+	for _, file := range payload.Files {
+		if _, exists := existFileNames[file.Filename]; exists {
+			continue
+		}
+		obj, err := parseFile(ctx, payload, bucketPath, file)
+		if err != nil {
+			return nil, err
+		}
+		toInsert = append(toInsert, obj)
+		res = append(res, obj.FileId)
+	}
+
+	if err := tx.Create(&toInsert).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
+
+	return res, nil
 }
 
 func (serv UploadServiceWeb) UploadLargeFile(ctx context.Context) {

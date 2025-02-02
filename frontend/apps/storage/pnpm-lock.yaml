@@ -1,0 +1,26 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  '@nino-work/requester':
+    specifier: workspace:*
+    version: link:../../@nino-work/requester
+  '@nino-work/shared':
+    specifier: workspace:*
+    version: link:../../@nino-work/shared
+  '@nino-work/ui-components':
+    specifier: workspace:*
+    version: link:../../@nino-work/ui-components
+  filesize:
+    specifier: ^10.1.6
+    version: 10.1.6
+
+packages:
+
+  /filesize@10.1.6:
+    resolution: {integrity: sha512-sJslQKU2uM33qH5nqewAwVB2QgR6w1aMNsYUp3aN5rMRyXEwJGmZvaWzeJFNTOXWlHQyBFCWrdj3fV/fsTOX8w==}
+    engines: {node: '>= 10.4.0'}
+    dev: false

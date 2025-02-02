@@ -6,7 +6,7 @@ export type StandardResponse<T> = {
 };
 
 export type DefineApiOptions = {
-  method?: 'GET' | 'POST',
+  method?: 'GET' | 'POST' | 'POSTFORM',
   url: string
   onError?(input?: any): Promise<any>
   headers?: Record<string, string>
@@ -73,25 +73,30 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     if (isGet) {
       const search = new URLSearchParams(input);
       fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
-    } else if (headers['Content-Type'] === 'multipart/form-data') {
+    } else if (method === 'POSTFORM') {
+      delete headers['Content-Type'];
       const formData = new FormData();
       for (const [key, value] of Object.entries(inputNext)) {
         if (Array.isArray(value) && value[0] instanceof File) {
+          delete inputNext[key];
           for (const file of value) {
             formData.append(`${key}[]`, file, file.name);
           }
+          // eslint-disable-next-line no-continue
+          continue;
         }
         if (value !== undefined) {
           formData.append(key, value);
         }
       }
+      body = formData;
     } else {
       body = JSON.stringify(inputNext);
     }
 
     const res = await fetch(fullurl, {
       headers: { ...headers, ...overrideHeaders },
-      method,
+      method: method === 'POSTFORM' ? 'POST' : method,
       ...others,
       body
     });

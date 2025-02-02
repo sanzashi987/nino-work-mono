@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded, UploadFile
+  ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded
 } from '@mui/icons-material';
 import {
   Stack, IconButton, Typography, Breadcrumbs, Link,
@@ -15,22 +15,18 @@ import {
   Box,
   Input,
   TableHead,
-  styled
+  Badge,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import Badge, { badgeClasses } from '@mui/material/Badge';
-import { loading, Uploader } from '@nino-work/ui-components';
+
+import { loading, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
+import { filesize } from 'filesize';
 import {
   BucketInfo, createDir, DirInfo, DirResponse, getBucketInfo, listBucketDir,
   uploadFiles
 } from '@/api';
-
-const CartBadge = styled(Badge)`
-  & .${badgeClasses.badge} {
-    top: -12px;
-    right: -6px;
-  }
-`;
 
 const BucketDetail: React.FC = () => {
   const { id } = useParams();
@@ -42,8 +38,9 @@ const BucketDetail: React.FC = () => {
   const [info, setInfo] = useState<BucketInfo | null>(null);
   const [dirContents, setDirContents] = useState<DirResponse | null>(null);
   const [paths, setPaths] = useState<DirInfo[] | undefined>(undefined);
-  const [folderDraft, setFolderDraft] = useState<{ pending: boolean } | null>(null);
-  const [toUpload, setToUpload] = useState<File[]>([]);
+  const [draftFolder, setDraftFolder] = useState<boolean>(false);
+  const [toUpload, setToUpload] = useState<{ files: File[], map: Record<string, boolean> }>({ files: [], map: {} });
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -59,33 +56,53 @@ const BucketDetail: React.FC = () => {
     listBucketDir({ bucket_id: id, path_id: pathId }).then(setDirContents);
   }, []);
 
-  const handleCreateDir = useCallback(() => {
+  const handleCreateDir = useCallback(async () => {
     const name = (ref.current?.firstChild as any)?.value;
     const currentPathId = paths?.at(-1)?.id;
     if (!currentPathId || !name) {
-      return;
+      return Promise.resolve();
     }
-    createDir({ name, bucket_id: Number(id), parent_id: currentPathId })
+    return createDir({ name, bucket_id: Number(id), parent_id: currentPathId })
       .then(() => {
         getBucketDirContent(currentPathId);
-        setFolderDraft(null);
-      }).catch(() => {
-        setFolderDraft({ pending: false });
+        setDraftFolder(false);
       });
-
-    setFolderDraft({ pending: true });
   }, [getBucketDirContent, id, paths]);
 
   const onSelectFile = useCallback((files: File[]) => {
-    setToUpload((last) => [...last, ...files]);
+    setToUpload((last) => {
+      const toAdd = files.filter((e) => !last.map[e.name]);
+      if (toAdd.length === 0) {
+        return last;
+      }
+      const next = { files: last.files.concat(), map: { ...last.map } };
+      return toAdd.reduce((l, c) => {
+        l.files.push(c);
+        // eslint-disable-next-line no-param-reassign
+        l.map[c.name] = true;
+        return l;
+      }, next);
+    });
   }, []);
 
-  const uploadFilesToBucket = useCallback(() => {
-    const currentPathId = paths?.at(-1)?.id;
-    if (!currentPathId || toUpload.length === 0) {
+  const openUploadMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (toUpload.files.length === 0) {
       return;
     }
-    uploadFiles({ bucekt_id: Number(id), path_id: currentPathId, file: toUpload });
+    setAnchorEl(e.currentTarget);
+  }, [toUpload]);
+
+  const uploadFilesToBucket = useCallback(async () => {
+    const currentPathId = paths?.at(-1)?.id;
+    if (!currentPathId || toUpload.files.length === 0) {
+      return Promise.resolve();
+    }
+    return uploadFiles({ bucket_id: Number(id), path_id: currentPathId, file: toUpload.files }).then(() => {
+      setAnchorEl(null);
+      getBucketDirContent(currentPathId);
+      setToUpload({ files: [], map: {} });
+    });
   }, [id, paths, toUpload]);
 
   return (
@@ -104,7 +121,6 @@ const BucketDetail: React.FC = () => {
         ? (
           <Stack direction="row" alignItems="center">
             <HomeRounded fontSize="small" />
-
             <Breadcrumbs maxItems={3}>
               {paths.slice(0, -1).map((p, i) => (
                 <Link
@@ -132,15 +148,12 @@ const BucketDetail: React.FC = () => {
         : (
           <>
             <Stack direction="row">
-              <IconButton onClick={() => {
-                setFolderDraft((last) => ((last === null) ? { pending: false } : last));
-              }}
-              >
+              <IconButton onClick={() => { setDraftFolder(true); }}>
                 <CreateNewFolder />
               </IconButton>
               <Uploader onChange={onSelectFile}>
-                <IconButton>
-                  <Badge badgeContent={toUpload.length} color="primary">
+                <IconButton onContextMenu={openUploadMenu}>
+                  <Badge badgeContent={toUpload.files.length} color="primary">
                     <CloudUpload />
                   </Badge>
                 </IconButton>
@@ -152,22 +165,26 @@ const BucketDetail: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell>Update Time</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
 
-                  {folderDraft !== null
+                  {draftFolder
                     && (
                       <TableRow>
                         <TableCell>
                           <Stack direction="row" spacing={1}>
                             <Input ref={ref} size="small" sx={{ input: { height: '12px', fontSize: '12px' } }} />
-                            <Button size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={handleCreateDir} loading={folderDraft.pending}>
-                              <Check fontSize="small" />
-                            </Button>
-                            <Button size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={() => { setFolderDraft(null); }} loading={folderDraft.pending}>
-                              <Close fontSize="small" />
-                            </Button>
+                            <LoadingGroup>
+                              <RequestButton size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={handleCreateDir}>
+                                <Check fontSize="small" />
+                              </RequestButton>
+                              <RequestButton size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={async () => { setDraftFolder(false); }}>
+                                <Close fontSize="small" />
+                              </RequestButton>
+                            </LoadingGroup>
                           </Stack>
                         </TableCell>
                       </TableRow>
@@ -187,17 +204,20 @@ const BucketDetail: React.FC = () => {
                           {e.name}
                         </Link>
                       </TableCell>
+                      <TableCell />
+                      <TableCell />
                     </TableRow>
                   ))}
 
                   {dirContents.files.map((e) => (
                     <TableRow key={`f${e.file_id}`}>
                       <TableCell>{e.name}</TableCell>
+                      <TableCell>{filesize(e.size)}</TableCell>
                       <TableCell>{e.update_time}</TableCell>
                     </TableRow>
                   ))}
 
-                  {dirContents.dirs.length + dirContents.files.length === 0 && folderDraft === null
+                  {dirContents.dirs.length + dirContents.files.length === 0 && !draftFolder
                     && (
                       <Stack justifyContent="center" textAlign="center" minHeight="200px">
                         No Data
@@ -209,6 +229,37 @@ const BucketDetail: React.FC = () => {
           </>
 
         )}
+
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}
+        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+      >
+        {toUpload.files.map((f, i) => (
+          <MenuItem
+            key={f.name}
+            onDoubleClick={() => {
+              setToUpload((last) => {
+                const next = last.files.concat();
+                const nextMap = { ...last.map };
+                next.splice(i, 1);
+                delete nextMap[f.name];
+                return { files: next, map: nextMap };
+              });
+            }}
+          >
+            {f.name}
+          </MenuItem>
+        ))}
+
+        <MenuItem sx={{ minWidth: 200, justifyContent: 'end', px: 1, py: 0 }}>
+          <Button fullWidth variant="contained" onClick={uploadFilesToBucket}>
+            Upload
+          </Button>
+        </MenuItem>
+      </Menu>
 
     </Box>
   );

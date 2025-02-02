@@ -104,7 +104,7 @@ func (c *BucketController) GetBucket(ctx *gin.Context) {
 
 	rootDir := model.Object{}
 
-	if err := tx.Where("bucket_id = ? AND dir = ? AND parent_id = ?", result.Id, true, 0).Find(&rootDir).Error; err != nil { 
+	if err := tx.Where("bucket_id = ? AND dir = ? AND parent_id = ?", result.Id, true, 0).Find(&rootDir).Error; err != nil {
 		c.AbortServerError(ctx, "GetBucket internal error: "+err.Error())
 		return
 	}
@@ -195,6 +195,7 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 type FileInfo struct {
 	FileId     string `json:"file_id"`
 	Name       string `json:"name"`
+	Size       int64  `json:"size"`
 	URI        string `json:"uri"`
 	UpdateTime int64  `json:"update_time"`
 	CreateTime int64  `json:"create_time"`
@@ -224,6 +225,7 @@ func ClusterObjects(data []*model.Object) ([]*FileInfo, []*DirInfo) {
 				FileId:     d.FileId,
 				Name:       d.Name,
 				URI:        d.URI,
+				Size:       d.Size,
 				UpdateTime: d.UpdateTime.Unix(),
 				CreateTime: d.CreateTime.Unix(),
 			})

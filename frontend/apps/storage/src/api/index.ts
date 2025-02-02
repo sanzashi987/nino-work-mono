@@ -22,6 +22,7 @@ type FileInfo = {
   file_id: string,
   name: string,
   uri: string,
+  size: number,
   update_time: number,
   create_time: number
 };
@@ -63,13 +64,12 @@ export const createDir = defineApi<{ bucket_id: number, parent_id: number, name:
 });
 
 export type UploadFileRequest = {
-  bucekt_id: number
+  bucket_id: number
   path_id: number
   file: File[]
 };
 
-export const uploadFiles = defineApi<UploadFileRequest, { file_id: string }>({
+export const uploadFiles = defineApi<UploadFileRequest, { file_ids: string[] }>({
   url: `${prefix}/bucket/upload`,
-  method: 'POST',
-  headers: { 'Content-Type': 'multipart/form-data' }
+  method: 'POSTFORM'
 });

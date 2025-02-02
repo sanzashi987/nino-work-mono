@@ -6,3 +6,5 @@ go.sum
 **/tmp/*
 runner-build-errors.log
 runner-build.exe~
+
+storage/*

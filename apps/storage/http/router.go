@@ -27,7 +27,7 @@ func NewRouter(loginPageUrl, bucketPath, tmpPath string) *gin.Engine {
 		authed.GET("/bucket/dir/list", bucketController.ListBucketDir)
 
 	}
-	v1.POST("/asset/upload", objectController.UploadFile)
+	v1.POST("/bucket/upload", objectController.UploadFile)
 	v1.GET("/asset/:bucket/:file_id", objectController.GetAsset)
 
 	return apiEngine

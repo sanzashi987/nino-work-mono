@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/storage/db/model"
@@ -24,20 +25,42 @@ var objectController ObjectController = ObjectController{
 func (c *ObjectController) UploadFile(ctx *gin.Context) {
 	user := ctx.GetUint64(controller.UserID)
 
-	req := service.UploadFilePayload{}
+	form, err := ctx.MultipartForm()
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err != nil {
 		c.AbortClientError(ctx, "upload payload error: "+err.Error())
 		return
 	}
 
-	uid, err := service.UploadServiceWebImpl.UploadFile(ctx, user, &req)
+	bucket_id, path_id := form.Value["bucket_id"], form.Value["path_id"]
+	files := form.File["file[]"]
+
+	if len(bucket_id) == 0 || len(path_id) == 0 || len(files) == 0 {
+		c.AbortClientError(ctx, "upload payload error: bucket_id or path_id is not provided")
+		return
+	}
+
+	bucketID, err := strconv.ParseUint(bucket_id[0], 10, 64)
+	pathId, err2 := strconv.ParseUint(path_id[0], 10, 64)
+
+	if err != nil || err2 != nil {
+		c.AbortClientError(ctx, "upload payload error: bucket_id or path_id is not a number")
+		return
+	}
+
+	payload := service.UploadFilePayload{
+		BucketID: bucketID,
+		PathId:   pathId,
+		Files:    files,
+	}
+
+	uid, err := service.UploadServiceWebImpl.UploadFile(ctx, user, &payload)
 	if err != nil {
 		c.AbortServerError(ctx, "upload file error: "+err.Error())
 		return
 	}
 
-	c.ResponseJson(ctx, gin.H{"file_id": uid})
+	c.ResponseJson(ctx, gin.H{"file_ids": uid})
 
 }
 
