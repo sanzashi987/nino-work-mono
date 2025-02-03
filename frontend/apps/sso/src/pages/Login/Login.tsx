@@ -36,7 +36,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
     setLoading(true);
     login(payload).then(({ jwt_token }) => {
       Cookie.set('login_token', jwt_token);
-      navigate('/dashboard');
+      navigate('/home');
     }).catch(noop).finally(() => {
       setLoading(false);
     });
@@ -45,7 +45,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
   useEffect(() => {
     const hasToken = Cookie.get('login_token');
     if (hasToken) {
-      navigate('/dashboard');
+      navigate('/home');
     }
   }, []);
 

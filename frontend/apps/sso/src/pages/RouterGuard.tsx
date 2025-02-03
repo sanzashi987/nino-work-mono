@@ -35,7 +35,7 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
     if (!userInfo) {
       return true;
     }
-    if (location.pathname === '/dashboard') {
+    if (location.pathname === '/home') {
       return true;
     }
 
@@ -55,7 +55,7 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
 
   return (
     <UserContext.Provider value={ctx}>
-      {authed ? <Outlet /> : <Navigate to="/dashboard" />}
+      {authed ? <Outlet /> : <Navigate to="/home" />}
     </UserContext.Provider>
   );
 };

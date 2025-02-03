@@ -5,42 +5,29 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  notistack:
-    specifier: ^3.0.1
-    version: 3.0.1(csstype@3.1.3)(react-dom@18.3.1)(react@18.3.1)
+  '@nino-work/assets':
+    specifier: workspace:*
+    version: link:../../@nino-work/assets
+  '@nino-work/requester':
+    specifier: workspace:*
+    version: link:../../@nino-work/requester
+  '@nino-work/shared':
+    specifier: workspace:*
+    version: link:../../@nino-work/shared
+  '@nino-work/ui-components':
+    specifier: workspace:*
+    version: link:../../@nino-work/ui-components
   react:
     specifier: ^19.0.0
     version: 18.3.1
   react-dom:
     specifier: ^19.0.0
     version: 18.3.1(react@18.3.1)
-
-devDependencies:
-  '@nino-work/assets':
-    specifier: workspace:*
-    version: link:../../packages/assets
-  '@nino-work/infra':
-    specifier: workspace:*
-    version: link:../../packages/infra
+  single-spa:
+    specifier: ^6.0.3
+    version: 6.0.3
 
 packages:
-
-  /clsx@1.2.1:
-    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
-    engines: {node: '>=6'}
-    dev: false
-
-  /csstype@3.1.3:
-    resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
-    dev: false
-
-  /goober@2.1.16(csstype@3.1.3):
-    resolution: {integrity: sha512-erjk19y1U33+XAMe1VTvIONHYoSqE4iS7BYUZfHaqeohLmnC0FdxEh7rQU+6MZ4OajItzjZFSRtVANrQwNq6/g==}
-    peerDependencies:
-      csstype: ^3.0.10
-    dependencies:
-      csstype: 3.1.3
-    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -51,21 +38,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-    dev: false
-
-  /notistack@3.0.1(csstype@3.1.3)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-ntVZXXgSQH5WYfyU+3HfcXuKaapzAJ8fBLQ/G618rn3yvSzEbnOB8ZSOwhX+dAORy/lw+GC2N061JA0+gYWTVA==}
-    engines: {node: '>=12.0.0', npm: '>=6.0.0'}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      clsx: 1.2.1
-      goober: 2.1.16(csstype@3.1.3)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    transitivePeerDependencies:
-      - csstype
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):
@@ -89,4 +61,8 @@ packages:
     resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
+
+  /single-spa@6.0.3:
+    resolution: {integrity: sha512-pXlwHXHhs3hx/MnGQHBLdFCVAN2rlm9TLBKazbDMyZ25QRxoen2vlUZ47MyXKa9K8Gd5UZs/gkuQad4TGbViwg==}
     dev: false

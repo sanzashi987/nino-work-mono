@@ -12,13 +12,11 @@ const BrowserRouter = createBrowserRouter([
     Component: AuthGuard,
     children: [
       {
-        path: 'dashboard',
+        path: 'home',
         Component: lazy(() => import('./Dashboard')),
         children: [
-          // { path: 'manage/user' },
-          // { path: 'manage/role' },
           {
-            path: 'manage/app',
+            path: 'root/app',
             Component: lazy(() => import('./Applications')),
             children: [
               {
@@ -31,7 +29,6 @@ const BrowserRouter = createBrowserRouter([
               }
             ]
           }
-          // { path: 'manage/menu' }
 
         ]
       }

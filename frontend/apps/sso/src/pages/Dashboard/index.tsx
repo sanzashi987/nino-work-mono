@@ -1,7 +1,6 @@
 import {
-  AppBar, Box, Container, IconButton, Menu, MenuItem, Stack, Toolbar,
-  useColorScheme,
-  useTheme
+  AppBar, Box, IconButton, Menu, MenuItem, Stack, Toolbar,
+  useColorScheme
 } from '@mui/material';
 import React from 'react';
 import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';

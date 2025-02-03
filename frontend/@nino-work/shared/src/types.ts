@@ -15,3 +15,7 @@ export type ModelMeta = {
   code: string
   description: string
 };
+
+export type MicroFrontendMaster = {
+
+};

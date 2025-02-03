@@ -38,7 +38,7 @@ func defaultRecord(db *gorm.DB) {
 		adminRole, rootPermission := model.CreateRoleWithPermission("Root Super Admin", "root.admin.super")
 		// permissionsToCreate = append(permissionsToCreate, &rootPermission)
 
-		codes := []string{"user", "app", "role", "permission"}
+		codes := []string{"user", "app", "role"}
 		userRoles := []*model.RoleModel{adminRole}
 		for _, code := range codes {
 			role, permission := model.CreateRoleWithPermission(
@@ -60,7 +60,7 @@ func defaultRecord(db *gorm.DB) {
 				Type:   model.MenuTypeMenu,
 				Order:  0,
 				Status: model.MenuEnable,
-				Path:   "/dashboard/manage/" + code,
+				Path:   "/home/root/" + code,
 			}
 			menus = append(menus, menu)
 		}
