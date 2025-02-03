@@ -9,6 +9,6 @@
     }
   },
   "include": [
-    "src", "../../@nino-work/ui-components/src/Loading.tsx",
+    "src",
   ]
 }

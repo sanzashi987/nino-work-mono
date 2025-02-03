@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ManagerShell, useDeps } from '@nino-work/ui-components';
 import { useNavigate } from 'react-router-dom';
 import { Button, IconButton } from '@mui/material';
@@ -51,9 +51,7 @@ const BucketList: React.FC = () => {
           color="info"
           variant="contained"
           sx={{ width: 'fit-content' }}
-          onClick={() => {
-            openCreateBucket(refresh);
-          }}
+          onClick={() => openCreateBucket(refresh)}
         >
           + Create Bucket
         </Button>

@@ -1,12 +1,11 @@
-import { lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import React, { lazy } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 const BrowserRouter = createBrowserRouter([
   {
-    path: 'bucket',
+    path: 'oss',
     children: [
       {
-        path: 'list',
         index: true,
         Component: lazy(() => import('./list'))
       },
@@ -15,6 +14,10 @@ const BrowserRouter = createBrowserRouter([
         Component: lazy(() => import('./detail'))
       }
     ]
+  },
+  {
+    path: '*',
+    Component: () => <Navigate to="/oss" />
   }
 ]);
 

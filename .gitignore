@@ -3,8 +3,11 @@ go.sum
 *.db
 *.exe
 
-**/tmp/*
+tmp/*
 runner-build-errors.log
 runner-build.exe~
 
 storage/*
+
+build
+node_modules

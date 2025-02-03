@@ -28,6 +28,7 @@ const ForkTsCheckerWebpackPlugin = process.env.TSC_COMPILE_ON_ERROR === 'true'
   : require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
+const appPackageJson = require(paths.appPackageJson)
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -755,6 +756,22 @@ module.exports = function (webpackEnv) {
     // our own hints via the FileSizeReporter
     performance: false
   };
+
+
+  if (hasInfraConfig) {
+    const infraConfig = require(infraPath)
+    if (infraConfig.mode === 'micro-frontend') {
+      const { name } = appPackageJson
+      config.entry = paths.appIndexMicro
+      config.output.libraryTarget = 'system'
+      config.output.filename = isEnvProduction ? `static/js/${name}.[contenthash:8].js` : `static/js/${name}.js`
+
+      config.externals = ["single-spa", "react", "react-dom", "react-dom/client"]
+    }
+  }
+
+
+
 
   return override(config);
 };

@@ -1,5 +1,5 @@
-import { lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import React, { lazy } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AuthGuard from './RouterGuard';
 
 const BrowserRouter = createBrowserRouter([
@@ -33,6 +33,10 @@ const BrowserRouter = createBrowserRouter([
         ]
       }
     ]
+  },
+  {
+    path: '*',
+    Component: () => <Navigate to="/login" />
   }
 ]);
 
