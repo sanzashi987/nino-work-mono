@@ -26,6 +26,7 @@
     "@nino-work/requester": "workspace:*",
     "@nino-work/shared": "workspace:*",
     "@nino-work/ui-components": "workspace:*",
+    "dayjs": "^1.11.13",
     "filesize": "^10.1.6",
     "react": "^19.0.0",
     "react-app-polyfill": "^3.0.0",

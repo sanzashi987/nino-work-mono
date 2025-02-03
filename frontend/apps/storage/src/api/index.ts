@@ -1,7 +1,7 @@
 import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
-const prefix = '/backend/v1';
+const prefix = '/backend/storage/v1';
 
 type BucketData = {
   id: number,
@@ -70,6 +70,11 @@ export type UploadFileRequest = {
 };
 
 export const uploadFiles = defineApi<UploadFileRequest, { file_ids: string[] }>({
-  url: `${prefix}/bucket/upload`,
+  url: `${prefix}/asset/upload`,
   method: 'POSTFORM'
+});
+
+export const deleteFile = defineApi<{ bucket_id:number, file_id:string }, void>({
+  url: `${prefix}/asset/delete`,
+  method: 'POST'
 });

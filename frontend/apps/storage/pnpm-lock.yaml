@@ -14,11 +14,18 @@ dependencies:
   '@nino-work/ui-components':
     specifier: workspace:*
     version: link:../../@nino-work/ui-components
+  dayjs:
+    specifier: ^1.11.13
+    version: 1.11.13
   filesize:
     specifier: ^10.1.6
     version: 10.1.6
 
 packages:
+
+  /dayjs@1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+    dev: false
 
   /filesize@10.1.6:
     resolution: {integrity: sha512-sJslQKU2uM33qH5nqewAwVB2QgR6w1aMNsYUp3aN5rMRyXEwJGmZvaWzeJFNTOXWlHQyBFCWrdj3fV/fsTOX8w==}

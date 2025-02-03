@@ -15,7 +15,7 @@ func NewRouter(loginPageUrl, bucketPath, tmpPath string) *gin.Engine {
 	}
 
 	authMiddleware := controller.ValidateMiddleware(loginPageUrl)
-	v1 := apiEngine.Group("/backend/v1").Use(applyPathInContext)
+	v1 := apiEngine.Group("/backend/storage/v1").Use(applyPathInContext)
 
 	{
 		authed := v1.Use(authMiddleware)
@@ -27,7 +27,8 @@ func NewRouter(loginPageUrl, bucketPath, tmpPath string) *gin.Engine {
 		authed.GET("/bucket/dir/list", bucketController.ListBucketDir)
 
 	}
-	v1.POST("/bucket/upload", objectController.UploadFile)
+	v1.POST("/asset/delete", objectController.DeleteFile)
+	v1.POST("/asset/upload", objectController.UploadFile)
 	v1.GET("/asset/:bucket/:file_id", objectController.GetAsset)
 
 	return apiEngine

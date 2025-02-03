@@ -9,7 +9,7 @@ import (
 
 type BaseTime struct {
 	CreateTime time.Time
-	UpdateTime time.Time
+	UpdateTime time.Time `gorm:""`
 }
 
 type BaseModel struct {
@@ -42,8 +42,9 @@ func (model *BaseModel) GetUpdatedDate() string {
 	return model.UpdateTime.Format("2006-01-02")
 }
 
-func (m *BaseModel) BeforCreate(tx *gorm.DB) (err error) {
+func (m *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 	m.CreateTime = time.Now()
+	m.UpdateTime = m.CreateTime
 	return
 }
 

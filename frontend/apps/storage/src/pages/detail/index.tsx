@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -17,14 +18,17 @@ import {
   TableHead,
   Badge,
   Menu,
-  MenuItem
+  MenuItem,
+  Popper,
+  ClickAwayListener
 } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import { loading, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
 import { filesize } from 'filesize';
+import { DATE_TIME_FORMAT } from '@nino-work/shared';
 import {
-  BucketInfo, createDir, DirInfo, DirResponse, getBucketInfo, listBucketDir,
+  BucketInfo, createDir, deleteFile, DirInfo, DirResponse, getBucketInfo, listBucketDir,
   uploadFiles
 } from '@/api';
 
@@ -40,7 +44,8 @@ const BucketDetail: React.FC = () => {
   const [paths, setPaths] = useState<DirInfo[] | undefined>(undefined);
   const [draftFolder, setDraftFolder] = useState<boolean>(false);
   const [toUpload, setToUpload] = useState<{ files: File[], map: Record<string, boolean> }>({ files: [], map: {} });
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [contextEl, setContextEl] = useState<null | { x:number, y:number, fileId:string }>(null);
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -67,7 +72,7 @@ const BucketDetail: React.FC = () => {
         getBucketDirContent(currentPathId);
         setDraftFolder(false);
       });
-  }, [getBucketDirContent, id, paths]);
+  }, [id, paths]);
 
   const onSelectFile = useCallback((files: File[]) => {
     setToUpload((last) => {
@@ -104,6 +109,19 @@ const BucketDetail: React.FC = () => {
       setToUpload({ files: [], map: {} });
     });
   }, [id, paths, toUpload]);
+
+  const deleteFileFromPopper = useCallback(() => {
+    const currentPathId = paths?.at(-1)?.id;
+
+    if (!contextEl?.fileId || !currentPathId) {
+      return;
+    }
+    deleteFile({ bucket_id: Number(id), file_id: contextEl.fileId }).then(() => {
+      getBucketDirContent(currentPathId);
+    }).finally(() => {
+      setContextEl(null);
+    });
+  }, [contextEl, paths]);
 
   return (
     <Box p={2}>
@@ -210,10 +228,17 @@ const BucketDetail: React.FC = () => {
                   ))}
 
                   {dirContents.files.map((e) => (
-                    <TableRow key={`f${e.file_id}`}>
+                    <TableRow
+                      key={`f${e.file_id}`}
+                      component="div"
+                      onContextMenu={(ev) => {
+                        ev.preventDefault();
+                        setContextEl({ x: ev.clientX, y: ev.clientY, fileId: e.file_id });
+                      }}
+                    >
                       <TableCell>{e.name}</TableCell>
                       <TableCell>{filesize(e.size)}</TableCell>
-                      <TableCell>{e.update_time}</TableCell>
+                      <TableCell>{dayjs(e.update_time * 1000).format(DATE_TIME_FORMAT)}</TableCell>
                     </TableRow>
                   ))}
 
@@ -235,7 +260,6 @@ const BucketDetail: React.FC = () => {
         anchorEl={anchorEl}
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
-        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
       >
         {toUpload.files.map((f, i) => (
           <MenuItem
@@ -260,7 +284,17 @@ const BucketDetail: React.FC = () => {
           </Button>
         </MenuItem>
       </Menu>
-
+      <Popper
+        sx={{ transform: `translate(${contextEl?.x}px, ${contextEl?.y}px)`, position: 'absolute', top: 0, left: 0 }}
+        open={!!contextEl}
+      >
+        <ClickAwayListener onClickAway={() => setContextEl(null)}>
+          <Paper>
+            <MenuItem dense>Rename</MenuItem>
+            <MenuItem dense onClick={deleteFileFromPopper}>Delete</MenuItem>
+          </Paper>
+        </ClickAwayListener>
+      </Popper>
     </Box>
   );
 };

@@ -104,3 +104,26 @@ func (c *ObjectController) CheckFileExists(ctx *gin.Context) {
 	}
 
 }
+
+func (c *ObjectController) DeleteFile(ctx *gin.Context) {
+	var req struct {
+		BucketID uint64 `json:"bucket_id" binding:"required"`
+		FileId   string `json:"file_id" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "DeleteFile params not passed: "+err.Error())
+		return
+	}
+
+	tx := db.NewTx(ctx).Begin()
+
+	if err := tx.Where("bucket_id = ? and file_id = ?", req.BucketID, req.FileId).Delete(&model.Object{}).Error; err != nil {
+		tx.Rollback()
+		c.AbortServerError(ctx, "DeleteFile internal error: "+err.Error())
+		return
+	}
+
+	tx.Commit()
+	c.SuccessVoid(ctx)
+}
