@@ -1,7 +1,7 @@
 process.env.PORT = 3001
 
 module.exports = {
-
+  mode: 'micro-host',
   devServer(config) {
     const { proxy } = config
 

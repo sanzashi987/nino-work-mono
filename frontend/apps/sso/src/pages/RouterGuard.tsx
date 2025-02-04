@@ -55,7 +55,8 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
 
   return (
     <UserContext.Provider value={ctx}>
-      {authed ? <Outlet /> : <Navigate to="/home" />}
+      {/* {authed ? <Outlet /> : <Navigate to="/home" />} */}
+      <Outlet />
     </UserContext.Provider>
   );
 };

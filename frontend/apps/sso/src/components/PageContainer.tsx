@@ -1,4 +1,4 @@
-import { Box, Paper } from '@mui/material';
+import { Paper } from '@mui/material';
 import React, { PropsWithChildren } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 

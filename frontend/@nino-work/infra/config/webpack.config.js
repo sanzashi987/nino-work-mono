@@ -75,7 +75,9 @@ const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
+// process.env.DISABLE_NEW_JSX_TRANSFORM = 'true'
 const hasJsxRuntime = (() => {
+  return false
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
     return false;
   }
@@ -191,6 +193,17 @@ module.exports = function (webpackEnv) {
     }
     return loaders;
   };
+
+
+  let isMicro = false
+  if (hasInfraConfig) {
+    const infraConfig = require(infraPath)
+    if (infraConfig.mode === 'micro-app' || infraConfig.mode === 'micro-host') {
+      isMicro = true
+    }
+  }
+
+
 
   const config = {
     target: ['browserslist'],
@@ -572,7 +585,7 @@ module.exports = function (webpackEnv) {
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         {
-
+          scriptLoading: isMicro ? "systemjs-module" : 'defer',
           inject: true,
           template: paths.appHtml,
           ...(isEnvProduction
@@ -754,20 +767,28 @@ module.exports = function (webpackEnv) {
     ].filter(Boolean),
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter
-    performance: false
+    performance: false,
+    devServer: {
+      hot: true,
+    },
   };
 
 
-  if (hasInfraConfig) {
-    const infraConfig = require(infraPath)
-    if (infraConfig.mode === 'micro-frontend') {
-      const { name } = appPackageJson
-      config.entry = paths.appIndexMicro
-      config.output.libraryTarget = 'system'
-      config.output.filename = isEnvProduction ? `static/js/${name}.[contenthash:8].js` : `static/js/${name}.js`
-
-      config.externals = ["single-spa", "react", "react-dom", "react-dom/client"]
-    }
+  if (isMicro) {
+    const { name } = appPackageJson
+    config.entry = paths.appIndexMicro
+    // config.output.libraryTarget = 'module'
+    config.output.libraryTarget = 'system'
+    // config.output.filename = isEnvProduction ? `static/js/${name}.[contenthash:8].js` : `static/js/${name}.js`
+    config.output.filename = `static/js/${name}.js`
+    config.output.uniqueName = name
+    config.output.devtoolNamespace = name
+    // config.experiments = {
+    //   outputModule: true
+    // }
+    // if (isEnvProduction) {
+    config.externals = ["single-spa", "react", "react-dom", "react-dom/client",]// "react-router", "react-router-dom"]
+    // }
   }
 
 

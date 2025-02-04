@@ -1,7 +1,8 @@
-process.env.PORT = 3002
+// process.env.PORT = 3002
+process.env.PORT = 3000
 
 module.exports = {
-  mode: 'micro-frontend',
+  mode: 'micro-app',
   devServer(config) {
     const { proxy } = config
 
@@ -12,5 +13,9 @@ module.exports = {
         changeOrigin: true,
       }
     }
+  },
+  webpack(config) {
+    config.output.publicPath = 'http://localhost:3000/'
+    return config
   }
 }

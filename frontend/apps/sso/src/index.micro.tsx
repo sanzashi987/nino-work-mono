@@ -1,5 +1,3 @@
-/// <reference types="@nino-work/infra/react-app-env.d.ts" />
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { registerApplication, start } from 'single-spa';
@@ -14,7 +12,6 @@ const menuConfig: MenuMeta[] = [
     icon: '',
     type: 1,
     order: 0
-
   }
 ];
 
@@ -23,11 +20,12 @@ menuConfig.forEach((menu) => {
     menu.code,
     () => import(/* webpackIgnore: true */ menu.code),
     (location) => location.pathname.startsWith(menu.path),
-    { domElementGetter: () => document.getElementById('#nino-sub-app') }
+    { domElementGetter: () => document.getElementById('nino-sub-app'), basename: 'home' }
   );
 });
 
 start();
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <App />

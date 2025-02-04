@@ -8,6 +8,7 @@ const lifecycles = singleSpaReact({
   errorBoundary() {
     return <div>Error</div>;
   },
+  // @ts-expect-error
   loadRootComponent: () => import(
     './App'
   ).then((mod) => mod.default)

@@ -1,7 +1,7 @@
 import React, { lazy } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { Navigate, RouteObject } from 'react-router-dom';
 
-const BrowserRouter = createBrowserRouter([
+const routes :RouteObject[] = [
   {
     path: 'oss',
     children: [
@@ -17,8 +17,8 @@ const BrowserRouter = createBrowserRouter([
   },
   {
     path: '*',
-    Component: () => <Navigate to="/oss" />
+    Component: () => <Navigate to="oss" />
   }
-]);
+];
 
-export default BrowserRouter;
+export default routes;

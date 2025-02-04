@@ -12,23 +12,23 @@ const BrowserRouter = createBrowserRouter([
     Component: AuthGuard,
     children: [
       {
-        path: 'home',
+        path: 'home/*',
         Component: lazy(() => import('./Dashboard')),
         children: [
-          {
-            path: 'root/app',
-            Component: lazy(() => import('./Applications')),
-            children: [
-              {
-                Component: lazy(() => import('./Applications/AppsManagement')),
-                index: true
-              },
-              {
-                path: 'permission/:appId',
-                Component: lazy(() => import('./Applications/Permission'))
-              }
-            ]
-          }
+          // {
+          //   path: 'root/app',
+          //   Component: lazy(() => import('./Applications')),
+          //   children: [
+          //     {
+          //       Component: lazy(() => import('./Applications/AppsManagement')),
+          //       index: true
+          //     },
+          //     {
+          //       path: 'permission/:appId',
+          //       Component: lazy(() => import('./Applications/Permission'))
+          //     }
+          //   ]
+          // }
 
         ]
       }
