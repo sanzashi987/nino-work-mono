@@ -2,7 +2,7 @@
 import { defaultEquals, ValueEqualityFn } from './equality';
 import { throwInvalidWriteToSignalError } from './errors';
 import {
-  accessProducer, producerIncrementEpoch, producerNotifyConsumers, producerUpdatesAllowed, REACTIVE_NODE, ReactiveNode, SIGNAL
+  accessProducer, producerIncrementEpoch, producerNotifyConsumers, producerUpdatesAllowed, REACTIVE_NODE, ReactiveNode, Signal, SIGNAL
 } from './reactive';
 
 let postSignalSetFn: (() => void) | null = null;
@@ -70,4 +70,33 @@ export function signalUpdateFn<T>(node: SignalNode<T>, updater: (value: T) => T)
   }
 
   signalSetFn(node, updater(node.value));
+}
+
+function signalAsReadonlyFn<T>(this: SignalGetter<T>): Signal<T> {
+  const node = this[SIGNAL] as SignalNode<T> & { readonlyFn?: Signal<T> };
+  if (node.readonlyFn === undefined) {
+    const readonlyFn = () => this();
+    (readonlyFn as any)[SIGNAL] = node;
+    node.readonlyFn = readonlyFn as Signal<T>;
+  }
+  return node.readonlyFn;
+}
+
+interface WritableSignal<T> extends SignalGetter<T> {
+  set(value: T): void;
+  update(updateFn: (value: T) => T): void;
+  asReadonly(): Signal<T>;
+}
+
+export function singal<T>(initialValue: T, opt?: { equal: ValueEqualityFn<T> }): WritableSignal<T> {
+  const signalFn = createSignal(initialValue) as WritableSignal<T>;
+  const node = signalFn[SIGNAL];
+  if (opt.equal) {
+    node.equal = opt.equal;
+  }
+  signalFn.set = (next: T) => signalSetFn(node, next);
+  signalFn.update = (updater: (next: T) => T) => signalUpdateFn(node, updater);
+  signalFn.asReadonly = signalAsReadonlyFn.bind(signalFn as any) as () => Signal<T>;
+
+  return signalFn;
 }

@@ -3,7 +3,7 @@
 import { defaultEquals, ValueEqualityFn } from './equality';
 import {
   accessProducer,
-  consumerBeginWork, consumerCompleteWork, REACTIVE_NODE, ReactiveNode, setActiveConsumer, SIGNAL,
+  consumerBeginWork, consumerCompleteWork, REACTIVE_NODE, ReactiveNode, setActiveConsumer, Signal, SIGNAL,
   updateProducerValueVersion
 } from './reactive';
 
@@ -78,21 +78,28 @@ const COMPUTED_NODE = /* @__PURE__ */ (() => ({
   }
 }))();
 
-export function createComputed<T>(computation:()=>T):ComputedGetter<T> {
+export function createComputed<T>(computation: () => T): ComputedGetter<T> {
   const node: ComputedNode<T> = Object.create(COMPUTED_NODE);
   node.computation = computation;
 
-  const computed = (() => {
+  const getter = (() => {
     updateProducerValueVersion(node);
     accessProducer(node);
     if (node.value === ERRORED) {
       throw node.error;
     }
-
     return node.value;
   }) as ComputedGetter<T>;
 
-  (computed as ComputedGetter<T>)[SIGNAL] = node;
+  (getter as ComputedGetter<T>)[SIGNAL] = node;
 
-  return computed;
+  return getter;
+}
+
+export function computed<T>(computation: () => T, opt?: { equal: ValueEqualityFn<T> }): Signal<T> {
+  const getter = createComputed(computation);
+  if (opt?.equal) {
+    getter[SIGNAL].equal = opt.equal;
+  }
+  return getter;
 }

@@ -40,6 +40,10 @@ export function isReactive(value: unknown): value is Reactive {
   return (value as Partial<Reactive>)[SIGNAL] !== undefined;
 }
 
+export type Signal<T> = (() => T) & {
+  [SIGNAL]:unknown
+};
+
 export interface ReactiveNode {
   version: Version
   lastCleanEpoch: Version;
@@ -161,7 +165,7 @@ function producerAddConsumer(producer: ReactiveNode, consumer: ReactiveNode, ind
   return producer.consumers.push(consumer) - 1;
 }
 
-function destroyConsumer(consumer: ReactiveNode) {
+export function destroyConsumer(consumer: ReactiveNode) {
   assertConsumer(consumer);
   if (isConsumerLive(consumer)) {
     for (let i = 0; i < consumer.producers.length; i++) {
@@ -182,7 +186,7 @@ function markProducerClean(node: ReactiveNode) {
   node.lastCleanEpoch = epoch;
 }
 
-function consumerPollProducersForChange(node: ReactiveNode): boolean {
+export function consumerPollProducersForChange(node: ReactiveNode): boolean {
   assertConsumer(node);
 
   for (let i = 0; i < node.producers.length; i++) {
