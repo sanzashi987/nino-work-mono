@@ -21,7 +21,7 @@ const menuConfig: MenuMeta[] = [
 menuConfig.forEach((menu) => {
   registerApplication(
     menu.code,
-    () => import(/* webpackIgnore: true */ menu.code),
+    () => System.import(/* webpackIgnore: true */ menu.code),
     (location) => location.pathname.startsWith(menu.path),
     { domElementGetter: () => document.getElementById('#nino-sub-app') }
   );

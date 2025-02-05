@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-import { Navigate, RouteObject } from 'react-router-dom';
+import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
 const routes :RouteObject[] = [
   {
@@ -17,8 +17,8 @@ const routes :RouteObject[] = [
   },
   {
     path: '*',
-    Component: () => <Navigate to="oss" />
+    Component: () => <Navigate to="/oss" />
   }
 ];
 
-export default routes;
+export default () => useRoutes(routes);

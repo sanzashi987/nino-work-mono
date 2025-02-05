@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { theme as defaultTheme } from '@nino-work/shared';
-import routes from './pages';
+import Routes from './pages';
 
 const theme = createTheme(defaultTheme);
 
@@ -11,13 +11,19 @@ type AppProps = {
   basename?:string
 };
 
+// const router = createBrowserRouter(routes);
+
 const App: React.FC<AppProps> = ({ basename }) => {
   console.log('basename', basename);
-  const router = useMemo(() => createBrowserRouter(routes, { basename }), []);
+
+  // return basename;
+  // const router = useMemo(() => createBrowserRouter(routes, { basename }), []);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <RouterProvider router={router} />
+      <BrowserRouter basename={basename}>
+        <Routes />
+      </BrowserRouter>
     </ThemeProvider>
   );
 };

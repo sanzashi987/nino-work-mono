@@ -28,7 +28,7 @@ const BucketList: React.FC = () => {
         render: (row: any) => (
           <>
             <IconButton onClick={() => {
-              navigate(`../detail/${row.id}`);
+              navigate(`./detail/${row.id}`);
             }}
             >
               <Settings />

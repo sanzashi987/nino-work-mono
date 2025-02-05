@@ -8,3 +8,6 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
+
+/** Only in micro frontend environment */
+declare var System: any;
