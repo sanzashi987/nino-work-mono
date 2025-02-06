@@ -5,7 +5,6 @@ import AuthGuard from './RouterGuard';
 const BrowserRouter = createBrowserRouter([
   {
     path: 'login',
-    index: true,
     Component: lazy(() => import('./Login'))
   },
   {
@@ -13,24 +12,7 @@ const BrowserRouter = createBrowserRouter([
     children: [
       {
         path: 'home/*',
-        Component: lazy(() => import('./Dashboard')),
-        children: [
-          // {
-          //   path: 'root/app',
-          //   Component: lazy(() => import('./Applications')),
-          //   children: [
-          //     {
-          //       Component: lazy(() => import('./Applications/AppsManagement')),
-          //       index: true
-          //     },
-          //     {
-          //       path: 'permission/:appId',
-          //       Component: lazy(() => import('./Applications/Permission'))
-          //     }
-          //   ]
-          // }
-
-        ]
+        Component: lazy(() => import('./Dashboard'))
       }
     ]
   },

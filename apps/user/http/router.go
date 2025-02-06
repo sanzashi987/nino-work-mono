@@ -27,6 +27,8 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	{
 		v1.POST("login", userController.UserLogin)
 		v1.POST("register", userController.UserRegister)
+		v1.GET("user/importmap", miscController.GetImportMap)
+
 		authed := v1.Use(authMiddleware)
 		authed.GET("token", userController.TestToken)
 		authed.GET("info", userController.UserInfo)

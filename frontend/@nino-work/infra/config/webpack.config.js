@@ -195,10 +195,14 @@ module.exports = function (webpackEnv) {
 
 
   let isMicro = false
+  let isMicroHost = false
   if (hasInfraConfig) {
     const infraConfig = require(infraPath)
     if (infraConfig.mode === 'micro-app' || infraConfig.mode === 'micro-host') {
       isMicro = true
+      if (infraConfig.mode === 'micro-host') {
+        isMicroHost = true
+      }
     }
   }
 
@@ -582,9 +586,10 @@ module.exports = function (webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
+      (!isMicro || isMicroHost) &&
       new HtmlWebpackPlugin(
         {
-          scriptLoading: isMicro ? "systemjs-module" : 'defer',
+          scriptLoading: isMicroHost ? "systemjs-module" : 'defer',
           inject: true,
           template: paths.appHtml,
           ...(isEnvProduction
