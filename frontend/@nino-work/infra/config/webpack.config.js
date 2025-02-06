@@ -786,7 +786,7 @@ module.exports = function (webpackEnv) {
     //   outputModule: true
     // }
     // if (isEnvProduction) {
-    config.externals = ["single-spa", "react", "react-dom", "react-dom/client",]// "react/jsx-runtime"]// "react-router", "react-router-dom"]
+    config.externals = ["single-spa", "react", "react-dom", "react-dom/client",]// "react-router", "react-router-dom"]
     // }
   }
 
