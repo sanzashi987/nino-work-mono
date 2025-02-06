@@ -1,4 +1,4 @@
-process.env.PORT = 3001
+process.env.PORT = 3000
 
 module.exports = {
   mode: 'micro-host',

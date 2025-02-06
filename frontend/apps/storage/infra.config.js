@@ -1,5 +1,4 @@
-// process.env.PORT = 3002
-process.env.PORT = 3000
+process.env.PORT = 3002
 
 module.exports = {
   mode: 'micro-app',
@@ -15,7 +14,7 @@ module.exports = {
     }
   },
   webpack(config) {
-    config.output.publicPath = 'http://localhost:3000/'
+    config.output.publicPath = 'http://localhost:3002/'
     return config
   }
 }

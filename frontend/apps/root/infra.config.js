@@ -9,7 +9,7 @@ module.exports = {
     config.proxy = {
       ...proxy,
       '/backend': {
-        target: 'http://localhost:8111',
+        target: 'http://localhost:8081',
         changeOrigin: true,
       }
     }

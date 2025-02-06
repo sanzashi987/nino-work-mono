@@ -6,9 +6,7 @@ import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { UserContext } from '../RouterGuard';
 
-type SideBarProps = {};
-
-const SideBar: React.FC<SideBarProps> = (props) => {
+const SideBar: React.FC = () => {
   const { menus } = useContext(UserContext);
 
   const localtion = useLocation();

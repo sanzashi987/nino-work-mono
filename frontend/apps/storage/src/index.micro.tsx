@@ -9,9 +9,7 @@ const lifecycles = singleSpaReact({
     return <div>Error</div>;
   },
   // @ts-expect-error
-  loadRootComponent: () => import(
-    './App'
-  ).then((mod) => mod.default)
+  loadRootComponent: () => import('./App').then((mod) => mod.default)
 });
 
 export const { bootstrap, mount, unmount } = lifecycles;

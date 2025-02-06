@@ -16,6 +16,7 @@ export type ModelMeta = {
   description: string
 };
 
-export type MicroFrontendMaster = {
+export type SubAppInjectProps = {
+  basename?:string
 
 };
