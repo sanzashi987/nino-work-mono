@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/user/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
@@ -15,10 +16,32 @@ type MiscController struct {
 
 var miscController = MiscController{}
 
+var defaultMap = map[string]map[string]string{
+	"imports": {
+		"react":            "https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js",
+		"react-dom":        "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js",
+		"react-dom/client": "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js",
+		"single-spa":       "https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/system/single-spa.min.js",
+	},
+}
+
 func (c *MiscController) GetImportMap(ctx *gin.Context) {
-	data := gin.H{
-		"message": "test token",
+	data := defaultMap
+
+	authed, err := controller.ValidateFromCtx(ctx)
+	if err == nil {
+		id := authed.UserID
+		userInfo, e := service.UserServiceWebImpl.GetUserInfo(ctx, id)
+		if e == nil {
+			menus := userInfo.Menus
+			menuCodes := make([]string, len(menus))
+			for i, menu := range menus {
+				menuCodes[i] = menu.Code
+			}
+		}
+
 	}
+
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		c.AbortServerError(ctx, "Failed to create JSON")

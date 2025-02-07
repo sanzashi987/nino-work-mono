@@ -113,13 +113,12 @@ type CodeName struct {
 	Code string `json:"code"`
 }
 type MenuMeta struct {
-	Name      string `json:"name"`
-	Code      string `json:"code"`
-	Icon      string `json:"icon"`
-	Hyperlink bool   `json:"hyperlink"`
-	Path      string `json:"path"`
-	Type      uint8  `json:"type"`
-	Order     int    `json:"order"`
+	Name  string `json:"name"`
+	Code  string `json:"code"`
+	Icon  string `json:"icon"`
+	Path  string `json:"path"`
+	Type  uint8  `json:"type"`
+	Order int    `json:"order"`
 }
 
 type UserInfoResponse struct {
@@ -165,13 +164,12 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 				continue
 			}
 			menuMap[code] = &MenuMeta{
-				Name:      menu.Name,
-				Code:      code,
-				Icon:      menu.Icon,
-				Hyperlink: menu.Hyperlink,
-				Path:      menu.Path,
-				Order:     menu.Order,
-				Type:      uint8(menu.Type),
+				Name:  menu.Name,
+				Code:  code,
+				Icon:  menu.Icon,
+				Path:  menu.Path,
+				Order: menu.Order,
+				Type:  uint8(menu.Type),
 			}
 
 		}

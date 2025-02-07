@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="utf-8" />
-  <!-- <link rel="icon" href="%PUBLIC_URL%/favicon.ico" /> -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
@@ -31,34 +30,13 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/import-map-overrides/dist/import-map-overrides.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/extras/amd.js"></script>
-
-  <script type="systemjs-importmap">
-    {
-      "imports":{
-        "react": "https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js",
-        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js",
-        "react-dom/client": "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js",
-        "single-spa":"https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/system/single-spa.min.js",
-        "oss.nino.work":"http://localhost:3000/static/js/oss.nino.work.js"
-      }
-    }
-  </script>
+  <script type="systemjs-importmap" src="/backend/user/v1/misc/importmap"></script>
 
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
-  <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
 </body>
 
 </html>

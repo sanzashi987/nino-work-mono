@@ -18,7 +18,7 @@ func main() {
 func runAsMicroService() {
 	bootstraper := bootstrap.CommonBootstrap("storage.nino.work")
 
-	db.ConnectDB()
+	db.ConnectDB(bootstraper.PsmConf.DbName)
 	rpcService := bootstraper.InitRpcService()
 
 	// webService := web.NewService(

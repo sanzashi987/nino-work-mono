@@ -60,17 +60,24 @@ const (
 	CookieName = "login_token"
 )
 
+func ValidateFromCtx(ctx *gin.Context) (*AuthClaims, error) {
+	jwtToken, err := ctx.Cookie(CookieName)
+	if err != nil {
+		return nil, err
+	}
+
+	claim, err := ValidateToken(jwtToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return claim, nil
+}
+
 func ValidateMiddleware(loginPageUrl string) func(*gin.Context) {
 
 	return func(ctx *gin.Context) {
-		jwtToken, err := ctx.Cookie(CookieName)
-		if err != nil {
-			redirectURL := loginPageUrl + "?redirect=" + url.QueryEscape(ctx.Request.Referer())
-			ctx.Redirect(http.StatusFound, redirectURL)
-			return
-		}
-		// jwtToken := ctx.GetHeader("Authentication")
-		claim, err := ValidateToken(jwtToken)
+		claim, err := ValidateFromCtx(ctx)
 		if err != nil {
 			redirectURL := loginPageUrl + "?redirect=" + url.QueryEscape(ctx.Request.Referer())
 			ctx.Redirect(http.StatusFound, redirectURL)

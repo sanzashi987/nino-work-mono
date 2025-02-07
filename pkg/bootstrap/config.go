@@ -21,7 +21,6 @@ type ServiceConfig struct {
 	Host    string
 	Port    string
 	WebPort string
-	Feature bool
 	DbName  string
 	Raw     map[string]string
 }
