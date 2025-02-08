@@ -8,16 +8,17 @@ import (
 
 const (
 	User        = 0
-	Application = 1  // 新增应用类型用户
+	Application = 1 // 新增应用类型用户
 )
 
 type UserModel struct {
 	db.BaseModel
-	Username string      `gorm:"column:username;type:varchar(255);unique"`
-	Password string      `gorm:"column:password;type:varchar(255)"`
-	Fobidden bool        `gorm:"column:forbidden"`
-	Roles    []*RoleModel `gorm:"many2many:user_roles;"`
-	Type     int          `gorm:"column:type;default:0"`  // 新增用户类型字段
+	Username string            `gorm:"column:username;type:varchar(255);unique"`
+	Password string            `gorm:"column:password;type:varchar(255)"`
+	Fobidden bool              `gorm:"column:forbidden"`
+	Roles    []*RoleModel      `gorm:"many2many:user_roles;"`
+	Type     int               `gorm:"column:type;default:0"` // 新增用户类型字段
+	App      *ApplicationModel `gorm:"foreignKey:ServiceUser"`
 }
 
 func (u UserModel) TableName() string {

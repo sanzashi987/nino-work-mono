@@ -46,7 +46,7 @@ export type ListPermissionsResponse = {
 };
 
 export const listPermissions = defineApi<ListPermissionsRequest, ListPermissionsResponse>(
-  { url: `${prefix}/apps/list-permission` }
+  { url: `${prefix}/apps/permission/list` }
 );
 
 export type CreatePermissionRequest = {
@@ -55,6 +55,6 @@ export type CreatePermissionRequest = {
 };
 
 export const createPermission = defineApi<CreatePermissionRequest, void>({
-  url: `${prefix}/permission/create`,
+  url: `${prefix}/apps/permission/create`,
   method: 'POST'
 });

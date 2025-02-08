@@ -12,6 +12,12 @@ type PermissionController struct {
 
 var permissionController = PermissionController{}
 
+func RegisterAppPermissionRoutes(router gin.IRoutes) {
+	router.GET("apps/permission/list", permissionController.ListPermissionsByApp)
+	router.POST("apps/permission/create", permissionController.CreatePermission)
+	router.POST("apps/permission/delete", permissionController.DeletePermission)
+}
+
 type ListPermissionRequest struct {
 	AppId *uint64 `form:"app_id" binding:"required"`
 }

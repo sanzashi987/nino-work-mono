@@ -19,11 +19,12 @@ type ApplicationModel struct {
 	Status      uint   `gorm:"column:status"`
 	CreateBy    uint64 `gorm:"column:create_by"`
 	AccessKey   string `gorm:"column:access_key;type:varchar(32);uniqueIndex"` // AK
-	SecretKey   string `gorm:"column:secret_key;type:varchar(64)"`            // SK
+	SecretKey   string `gorm:"column:secret_key;type:varchar(64)"`             // SK
+	ServiceUser uint64 `gorm:"column:service_user"`
 	// store permission Id here
 	SuperAdmin uint64 `gorm:"column:super_admin;"`
 	// store permission Id here
-	Admin       uint64            `gorm:"column:admin;"`
+	Admin       uint64             `gorm:"column:admin;"`
 	Permissions []*PermissionModel `gorm:"foreignKey:AppId"`
 }
 
@@ -33,14 +34,25 @@ func (f ApplicationModel) TableName() string {
 
 func (app *ApplicationModel) BeforeCreate(tx *gorm.DB) error {
 	// 生成 AK、SK
-	app.AccessKey = utils.GenerateRandomString(16) // 生成较短的 AK，方便使用
-	app.SecretKey = utils.GenerateRandomString(32) // 生成较长的 SK，提高安全性
-	
+	accessKey, secretKey, err := utils.GenerateSecureKeys()
+
+	if err != nil {
+		return err
+	}
+	app.AccessKey, app.SecretKey = accessKey, secretKey
+
 	// 创建应用用户
 	appUser := &UserModel{
-		Username: app.Code + "_system",
-		Type: Application,
+		Username: app.Code,
+		Password: "",
+		Type:     Application,
 	}
 
-	return tx.Create(appUser).Error
+	if err := tx.Create(appUser).Error; err != nil {
+		return err
+	}
+
+	app.ServiceUser = appUser.Id
+	return nil
+
 }

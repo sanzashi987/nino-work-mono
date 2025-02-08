@@ -5,9 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
-	"net/url"
-	"sort"
 	"strings"
 )
 
@@ -31,42 +28,22 @@ func GenerateSecureKeys() (accessKey, secretKey string, err error) {
 }
 
 func GenerateSignature(
+	psm string,
 	method string,
 	path string,
-	query url.Values,
 	contentType string,
 	timestamp string,
 	secretKey string,
 ) string {
-	// 1. 规范化参数
-	params := make(url.Values)
-	for k, v := range query {
-		params[k] = v
-	}
-
-	// 2. 参数排序
-	var paramKeys []string
-	for k := range params {
-		paramKeys = append(paramKeys, k)
-	}
-	sort.Strings(paramKeys)
-
-	// 3. 构建待签名字符串
-	var paramParts []string
-	for _, k := range paramKeys {
-		paramParts = append(paramParts,
-			fmt.Sprintf("%s=%s", url.QueryEscape(k), url.QueryEscape(params.Get(k))))
-	}
 
 	payload := strings.Join([]string{
+		psm,
 		method,
 		path,
-		strings.Join(paramParts, "&"),
 		contentType,
 		timestamp,
 	}, "\n")
 
-	// 4. 计算HMAC-SHA256
 	mac := hmac.New(sha256.New, []byte(secretKey))
 	mac.Write([]byte(payload))
 	signature := base64.StdEncoding.EncodeToString(mac.Sum(nil))
