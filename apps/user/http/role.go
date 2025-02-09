@@ -12,9 +12,8 @@ type RoleController struct {
 	controller.BaseController
 }
 
-var roleController = RoleController{}
-
 func RegisterRoleRoutes(router gin.IRoutes) {
+	var roleController = RoleController{}
 	router.POST("roles/create", roleController.createRole)
 	router.GET("roles/:id", roleController.getRoleDetail)
 	router.POST("roles/update", roleController.updateRole)
@@ -25,14 +24,14 @@ func RegisterRoleRoutes(router gin.IRoutes) {
 func (rc *RoleController) createRole(c *gin.Context) {
 	var req service.CreateRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		rc.AbortClientError(c, "Fail to read required fields: "+err.Error())
+		rc.AbortClientError(c, "[http] createRole: Fail to read required fields: "+err.Error())
 		return
 	}
 
 	userId := c.GetUint64(controller.UserID)
 
-	if err := service.RoleServiceWebImpl.CreateRole(c.Request.Context(), userId, req); err != nil {
-		rc.AbortServerError(c, "Fail to create role: "+err.Error())
+	if err := service.RoleServiceWebImpl.CreateRole(c, userId, req); err != nil {
+		rc.AbortServerError(c, "[http] createRole: Fail to create role: "+err.Error())
 		return
 	}
 
@@ -42,13 +41,13 @@ func (rc *RoleController) createRole(c *gin.Context) {
 func (rc *RoleController) getRoleDetail(c *gin.Context) {
 	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		rc.AbortClientError(c, "Invalid role id")
+		rc.AbortClientError(c, "[http] getRoleDetail: Invalid role id")
 		return
 	}
 
-	role, err := service.RoleServiceWebImpl.GetRoleDetail(c.Request.Context(), roleId)
+	role, err := service.RoleServiceWebImpl.GetRoleDetail(c, roleId)
 	if err != nil {
-		rc.AbortServerError(c, "Fail to get role detail: "+err.Error())
+		rc.AbortServerError(c, "[http] getRoleDetail: Fail to get role detail: "+err.Error())
 		return
 	}
 
@@ -56,20 +55,14 @@ func (rc *RoleController) getRoleDetail(c *gin.Context) {
 }
 
 func (rc *RoleController) updateRole(c *gin.Context) {
-	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		rc.AbortClientError(c, "Invalid role id")
-		return
-	}
-
-	var req service.CreateRoleRequest
+	var req service.UpdateRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		rc.AbortClientError(c, "Fail to read required fields: "+err.Error())
+		rc.AbortClientError(c, "[http] updateRole: Fail to read required fields: "+err.Error())
 		return
 	}
 
-	if err := service.RoleServiceWebImpl.UpdateRole(c.Request.Context(), roleId, req); err != nil {
-		rc.AbortServerError(c, "Fail to update role: "+err.Error())
+	if err := service.RoleServiceWebImpl.UpdateRole(c, req); err != nil {
+		rc.AbortServerError(c, "[http] updateRole: Fail to update role: "+err.Error())
 		return
 	}
 
@@ -79,12 +72,12 @@ func (rc *RoleController) updateRole(c *gin.Context) {
 func (rc *RoleController) deleteRole(c *gin.Context) {
 	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		rc.AbortClientError(c, "Invalid role id")
+		rc.AbortClientError(c, "[http] deleteRole: Invalid role id")
 		return
 	}
 
-	if err := service.RoleServiceWebImpl.DeleteRole(c.Request.Context(), roleId); err != nil {
-		rc.AbortServerError(c, "Fail to delete role: "+err.Error())
+	if err := service.RoleServiceWebImpl.DeleteRole(c, roleId); err != nil {
+		rc.AbortServerError(c, "[http] deleteRole: Fail to delete role: "+err.Error())
 		return
 	}
 
@@ -93,9 +86,9 @@ func (rc *RoleController) deleteRole(c *gin.Context) {
 
 func (rc *RoleController) suggestRoles(c *gin.Context) {
 	keyword := c.Query("keyword")
-	roles, err := service.RoleServiceWebImpl.SuggestRoles(c.Request.Context(), keyword)
+	roles, err := service.RoleServiceWebImpl.SuggestRoles(c, keyword)
 	if err != nil {
-		rc.AbortServerError(c, "Fail to suggest roles: "+err.Error())
+		rc.AbortServerError(c, "[http] suggestRoles: Fail to suggest roles: "+err.Error())
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/http"
-	"github.com/sanzashi987/nino-work/apps/user/service"
+	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/bootstrap"
 	"github.com/sanzashi987/nino-work/proto/user"
 )
@@ -22,7 +22,7 @@ func runAsMicroService() {
 
 	webService := bootstraper.InitWebService(http.NewRouter(bootstraper.Config.System.LoginPage))
 
-	user.RegisterUserServiceHandler(rpcService.Server(), service.GetUserServiceRpc())
+	user.RegisterUserServiceHandler(rpcService.Server(), userService.GetUserServiceRpc())
 	webService.Init()
 	rpcService.Init()
 

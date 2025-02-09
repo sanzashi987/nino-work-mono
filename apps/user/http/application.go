@@ -33,12 +33,12 @@ type AppInfo struct {
 }
 
 type ListAppResponse struct {
-	Data []AppInfo `json:"data"`
+	Data []*AppInfo `json:"data"`
 	shared.PaginationResponse
 }
 
-func intoAppInfoMeta(app *model.ApplicationModel) AppInfo {
-	return AppInfo{
+func intoAppInfoMeta(app *model.ApplicationModel) *AppInfo {
+	return &AppInfo{
 		Id:          app.Id,
 		Name:        app.Name,
 		Code:        app.Code,
@@ -63,9 +63,9 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 		return
 	}
 
-	metas := []AppInfo{}
-	for _, app := range apps {
-		metas = append(metas, intoAppInfoMeta(app))
+	metas := make([]*AppInfo, len(apps))
+	for i, app := range apps {
+		metas[i] = intoAppInfoMeta(app)
 	}
 
 	total := len(metas)

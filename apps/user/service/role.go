@@ -6,6 +6,7 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
@@ -23,7 +24,7 @@ type CreateRoleRequest struct {
 
 // 创建角色
 func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
-	user, tx, err := getUserRolePermission(ctx, userId)
+	user, tx, err :=  userService.GetUserRolePermission(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -79,15 +80,26 @@ func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*mod
 	return &role, nil
 }
 
+type UpdateRoleRequest struct {
+	RoleName        string   `json:"role_name"`
+	RoleId          uint64   `json:"role_id" binding:"required"`
+	RoleDescription string   `json:"role_description"`
+	PermissionIds   []uint64 `json:"permission_ids"`
+}
+
 // 更新角色
-func (r *RoleServiceWeb) UpdateRole(ctx context.Context, roleId uint64, payload CreateRoleRequest) error {
+func (r *RoleServiceWeb) UpdateRole(ctx context.Context, payload UpdateRoleRequest) error {
 	tx := db.NewTx(ctx).Begin()
-	role := &model.RoleModel{
-		Name:        payload.RoleName,
-		Code:        payload.RoleCode,
-		Description: payload.RoleDescription,
+	role := &model.RoleModel{}
+
+	if payload.RoleName != "" {
+		role.Name = payload.RoleName
 	}
-	role.Id = roleId
+	if payload.RoleDescription != "" {
+		role.Description = payload.RoleDescription
+	}
+
+	role.Id = payload.RoleId
 
 	if err := tx.Updates(role).Error; err != nil {
 		tx.Rollback()

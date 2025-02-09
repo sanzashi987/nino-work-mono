@@ -1,4 +1,4 @@
-package service
+package consts
 
 const (
 	Success             int32 = 0

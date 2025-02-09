@@ -5,7 +5,7 @@ import (
 	iHttp "net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/user/service"
+	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/proto/user"
 )
@@ -36,7 +36,7 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 		Expiry:   &req.Expiry,
 	}
 
-	if err := service.UserServiceRpcImpl.UserLogin(ctx, &rpcReq, &res); err != nil {
+	if err := userService.UserServiceRpcImpl.UserLogin(ctx, &rpcReq, &res); err != nil {
 		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error "+err.Error())
 		return
 	}
@@ -59,7 +59,7 @@ func (c *UserController) UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
+	if err := userService.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
 		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
 		return
 	}
@@ -70,7 +70,7 @@ func (c *UserController) UserRegister(ctx *gin.Context) {
 func (c *UserController) UserInfo(ctx *gin.Context) {
 
 	userId := ctx.GetUint64(controller.UserID)
-	info, err := service.UserServiceWebImpl.GetUserInfo(ctx, userId)
+	info, err := userService.UserServiceWebImpl.GetUserInfo(ctx, userId)
 
 	if err != nil {
 		c.AbortServerError(ctx, "[http] user info: Fail to read user info:"+err.Error())

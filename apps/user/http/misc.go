@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/user/service"
+	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
@@ -31,7 +31,7 @@ func (c *MiscController) GetImportMap(ctx *gin.Context) {
 	authed, err := controller.ValidateFromCtx(ctx)
 	if err == nil {
 		id := authed.UserID
-		userInfo, e := service.UserServiceWebImpl.GetUserInfo(ctx, id)
+		userInfo, e := userService.UserServiceWebImpl.GetUserInfo(ctx, id)
 		if e == nil {
 			menus := userInfo.Menus
 			menuCodes := make([]string, len(menus))

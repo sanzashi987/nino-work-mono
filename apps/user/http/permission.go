@@ -10,9 +10,8 @@ type PermissionController struct {
 	controller.BaseController
 }
 
-var permissionController = PermissionController{}
-
 func RegisterAppPermissionRoutes(router gin.IRoutes) {
+	var permissionController = PermissionController{}
 	router.GET("apps/permission/list", permissionController.ListPermissionsByApp)
 	router.POST("apps/permission/create", permissionController.CreatePermission)
 	router.POST("apps/permission/delete", permissionController.DeletePermission)

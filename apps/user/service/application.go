@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
+
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
@@ -74,7 +76,7 @@ func (u *ApplicationServiceWeb) CreateApp(ctx context.Context, userId uint64, pa
 	return application, nil
 }
 
-func removeRepeat(result *AppAdminResult) []*model.ApplicationModel {
+func removeRepeat(result *userService.AppAdminResult) []*model.ApplicationModel {
 	apps := []*model.ApplicationModel{}
 	appMap := map[uint64]*model.ApplicationModel{}
 
@@ -95,7 +97,7 @@ func removeRepeat(result *AppAdminResult) []*model.ApplicationModel {
 }
 
 func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uint64) ([]*model.ApplicationModel, error) {
-	result, err := getUserAdmins(ctx, userId)
+	result, err := userService.GetUserAdmins(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +106,7 @@ func (u *ApplicationServiceWeb) ListApplications(ctx context.Context, userId uin
 }
 
 func userIsManager(ctx context.Context, userId uint64, appId *uint64, superOnly bool) (app *model.ApplicationModel, tx *gorm.DB, err error) {
-	user, tx, err := getUserRolePermission(ctx, userId)
+	user, tx, err := userService.GetUserRolePermission(ctx, userId)
 	if err != nil {
 		return
 	}
