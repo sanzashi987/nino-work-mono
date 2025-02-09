@@ -33,6 +33,30 @@ func GetUserRolePermission(ctx context.Context, userId uint64) (*model.UserModel
 type AppAdminResult struct {
 	SuperAdminApps []*model.ApplicationModel
 	AdminApps      []*model.ApplicationModel
+	Tx             *gorm.DB
+}
+
+func (a *AppAdminResult) HasAnyAdmin() bool {
+	return (len(a.SuperAdminApps) + len(a.AdminApps)) > 0
+}
+func (a *AppAdminResult) GetAllAppIds() []uint64 {
+	admins := a.AdminApps
+	superAdmins := a.SuperAdminApps
+
+	appIdSet := make(map[uint64]bool)
+
+	for _, app := range admins {
+		appIdSet[app.Id] = true
+	}
+	for _, app := range superAdmins {
+		appIdSet[app.Id] = true
+	}
+
+	appIds := []uint64{}
+	for key := range appIdSet {
+		appIds = append(appIds, key)
+	}
+	return appIds
 }
 
 func GetUserAdmins(ctx context.Context, userId uint64) (*AppAdminResult, error) {
@@ -86,7 +110,73 @@ func GetUserAdmins(ctx context.Context, userId uint64) (*AppAdminResult, error) 
 	result := AppAdminResult{
 		SuperAdminApps: superRes,
 		AdminApps:      adminRes,
+		Tx:             tx,
 	}
 
 	return &result, nil
+}
+
+type AdminResult struct {
+	IsAdmin bool `json:"is_admin"`
+	IsSuper bool `json:"is_super"`
+}
+
+func (a AdminResult) Admin() bool {
+	return a.IsAdmin || a.IsSuper
+}
+
+type AdminData struct {
+	Result *AdminResult
+	App    *model.ApplicationModel
+	Tx     *gorm.DB
+}
+
+func UserIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*AdminData, error) {
+	tx := db.NewTx(ctx)
+	user, err := dao.FindUserWithRoles(tx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	userRolesMap := map[uint64]*model.RoleModel{}
+	for _, role := range user.Roles {
+		userRolesMap[role.Id] = role
+	}
+
+	app := model.ApplicationModel{}
+	if err := tx.Where("id = ?", *appId).Find(&app).Error; err != nil {
+		return nil, err
+	}
+
+	result := AdminResult{}
+
+	superRoles, err := dao.GetRolesByPermission(tx, app.SuperAdmin)
+	if err != nil {
+		return nil, err
+	}
+	roles, err := dao.GetRolesByPermission(tx, app.Admin)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, role := range superRoles {
+		if _, exist := userRolesMap[role.Id]; exist {
+			result.IsSuper = true
+			break
+		}
+	}
+	for _, role := range roles {
+		if _, exist := userRolesMap[role.Id]; exist {
+			result.IsAdmin = true
+			break
+		}
+	}
+
+	data := AdminData{
+		Tx:     tx,
+		Result: &result,
+		App:    &app,
+	}
+
+	return &data, nil
 }

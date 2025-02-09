@@ -1,6 +1,6 @@
 const theme = {
   spacing: 4,
-  shape: { borderRadius: 2 },
+  shape: { borderRadius: 4 },
   palette: {
     // mode: 'dark',
     // primary: {

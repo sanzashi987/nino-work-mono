@@ -15,7 +15,7 @@ type RoleController struct {
 func RegisterRoleRoutes(router gin.IRoutes) {
 	var roleController = RoleController{}
 	router.POST("roles/create", roleController.createRole)
-	router.GET("roles/:id", roleController.getRoleDetail)
+	router.POST("roles/list", roleController.listManagedRoles)
 	router.POST("roles/update", roleController.updateRole)
 	router.POST("roles/delete", roleController.deleteRole)
 	router.GET("roles/suggest", roleController.suggestRoles)
@@ -38,16 +38,19 @@ func (rc *RoleController) createRole(c *gin.Context) {
 	rc.SuccessVoid(c)
 }
 
-func (rc *RoleController) getRoleDetail(c *gin.Context) {
+
+
+
+func (rc *RoleController) listManagedRoles(c *gin.Context) {
 	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		rc.AbortClientError(c, "[http] getRoleDetail: Invalid role id")
+		rc.AbortClientError(c, "[http] listManagedRoles: Invalid role id")
 		return
 	}
 
 	role, err := service.RoleServiceWebImpl.GetRoleDetail(c, roleId)
 	if err != nil {
-		rc.AbortServerError(c, "[http] getRoleDetail: Fail to get role detail: "+err.Error())
+		rc.AbortServerError(c, "[http] listManagedRoles: Fail to get role detail: "+err.Error())
 		return
 	}
 
