@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -38,4 +39,42 @@ func FindRolesWithPermissions(tx *gorm.DB, roles ...*model.RoleModel) error {
 	}
 
 	return nil
+}
+
+func FindAllPermissionsWithRoleIds(tx *gorm.DB, roleIds []uint64) (*utils.Set[uint64], error) {
+	rolesWithPerms := []*model.RoleModel{}
+
+	err := tx.
+		Preload("Permissions").
+		Where("id IN ?", roleIds).
+		Find(&rolesWithPerms).Error
+	if err != nil {
+		return nil, err
+	}
+
+	permissionSet := utils.NewSet[uint64]()
+
+	for _, role := range rolesWithPerms {
+		for _, p := range role.Permissions {
+			permissionSet.Add(p.Id)
+		}
+	}
+
+	return permissionSet, nil
+}
+
+func FindAllPermissionsWithAppIds(tx *gorm.DB, appIds []uint64) (*utils.Set[uint64], error) {
+	permissions := []*model.PermissionModel{}
+
+	if err := tx.Where("app_id in ?", appIds).Find(&permissions).Error; err != nil {
+		return nil, err
+	}
+
+	permissionSet := utils.NewSet[uint64]()
+
+	for _, p := range permissions {
+		permissionSet.Add(p.Id)
+	}
+
+	return permissionSet, nil
 }

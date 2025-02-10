@@ -22,7 +22,7 @@ func runAsMicroService() {
 
 	webService := bootstraper.InitWebService(http.NewRouter(bootstraper.Config.System.LoginPage))
 
-	user.RegisterUserServiceHandler(rpcService.Server(), userService.GetUserServiceRpc())
+	user.RegisterUserServiceHandler(rpcService.Server(), userService.UserServiceRpcImpl)
 	webService.Init()
 	rpcService.Init()
 

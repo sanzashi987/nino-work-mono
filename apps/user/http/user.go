@@ -51,21 +51,21 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 	c.ResponseJson(ctx, &res)
 }
 
-func (c *UserController) UserRegister(ctx *gin.Context) {
-	var req = user.UserRegisterRequest{}
-	var res = user.UserLoginResponse{}
-	if err := ctx.BindJSON(&req); err != nil {
-		c.AbortClientError(ctx, "[http] user regiser: Fail to read required fields "+err.Error())
-		return
-	}
+// func (c *UserController) UserRegister(ctx *gin.Context) {
+// 	var req = user.UserRegisterRequest{}
+// 	var res = user.UserLoginResponse{}
+// 	if err := ctx.BindJSON(&req); err != nil {
+// 		c.AbortClientError(ctx, "[http] user regiser: Fail to read required fields "+err.Error())
+// 		return
+// 	}
 
-	if err := userService.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
-		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
-		return
-	}
+// 	if err := userService.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
+// 		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
+// 		return
+// 	}
 
-	c.ResponseJson(ctx, &res)
-}
+// 	c.ResponseJson(ctx, &res)
+// }
 
 func (c *UserController) UserInfo(ctx *gin.Context) {
 

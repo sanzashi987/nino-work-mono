@@ -8,8 +8,8 @@ type RoleModel struct {
 	Name        string             `gorm:"column:name"`
 	Description string             `gorm:"column:description"`
 	Permissions []*PermissionModel `gorm:"many2many:role_permissions;"`
-	Users       []UserModel        `gorm:"many2many:user_roles;"`
-	Menus       []MenuModel        `gorm:"many2many:menu_roles;"`
+	Users       []*UserModel       `gorm:"many2many:user_roles;"`
+	Menus       []*MenuModel       `gorm:"many2many:menu_roles;"`
 }
 
 func (u RoleModel) TableName() string {

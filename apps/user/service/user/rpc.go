@@ -14,13 +14,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserServiceRpc struct{}
-
-var UserServiceRpcImpl *UserServiceRpc = &UserServiceRpc{}
-
-func GetUserServiceRpc() user.UserServiceHandler {
-	return UserServiceRpcImpl
+type UserServiceRpc struct {
+	user.UserServiceHandler
 }
+
+var UserServiceRpcImpl = &UserServiceRpc{}
+
+// func (u *UserServiceRpc) GetApplicationPermissions() {
+
+// }
+// func (u *UserServiceRpc) GetUserPermissions() {
+// }
 
 func (u *UserServiceRpc) UserLogin(ctx context.Context, in *user.UserLoginRequest, out *user.UserLoginResponse) (err error) {
 	user, err := dao.FindUserByUsername(db.NewTx(ctx), in.Username)

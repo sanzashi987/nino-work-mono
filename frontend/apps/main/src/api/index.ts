@@ -31,7 +31,6 @@ export type MenuMeta = {
   name: string
   code: string
   icon: string
-  hyperlink?: boolean
   path: string
   type: MenuType
   order: number

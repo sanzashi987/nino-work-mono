@@ -8,22 +8,27 @@ import (
 )
 
 type BaseTime struct {
-	CreateTime time.Time
-	UpdateTime time.Time `gorm:""`
+	CreateTime time.Time `gorm:"column:create_time"`
+	UpdateTime time.Time `gorm:"column:update_time"`
 }
 
 type BaseModel struct {
 	BaseTime
 	Id         uint64         `gorm:"column:id;primaryKey;not null;index;unique;"`
 	DeleteTime gorm.DeletedAt `gorm:"index"`
+	IGetId
 }
 
-type GetId interface {
+type IGetId interface {
 	GetId() uint64
 }
 
 type GetDeleteTime interface {
 	GetDeleteTime() *time.Time
+}
+
+func (model *BaseModel) GetId() uint64 {
+	return model.Id
 }
 
 func (model BaseModel) GetDeleteTime() *time.Time {
@@ -51,4 +56,12 @@ func (m *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 func (m *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 	m.UpdateTime = time.Now()
 	return
+}
+
+func ToIdList(a []IGetId) []uint64 {
+	res := make([]uint64, len(a))
+	for i, model := range a {
+		res[i] = model.GetId()
+	}
+	return res
 }

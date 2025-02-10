@@ -6,6 +6,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -39,6 +40,12 @@ type AppAdminResult struct {
 func (a *AppAdminResult) HasAnyAdmin() bool {
 	return (len(a.SuperAdminApps) + len(a.AdminApps)) > 0
 }
+
+func (this *AppAdminResult) ToPermissionSet() (*utils.Set[uint64], error) {
+	appIds := this.GetAllAppIds()
+	return dao.FindAllPermissionsWithAppIds(this.Tx, appIds)
+}
+
 func (a *AppAdminResult) GetAllAppIds() []uint64 {
 	admins := a.AdminApps
 	superAdmins := a.SuperAdminApps
