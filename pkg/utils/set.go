@@ -37,3 +37,40 @@ func (s *Set[T]) IsStrictlyContains(other *Set[T]) bool {
 func (s *Set[T]) ToRaw() map[T]bool {
 	return s.elements
 }
+
+func (s *Set[T]) Intersection(other *Set[T]) *Set[T] {
+	iter := other
+
+	if len(other.elements) > len(s.elements) {
+		iter = s
+	}
+
+	result := NewSet[T]()
+	for key := range iter.elements {
+		if other.elements[key] {
+			result.Add(key)
+		}
+	}
+	return result
+}
+
+func (s *Set[T]) Union(other *Set[T]) *Set[T] {
+	result := NewSet[T]()
+	for key := range s.elements {
+		result.Add(key)
+	}
+	for key := range other.elements {
+		result.Add(key)
+	}
+	return result
+}
+
+func (s *Set[T]) Diff(other *Set[T]) (*Set[T], *Set[T]) {
+	intersection := s.Intersection(other)
+	relativeComplement := s.Union(other)
+	for key := range intersection.elements {
+		relativeComplement.Remove(key)
+	}
+
+	return intersection, relativeComplement
+}
