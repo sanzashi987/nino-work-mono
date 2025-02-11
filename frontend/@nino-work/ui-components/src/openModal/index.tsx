@@ -38,6 +38,8 @@ const Modal: React.FC<ModalProps> = ({ title, content, onClose, action, contentP
   );
 };
 
+const SimpleForm = () => { };
+
 const openModal = (props:Omit<ModalProps, 'onClose'>) => {
   const modalRoot = document.createElement('div');
   document.body.appendChild(modalRoot);

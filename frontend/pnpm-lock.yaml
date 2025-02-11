@@ -228,47 +228,11 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
-
-  apps/root:
-    dependencies:
-      '@emotion/react':
-        specifier: ^11.14.0
-        version: 11.14.0(@types/react@19.0.2)(react@18.3.1)
-      '@emotion/styled':
-        specifier: ^11.14.0
-        version: 11.14.0(@emotion/react@11.14.0)(@types/react@19.0.2)(react@18.3.1)
-      '@mui/icons-material':
-        specifier: ^6.4.0
-        version: 6.4.0(@mui/material@6.4.0)(@types/react@19.0.2)(react@18.3.1)
-      '@mui/material':
-        specifier: ^6.4.0
-        version: 6.4.0(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react-dom@18.3.1)(react@18.3.1)
-      '@nino-work/requester':
-        specifier: workspace:*
-        version: link:../../@nino-work/requester
-      '@nino-work/shared':
-        specifier: workspace:*
-        version: link:../../@nino-work/shared
-      '@nino-work/ui-components':
-        specifier: workspace:*
-        version: link:../../@nino-work/ui-components
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
       react-hook-form:
         specifier: ^7.54.2
         version: 7.54.2(react@18.3.1)
-      react-router-dom:
-        specifier: ^7.1.1
-        version: 7.1.1(react-dom@18.3.1)(react@18.3.1)
-      single-spa-react:
-        specifier: ^6.0.2
-        version: 6.0.2(@types/react-dom@19.0.2)(@types/react@19.0.2)(react@18.3.1)
 
-  apps/sso:
+  apps/main:
     dependencies:
       '@emotion/react':
         specifier: ^11.14.0
@@ -319,6 +283,45 @@ importers:
       '@types/js-cookie':
         specifier: ^3.0.6
         version: 3.0.6
+
+  apps/root:
+    dependencies:
+      '@emotion/react':
+        specifier: ^11.14.0
+        version: 11.14.0(@types/react@19.0.2)(react@18.3.1)
+      '@emotion/styled':
+        specifier: ^11.14.0
+        version: 11.14.0(@emotion/react@11.14.0)(@types/react@19.0.2)(react@18.3.1)
+      '@mui/icons-material':
+        specifier: ^6.4.0
+        version: 6.4.0(@mui/material@6.4.0)(@types/react@19.0.2)(react@18.3.1)
+      '@mui/material':
+        specifier: ^6.4.0
+        version: 6.4.0(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react-dom@18.3.1)(react@18.3.1)
+      '@nino-work/requester':
+        specifier: workspace:*
+        version: link:../../@nino-work/requester
+      '@nino-work/shared':
+        specifier: workspace:*
+        version: link:../../@nino-work/shared
+      '@nino-work/ui-components':
+        specifier: workspace:*
+        version: link:../../@nino-work/ui-components
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-hook-form:
+        specifier: ^7.54.2
+        version: 7.54.2(react@18.3.1)
+      react-router-dom:
+        specifier: ^7.1.1
+        version: 7.1.1(react-dom@18.3.1)(react@18.3.1)
+      single-spa-react:
+        specifier: ^6.0.2
+        version: 6.0.2(@types/react-dom@19.0.2)(@types/react@19.0.2)(react@18.3.1)
 
   apps/storage:
     dependencies:
@@ -8109,7 +8112,6 @@ packages:
       react: ^16.8.0 || ^17 || ^18 || ^19
     dependencies:
       react: 18.3.1
-    dev: false
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}

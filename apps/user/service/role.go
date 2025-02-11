@@ -85,10 +85,10 @@ func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*mod
 }
 
 type UpdateRoleRequest struct {
-	RoleName        string   `json:"role_name"`
-	RoleId          uint64   `json:"role_id" binding:"required"`
-	RoleDescription string   `json:"role_description"`
-	PermissionIds   []uint64 `json:"permission_ids"`
+	Id            uint64   `json:"id" binding:"required"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description"`
+	PermissionIds []uint64 `json:"permission_ids"`
 }
 
 // 更新角色
@@ -96,14 +96,14 @@ func (r *RoleServiceWeb) UpdateRole(ctx context.Context, payload UpdateRoleReque
 	tx := db.NewTx(ctx).Begin()
 	role := &model.RoleModel{}
 
-	if payload.RoleName != "" {
-		role.Name = payload.RoleName
+	if payload.Name != "" {
+		role.Name = payload.Name
 	}
-	if payload.RoleDescription != "" {
-		role.Description = payload.RoleDescription
+	if payload.Description != "" {
+		role.Description = payload.Description
 	}
 
-	role.Id = payload.RoleId
+	role.Id = payload.Id
 
 	if err := tx.Updates(role).Error; err != nil {
 		tx.Rollback()
@@ -112,9 +112,9 @@ func (r *RoleServiceWeb) UpdateRole(ctx context.Context, payload UpdateRoleReque
 
 	// 更新权限关联
 	if len(payload.PermissionIds) > 0 {
-		permissions := make([]model.PermissionModel, 0)
+		permissions := make([]*model.PermissionModel, 0)
 		for _, pid := range payload.PermissionIds {
-			permission := model.PermissionModel{}
+			permission := &model.PermissionModel{}
 			permission.Id = pid
 			permissions = append(permissions, permission)
 		}
@@ -162,7 +162,7 @@ type RoleMeta struct {
 }
 
 type ListRolesResponse struct {
-	Roles []*RoleMeta `json:"roles"`
+	Data []*RoleMeta `json:"data"`
 	shared.PaginationResponse
 }
 
@@ -177,7 +177,7 @@ func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *
 
 	if !result.HasAnyAdmin() {
 		return &ListRolesResponse{
-			Roles: []*RoleMeta{},
+			Data: []*RoleMeta{},
 		}, nil
 	}
 
@@ -208,7 +208,7 @@ func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *
 	}
 
 	return &ListRolesResponse{
-		Roles: roleMetas,
+		Data: roleMetas,
 		PaginationResponse: shared.PaginationResponse{
 			PageIndex:   payload.Page,
 			PageSize:    payload.Size,

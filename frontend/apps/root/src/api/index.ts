@@ -1,7 +1,7 @@
 import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
-const prefix = '/backend/v1';
+const prefix = '/backend/user/v1';
 
 export enum AppStatus {
   ENABLE = 0,
@@ -56,5 +56,40 @@ export type CreatePermissionRequest = {
 
 export const createPermission = defineApi<CreatePermissionRequest, void>({
   url: `${prefix}/apps/permission/create`,
+  method: 'POST'
+});
+
+type RoleInfo = {
+  id: number
+  name: string,
+  code: string
+};
+
+export const listRoles = defineApi<PagninationRequest, PaginationResponse<RoleInfo>>({
+  url: `${prefix}/roles/list`,
+  method: 'POST'
+});
+
+type CreateRoleRequest = {
+  name: string
+  code: string
+  description?: string
+  permission_ids?: number[]
+};
+
+export const createRoles = defineApi<CreateRoleRequest, void>({
+  url: `${prefix}/roles/create`,
+  method: 'POST'
+});
+
+type UpdateRoleRequest = {
+  id: number
+  name?: string
+  description?: string
+  permission_ids?: number[]
+};
+
+export const updateRoles = defineApi<UpdateRoleRequest, void>({
+  url: `${prefix}/roles/update`,
   method: 'POST'
 });

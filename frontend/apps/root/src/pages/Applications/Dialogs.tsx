@@ -65,6 +65,5 @@ export const openCreatePermission = (appId:number, onSuccess: VoidFunction) => {
     title: 'Create Permission',
     content: <BasicCreate onSuccess={onSuccess} requester={requester} />,
     action: false
-
   });
 };

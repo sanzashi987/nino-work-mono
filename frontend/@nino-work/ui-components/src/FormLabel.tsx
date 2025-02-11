@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import React from 'react';
 
 type FormLabelProps = {
-  title: string
+  title: string | React.ReactNode
   field: string
 };
 

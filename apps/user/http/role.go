@@ -8,6 +8,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/user/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type RoleController struct {
@@ -41,19 +42,21 @@ func (rc *RoleController) createRole(c *gin.Context) {
 }
 
 func (rc *RoleController) listManagedRoles(c *gin.Context) {
-	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
+	userId := c.GetUint64(controller.UserID)
+
+	var req shared.PaginationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		rc.AbortClientError(c, "[http] listManagedRoles: Invalid role id")
 		return
 	}
 
-	role, err := service.RoleServiceWebImpl.GetRoleDetail(c, roleId)
+	res, err := service.RoleServiceWebImpl.ListRoles(c, userId, &req)
 	if err != nil {
 		rc.AbortServerError(c, "[http] listManagedRoles: Fail to get role detail: "+err.Error())
 		return
 	}
 
-	rc.ResponseJson(c, role)
+	rc.ResponseJson(c, res)
 }
 
 func (rc *RoleController) updateRole(c *gin.Context) {
