@@ -78,7 +78,7 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	v1 := apiEngine.Group("/backend/user/v1")
 	{
 		v1.POST("login", userController.UserLogin)
-		v1.POST("register", userController.UserRegister)
+		// v1.POST("register", userController.UserRegister)
 		v1.GET("misc/importmap", miscController.GetImportMap)
 
 		authed := v1.Use(enhancedAuth)

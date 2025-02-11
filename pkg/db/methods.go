@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -136,4 +137,15 @@ func (dao *BaseDao[Model]) LogicalDelete(record Model, config ...Configure) (err
 func (dao *BaseDao[Model]) FindByKey(key string, value any, config ...Configure) (result *Model, err error) {
 	err = dao.GetOrm(config...).Where(fmt.Sprintf("%s = ?", key), value).First(result).Error
 	return
+}
+
+func CommonSuggest[T any](ctx context.Context, keyword string, results *[]T) error {
+	tx := NewTx(ctx)
+	if err := tx.
+		Where("name LIKE ? OR code LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
+		Find(results).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

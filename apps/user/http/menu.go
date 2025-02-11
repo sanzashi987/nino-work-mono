@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	menuService "github.com/sanzashi987/nino-work/apps/user/service/menu"
-	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
@@ -23,7 +22,7 @@ func RegisterMenuRoutes(router gin.IRoutes) {
 	router.GET("menus/:id", menuController.getMenuDetail)
 	router.POST("menus/update", menuController.updateMenu)
 	router.POST("menus/delete", menuController.deleteMenu)
-	router.GET("menus/suggest", menuController.suggestMenus)
+	router.GET("menus/suggest", menuController.suggest)
 }
 
 func (mc *MenuController) createMenu(c *gin.Context) {
@@ -125,13 +124,17 @@ func (mc *MenuController) deleteMenu(c *gin.Context) {
 	mc.SuccessVoid(c)
 }
 
-func (mc *MenuController) suggestMenus(c *gin.Context) {
+func (mc *MenuController) suggest(c *gin.Context) {
 	keyword := c.Query("keyword")
-	menus, err := userService.MenuServiceWebImpl.SuggestMenus(c, keyword)
-	if err != nil {
-		mc.AbortServerError(c, "suggestMenus: fail to suggest menus: "+err.Error())
+	if keyword == "" {
+		mc.ResponseJson(c, []model.MenuModel{})
 		return
 	}
 
-	mc.ResponseJson(c, menus)
+	var roles []model.MenuModel
+	if err := db.CommonSuggest[model.MenuModel](c, keyword, &roles); err != nil {
+		mc.AbortClientError(c, "fail to suggest: "+err.Error())
+	}
+
+	mc.ResponseJson(c, roles)
 }

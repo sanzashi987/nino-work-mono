@@ -4,8 +4,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/apps/user/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type RoleController struct {
@@ -18,7 +20,7 @@ func RegisterRoleRoutes(router gin.IRoutes) {
 	router.POST("roles/list", roleController.listManagedRoles)
 	router.POST("roles/update", roleController.updateRole)
 	router.POST("roles/delete", roleController.deleteRole)
-	router.GET("roles/suggest", roleController.suggestRoles)
+	router.GET("roles/suggest", roleController.suggest)
 }
 
 func (rc *RoleController) createRole(c *gin.Context) {
@@ -37,9 +39,6 @@ func (rc *RoleController) createRole(c *gin.Context) {
 
 	rc.SuccessVoid(c)
 }
-
-
-
 
 func (rc *RoleController) listManagedRoles(c *gin.Context) {
 	roleId, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -87,12 +86,16 @@ func (rc *RoleController) deleteRole(c *gin.Context) {
 	rc.SuccessVoid(c)
 }
 
-func (rc *RoleController) suggestRoles(c *gin.Context) {
+func (rc *RoleController) suggest(c *gin.Context) {
 	keyword := c.Query("keyword")
-	roles, err := service.RoleServiceWebImpl.SuggestRoles(c, keyword)
-	if err != nil {
-		rc.AbortServerError(c, "[http] suggestRoles: Fail to suggest roles: "+err.Error())
+	if keyword == "" {
+		rc.ResponseJson(c, []model.RoleModel{})
 		return
+	}
+
+	var roles []model.RoleModel
+	if err := db.CommonSuggest[model.RoleModel](c, keyword, &roles); err != nil {
+		rc.AbortClientError(c, "fail to suggest: "+err.Error())
 	}
 
 	rc.ResponseJson(c, roles)

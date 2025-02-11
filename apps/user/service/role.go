@@ -23,6 +23,9 @@ type CreateRoleRequest struct {
 	PermissionIds   []uint64 `json:"permission_ids"`
 }
 
+var errNopermission = errors.New("user does not have any admin permission")
+var errEmptyPermission = errors.New("no permission to bind")
+
 // 创建角色
 func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
 	user, tx, err := userService.GetUserRolePermission(ctx, userId)
@@ -31,10 +34,10 @@ func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload 
 	}
 
 	if len(user.Roles) == 0 {
-		return errors.New("user does not have any admin permission")
+		return errNopermission
 	}
 	if len(payload.PermissionIds) == 0 {
-		return errors.New("no permission to bind")
+		return errEmptyPermission
 	}
 
 	tx = tx.Begin()
@@ -151,25 +154,11 @@ func (r *RoleServiceWeb) DeleteRole(ctx context.Context, roleId uint64) error {
 	return nil
 }
 
-// 模糊搜索角色
-func (r *RoleServiceWeb) SuggestRoles(ctx context.Context, keyword string) ([]model.RoleModel, error) {
-	tx := db.NewTx(ctx)
-
-	var roles []model.RoleModel
-
-	if err := tx.
-		Where("name LIKE ? OR code LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
-		Find(&roles).Error; err != nil {
-		return nil, err
-	}
-
-	return roles, nil
-}
-
 type RoleMeta struct {
-	Name        string             `json:"name"`
-	Code        string             `json:"code"`
-	Permissions []*shared.EnumMeta `json:"permissions"`
+	Id   uint64 `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+	// Permissions []*shared.EnumMeta `json:"permissions"`
 }
 
 type ListRolesResponse struct {
@@ -197,29 +186,22 @@ func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *
 	var roles []model.RoleModel
 	var totalCount int64
 
-	offset := (payload.Page - 1) * payload.Size
+	query := tx.Model(&model.RoleModel{}).
+		Joins("JOIN role_permissions ON role_permissions.role_id = roles.id").
+		Joins("JOIN permissions ON permissions.id = role_permissions.permission_id").
+		Where("permissions.app_id IN ?", appIds)
 
-	var permissions []*model.PermissionModel
-
-	if err := tx.Where("permissions.app_id IN ?", appIds).Find(&permissions).Error; err != nil {
+	if err := query.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}
-
-	permissionIds := make([]uint64, len(permissions))
-	for i, permission := range permissions {
-		permissionIds[i] = permission.Id
+	if err := query.Order("id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Find(&roles).Error; err != nil {
+		return nil, err
 	}
-
-	var roleIds = []*struct {
-		RoleId uint64 `json:"role_model_id"`
-	}
-	subQuery := tx.Table("role_permissions").Select("role_model_id", "permission_model_id").Where("permission_model_id  IN ? ", permissionIds).Scan(&roles)
-
-	// if err :=tx.Model(&model.RoleModel{}).
 
 	roleMetas := make([]*RoleMeta, len(roles))
 	for i, role := range roles {
 		roleMetas[i] = &RoleMeta{
+			Id:   role.Id,
 			Name: role.Name,
 			Code: role.Code,
 		}
