@@ -41,6 +41,21 @@ fresh -c ./user/app/runner.conf
 [Etcd release page](https://github.com/etcd-io/etcd/releases/)
 
 
+#### Install `typesense` (vector database)
+Using self-hosting version
+[Install Typesense Instruction](https://typesense.org/docs/guide/install-typesense.html#option-2-local-machine-self-hosting)
+Run the server locally
+```bash
+# Start Typesense
+export TYPESENSE_API_KEY=xyz
+mkdir "$(pwd)"/typesense-data
+./typesense-server --data-dir="$(pwd)"/typesense-data --api-key=$TYPESENSE_API_KEY --enable-cors
+```
+
+
+go-client for `typesense` [github](https://github.com/typesense/typesense-go)
+
+
 
 #### Bootstrap the system
 ```bash
