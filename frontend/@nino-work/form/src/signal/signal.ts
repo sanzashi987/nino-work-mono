@@ -88,7 +88,7 @@ interface WritableSignal<T> extends SignalGetter<T> {
   asReadonly(): Signal<T>;
 }
 
-export function singal<T>(initialValue: T, opt?: { equal: ValueEqualityFn<T> }): WritableSignal<T> {
+export function signal<T>(initialValue: T, opt?: { equal: ValueEqualityFn<T> }): WritableSignal<T> {
   const signalFn = createSignal(initialValue) as WritableSignal<T>;
   const node = signalFn[SIGNAL];
   if (opt.equal) {

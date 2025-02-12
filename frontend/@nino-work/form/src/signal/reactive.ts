@@ -305,3 +305,12 @@ export const REACTIVE_NODE: ReactiveNode = {
   consumerMarkedDirty: () => {},
   consumerOnSignalRead: () => {}
 };
+
+export function untracked<T>(untrackedReader: () => T): T {
+  const prev = setActiveConsumer(null);
+  try {
+    return untrackedReader();
+  } finally {
+    setActiveConsumer(prev);
+  }
+}

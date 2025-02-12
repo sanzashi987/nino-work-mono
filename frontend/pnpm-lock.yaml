@@ -62,7 +62,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2(rollup@4.34.3)
 
-  '@nino-work/hook-formik-model':
+  '@nino-work/form':
     devDependencies:
       react:
         specifier: ^18.3.1

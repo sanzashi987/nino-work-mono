@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "ES6",
     "lib": [
-      "esnext",
-      "dom"
+      "dom",
+      "esnext"
     ],
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
     "src"

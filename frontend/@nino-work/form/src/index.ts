@@ -103,7 +103,7 @@ type MakeIntersect<T> = (T extends any ? (x: T) => void : never) extends (x: inf
 
 export const model = (): IModel<any, any> & MakeIntersect<WidgetMutate<unknown, unknown>[WidgetIdentifier]> => ({} as any);
 
-export const defineModel = <T>(models: DefineArrayModels<T>) => models;
+export const defineModel = <const T>(models: DefineArrayModels<T>) => models;
 
 // const
 export const res = defineModel<Form>([
