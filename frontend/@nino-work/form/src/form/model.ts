@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { signal, untracked } from '../signal';
 
 export const enum FormControlStatus {
@@ -9,10 +10,39 @@ export const enum FormControlStatus {
 
 export type FormHooks = 'change' | 'blur' | 'submit';
 
-abstract class AbstractControl<TValue, TRawValue extends TValue = TValue> {
-  public parent: FormGroup | FormArray | null;
+export type IsAny<T, Y, N> = 0 extends 1 & T ? Y : N;
+export type TypedOrUntyped<T, Typed, Untyped> = IsAny<T, Untyped, Typed>;
+export type FormValue<T extends AbstractStruct | undefined> =
+  T extends AbstractStruct<any, any> ? T['value'] : never;
+export type FormRawValue<T extends AbstractStruct | undefined> =
+  T extends AbstractStruct<any, any>
+    ? T['setValue'] extends (v: infer R) => void
+      ? R
+      : never
+    : never;
+
+export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TValue> {
+  readonly defaultValue: TValue | null;
+
+  private _parent: AbstractStruct | AbstractStruct | null;
 
   private valueReactive = signal<TValue | undefined>(undefined);
+
+  private updateStrategy: FormHooks = 'change';
+
+  abstract iterChild(cb:(c:AbstractStruct)=>void):void;
+
+  abstract setValue(value: TRawValue, options?: Object): void;
+  abstract patchValue(value: TValue, options?: Object): void;
+  abstract reset(value?: TValue, options?: Object): void;
+
+  setParent(p: AbstractStruct | null) {
+    this._parent = p;
+  }
+
+  get parent() {
+    return this._parent;
+  }
 
   get value() {
     return untracked(() => this.valueReactive());
@@ -47,6 +77,7 @@ abstract class AbstractControl<TValue, TRawValue extends TValue = TValue> {
   get root() {
     let x = this;
     while (x.parent) {
+      // @ts-ignore
       x = x.parent;
     }
     return x;
