@@ -24,7 +24,7 @@ const WATCH_NODE: Partial<WatchNode> = /* @__PURE__ */ (() => ({
 export interface WatchNode extends ReactiveNode {
   hasRun: boolean
   ref: Watch
-  fn: () => (VoidFunction | null)
+  fn: (() =>VoidFunction) | VoidFunction
   cleanupFn: VoidFunction
   schedule: ((watch: Watch) => void) | null
 }

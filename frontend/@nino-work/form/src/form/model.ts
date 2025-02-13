@@ -1,5 +1,4 @@
-/* eslint-disable no-underscore-dangle */
-import { signal, untracked } from '../signal';
+import { effect, signal, untracked } from '../signal';
 
 export const enum FormControlStatus {
   VALID = 'VALID',
@@ -30,11 +29,11 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
 
   private updateStrategy: FormHooks = 'change';
 
-  abstract iterChild(cb:(c:AbstractStruct)=>void):void;
-
   abstract setValue(value: TRawValue, options?: Object): void;
   abstract patchValue(value: TValue, options?: Object): void;
   abstract reset(value?: TValue, options?: Object): void;
+  abstract _forEachChild(cb:(c:AbstractStruct)=>void):void;
+  abstract _updateValue(): void;
 
   setParent(p: AbstractStruct | null) {
     this._parent = p;
@@ -46,6 +45,14 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
 
   get value() {
     return untracked(() => this.valueReactive());
+  }
+
+  getRawValue(): any {
+    return this.value;
+  }
+
+  _find(name: string | number): AbstractStruct | null {
+    return null;
   }
 
   private readonly statusReactive = signal<FormControlStatus | undefined>(undefined);
@@ -81,5 +88,25 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
       x = x.parent;
     }
     return x;
+  }
+
+  watch(cb: (v: TValue) => void): VoidFunction {
+    const { destroy } = effect(() => {
+      const value = this.valueReactive();
+      cb(value);
+    });
+    return destroy;
+  }
+
+  get<P extends string | readonly (string | number)[]>(path: P): AbstractStruct<any> | null;
+  get<P extends string | (string | number)[]>(path: P): AbstractStruct<any> | null {
+    let currPath: Array<string | number> | string = path;
+    if (currPath == null) return null;
+    if (!Array.isArray(currPath)) currPath = currPath.split('.');
+    if (currPath.length === 0) return null;
+    return currPath.reduce(
+      (control: AbstractStruct | null, name) => control && control._find(name),
+      this
+    );
   }
 }
