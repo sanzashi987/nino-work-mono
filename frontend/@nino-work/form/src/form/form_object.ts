@@ -20,6 +20,8 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
   > {
+  defaultValue: TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>;
+
   controls: TypedOrUntyped<TControl, TControl, { [key: string]: AbstractStruct<any> }>;
 
   override setValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, { [K in keyof TControl]: FormRawValue<TControl[K]>; }>, any>, options?: Object): void {
@@ -47,14 +49,6 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct
     return next;
   }
 
-  override getRawValue():TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any> {
-    const next: any = {};
-    this._forEachChild((ctrl, key) => {
-      next[key] = ctrl.getRawValue();
-    });
-    return next;
-  }
-
   setupControls(): void {
     this._forEachChild((c) => {
       c.setParent(this);
@@ -68,5 +62,17 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct
         cb(control, key);
       }
     });
+  }
+
+  override _find(name: string | number): AbstractStruct | null {
+    return this.controls[name] ?? null;
+  }
+
+  override getRawValue():TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any> {
+    const next: any = {};
+    this._forEachChild((ctrl, key) => {
+      next[key] = ctrl.getRawValue();
+    });
+    return next;
   }
 }

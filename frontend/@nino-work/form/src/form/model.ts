@@ -1,4 +1,6 @@
 import { effect, signal, untracked } from '../signal';
+import type { ValidationErrors, ValidatorFn } from './validators';
+import { coerceToValidator } from './validators';
 
 export const enum FormControlStatus {
   VALID = 'VALID',
@@ -21,19 +23,35 @@ export type FormRawValue<T extends AbstractStruct | undefined> =
     : never;
 
 export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TValue> {
-  readonly defaultValue: TValue | null;
+  /** validators */
+  public errors: ValidationErrors | null = null;
+
+  private _composedValidatorFn: ValidatorFn | null;
+
+  private _rawValidators: ValidatorFn | ValidatorFn[] | null;
+
+  private _composeValidators(validators: ValidatorFn | ValidatorFn[] | null) {
+    this._rawValidators = Array.isArray(validators) ? validators.slice() : validators;
+    this._composedValidatorFn = coerceToValidator(this._rawValidators);
+  }
 
   private _parent: AbstractStruct | AbstractStruct | null;
 
-  private valueReactive = signal<TValue | undefined>(undefined);
-
   private updateStrategy: FormHooks = 'change';
 
-  abstract setValue(value: TRawValue, options?: Object): void;
-  abstract patchValue(value: TValue, options?: Object): void;
-  abstract reset(value?: TValue, options?: Object): void;
   abstract _forEachChild(cb:(c:AbstractStruct)=>void):void;
-  abstract _updateValue(): void;
+  abstract _allControlsDisabled(): boolean;
+
+  /** dirty */
+  private _dirtyReactive = signal(false);
+
+  get dirty() {
+    return untracked(this._dirtyReactive);
+  }
+
+  set dirty(val: boolean) {
+    untracked(() => this._dirtyReactive.set(val));
+  }
 
   setParent(p: AbstractStruct | null) {
     this._parent = p;
@@ -43,6 +61,11 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     return this._parent;
   }
 
+  /** values */
+  readonly defaultValue: TValue | null;
+
+  private valueReactive = signal<TValue | undefined>(undefined);
+
   get value() {
     return untracked(() => this.valueReactive());
   }
@@ -50,6 +73,10 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
   getRawValue(): any {
     return this.value;
   }
+  abstract setValue(value: TRawValue, options?: Object): void;
+  abstract patchValue(value: TValue, options?: Object): void;
+  abstract reset(value?: TValue, options?: Object): void;
+  abstract _updateValue(): void;
 
   _find(name: string | number): AbstractStruct | null {
     return null;
@@ -65,21 +92,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     untracked(() => this.statusReactive.set(v));
   }
 
-  get valid() {
-    return this.status === FormControlStatus.VALID;
-  }
-
-  get invalid() {
-    return this.status === FormControlStatus.INVALID;
-  }
-
-  get disabled() {
-    return this.status === FormControlStatus.DISABLED;
-  }
-
-  get enabled() {
-    return this.status !== FormControlStatus.DISABLED;
-  }
+  abstract _anyControls(fn:(c: AbstractStruct) => boolean):boolean;
 
   get root() {
     let x = this;
@@ -90,7 +103,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     return x;
   }
 
-  watch(cb: (v: TValue) => void): VoidFunction {
+  watchValue(cb: (v: TValue) => void): VoidFunction {
     const { destroy } = effect(() => {
       const value = this.valueReactive();
       cb(value);
@@ -109,4 +122,11 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
       this
     );
   }
+
+  private _setInitialStatus() {
+    this.status = this._allControlsDisabled() ? FormControlStatus.DISABLED : FormControlStatus.VALID;
+  }
+}
+function coerceToAsyncValidator(_rawAsyncValidators: any): ValidatorFn {
+  throw new Error('Function not implemented.');
 }
