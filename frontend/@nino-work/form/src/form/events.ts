@@ -1,13 +1,13 @@
-import type { AbstractStruct } from './model';
+import type { AbstractControl } from './model';
 
 export abstract class ControlEvent<T = any> {
-  public abstract readonly source: AbstractStruct<unknown>;
+  public abstract readonly source: AbstractControl<unknown>;
 }
 
 export class ValueChangeEvent<T> extends ControlEvent<T> {
   constructor(
     public readonly value: T,
-    public readonly source: AbstractStruct
+    public readonly source: AbstractControl
   ) {
     super();
   }
@@ -16,7 +16,7 @@ export class ValueChangeEvent<T> extends ControlEvent<T> {
 export class DityhangeEvent extends ControlEvent {
   constructor(
     public readonly dirty: boolean,
-    public readonly source: AbstractStruct
+    public readonly source: AbstractControl
   ) {
     super();
   }

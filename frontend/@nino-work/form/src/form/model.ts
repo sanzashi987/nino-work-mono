@@ -1,9 +1,8 @@
-import { FormStatus } from 'react-dom';
 import { effect, signal, untracked } from '../signal';
 import type { ValidationErrors, ValidatorFn } from './validators';
 import { composeValidators } from './validators';
 
-export const enum FormControlStatus {
+export const enum ControlStatus {
   VALID = 'VALID',
   INVALID = 'INVALID',
   PENDING = 'PENDING',
@@ -14,16 +13,16 @@ export type FormHooks = 'change' | 'blur' | 'submit';
 
 export type IsAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 export type TypedOrUntyped<T, Typed, Untyped> = IsAny<T, Untyped, Typed>;
-export type FormValue<T extends AbstractStruct | undefined> =
-  T extends AbstractStruct<any, any> ? T['value'] : never;
-export type FormRawValue<T extends AbstractStruct | undefined> =
-  T extends AbstractStruct<any, any>
+export type FormValue<T extends AbstractControl | undefined> =
+  T extends AbstractControl<any, any> ? T['value'] : never;
+export type FormRawValue<T extends AbstractControl | undefined> =
+  T extends AbstractControl<any, any>
     ? T['setValue'] extends (v: infer R) => void
       ? R
       : never
     : never;
 
-export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TValue> {
+export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
   /** validators */
   public errors: ValidationErrors | null = null;
 
@@ -41,7 +40,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
 
   private runValidator(shouldHaveEmitted: boolean, emitEvent?: boolean) {
     if (this._composedValidatorFn) {
-      this.status = FormControlStatus.PENDING;
+      this.status = ControlStatus.PENDING;
       Promise.resolve().then(() => this._composedValidatorFn(this))
         .then((err) => {
           this.errors = err;
@@ -51,7 +50,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     }
   }
 
-  private _updateErrors(emitEvent: boolean, changedControl: AbstractStruct, shouldHaveEmitted?: boolean) {
+  private _updateErrors(emitEvent: boolean, changedControl: AbstractControl, shouldHaveEmitted?: boolean) {
     const status = this._deriveStatus();
 
     if (emitEvent || shouldHaveEmitted) {
@@ -65,7 +64,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     }
   }
 
-  markAsPending(opts: { onlySelf?: boolean, source?: AbstractStruct }) {
+  markAsPending(opts: { onlySelf?: boolean, source?: AbstractControl }) {
     const control = opts.source ?? this;
     if (this._parent && !opts.onlySelf) {
       this._parent.markAsPending({ ...opts, source: control });
@@ -81,12 +80,12 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
 
   /** structure tree */
 
-  abstract _forEachChild(cb: (c: AbstractStruct) => void): void;
-  abstract _anyControls(fn:(c: AbstractStruct) => boolean):boolean;
+  abstract _forEachChild(cb: (c: AbstractControl) => void): void;
+  abstract _anyControls(fn:(c: AbstractControl) => boolean):boolean;
 
-  private _parent: AbstractStruct | AbstractStruct | null;
+  private _parent: AbstractControl | AbstractControl | null;
 
-  setParent(p: AbstractStruct | null) {
+  setParent(p: AbstractControl | null) {
     this._parent = p;
   }
 
@@ -103,19 +102,19 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     return x;
   }
 
-  get<P extends string | readonly (string | number)[]>(path: P): AbstractStruct<any> | null;
-  get<P extends string | (string | number)[]>(path: P): AbstractStruct<any> | null {
+  get<P extends string | readonly (string | number)[]>(path: P): AbstractControl<any> | null;
+  get<P extends string | (string | number)[]>(path: P): AbstractControl<any> | null {
     let currPath: Array<string | number> | string = path;
     if (currPath == null) return null;
     if (!Array.isArray(currPath)) currPath = currPath.split('.');
     if (currPath.length === 0) return null;
     return currPath.reduce(
-      (control: AbstractStruct | null, name) => control && control._find(name),
+      (control: AbstractControl | null, name) => control && control._find(name),
       this
     );
   }
 
-  _find(name: string | number): AbstractStruct | null {
+  _find(name: string | number): AbstractControl | null {
     return null;
   }
 
@@ -132,7 +131,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     untracked(() => this._dirtyReactive.set(val));
   }
 
-  markAsDirty(opts: { onlySelf?: boolean, source?: AbstractStruct }) {
+  markAsDirty(opts: { onlySelf?: boolean, source?: AbstractControl }) {
     const changed = this.dirty === false;
 
     const sourceControl = opts.source ?? this;
@@ -145,7 +144,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     }
   }
 
-  markAsPristine(opts: { onlySelf?: boolean, source?: AbstractStruct }) {
+  markAsPristine(opts: { onlySelf?: boolean, source?: AbstractControl }) {
     const changed = this.dirty === true;
     this.dirty = false;
     const control = opts.source ?? this;
@@ -164,7 +163,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     return this._anyControls((c) => c.dirty);
   }
 
-  _updateDirty(opts: { onlySelf?:boolean }, source:AbstractStruct) {
+  _updateDirty(opts: { onlySelf?:boolean }, source:AbstractControl) {
     const nextDirty = this._anyControlsDirty();
     const changed = this.dirty !== nextDirty;
     if (changed) {
@@ -192,29 +191,29 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
   abstract reset(value?: TValue, options?: Object): void;
   abstract _deriveValue(): void;
 
-  private readonly statusReactive = signal<FormControlStatus | undefined>(undefined);
+  private readonly statusReactive = signal<ControlStatus | undefined>(undefined);
 
   get enabled(): boolean {
-    return this.status !== FormControlStatus.DISABLED;
+    return this.status !== ControlStatus.DISABLED;
   }
 
-  get status(): FormControlStatus {
+  get status(): ControlStatus {
     return untracked(this.statusReactive);
   }
 
-  private set status(v: FormControlStatus) {
+  private set status(v: ControlStatus) {
     untracked(() => this.statusReactive.set(v));
   }
 
-  private _deriveStatus():FormControlStatus {
-    if (this._allControlsDisabled()) return FormControlStatus.DISABLED;
-    if (this.errors) return FormControlStatus.INVALID;
-    if (this._anyControlsHaveStatus(FormControlStatus.VALID)) return FormControlStatus.INVALID;
-    return FormControlStatus.VALID;
+  private _deriveStatus():ControlStatus {
+    if (this._allControlsDisabled()) return ControlStatus.DISABLED;
+    if (this.errors) return ControlStatus.INVALID;
+    if (this._anyControlsHaveStatus(ControlStatus.VALID)) return ControlStatus.INVALID;
+    return ControlStatus.VALID;
   }
 
-  updateValueAndValidity(opts: { onlySelf?: boolean, source?:AbstractStruct }) {
-    this.status = this._allControlsDisabled() ? FormControlStatus.DISABLED : FormControlStatus.VALID;
+  updateValueAndValidity(opts: { onlySelf?: boolean, source?:AbstractControl }) {
+    this.status = this._allControlsDisabled() ? ControlStatus.DISABLED : ControlStatus.VALID;
     this._deriveValue();
     const source = opts.source ?? this;
 
@@ -224,7 +223,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
   }
 
   enable() {
-    this.status = FormControlStatus.VALID;
+    this.status = ControlStatus.VALID;
     this._forEachChild((c) => {
       c.enable();
     });
@@ -237,7 +236,7 @@ export abstract class AbstractStruct<TValue = any, TRawValue extends TValue = TV
     return onlySelf && !!parentDirty && this.parent._anyControlsDirty();
   }
 
-  _anyControlsHaveStatus(status: FormControlStatus): boolean {
+  _anyControlsHaveStatus(status: ControlStatus): boolean {
     return this._anyControls((c) => c.status === status);
   }
 

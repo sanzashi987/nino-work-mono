@@ -1,10 +1,10 @@
-import { AbstractStruct, FormControlStatus } from './model';
+import { AbstractControl, ControlStatus } from './model';
 
-class FormPrimitive <TValue = any> extends AbstractStruct<TValue> {
+class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
   readonly defaultValue: TValue;
 
   override _allControlsDisabled(): boolean {
-    return this.status === FormControlStatus.DISABLED;
+    return this.status === ControlStatus.DISABLED;
   }
 
   override setValue(value: TValue, opts: Object): void {

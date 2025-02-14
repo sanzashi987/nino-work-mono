@@ -1,11 +1,11 @@
-import type { AbstractStruct } from './model';
+import type { AbstractControl } from './model';
 
 export type ValidationErrors = {
   [key: string]: any;
 };
 
 export interface ValidatorFn {
-  (control: AbstractStruct):ValidationErrors | null |(Promise<ValidationErrors | null>) ;
+  (control: AbstractControl):ValidationErrors | null |(Promise<ValidationErrors | null>) ;
 }
 
 export interface Observable<T> {
@@ -15,17 +15,17 @@ export interface Observable<T> {
 
 export interface AsyncValidatorFn {
   // (control: AbstractStruct): Promise<ValidationErrors | null> | Observable<ValidationErrors | null>;
-  (control: AbstractStruct): Promise<ValidationErrors | null> | Observable<ValidationErrors | null>;
+  (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null>;
 }
 
 function isPresent(o: any): boolean {
   return o != null;
 }
 
-type GenericValidatorFn = (control: AbstractStruct) => any;
+type GenericValidatorFn = (control: AbstractControl) => any;
 
 function runValidators<V extends GenericValidatorFn>(
-  control: AbstractStruct,
+  control: AbstractControl,
   validators: V[]
 ): ReturnType<V>[] {
   return validators.map((validator) => validator(control));
@@ -45,7 +45,7 @@ function compose(validators: (ValidatorFn | null | undefined)[] | null): Validat
   const presentValidators: ValidatorFn[] = validators.filter(isPresent) as any;
   if (presentValidators.length === 0) return null;
 
-  return function (control: AbstractStruct) {
+  return function (control: AbstractControl) {
     return mergeErrors(runValidators<ValidatorFn>(control, presentValidators));
   };
 }

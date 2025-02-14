@@ -1,28 +1,28 @@
 import { ObjectModel } from './define';
 import {
-  AbstractStruct, FormRawValue, FormValue, IsAny, TypedOrUntyped
+  AbstractControl, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './model';
 
-export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractStruct<any> }> = TypedOrUntyped<
+export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
 T,
 Partial<{ [K in keyof T]: FormValue<T[K]> }>,
 { [key: string]: any }
 >;
 
-export type ExtractFormObjectRawValue<T extends { [K in keyof T]?: AbstractStruct<any> }> = TypedOrUntyped<
+export type ExtractFormObjectRawValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
 T,
 { [K in keyof T]: FormRawValue<T[K]> },
 { [key: string]: any }
 >;
 
-export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct<any> } = any>
-  extends AbstractStruct<
+export class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> } = any>
+  extends AbstractControl<
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
   > {
   defaultValue: TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>;
 
-  controls: TypedOrUntyped<TControl, TControl, { [key: string]: AbstractStruct<any> }>;
+  controls: TypedOrUntyped<TControl, TControl, { [key: string]: AbstractControl<any> }>;
 
   override setValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, { [K in keyof TControl]: FormRawValue<TControl[K]>; }>, any>, options?: Object): void {
     Object.keys(value).forEach(() => { });
@@ -55,7 +55,7 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct
     });
   }
 
-  override _forEachChild(cb: (c: AbstractStruct, key:string) => void): void {
+  override _forEachChild(cb: (c: AbstractControl, key:string) => void): void {
     Object.keys(this.controls).forEach((key) => {
       const control = (this.controls as any)[key];
       if (control) {
@@ -64,7 +64,7 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractStruct
     });
   }
 
-  override _find(name: string | number): AbstractStruct | null {
+  override _find(name: string | number): AbstractControl | null {
     return this.controls[name] ?? null;
   }
 
