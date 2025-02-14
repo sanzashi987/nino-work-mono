@@ -24,7 +24,7 @@ function isPresent(o: any): boolean {
 
 type GenericValidatorFn = (control: AbstractStruct) => any;
 
-function executeValidators<V extends GenericValidatorFn>(
+function runValidators<V extends GenericValidatorFn>(
   control: AbstractStruct,
   validators: V[]
 ): ReturnType<V>[] {
@@ -46,14 +46,10 @@ function compose(validators: (ValidatorFn | null | undefined)[] | null): Validat
   if (presentValidators.length === 0) return null;
 
   return function (control: AbstractStruct) {
-    return mergeErrors(executeValidators<ValidatorFn>(control, presentValidators));
+    return mergeErrors(runValidators<ValidatorFn>(control, presentValidators));
   };
 }
 
 export function composeValidators(validators: Array< ValidatorFn>): ValidatorFn | null {
   return validators != null ? compose(validators) : null;
-}
-
-export function coerceToValidator(validator: ValidatorFn | ValidatorFn[] | null): ValidatorFn | null {
-  return Array.isArray(validator) ? composeValidators(validator) : validator || null;
 }
