@@ -1,5 +1,6 @@
+/* eslint-disable no-restricted-syntax */
 import {
-  AbstractControl, FormRawValue, FormValue, IsAny, TypedOrUntyped
+  AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './model';
 
 export type ExtractFormArrayValue<T extends AbstractControl<any>> = TypedOrUntyped<
@@ -22,11 +23,14 @@ TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
   }
 
   _anyControls(fn: (c: AbstractControl) => boolean): boolean {
-    throw new Error('Method not implemented.');
+    return this.controls.some((control) => control.enabled && fn(control));
   }
 
   _allControlsDisabled(): boolean {
-    throw new Error('Method not implemented.');
+    for (const control of this.controls) {
+      if (control.enabled) return false;
+    }
+    return this.controls.length > 0 || this.status === ControlStatus.DISABLED;
   }
 
   setValue(value: TypedOrUntyped<TControl, IsAny<TControl, any[], FormRawValue<TControl>[]>, any>, options?: Object): void {
@@ -60,6 +64,8 @@ TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
   }
 
   override _deriveValue(): void {
-    this.controls;
+    this.valueReactive.set(
+      this.controls.map((control) => control.value)
+    );
   }
 }

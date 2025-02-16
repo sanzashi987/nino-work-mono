@@ -21,7 +21,7 @@ export type FormRawValue<T extends AbstractControl | undefined> =
     : never;
 
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
-  name:string;
+  name: string;
 
   /** validators */
   public errors: ValidationErrors | null = null;

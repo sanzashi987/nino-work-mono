@@ -1,6 +1,7 @@
+/* eslint-disable no-restricted-syntax */
 import { ObjectModel } from './define';
 import {
-  AbstractControl, FormRawValue, FormValue, IsAny, TypedOrUntyped
+  AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './model';
 
 export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
@@ -20,16 +21,32 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractContro
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
   > {
-  _anyControls(fn: (c: AbstractControl) => boolean): boolean {
-    throw new Error('Method not implemented.');
+  constructor(controls: TControl, private proto: ObjectModel<TControl, any>) {
+    super();
+    this.controls = controls;
   }
 
-  _allControlsDisabled(): boolean {
-    throw new Error('Method not implemented.');
+  contains<K extends string & keyof TControl>(controlName: K): boolean {
+    // eslint-disable-next-line no-prototype-builtins
+    return this.controls.hasOwnProperty(controlName);
   }
 
-  _deriveValue(): void {
-    throw new Error('Method not implemented.');
+  override _anyControls(fn: (c: AbstractControl) => boolean): boolean {
+    for (const [controlName, control] of Object.entries(this.controls)) {
+      if (this.contains(controlName as any) && fn(control as any)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  override _allControlsDisabled(): boolean {
+    for (const controlName of Object.keys(this.controls) as Array<keyof TControl>) {
+      if ((this.controls as any)[controlName].status !== ControlStatus.DISABLED) {
+        return false;
+      }
+    }
+    return Object.keys(this.controls).length > 0 || this.status === ControlStatus.DISABLED;
   }
 
   outsideValues: any = {};
@@ -47,19 +64,31 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractContro
         this.outsideValues[name] = value[name];
       }
     });
+    this.updateValueAndValidity(options);
   }
 
-  patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
-    throw new Error('Method not implemented.');
+  override patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
+    if (value == null) return;
+    (Object.keys(value) as Array<keyof TControl>).forEach((name) => {
+      const control = (this.controls as any)[name];
+      if (control) {
+        control.patchValue(value[name as any]);
+      }
+    });
+    this.updateValueAndValidity(options);
   }
 
-  reset(value?: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
-    throw new Error('Method not implemented.');
+  override reset(value?: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
+    this._forEachChild((control: AbstractControl, name) => {
+      control.reset(value ? (value as any)[name] : null);
+    });
+    this._updateDirty(options, this);
+    this.outsideValues = {};
+    this.updateValueAndValidity(options);
   }
 
-  constructor(controls: TControl, private proto: ObjectModel<TControl, any>) {
-    super();
-    this.controls = controls;
+  _deriveValue(): void {
+    this.valueReactive.set(this._reduceValue() as any);
   }
 
   _reduceValue(): Partial<TControl> {
@@ -103,7 +132,7 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractContro
   }
 
   override getRawValue():TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any> {
-    const next: any = {};
+    const next: any = { ...this.outsideValues };
     this._forEachChild((ctrl, key) => {
       next[key] = ctrl.getRawValue();
     });
