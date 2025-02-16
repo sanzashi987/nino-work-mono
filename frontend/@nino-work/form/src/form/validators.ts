@@ -1,12 +1,34 @@
+import React from 'react';
 import type { AbstractControl } from './model';
 
-export type ValidationErrors = {
-  [key: string]: any;
+export interface ValidatorFn {
+  // (control: AbstractControl):ValidationErrors | null |(Promise<ValidationErrors | null>) ;
+  (value: any): Promise<React.ReactNode>
+}
+
+export type Path = string | number;
+
+type ErrorUI = string | React.ReactElement;
+
+export interface Rules {
+  len?: number;
+  max?: number;
+  message?: ErrorUI;
+  min?: number;
+  pattern?: RegExp;
+  required?: boolean;
+  whitespace?: boolean
+  warning?: boolean;
+  validator?: ValidatorFn;
+}
+
+type ValidationError = {
+  name:Path[]
+  errors: ErrorUI[]
+  warnings:ErrorUI[]
 };
 
-export interface ValidatorFn {
-  (control: AbstractControl):ValidationErrors | null |(Promise<ValidationErrors | null>) ;
-}
+export type ValidationErrors = ValidationError[];
 
 export interface Observable<T> {
   subscribe(fn: (v: T) => void): void
@@ -22,13 +44,16 @@ function isPresent(o: any): boolean {
   return o != null;
 }
 
-type GenericValidatorFn = (control: AbstractControl) => any;
+type GenericValidatorFn = (value:any) => any;
 
 function runValidators<V extends GenericValidatorFn>(
   control: AbstractControl,
   validators: V[]
-): ReturnType<V>[] {
-  return validators.map((validator) => validator(control));
+): Promise<ErrorUI[]> {
+  const val = validators.map((validator) => Promise.resolve().then(() => validator(control)));
+  return Promise.allSettled(val)
+    .then((res) => res.filter((p) => p.status === 'rejected')
+      .map((e) => e.reason));
 }
 
 function mergeErrors(arrayOfErrors: (ValidationErrors | null)[]): ValidationErrors | null {

@@ -9,8 +9,6 @@ export const enum ControlStatus {
   DISABLED = 'DISABLED'
 }
 
-export type FormHooks = 'change' | 'blur' | 'submit';
-
 export type IsAny<T, Y, N> = 0 extends 1 & T ? Y : N;
 export type TypedOrUntyped<T, Typed, Untyped> = IsAny<T, Untyped, Typed>;
 export type FormValue<T extends AbstractControl | undefined> =
@@ -23,6 +21,8 @@ export type FormRawValue<T extends AbstractControl | undefined> =
     : never;
 
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
+  name:string;
+
   /** validators */
   public errors: ValidationErrors | null = null;
 
@@ -30,37 +30,37 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
 
   private _rawValidators: ValidatorFn | ValidatorFn[] | null;
 
-  private _pendingValidator = null;
-
   private _composeValidators(validators: ValidatorFn | ValidatorFn[] | null) {
     const validatorArr = Array.isArray(validators) ? validators.slice() : validators;
     this._rawValidators = validatorArr;
     this._composedValidatorFn = Array.isArray(validatorArr) ? composeValidators(validatorArr) : validatorArr || null;
   }
 
-  private runValidator(shouldHaveEmitted: boolean, emitEvent?: boolean) {
+  private runValidator(emitEvent?: boolean) {
     if (this._composedValidatorFn) {
-      this.status = ControlStatus.PENDING;
+      this.statusReactive.set(ControlStatus.PENDING);
       Promise.resolve().then(() => this._composedValidatorFn(this))
         .then((err) => {
           this.errors = err;
-          this._updateErrors(emitEvent, this, shouldHaveEmitted);
+          this._updateErrors(emitEvent, this);
         })
-        .finally();
+        .catch(() => {
+          this.statusReactive.set(ControlStatus.VALID);
+        });
     }
   }
 
-  private _updateErrors(emitEvent: boolean, changedControl: AbstractControl, shouldHaveEmitted?: boolean) {
+  private _updateErrors(emitEvent: boolean, changedControl: AbstractControl) {
     const status = this._deriveStatus();
 
-    if (emitEvent || shouldHaveEmitted) {
+    if (emitEvent) {
       this.statusReactive.set(status);
     } else {
       this.status = status;
     }
 
     if (this._parent) {
-      this._parent._updateErrors(emitEvent, changedControl, shouldHaveEmitted);
+      this._parent._updateErrors(emitEvent, changedControl);
     }
   }
 
@@ -75,8 +75,6 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     // eslint-disable-next-line no-multi-assign
     this._rawValidators = this._composedValidatorFn = null;
   }
-
-  private updateStrategy: FormHooks = 'change';
 
   /** structure tree */
 
@@ -146,16 +144,16 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
 
   markAsPristine(opts: { onlySelf?: boolean, source?: AbstractControl }) {
     const changed = this.dirty === true;
-    this.dirty = false;
+
     const control = opts.source ?? this;
     this._forEachChild((c) => {
       c.markAsPristine({ onlySelf: true });
     });
-    if (this._parent && !opts.onlySelf) {
-      this._parent._updateDirty(opts, control);
-    }
     if (changed) {
       this._dirtyReactive.set(false);
+    }
+    if (this._parent && !opts.onlySelf) {
+      this._parent._updateDirty(opts, control);
     }
   }
 
@@ -213,17 +211,21 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   updateValueAndValidity(opts: { onlySelf?: boolean, source?:AbstractControl }) {
-    this.status = this._allControlsDisabled() ? ControlStatus.DISABLED : ControlStatus.VALID;
+    const status = this._allControlsDisabled() ? ControlStatus.DISABLED : ControlStatus.VALID;
     this._deriveValue();
     const source = opts.source ?? this;
 
+    if (status !== ControlStatus.DISABLED) {
+      this.runValidator();
+    }
     if (this._parent && !opts.onlySelf) {
       this._parent.updateValueAndValidity({ ...opts, source });
     }
   }
 
   enable() {
-    this.status = ControlStatus.VALID;
+    this.statusReactive.set(ControlStatus.VALID);
+
     this._forEachChild((c) => {
       c.enable();
     });

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export function mergeDefault<T extends {}>(value: Partial<T> | undefined, defaultVal: Partial<T>) {
   const next = value ?? {};
   return Object.keys(defaultVal).reduce((last, key, val) => {
@@ -9,3 +8,5 @@ export function mergeDefault<T extends {}>(value: Partial<T> | undefined, defaul
     return last;
   }, next);
 }
+
+export function noop() {}

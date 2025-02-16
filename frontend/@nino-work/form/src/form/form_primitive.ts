@@ -14,7 +14,15 @@ class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
 
   override patchValue = this.setValue;
 
+  override _deriveValue(): void { }
+
   override reset(value: TValue = this.defaultValue, opts?: Object): void {
     this.setValue(value, opts);
+  }
+
+  override _forEachChild(): void {}
+
+  override _anyControls(): boolean {
+    return false;
   }
 }
