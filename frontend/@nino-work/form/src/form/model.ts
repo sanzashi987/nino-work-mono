@@ -1,6 +1,6 @@
 import { effect, signal, untracked } from '../signal';
-import type { ValidationErrors, ValidatorFn } from './validators';
-import { composeValidators } from './validators';
+import type { ValidationErrors, ValidatorFn, ValidatorRule } from './validators';
+import { composeValidator } from './validators';
 
 export const enum ControlStatus {
   VALID = 'VALID',
@@ -21,32 +21,25 @@ export type FormRawValue<T extends AbstractControl | undefined> =
     : never;
 
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
-  name: string;
+  constructor(rules?:Rule[]) {
+
+  }
 
   /** validators */
   public errors: ValidationErrors | null = null;
 
   private _composedValidatorFn: ValidatorFn | null;
 
-  private _rawValidators: ValidatorFn | ValidatorFn[] | null;
+  private _rawRules: ValidatorRule[] | null;
 
-  private _composeValidators(validators: ValidatorFn | ValidatorFn[] | null) {
-    const validatorArr = Array.isArray(validators) ? validators.slice() : validators;
-    this._rawValidators = validatorArr;
-    this._composedValidatorFn = Array.isArray(validatorArr) ? composeValidators(validatorArr) : validatorArr || null;
+  private _composeValidators(rules:ValidatorRule[] | null) {
+    this._rawRules = rules;
+    this._composedValidatorFn = composeValidator(rules) || null;
   }
 
   private runValidator(emitEvent?: boolean) {
     if (this._composedValidatorFn) {
       this.statusReactive.set(ControlStatus.PENDING);
-      Promise.resolve().then(() => this._composedValidatorFn(this))
-        .then((err) => {
-          this.errors = err;
-          this._updateErrors(emitEvent, this);
-        })
-        .catch(() => {
-          this.statusReactive.set(ControlStatus.VALID);
-        });
     }
   }
 
@@ -74,7 +67,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
 
   clearValidator() {
     // eslint-disable-next-line no-multi-assign
-    this._rawValidators = this._composedValidatorFn = null;
+    this._rawRules = this._composedValidatorFn = null;
   }
 
   /** structure tree */
