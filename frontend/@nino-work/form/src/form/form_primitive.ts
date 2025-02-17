@@ -17,6 +17,7 @@ class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
   override _deriveValue(): void { }
 
   override reset(value: TValue = this.defaultValue, opts?: Object): void {
+    this.markAsPristine(opts);
     this.setValue(value, opts);
   }
 
@@ -26,3 +27,5 @@ class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
     return false;
   }
 }
+
+export default FormPrimitive;

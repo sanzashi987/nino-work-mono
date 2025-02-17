@@ -18,8 +18,10 @@ class FormArray<TControl extends AbstractControl<any> = any> extends AbstractCon
 TypedOrUntyped<TControl, ExtractFormArrayValue<TControl>, any>,
 TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
 > {
-  _forEachChild(cb: (c: AbstractControl) => void): void {
-    throw new Error('Method not implemented.');
+  override _forEachChild(cb: (c: AbstractControl, index:number) => void): void {
+    this.controls.forEach((control: AbstractControl, index: number) => {
+      cb(control, index);
+    });
   }
 
   _anyControls(fn: (c: AbstractControl) => boolean): boolean {

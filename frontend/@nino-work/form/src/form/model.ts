@@ -65,6 +65,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   markAsPending(opts: { onlySelf?: boolean, source?: AbstractControl }) {
+    this.statusReactive.set(ControlStatus.PENDING);
     const control = opts.source ?? this;
     if (this._parent && !opts.onlySelf) {
       this._parent.markAsPending({ ...opts, source: control });
@@ -223,15 +224,25 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     }
   }
 
-  enable() {
+  enable(opts: { onlySelf?: boolean }) {
     this.statusReactive.set(ControlStatus.VALID);
-
+    const dirty = this._isParentDirty();
     this._forEachChild((c) => {
-      c.enable();
+      c.enable({ ...opts, onlySelf: true });
     });
+    this.updateValueAndValidity({ onlySelf: true });
+    this._updateParents({ ...opts, skipPristineCheck: dirty }, this);
   }
 
-  disable() { }
+  disable(opts: { onlySelf?: boolean }) {
+    this.statusReactive.set(ControlStatus.DISABLED);
+    const dirty = this._isParentDirty();
+    this._forEachChild((c) => {
+      c.disable({ ...opts, onlySelf: true });
+    });
+    this.updateValueAndValidity({ onlySelf: true });
+    this._updateParents({ ...opts, skipPristineCheck: dirty }, this);
+  }
 
   private _isParentDirty(onlySelf = false) {
     const parentDirty = this._parent && this._parent.dirty;
@@ -242,8 +253,16 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     return this._anyControls((c) => c.status === status);
   }
 
-  private _updateParents() {
-
+  private _updateParents(
+    opts: { onlySelf?: boolean; skipPristineCheck?: boolean },
+    source: AbstractControl
+  ) {
+    if (this._parent) {
+      this._parent.updateValueAndValidity({});
+      if (!opts.skipPristineCheck) {
+        this._parent._updateDirty({}, source);
+      }
+    }
   }
 
   watchValue(cb: (v: TValue) => void): VoidFunction {
