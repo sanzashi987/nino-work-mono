@@ -47,9 +47,10 @@ type BaseModel<
   field: string
   watch?: readonly [...ToWatch],
   watchOptions?: WatchOption<StoreToWatch>
-  formItemProps?: {}
+  formItemProps?: {
+    initialValue?: ModelValue;
+  }
   callback?(value: any, form: FormInstance<StoreToWatch>): void,
-  defaultValue?: ModelValue
 };
 
 type GetModel<V, S> = V extends (infer A)[]
@@ -115,7 +116,7 @@ export const res = defineModel<Form>([
     field: 'b',
     children:
       [
-        { field: 'test', label: 'test', defaultValue: '2' }
+        { field: 'test', label: 'test', formItemProps: { initialValue: '2' } }
       ]
   }, {
     label: 'cc',
@@ -125,10 +126,10 @@ export const res = defineModel<Form>([
       children: [{
         label: '',
         field: 'test2',
-        defaultValue: '233'
+        formItemProps: { initialValue: '233' }
       }]
     },
-    defaultValue: [{ test2: '' }]
+    formItemProps: { initialValue: [{ test2: '' }] }
   },
   { label: 'd', field: 'd', children: { label: '2' } }
 
@@ -138,7 +139,7 @@ const buildValueFromSchema = <T>(
   schema: DeriveChildrenForObject<T>[number],
   currentLevelData: any = {}
 ) => {
-  currentLevelData[schema.field] = currentLevelData[schema.field] ?? schema.defaultValue;
+  currentLevelData[schema.field] = currentLevelData[schema.field] ?? schema.formItemProps?.initialValue;
   if ('children' in schema) {
     if (Array.isArray(schema.children)) {
       const data: any = currentLevelData[schema.field] ?? {};
