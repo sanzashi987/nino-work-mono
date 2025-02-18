@@ -47,6 +47,7 @@ type BaseModel<
   field: string
   watch?: readonly [...ToWatch],
   watchOptions?: WatchOption<StoreToWatch>
+  formItemProps?: {}
   callback?(value: any, form: FormInstance<StoreToWatch>): void,
   defaultValue?: ModelValue
 };

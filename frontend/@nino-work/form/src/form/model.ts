@@ -1,5 +1,7 @@
 import { effect, signal, untracked } from '../signal';
-import type { ValidationErrors, ValidatorFn, ValidatorRule } from './validators';
+import type FormArray from './form_array';
+import type FormObject from './form_object';
+import type { ComposedValidatorFn, Path, ValidationError, ValidatorRule } from './validators';
 import { composeValidator } from './validators';
 
 export const enum ControlStatus {
@@ -20,40 +22,48 @@ export type FormRawValue<T extends AbstractControl | undefined> =
       : never
     : never;
 
+export type LegalParent = FormObject | FormArray;
+let nextInstanceId = 0;
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
-  constructor(rules?:Rule[]) {
+  protected readonly instanceId: string;
 
+  constructor(rules?: ValidatorRule[]) {
+    // eslint-disable-next-line no-plusplus
+    this.instanceId = `nino-control-${nextInstanceId++}`;
+    if (rules) {
+      this._composeValidator(rules);
+    }
   }
 
   /** validators */
-  public errors: ValidationErrors | null = null;
+  public errors: ValidationError | null = null;
 
-  private _composedValidatorFn: ValidatorFn | null;
+  private _composedValidatorFn: ComposedValidatorFn | null;
 
-  private _rawRules: ValidatorRule[] | null;
+  // private _rawRules: ValidatorRule[] | null;
 
-  private _composeValidators(rules:ValidatorRule[] | null) {
-    this._rawRules = rules;
-    this._composedValidatorFn = composeValidator(rules) || null;
+  private _composeValidator(rules?: ValidatorRule[]) {
+    if (rules) {
+      // this._rawRules = rules;
+      this._composedValidatorFn = composeValidator(rules);
+    }
   }
 
-  private runValidator(emitEvent?: boolean) {
+  private runValidator() {
     if (this._composedValidatorFn) {
       this.statusReactive.set(ControlStatus.PENDING);
+      this._composedValidatorFn(this.value).then(({ errors, warnings }) => {
+        this.errors = (errors.length === 0 && warnings.length === 0) ? null : { errors, warnings };
+        this._updateErrors(this);
+      });
     }
   }
 
-  private _updateErrors(emitEvent: boolean, changedControl: AbstractControl) {
+  private _updateErrors(changedControl: AbstractControl) {
     const status = this._deriveStatus();
-
-    if (emitEvent) {
-      this.statusReactive.set(status);
-    } else {
-      this.status = status;
-    }
-
+    this.statusReactive.set(status);
     if (this._parent) {
-      this._parent._updateErrors(emitEvent, changedControl);
+      this._parent._updateErrors(changedControl);
     }
   }
 
@@ -66,18 +76,16 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   clearValidator() {
-    // eslint-disable-next-line no-multi-assign
-    this._rawRules = this._composedValidatorFn = null;
+    this._composedValidatorFn = null;
   }
 
   /** structure tree */
 
   abstract _forEachChild(cb: (c: AbstractControl) => void): void;
   abstract _anyControls(fn:(c: AbstractControl) => boolean):boolean;
+  private _parent: LegalParent | null;
 
-  private _parent: AbstractControl | AbstractControl | null;
-
-  setParent(p: AbstractControl | null) {
+  setParent(p: LegalParent | null) {
     this._parent = p;
   }
 
@@ -94,9 +102,9 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     return x;
   }
 
-  get<P extends string | readonly (string | number)[]>(path: P): AbstractControl<any> | null;
-  get<P extends string | (string | number)[]>(path: P): AbstractControl<any> | null {
-    let currPath: Array<string | number> | string = path;
+  get<P extends string | readonly Path[]>(path: P): AbstractControl<any> | null;
+  get<P extends string | Path[]>(path: P): AbstractControl<any> | null {
+    let currPath: Array<Path> | string = path;
     if (currPath == null) return null;
     if (!Array.isArray(currPath)) currPath = currPath.split('.');
     if (currPath.length === 0) return null;
@@ -106,8 +114,27 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     );
   }
 
-  _find(name: string | number): AbstractControl | null {
+  _find(name: Path): AbstractControl | null {
     return null;
+  }
+
+  _findChildName(control: AbstractControl): Path | null {
+    return null;
+  }
+
+  /* the name always stores at its parent, root will be an empty arr */
+  get name(): Path[] {
+    if (this._parent) {
+      const parentBase = this._parent.name;
+      const localField = this._parent._findChildName(this);
+      if (localField === null) {
+        // unexpected case ,
+        // a control that isnt registered to the parent
+        return [];
+      }
+      return parentBase.concat(localField);
+    }
+    return [];
   }
 
   abstract _allControlsDisabled(): boolean;
@@ -200,7 +227,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   private _deriveStatus():ControlStatus {
     if (this._allControlsDisabled()) return ControlStatus.DISABLED;
     if (this.errors) return ControlStatus.INVALID;
-    if (this._anyControlsHaveStatus(ControlStatus.VALID)) return ControlStatus.INVALID;
+    if (this._anyControlsHaveStatus(ControlStatus.PENDING)) return ControlStatus.PENDING;
     return ControlStatus.VALID;
   }
 
@@ -250,7 +277,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     opts: { onlySelf?: boolean; skipPristineCheck?: boolean },
     source: AbstractControl
   ) {
-    if (this._parent) {
+    if (this._parent && !opts.onlySelf) {
       this._parent.updateValueAndValidity({});
       if (!opts.skipPristineCheck) {
         this._parent._updateDirty({}, source);

@@ -2,6 +2,7 @@
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './model';
+import { Path } from './validators';
 
 export type ExtractFormArrayValue<T extends AbstractControl<any>> = TypedOrUntyped<
 T,
@@ -70,4 +71,12 @@ TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
       this.controls.map((control) => control.value)
     );
   }
+
+  override _findChildName(control: AbstractControl): Path | null {
+    const index = this.controls.findIndex((c) => c === control);
+    if (index === -1) return null;
+    return index;
+  }
 }
+
+export default FormArray;

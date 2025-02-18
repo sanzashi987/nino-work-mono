@@ -3,6 +3,7 @@ import { ObjectModel } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './model';
+import { Path } from './validators';
 
 export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
 T,
@@ -16,7 +17,7 @@ T,
 { [key: string]: any }
 >;
 
-export class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> } = any>
+class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> } = any>
   extends AbstractControl<
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
@@ -138,4 +139,12 @@ export class FormObject<TControl extends { [K in keyof TControl]: AbstractContro
     });
     return next;
   }
+
+  override _findChildName(control: AbstractControl): Path | null {
+    const res = Object.entries(this.controls).find((c) => c[1] === control);
+    if (!res) return null;
+    return res[0];
+  }
 }
+
+export default FormObject;
