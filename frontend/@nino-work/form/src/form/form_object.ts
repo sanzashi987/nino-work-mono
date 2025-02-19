@@ -2,7 +2,7 @@
 import { ObjectModel } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
-} from './model';
+} from './control';
 import { Path } from './validators';
 
 export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
@@ -22,9 +22,8 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
   > {
-  constructor(controls: TControl, private proto: ObjectModel<TControl, any>) {
-    super();
-    this.controls = controls;
+  constructor(model: ObjectModel<ExtractFormObjectValue<TControl>, any>, initialValue?:any) {
+    super(model);
   }
 
   contains<K extends string & keyof TControl>(controlName: K): boolean {
@@ -52,20 +51,20 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
 
   outsideValues: any = {};
 
-  defaultValue: TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>;
-
   controls: TypedOrUntyped<TControl, TControl, { [key: string]: AbstractControl<any> }>;
 
   override setValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, { [K in keyof TControl]: FormRawValue<TControl[K]>; }>, any>, options?: Object): void {
-    Object.keys(value).forEach((name) => {
-      const control = this.controls[name];
-      if (control) {
-        control.setValue(value[name]);
-      } else {
-        this.outsideValues[name] = value[name];
-      }
-    });
-    this.updateValueAndValidity(options);
+    if (!(value instanceof Array) && typeof value === 'object') {
+      Object.keys(value).forEach((name) => {
+        const control = this.controls[name];
+        if (control) {
+          control.setValue(value[name]);
+        } else {
+          this.outsideValues[name] = value[name];
+        }
+      });
+      this.updateValueAndValidity(options);
+    }
   }
 
   override patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
@@ -79,9 +78,9 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
     this.updateValueAndValidity(options);
   }
 
-  override reset(value?: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
-    this._forEachChild((control: AbstractControl, name) => {
-      control.reset(value ? (value as any)[name] : null);
+  override reset(options: { onlySelf?: boolean } = {}): void {
+    this._forEachChild((control: AbstractControl) => {
+      control.reset({ onlySelf: true });
     });
     this._updateDirty(options, this);
     this.outsideValues = {};

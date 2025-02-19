@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-syntax */
+import { ArrayModel } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
-} from './model';
+} from './control';
 import { Path } from './validators';
 
 export type ExtractFormArrayValue<T extends AbstractControl<any>> = TypedOrUntyped<
@@ -19,33 +20,67 @@ class FormArray<TControl extends AbstractControl<any> = any> extends AbstractCon
 TypedOrUntyped<TControl, ExtractFormArrayValue<TControl>, any>,
 TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
 > {
+  constructor(model:ArrayModel<ExtractFormArrayValue<TControl>, any>, initialValue?:ExtractFormArrayValue<TControl>) {
+    super(model, initialValue);
+  }
+
   override _forEachChild(cb: (c: AbstractControl, index:number) => void): void {
     this.controls.forEach((control: AbstractControl, index: number) => {
       cb(control, index);
     });
   }
 
-  _anyControls(fn: (c: AbstractControl) => boolean): boolean {
+  override _anyControls(fn: (c: AbstractControl) => boolean): boolean {
     return this.controls.some((control) => control.enabled && fn(control));
   }
 
-  _allControlsDisabled(): boolean {
+  override _allControlsDisabled(): boolean {
     for (const control of this.controls) {
       if (control.enabled) return false;
     }
     return this.controls.length > 0 || this.status === ControlStatus.DISABLED;
   }
 
-  setValue(value: TypedOrUntyped<TControl, IsAny<TControl, any[], FormRawValue<TControl>[]>, any>, options?: Object): void {
-    throw new Error('Method not implemented.');
+  override setValue(value: TypedOrUntyped<TControl, IsAny<TControl, any[], FormRawValue<TControl>[]>, any>, options: { onlySelf?: boolean } = {}): void {
+    if (!Array.isArray(value)) {
+      console.warn('expected to receive an array as value');
+      return;
+    }
+    value.forEach((val, index) => {
+      const control = this.at(index);
+      if (control) {
+        control.setValue(val, { onlySelf: true });
+      }
+    });
+    this.updateValueAndValidity(options);
   }
 
-  patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, any[], FormValue<TControl>[]>, any>, options?: Object): void {
-    throw new Error('Method not implemented.');
+  override patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, any[], FormValue<TControl>[]>, any>, options?: Object): void {
+    if (!Array.isArray(value)) {
+      console.warn('expected to receive an array as value');
+      return;
+    }
+    value.forEach((val, index) => {
+      const control = this.at(index);
+      if (control) {
+        control.setValue(val, { onlySelf: true });
+      }
+    });
+
+    this.updateValueAndValidity(options);
   }
 
-  reset(value?: TypedOrUntyped<TControl, IsAny<TControl, any[], FormValue<TControl>[]>, any>, options?: Object): void {
-    throw new Error('Method not implemented.');
+  override reset(options: { onlySelf?: boolean } = {}): void {
+    this.controls.forEach((c) => {
+      c.reset({ onlySelf: true });
+    });
+
+    this._updateDirty(options, this);
+    this.updateValueAndValidity(options);
+  }
+
+  override getRawValue() :any {
+    return this.controls.map((c) => c.getRawValue());
   }
 
   controls: Array<AbstractControl<any>> = [];
@@ -77,6 +112,10 @@ TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
     if (index === -1) return null;
     return index;
   }
+
+  push() { }
+
+  remove() { }
 }
 
 export default FormArray;

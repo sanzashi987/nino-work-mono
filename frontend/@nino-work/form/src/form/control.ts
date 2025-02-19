@@ -1,4 +1,5 @@
 import { effect, signal, untracked } from '../signal';
+import { BaseModel } from './define';
 import type FormArray from './form_array';
 import type FormObject from './form_object';
 import type { ComposedValidatorFn, Path, ValidationError, ValidatorRule } from './validators';
@@ -27,11 +28,15 @@ let nextInstanceId = 0;
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
   protected readonly instanceId: string;
 
-  constructor(rules?: ValidatorRule[]) {
+  protected readonly protoModel: BaseModel<any, any>;
+
+  constructor(model: BaseModel<TValue, any>, initialValue?: TValue) {
+    this.initialValue = initialValue ?? model.formItemProps.initialValue;
+    this.protoModel = model;
     // eslint-disable-next-line no-plusplus
     this.instanceId = `nino-control-${nextInstanceId++}`;
-    if (rules) {
-      this._composeValidator(rules);
+    if (model.formItemProps?.rules) {
+      this._composeValidator(model.formItemProps.rules);
     }
   }
 
@@ -182,7 +187,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     return this._anyControls((c) => c.dirty);
   }
 
-  _updateDirty(opts: { onlySelf?:boolean }, source:AbstractControl) {
+  _updateDirty(opts: { onlySelf?: boolean }, source: AbstractControl) {
     const nextDirty = this._anyControlsDirty();
     const changed = this.dirty !== nextDirty;
     if (changed) {
@@ -194,7 +199,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   /** values */
-  readonly defaultValue: TValue | null;
+  readonly initialValue: TValue | null;
 
   protected valueReactive = signal<TValue | undefined>(undefined);
 
@@ -207,7 +212,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
   abstract setValue(value: TRawValue, options?: Object): void;
   abstract patchValue(value: TValue, options?: Object): void;
-  abstract reset(value?: TValue, options?: Object): void;
+  abstract reset(options?: Object): void;
   abstract _deriveValue(): void;
 
   private readonly statusReactive = signal<ControlStatus | undefined>(undefined);

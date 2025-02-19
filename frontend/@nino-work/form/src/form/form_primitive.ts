@@ -1,7 +1,7 @@
-import { AbstractControl, ControlStatus } from './model';
+import { AbstractControl, ControlStatus } from './control';
 
 class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
-  readonly defaultValue: TValue;
+  readonly initialValue: TValue;
 
   override _allControlsDisabled(): boolean {
     return this.status === ControlStatus.DISABLED;
@@ -16,9 +16,9 @@ class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
 
   override _deriveValue(): void { }
 
-  override reset(value: TValue = this.defaultValue, opts?: Object): void {
+  override reset(opts: { onlySelf?: boolean } = {}): void {
     this.markAsPristine(opts);
-    this.setValue(value, opts);
+    this.setValue(this.initialValue, opts);
   }
 
   override _forEachChild(): void {}

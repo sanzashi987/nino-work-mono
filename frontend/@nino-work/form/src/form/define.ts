@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-param-reassign */
 import React from 'react';
+import { ValidatorRule } from './validators';
 
 export type SupportedValidationValue = boolean | number | string | RegExp;
 
@@ -19,7 +20,8 @@ export interface WidgetMutate<W, P> {
 
 }
 
-type WidgetStandardProps<T> = {
+export type WidgetStandardProps<T> = {
+  id?: string
   value?: T
   onChange?(next: T): void
 };
@@ -36,7 +38,7 @@ type FormInstance<T> = {
 
 export type IModel<T, S> = PrimitiveModel<T, S> | ObjectModel<T, S> | ArrayModel<T, S>;
 
-type BaseModel<
+export type BaseModel<
   ModelValue,
   StoreValue,
   ToWatch extends React.Key[][] = [],
@@ -47,8 +49,11 @@ type BaseModel<
   field: string
   watch?: readonly [...ToWatch],
   watchOptions?: WatchOption<StoreToWatch>
+  widget?: any
+  widgetProps?:any
   formItemProps?: {
     initialValue?: ModelValue;
+    rules?: ValidatorRule[]
   }
   callback?(value: any, form: FormInstance<StoreToWatch>): void,
 };
@@ -59,9 +64,7 @@ type GetModel<V, S> = V extends (infer A)[]
     ? ObjectModel<V, S>
     : V extends never ? PrimitiveModel<string, S> : PrimitiveModel<V, S>;
 
-export type PrimitiveModel<V, S> = {
-  initialValue?: V
-} & BaseModel<V, S>;
+export type PrimitiveModel<V, S> = BaseModel<V, S>;
 
 export type ArrayModel<V, S> = {
   children?: Omit<GetModel<V, S>, 'field'>
