@@ -2,6 +2,9 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
 import { ValidatorRule } from './validators';
+import FormObject from './form_object';
+import FormArray from './form_array';
+import FormPrimitive from './form_primitive';
 
 export type SupportedValidationValue = boolean | number | string | RegExp;
 
@@ -45,7 +48,7 @@ export type BaseModel<
   StoreToWatch = StoreValue
 > = {
   // label: React.ReactNode
-  label: string
+  label?: string
   field: string
   watch?: readonly [...ToWatch],
   watchOptions?: WatchOption<StoreToWatch>
@@ -176,4 +179,24 @@ export const createForm = <T>(schemas: DeriveChildrenForObject<T>, opts?: FormOp
   const initialValue = buildFormDataFromSchemas(schemas, opts?.initialValue);
 
   console.log(initialValue);
+};
+
+export const decideControl = (m: IModel<any, any>, data?: any) => {
+  const initValue = data ?? m.formItemProps.initialValue;
+
+  if ('children' in m) {
+    if (typeof m.children === 'object') {
+      if (Array.isArray(m.children)) {
+        return new FormObject(m as any, initValue);
+      }
+      return new FormArray(m as any, initValue);
+    }
+  }
+  if (typeof initValue === 'object') {
+    if (Array.isArray(initValue)) {
+      return new FormArray(m as any, initValue);
+    }
+    return new FormObject(m as any, initValue);
+  }
+  return new FormPrimitive(m as any, initValue);
 };

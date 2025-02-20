@@ -20,8 +20,11 @@ class FormArray<TControl extends AbstractControl<any> = any> extends AbstractCon
 TypedOrUntyped<TControl, ExtractFormArrayValue<TControl>, any>,
 TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
 > {
-  constructor(model:ArrayModel<ExtractFormArrayValue<TControl>, any>, initialValue?:ExtractFormArrayValue<TControl>) {
+  constructor(model:ArrayModel<ExtractFormArrayValue<TControl>, any>, initialValue:ExtractFormArrayValue<TControl> = []) {
     super(model, initialValue);
+    if (typeof model.children === 'object' && !Array.isArray(model.children)) {
+      initialValue.map;
+    }
   }
 
   override _forEachChild(cb: (c: AbstractControl, index:number) => void): void {

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { ObjectModel } from './define';
+import { decideControl, IModel, ObjectModel } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './control';
@@ -22,8 +22,23 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
   TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
   TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
   > {
-  constructor(model: ObjectModel<ExtractFormObjectValue<TControl>, any>, initialValue?:any) {
-    super(model);
+  constructor(model: ObjectModel<ExtractFormObjectValue<TControl>, any>, initialValue: any = {}) {
+    super(model, initialValue);
+    const myInitialValue = {};
+    const otherValue = { ...initialValue };
+    if (Array.isArray(model.children)) {
+      this.controls = Object.fromEntries((model.children as IModel<any, any>[]).map((ctrl) => {
+        const { field } = ctrl;
+        if (field in initialValue) {
+          myInitialValue[field] = initialValue[field];
+          delete otherValue[field];
+        }
+        return [field, decideControl(ctrl, initialValue[field])];
+      })) as any;
+    }
+    // @ts-ignore
+    this.initialValue = myInitialValue;
+    this.outsideValues = otherValue;
   }
 
   contains<K extends string & keyof TControl>(controlName: K): boolean {
