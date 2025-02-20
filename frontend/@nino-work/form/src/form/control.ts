@@ -1,5 +1,5 @@
 import { effect, signal, untracked } from '../signal';
-import { BaseModel } from './define';
+import type { IModel } from './define';
 import type FormArray from './form_array';
 import type FormObject from './form_object';
 import type { ComposedValidatorFn, Path, ValidationError, ValidatorRule } from './validators';
@@ -28,10 +28,10 @@ let nextInstanceId = 0;
 export abstract class AbstractControl<TValue = any, TRawValue extends TValue = TValue> {
   protected readonly instanceId: string;
 
-  protected readonly protoModel: BaseModel<any, any>;
+  protected readonly protoModel: IModel<any, any>;
 
-  constructor(model: BaseModel<TValue, any>, initialValue?: TValue) {
-    this.initialValue = initialValue ?? model.formItemProps.initialValue;
+  constructor(model: IModel<TValue, any>, initialValue?: TValue) {
+    this.initialValue = initialValue ?? model.formItemProps.initialValue as TValue;
     this.protoModel = model;
     // eslint-disable-next-line no-plusplus
     this.instanceId = `nino-control-${nextInstanceId++}`;

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { decideControl, IModel, ObjectModel } from './define';
+import { decideControl, type IModel, type ObjectModel } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './control';
@@ -17,12 +17,9 @@ T,
 { [key: string]: any }
 >;
 
-class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> } = any>
-  extends AbstractControl<
-  TypedOrUntyped<TControl, ExtractFormObjectValue<TControl>, any>,
-  TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any>
-  > {
-  constructor(model: ObjectModel<ExtractFormObjectValue<TControl>, any>, initialValue: any = {}) {
+class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
+  extends AbstractControl<TValue, TRawValue> {
+  constructor(model: ObjectModel<TValue, any>, initialValue: any = {}) {
     super(model, initialValue);
     const myInitialValue = {};
     const otherValue = { ...initialValue };
@@ -41,7 +38,7 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
     this.outsideValues = otherValue;
   }
 
-  contains<K extends string & keyof TControl>(controlName: K): boolean {
+  contains<K extends string & keyof TValue>(controlName: K): boolean {
     // eslint-disable-next-line no-prototype-builtins
     return this.controls.hasOwnProperty(controlName);
   }
@@ -56,7 +53,7 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
   }
 
   override _allControlsDisabled(): boolean {
-    for (const controlName of Object.keys(this.controls) as Array<keyof TControl>) {
+    for (const controlName of Object.keys(this.controls) as Array<keyof TValue>) {
       if ((this.controls as any)[controlName].status !== ControlStatus.DISABLED) {
         return false;
       }
@@ -66,9 +63,9 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
 
   outsideValues: any = {};
 
-  controls: TypedOrUntyped<TControl, TControl, { [key: string]: AbstractControl<any> }>;
+  controls: { [K in keyof TValue]: AbstractControl<TValue[K]> };
 
-  override setValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, { [K in keyof TControl]: FormRawValue<TControl[K]>; }>, any>, options?: Object): void {
+  override setValue(value: Partial<TRawValue>, options?: Object): void {
     if (!(value instanceof Array) && typeof value === 'object') {
       Object.keys(value).forEach((name) => {
         const control = this.controls[name];
@@ -82,9 +79,9 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
     }
   }
 
-  override patchValue(value: TypedOrUntyped<TControl, IsAny<TControl, { [key: string]: any; }, Partial<{ [K in keyof TControl]: FormValue<TControl[K]>; }>>, any>, options?: Object): void {
+  override patchValue(value: Partial<TRawValue>, options?: Object): void {
     if (value == null) return;
-    (Object.keys(value) as Array<keyof TControl>).forEach((name) => {
+    (Object.keys(value) as Array<keyof TValue>).forEach((name) => {
       const control = (this.controls as any)[name];
       if (control) {
         control.patchValue(value[name as any]);
@@ -106,8 +103,8 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
     this.valueReactive.set(this._reduceValue() as any);
   }
 
-  _reduceValue(): Partial<TControl> {
-    const acc: Partial<TControl> = {};
+  _reduceValue(): Partial<TValue> {
+    const acc: Partial<TValue> = {};
     return this._reduceChildren(acc, (last, control, name) => {
       // eslint-disable-next-line no-param-reassign
       last[name] = control.value;
@@ -116,12 +113,12 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
   }
 
   /** @internal */
-  _reduceChildren<T, K extends keyof TControl>(
+  _reduceChildren<T, K extends keyof TValue>(
     initValue: T,
-    fn: (acc: T, control: TControl[K], name: K) => T
+    fn: (acc: T, control: AbstractControl<TValue[K], any>, name: K) => T
   ): T {
     let res = initValue;
-    this._forEachChild((control: TControl[K], name: K) => {
+    this._forEachChild((control: AbstractControl<TValue[K], any>, name: K) => {
       res = fn(res, control, name);
     });
     return res;
@@ -146,7 +143,7 @@ class FormObject<TControl extends { [K in keyof TControl]: AbstractControl<any> 
     return this.controls[name] ?? null;
   }
 
-  override getRawValue():TypedOrUntyped<TControl, ExtractFormObjectRawValue<TControl>, any> {
+  override getRawValue(): TRawValue {
     const next: any = { ...this.outsideValues };
     this._forEachChild((ctrl, key) => {
       next[key] = ctrl.getRawValue();

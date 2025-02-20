@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { ArrayModel } from './define';
+import { type ArrayModel, decideControl } from './define';
 import {
   AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
 } from './control';
@@ -21,10 +21,17 @@ TypedOrUntyped<TControl, ExtractFormArrayValue<TControl>, any>,
 TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
 > {
   constructor(model:ArrayModel<ExtractFormArrayValue<TControl>, any>, initialValue:ExtractFormArrayValue<TControl> = []) {
-    super(model, initialValue);
+    super(model as any, initialValue);
+    const arrayEnsured = Array.isArray(initialValue) ? initialValue : [];
     if (typeof model.children === 'object' && !Array.isArray(model.children)) {
-      initialValue.map;
+      this.controls = arrayEnsured.map((v) => decideControl(model.children as any, v));
+      this._forEachChild((control) => {
+        control.setParent(this);
+      });
     }
+    // @ts-ignore
+    this.initialValue = arrayEnsured;
+    this.updateValueAndValidity({ onlySelf: true });
   }
 
   override _forEachChild(cb: (c: AbstractControl, index:number) => void): void {
@@ -116,9 +123,42 @@ TypedOrUntyped<TControl, ExtractFormArrayRawValue<TControl>, any>
     return index;
   }
 
-  push() { }
+  private createChildren(value?:any) {
+    const model = this.protoModel;
+    if ('children' in model && typeof model.children === 'object' && !Array.isArray(model.children)) {
+      const control = decideControl(model, value);
+      control.setParent(this);
+      return control;
+    }
+    return null;
+  }
 
-  remove() { }
+  push(value?: any) {
+    const control = this.createChildren(value);
+    if (control) {
+      this.controls.push(control);
+      this.updateValueAndValidity({});
+    }
+  }
+
+  insert(index: number, value?: any) {
+    const control = this.createChildren(value);
+    if (control) {
+      this.controls.splice(index, 0, control);
+      this.updateValueAndValidity({});
+    }
+  }
+
+  removeAt(index: number) {
+    const adjustedIndex = this._adjustIndex(index);
+    if (adjustedIndex >= 0) {
+      const controls = this.controls.splice(adjustedIndex, 1);
+      controls.forEach((control) => {
+        control.setParent(null);
+      });
+      this.updateValueAndValidity({});
+    }
+  }
 }
 
 export default FormArray;

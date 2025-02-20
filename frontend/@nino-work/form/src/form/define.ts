@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import { ValidatorRule } from './validators';
+import type { ValueEqualityFn } from '../signal/equality';
+import type { ValidatorRule } from './validators';
 import FormObject from './form_object';
 import FormArray from './form_array';
 import FormPrimitive from './form_primitive';
@@ -31,21 +32,17 @@ export type WidgetStandardProps<T> = {
 
 // type Validate
 
-type WatchOption<Store> = {
-  form?: FormInstance<Store>
-};
-
-type FormInstance<T> = {
-
+type WatchOption<Store extends {}> = {
+  form?: FormObject<Store>
 };
 
 export type IModel<T, S> = PrimitiveModel<T, S> | ObjectModel<T, S> | ArrayModel<T, S>;
 
 export type BaseModel<
   ModelValue,
-  StoreValue,
+  StoreValue extends {},
   ToWatch extends React.Key[][] = [],
-  StoreToWatch = StoreValue
+  StoreToWatch extends StoreValue = StoreValue
 > = {
   // label: React.ReactNode
   label?: string
@@ -56,9 +53,11 @@ export type BaseModel<
   widgetProps?:any
   formItemProps?: {
     initialValue?: ModelValue;
-    rules?: ValidatorRule[]
-  }
-  callback?(value: any, form: FormInstance<StoreToWatch>): void,
+    rules?: ValidatorRule[],
+    equality?:ValueEqualityFn<ModelValue>
+  },
+
+  callback?(value: any, form: FormObject<StoreToWatch>): void,
 };
 
 type GetModel<V, S> = V extends (infer A)[]
@@ -181,7 +180,7 @@ export const createForm = <T>(schemas: DeriveChildrenForObject<T>, opts?: FormOp
   console.log(initialValue);
 };
 
-export const decideControl = (m: IModel<any, any>, data?: any) => {
+export function decideControl(m: IModel<any, any>, data?: any) {
   const initValue = data ?? m.formItemProps.initialValue;
 
   if ('children' in m) {
@@ -199,4 +198,4 @@ export const decideControl = (m: IModel<any, any>, data?: any) => {
     return new FormObject(m as any, initValue);
   }
   return new FormPrimitive(m as any, initValue);
-};
+}
