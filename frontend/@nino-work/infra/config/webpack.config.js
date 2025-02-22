@@ -207,6 +207,17 @@ module.exports = function (webpackEnv) {
   }
 
 
+  const isMicroFromEnv = process.env.NINO_MODE === 'micro-app' || process.env.NINO_MODE === 'micro-host'
+  const isMicroHostFromEnv = process.env.NINO_MODE === 'micro-host'
+
+  isMicro ||= isMicroFromEnv
+  isMicroHost ||= isMicroHostFromEnv
+
+
+
+  const useHtml = (!isMicro || isMicroHost)
+
+  // console.log('isMicro', isMicro, 'isMicroHost', isMicroHost)
 
   const config = {
     target: ['browserslist'],
@@ -586,12 +597,12 @@ module.exports = function (webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
-      (!isMicro || isMicroHost) &&
-      new HtmlWebpackPlugin(
+      useHtml && new HtmlWebpackPlugin(
         {
           scriptLoading: isMicroHost ? "systemjs-module" : 'defer',
           inject: true,
           template: paths.appHtml,
+          templateParameters: () => { },
           ...(isEnvProduction
             ? {
               minify: {

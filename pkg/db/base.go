@@ -16,7 +16,7 @@ type BaseModel struct {
 	BaseTime
 	Id         uint64         `gorm:"column:id;primaryKey;not null;index;unique;"`
 	DeleteTime gorm.DeletedAt `gorm:"index"`
-	IGetId
+	IGetId     `gorm:"-"`
 }
 
 type IGetId interface {

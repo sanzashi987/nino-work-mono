@@ -2,7 +2,8 @@
 process.env.PORT = 3001
 
 module.exports = {
-  mode: 'micro-app',
+  // also can read from `process.env.NINO_MODE`
+  // mode: 'micro-app',
   devServer(config) {
     const { proxy } = config
 
@@ -14,8 +15,8 @@ module.exports = {
       }
     }
   },
-  webpack(config) {
-    config.output.publicPath = 'http://localhost:3000/'
-    return config
-  }
+  // webpack(config) {
+  //   config.output.publicPath = 'http://localhost:3000/'
+  //   return config
+  // }
 }

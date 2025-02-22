@@ -13,8 +13,8 @@ module.exports = {
       }
     }
   },
-  webpack(config) {
-    config.output.publicPath = 'http://localhost:3002/'
-    return config
-  }
+  // webpack(config) {
+  //   config.output.publicPath = 'http://localhost:3002/'
+  //   return config
+  // }
 }
