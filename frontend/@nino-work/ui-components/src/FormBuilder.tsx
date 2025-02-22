@@ -1,33 +1,24 @@
-/* eslint-disable no-param-reassign */
-import React, { useEffect, useMemo, useState } from 'react';
-import { useForm, UseFormReturn, FormProvider } from 'react-hook-form';
-import { noop } from '@nino-work/shared';
+import React, { useMemo } from 'react';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import Grid from '@mui/material/Grid2';
 import { Stack, TextField } from '@mui/material';
 import { FormCommonLayout, Model } from './ManagerShell/defineModel';
 import FormLabel from './FormLabel';
 
-type FormBuilderProps<FormData, T = any> = {
+export type FormBuilderProps<FormData, T = any> = {
   schema: Model<T>[],
-  // onSubmit: (d: FormData) => Promise<any>
-  formRef?: React.RefObject<UseFormReturn<FormData, any, undefined>>
+  onSubmit?: (d: FormData) => Promise<any>
+  form?:UseFormReturn<FormData, any, undefined>,
   spacing?: number
-
 } & FormCommonLayout;
 
 const FormBuilder = <FormData, T = any>(props:FormBuilderProps<FormData, T>) => {
   const instance = useForm<FormData>();
-  const { schema, formRef, colSpan = 12, spacing = 2, layout = 'column' } = props;
-  useEffect(() => {
-    if (formRef) {
-      formRef.current = instance;
-      return () => { formRef.current = null; };
-    }
-    return noop;
-  }, [formRef]);
+  const { schema, form, colSpan = 12, spacing = 2, layout = 'column' } = props;
+  const usedForm = form ?? instance;
 
   const widgets = useMemo(() => schema.map((s) => {
-    const { label, field, formCellProps } = s;
+    const { label, field, formCellProps = {} } = s;
     const lay = formCellProps.layout ?? layout;
     const size = formCellProps.colSpan ?? colSpan;
     const widget = formCellProps.widget ?? TextField;
@@ -36,16 +27,18 @@ const FormBuilder = <FormData, T = any>(props:FormBuilderProps<FormData, T>) => 
         <Stack direction={lay}>
           <FormLabel title={label} field={field} />
           {/* @ts-ignore */ }
-          {React.createElement(widget, { id: field, ...instance.register(field) })}
+          {React.createElement(widget, { id: field, ...usedForm.register(field), ...(formCellProps.widgetProps ?? {}) })}
         </Stack>
       </Grid>
     );
-  }), [colSpan, instance, layout, schema]);
+  }), [colSpan, usedForm, layout, schema]);
 
   return (
-    <Grid spacing={spacing ?? 2} container>
-      {widgets}
-    </Grid>
+    <form onSubmit={usedForm.handleSubmit(props.onSubmit)}>
+      <Grid spacing={spacing ?? 2} container>
+        {widgets}
+      </Grid>
+    </form>
   );
 };
 

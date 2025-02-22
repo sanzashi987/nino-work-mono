@@ -3,14 +3,14 @@ import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
 const routes :RouteObject[] = [
   {
-    path: 'root',
+    path: '/root',
     children: [
       {
         path: 'app',
         children: [
           {
             index: true,
-            Component: lazy(() => import('./Applications'))
+            Component: lazy(() => import('./Applications/index'))
 
           },
           {
@@ -18,6 +18,16 @@ const routes :RouteObject[] = [
             Component: lazy(() => import('./Applications/Permission'))
           }
         ]
+      },
+      {
+        path: 'role',
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('./Roles/index'))
+          }
+        ]
+
       }
     ]
   },

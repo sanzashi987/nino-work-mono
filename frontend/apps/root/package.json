@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npx infra-start",
-    "start-mf": "NINO_MODE=micro-app npx infra-start",
+    "start-mf":"npx infra-start --mode=micro-app",
     "build": "npx infra-build"
   },
   "browserslist": {

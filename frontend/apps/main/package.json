@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "npx infra-start",
+    "start-mf": "npx infra-start --mode=micro-host",
     "build": "npx infra-build"
   },
   "browserslist": {

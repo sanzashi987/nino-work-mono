@@ -207,16 +207,22 @@ module.exports = function (webpackEnv) {
   }
 
 
-  const isMicroFromEnv = process.env.NINO_MODE === 'micro-app' || process.env.NINO_MODE === 'micro-host'
-  const isMicroHostFromEnv = process.env.NINO_MODE === 'micro-host'
+  const mode = process.argv.find((arg) => arg.startsWith('--mode'))
+  if (mode) {
 
-  isMicro ||= isMicroFromEnv
-  isMicroHost ||= isMicroHostFromEnv
+    const isMicroFromEnv = mode === '--mode=micro-app' || mode === '--mode=micro-host'
+    const isMicroHostFromEnv = mode === '--mode=micro-host'
+
+
+    isMicro ||= isMicroFromEnv
+    isMicroHost ||= isMicroHostFromEnv
+  }
+
+
 
 
 
   const useHtml = (!isMicro || isMicroHost)
-
   // console.log('isMicro', isMicro, 'isMicroHost', isMicroHost)
 
   const config = {
@@ -602,7 +608,47 @@ module.exports = function (webpackEnv) {
           scriptLoading: isMicroHost ? "systemjs-module" : 'defer',
           inject: true,
           template: paths.appHtml,
-          templateParameters: () => { },
+          templateParameters: (compilation, assets, assetTags, options) => {
+            if (isMicroHost) {
+              assetTags.headTags.push(
+                {
+                  tagName: "script",
+                  attributes: {
+                    src: "https://cdn.jsdelivr.net/npm/import-map-overrides/dist/import-map-overrides.js"
+                  }
+                },
+                {
+                  tagName: "script",
+                  attributes: {
+                    src: "https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"
+                  }
+                },
+                {
+                  tagName: "script",
+                  attributes: {
+                    src: "https://cdn.jsdelivr.net/npm/systemjs/dist/extras/amd.js"
+                  }
+                },
+                {
+                  tagName: "script",
+                  attributes: {
+                    type: "systemjs-importmap",
+                    src: "/backend/user/v1/misc/importmap"
+                  }
+                },
+              )
+            }
+
+            return {
+              compilation,
+              webpackConfig: compilation.options,
+              htmlWebpackPlugin: {
+                tags: assetTags,
+                files: assets,
+                options
+              }
+            }
+          },
           ...(isEnvProduction
             ? {
               minify: {

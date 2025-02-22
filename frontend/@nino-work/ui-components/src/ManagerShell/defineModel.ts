@@ -9,7 +9,8 @@ export type Model<T = string> = {
   label: string
   field: string,
   formCellProps?: FormCommonLayout & {
-    widget?: React.ComponentType
+    widget?: React.ComponentType,
+    widgetProps?: any
   },
   headerCellProps?: TableCellProps
   dataCellProps?: TableCellProps & {
