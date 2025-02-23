@@ -70,7 +70,7 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 func (c *UserController) UserInfo(ctx *gin.Context) {
 
 	userId := ctx.GetUint64(controller.UserID)
-	info, err := userService.UserServiceWebImpl.GetUserInfo(ctx, userId)
+	info, err := userService.GetUserInfo(ctx, userId)
 
 	if err != nil {
 		c.AbortServerError(ctx, "[http] user info: Fail to read user info:"+err.Error())

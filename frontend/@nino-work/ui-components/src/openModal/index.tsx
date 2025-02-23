@@ -26,14 +26,21 @@ export const OpenModalContext = React.createContext<
 
 const Modal: React.FC<ModalProps> = ({ title, content, onClose, action, contentProps = {}, ...dialogProps }) => {
   const defaultActions = action ?? <Button onClick={onClose}>Close</Button>;
-  const form = useForm();
+  const defaultForm = useForm();
+  const { form, content: contentWithForm } = useMemo(() => {
+    if (React.isValidElement(content) && 'form' in content.props) {
+      return { form: content.props.form as UseFormReturn, content };
+    }
+    return { form: defaultForm, content: React.cloneElement(content as any, { form: defaultForm }) };
+  }, [content, defaultForm]);
+
   const ctx = useMemo(() => ({ close: onClose, form }), []);
   return (
     <OpenModalContext.Provider value={ctx}>
       <Dialog maxWidth="sm" fullWidth {...dialogProps} open>
         {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContent sx={{ p: 2 }} {...contentProps}>
-          {content}
+          {contentWithForm}
         </DialogContent>
         <DialogActions>
           {defaultActions}
@@ -89,6 +96,7 @@ const openModal = (props:Omit<ModalProps, 'onClose'>) => {
 type OpenSimpleFormProps<FormData> = {
   modalProps: Omit<ModalProps, 'onClose' | 'content'>,
   formProps: FormBuilderProps<FormData> & SimpleFormSubmit<FormData>;
+  dataBackfill?: FormData
 };
 export const openSimpleForm = <FormData,>({ modalProps, formProps }: OpenSimpleFormProps<FormData>) => {
   const defaultAction = <SimpleFormAction onOk={formProps.onOk} />;

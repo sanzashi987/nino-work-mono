@@ -6,12 +6,9 @@ import (
 
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 	"gorm.io/gorm"
 )
-
-type PermissionServiceWeb struct{}
-
-var PermissionServiceWebImpl *PermissionServiceWeb = &PermissionServiceWeb{}
 
 type PermissionPayload struct {
 	Name        string `json:"name" binding:"required"`
@@ -24,7 +21,7 @@ type CreatePermissionRequest struct {
 	Permissions []*PermissionPayload `json:"permissions" binding:"required"`
 }
 
-func (u *PermissionServiceWeb) CreatePermission(ctx context.Context, userId uint64, payload CreatePermissionRequest) error {
+func CreatePermission(ctx context.Context, userId uint64, payload CreatePermissionRequest) error {
 	data, err := userService.UserIsAdmin(ctx, userId, payload.AppId)
 	if err != nil || !data.Result.Admin() {
 		return errors.New("user is not the admin of this app")
@@ -63,7 +60,7 @@ type RemovePermissionRequest struct {
 	Permissions []uint64 `json:"permissions"`
 }
 
-func (u *ApplicationServiceWeb) RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
+func RemovePermission(ctx context.Context, userId uint64, payload RemovePermissionRequest) error {
 	app, tx, err := userIsManager(ctx, userId, payload.AppId, false)
 	if err != nil {
 		return err
@@ -94,7 +91,7 @@ type PermissionsResult struct {
 	*userService.AdminResult
 }
 
-func (s *PermissionServiceWeb) ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsResult, error) {
+func ListPermissionsByApp(ctx context.Context, userId uint64, appId *uint64) (*PermissionsResult, error) {
 	data, err := userService.UserIsAdmin(ctx, userId, appId)
 	if err != nil {
 		return nil, err
@@ -132,7 +129,7 @@ type DeletePermissionRequest struct {
 	AppId uint64 `json:"app_id"`
 }
 
-func (s *PermissionServiceWeb) DeletePermission(ctx context.Context, userId uint64, payload DeletePermissionRequest) error {
+func DeletePermission(ctx context.Context, userId uint64, payload DeletePermissionRequest) error {
 	data, err := userService.UserIsAdmin(ctx, userId, &payload.AppId)
 	if err != nil {
 		return err
@@ -160,7 +157,7 @@ type SearchPermissionRequest struct {
 	Code  string  `json:"code" binding:"required"`
 }
 
-func (s *PermissionServiceWeb) SearchPermission(ctx context.Context, userId uint64, payload SearchPermissionRequest) (*PermissionRecord, error) {
+func SearchPermission(ctx context.Context, userId uint64, payload SearchPermissionRequest) (*PermissionRecord, error) {
 	data, err := userService.UserIsAdmin(ctx, userId, payload.AppId)
 
 	if err != nil {
@@ -184,4 +181,8 @@ func (s *PermissionServiceWeb) SearchPermission(ctx context.Context, userId uint
 		Name: permission.Name,
 		Code: permission.Code,
 	}, nil
+}
+
+func GetAdministratedPermissions(ctx context.Context, userId uint64) ([]*shared.EnumMeta, error) {
+
 }

@@ -11,6 +11,7 @@ export type Model<T = string> = {
   formCellProps?: FormCommonLayout & {
     widget?: React.ComponentType,
     widgetProps?: any
+    type?: 'hidden'
   },
   headerCellProps?: TableCellProps
   dataCellProps?: TableCellProps & {

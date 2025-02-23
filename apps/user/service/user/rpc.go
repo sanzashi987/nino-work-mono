@@ -98,3 +98,13 @@ func (u *UserServiceRpc) UserRegister(ctx context.Context, in *user.UserRegister
 	err = errors.New("unknown edge case in user service")
 	return
 }
+
+// GetApplicationPermissions implements user.UserServiceHandler.
+func (u *UserServiceRpc) GetApplicationPermissions(context.Context, *user.ApplicationPermissionsRequest, *user.ApplicationPermissionsResponse) error {
+	panic("unimplemented")
+}
+
+// GetUserPermissions implements user.UserServiceHandler.
+func (u *UserServiceRpc) GetUserPermissions(context.Context, *user.UserPermissionsRequest, *user.UserPermissionsResponse) error {
+	panic("unimplemented")
+}

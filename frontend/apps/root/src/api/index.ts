@@ -18,7 +18,10 @@ type AppModel = {
 
 export type AppListResponse = PaginationResponse<AppModel>;
 
-export const getAppList = defineApi<PagninationRequest, AppListResponse>({ url: `${prefix}/apps/list`, method: 'POST' });
+export const getAppList = defineApi<PagninationRequest, AppListResponse>({
+  url: `${prefix}/apps/list`,
+  method: 'POST'
+});
 
 export type CreateAppRequest = Pick<AppModel, 'code' | 'name' | 'description'>;
 
@@ -70,14 +73,14 @@ export const listRoles = defineApi<PagninationRequest, PaginationResponse<RoleIn
   method: 'POST'
 });
 
-type CreateRoleRequest = {
+export type CreateRoleRequest = {
   name: string
   code: string
   description?: string
   permission_ids?: number[]
 };
 
-export const createRoles = defineApi<CreateRoleRequest, void>({
+export const createRole = defineApi<CreateRoleRequest, void>({
   url: `${prefix}/roles/create`,
   method: 'POST'
 });
@@ -89,7 +92,7 @@ type UpdateRoleRequest = {
   permission_ids?: number[]
 };
 
-export const updateRoles = defineApi<UpdateRoleRequest, void>({
+export const updateRole = defineApi<UpdateRoleRequest, void>({
   url: `${prefix}/roles/update`,
   method: 'POST'
 });

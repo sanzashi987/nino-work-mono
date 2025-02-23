@@ -2,23 +2,7 @@ package userService
 
 import (
 	"context"
-
-	"github.com/sanzashi987/nino-work/proto/user"
 )
-
-// GetApplicationPermissions implements user.UserServiceHandler.
-func (u *UserServiceRpc) GetApplicationPermissions(context.Context, *user.ApplicationPermissionsRequest, *user.ApplicationPermissionsResponse) error {
-	panic("unimplemented")
-}
-
-// GetUserPermissions implements user.UserServiceHandler.
-func (u *UserServiceRpc) GetUserPermissions(context.Context, *user.UserPermissionsRequest, *user.UserPermissionsResponse) error {
-	panic("unimplemented")
-}
-
-type UserServiceWeb struct{}
-
-var UserServiceWebImpl *UserServiceWeb = &UserServiceWeb{}
 
 type CodeName struct {
 	Name string `json:"name"`
@@ -41,7 +25,7 @@ type UserInfoResponse struct {
 	Roles       []*CodeName `json:"roles"`
 }
 
-func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
+func GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
 
 	user, tx, err := GetUserRolePermission(ctx, userId)
 	if err != nil {
@@ -101,4 +85,3 @@ func (u *UserServiceWeb) GetUserInfo(ctx context.Context, userId uint64) (*UserI
 	}, nil
 
 }
-

@@ -15,6 +15,7 @@ func RegisterAppPermissionRoutes(router gin.IRoutes) {
 	router.GET("apps/permission/list", permissionController.ListPermissionsByApp)
 	router.POST("apps/permission/create", permissionController.CreatePermission)
 	router.POST("apps/permission/delete", permissionController.DeletePermission)
+	router.POST("apps/permission/delete", permissionController.DeletePermission)
 }
 
 type ListPermissionRequest struct {
@@ -30,7 +31,7 @@ func (c *PermissionController) ListPermissionsByApp(ctx *gin.Context) {
 		return
 	}
 
-	result, err := service.PermissionServiceWebImpl.ListPermissionsByApp(ctx, userId, req.AppId)
+	result, err := service.ListPermissionsByApp(ctx, userId, req.AppId)
 
 	if err != nil {
 		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
@@ -50,7 +51,7 @@ func (c *PermissionController) CreatePermission(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.PermissionServiceWebImpl.CreatePermission(ctx, userId, req); err != nil {
+	if err := service.CreatePermission(ctx, userId, req); err != nil {
 		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
 		return
 	}
@@ -67,10 +68,23 @@ func (c *PermissionController) DeletePermission(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.PermissionServiceWebImpl.DeletePermission(ctx, userId, req); err != nil {
+	if err := service.DeletePermission(ctx, userId, req); err != nil {
 		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
 		return
 	}
 
 	c.SuccessVoid(ctx)
+}
+
+func (c *PermissionController) GetAdministratedPermissions(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	result, err := service.GetAdministratedPermissions(ctx, userId)
+
+	if err != nil {
+		c.AbortServerError(ctx, "[http] list permissions: service error"+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, result)
 }

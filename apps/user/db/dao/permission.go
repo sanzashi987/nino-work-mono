@@ -36,3 +36,4 @@ func GetRolesByPermission(tx *gorm.DB, permissionId uint64) ([]*model.RoleModel,
 
 	return roles, err
 }
+

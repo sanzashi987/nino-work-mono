@@ -5,14 +5,15 @@ import { Stack, TextField } from '@mui/material';
 import { FormCommonLayout, Model } from './ManagerShell/defineModel';
 import FormLabel from './FormLabel';
 
-export type FormBuilderProps<FormData, T = any> = {
+export type FormBuilderProps<FormData extends {}, T = any> = {
   schema: Model<T>[],
   onSubmit?: (d: FormData) => Promise<any>
   form?:UseFormReturn<FormData, any, undefined>,
   spacing?: number
 } & FormCommonLayout;
 
-const FormBuilder = <FormData, T = any>(props:FormBuilderProps<FormData, T>) => {
+// TODO add validator
+const FormBuilder = <FormData, T = any>(props: FormBuilderProps<FormData, T>) => {
   const instance = useForm<FormData>();
   const { schema, form, colSpan = 12, spacing = 2, layout = 'column' } = props;
   const usedForm = form ?? instance;
@@ -22,6 +23,12 @@ const FormBuilder = <FormData, T = any>(props:FormBuilderProps<FormData, T>) => 
     const lay = formCellProps.layout ?? layout;
     const size = formCellProps.colSpan ?? colSpan;
     const widget = formCellProps.widget ?? TextField;
+    const hidden = formCellProps.type === 'hidden';
+    if (hidden) {
+      /* @ts-ignore */
+      return <input id={field} {...usedForm.register(field)} type="hidden" />;
+    }
+
     return (
       <Grid key={field} size={size}>
         <Stack direction={lay}>

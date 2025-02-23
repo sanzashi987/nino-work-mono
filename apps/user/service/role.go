@@ -187,14 +187,13 @@ func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *
 	var totalCount int64
 
 	query := tx.Model(&model.RoleModel{}).
-		Joins("JOIN role_permissions ON role_permissions.role_id = roles.id").
-		Joins("JOIN permissions ON permissions.id = role_permissions.permission_id").
-		Where("permissions.app_id IN ?", appIds)
+		Joins("JOIN permissions ON permissions.app_id IN ? AND permissions.id = role_permissions.permission_model_id", appIds).
+		Joins("JOIN role_permissions ON role_permissions.role_model_id = roles.id")
 
 	if err := query.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}
-	if err := query.Order("id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Find(&roles).Error; err != nil {
+	if err := query.Order("roles.id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Find(&roles).Error; err != nil {
 		return nil, err
 	}
 

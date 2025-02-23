@@ -31,7 +31,7 @@ func (c *MiscController) GetImportMap(ctx *gin.Context) {
 	authed, err := controller.ValidateFromCtx(ctx)
 	if err == nil {
 		id := authed.UserID
-		userInfo, e := userService.UserServiceWebImpl.GetUserInfo(ctx, id)
+		userInfo, e := userService.GetUserInfo(ctx, id)
 		if e == nil {
 			menus := userInfo.Menus
 			menuCodes := make([]string, len(menus))
