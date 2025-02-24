@@ -9,7 +9,7 @@ export type Model<T = string> = {
   label: string
   field: string,
   formCellProps?: FormCommonLayout & {
-    widget?: React.ComponentType,
+    widget?: React.ComponentType<any>,
     widgetProps?: any
     type?: 'hidden'
   },

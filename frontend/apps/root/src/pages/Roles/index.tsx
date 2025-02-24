@@ -3,7 +3,7 @@ import { IconButton, Button } from '@mui/material';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import React, { useMemo } from 'react';
 import { listRoles } from '@/api';
-import { openCreateApp } from '../Applications/Dialogs';
+import openUpsertRole from './upsertRole';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -42,7 +42,7 @@ const RoleManagement: React.FC = () => {
       schema={schema}
       requester={listRoles}
       ActionNode={(
-        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openCreateApp(refresh)}>
+        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openUpsertRole(refresh)}>
           + Create Role
         </Button>
       )}
