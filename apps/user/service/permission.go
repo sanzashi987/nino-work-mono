@@ -184,5 +184,32 @@ func SearchPermission(ctx context.Context, userId uint64, payload SearchPermissi
 }
 
 func GetAdministratedPermissions(ctx context.Context, userId uint64) ([]*shared.EnumMeta, error) {
+	res, err := userService.GetUserAdmins(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	appIds := []uint64{}
+	for _, app := range res.AdminApps {
+		appIds = append(appIds, app.Id)
+	}
+	for _, app := range res.SuperAdminApps {
+		appIds = append(appIds, app.Id)
+	}
+	tx := res.Tx
+
+	permissions := []*model.PermissionModel{}
+	if err := tx.Table("permissions").Where("app_id IN ?", appIds).Find(&permissions).Error; err != nil {
+		return nil, err
+	}
+
+	resPermissions := []*shared.EnumMeta{}
+	for _, p := range permissions {
+		resPermissions = append(resPermissions, &shared.EnumMeta{
+			Value: p.Id,
+			Name:  p.Name,
+		})
+	}
+
+	return resPermissions, nil
 
 }

@@ -15,7 +15,7 @@ func RegisterAppPermissionRoutes(router gin.IRoutes) {
 	router.GET("apps/permission/list", permissionController.ListPermissionsByApp)
 	router.POST("apps/permission/create", permissionController.CreatePermission)
 	router.POST("apps/permission/delete", permissionController.DeletePermission)
-	router.POST("apps/permission/delete", permissionController.DeletePermission)
+	router.POST("apps/permission/admined-permission", permissionController.GetAdministratedPermissions)
 }
 
 type ListPermissionRequest struct {

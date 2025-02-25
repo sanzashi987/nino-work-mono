@@ -20,3 +20,8 @@ export type SubAppInjectProps = {
   basename?:string
 
 };
+
+export type Enum<T = string> = {
+  value: T
+  name: string
+};

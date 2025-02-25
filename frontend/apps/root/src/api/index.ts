@@ -1,4 +1,4 @@
-import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import { Enum, ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
 const prefix = '/backend/user/v1';
@@ -94,5 +94,10 @@ type UpdateRoleRequest = {
 
 export const updateRole = defineApi<UpdateRoleRequest, void>({
   url: `${prefix}/roles/update`,
+  method: 'POST'
+});
+
+export const listAdminstratedPermissions = defineApi<void, Enum[]>({
+  url: `${prefix}/apps/permission/admined-permission`,
   method: 'POST'
 });
