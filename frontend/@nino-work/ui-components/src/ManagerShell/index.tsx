@@ -35,7 +35,7 @@ const ManagerShell = <Res, T>({
   useEffect(() => {
     setData(null);
     requester(pagination).then(setData).catch(noop);
-  }, deps);
+  }, [...deps, pagination]);
 
   const tableHeader = useMemo(() => (
     <TableHead>

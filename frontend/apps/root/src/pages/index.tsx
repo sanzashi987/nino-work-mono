@@ -28,6 +28,16 @@ const routes :RouteObject[] = [
           }
         ]
 
+      },
+      {
+        path: 'role',
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('./Users/index'))
+          }
+        ]
+
       }
     ]
   },
