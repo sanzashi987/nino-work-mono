@@ -1,5 +1,5 @@
 import { AutoSelect, Model, openSimpleForm } from '@nino-work/ui-components';
-import { createRole, CreateRoleRequest } from '@/api';
+import { createRole, CreateRoleRequest, listAdminstratedPermissions } from '@/api';
 
 const upsertModels: Model[] = [
   { label: 'Name', field: 'name', formCellProps: { widgetProps: { variant: 'standard' } } },
@@ -12,11 +12,8 @@ const upsertModels: Model[] = [
       widgetProps: {
         size: 'small',
         multiple: true,
-        requester: () => new Promise((res) => {
-          setTimeout(() => {
-            res([{ label: '233', value: 233 }]);
-          }, 3000);
-        })
+        defaultValue: [],
+        requester: () => listAdminstratedPermissions().then((res) => res.map((e) => ({ label: e.name, value: e.value })))
       }
     }
   },

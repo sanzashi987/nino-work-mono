@@ -188,17 +188,15 @@ func GetAdministratedPermissions(ctx context.Context, userId uint64) ([]*shared.
 	if err != nil {
 		return nil, err
 	}
-	appIds := []uint64{}
-	for _, app := range res.AdminApps {
-		appIds = append(appIds, app.Id)
-	}
-	for _, app := range res.SuperAdminApps {
-		appIds = append(appIds, app.Id)
-	}
-	tx := res.Tx
 
+	perset, err := res.ToPermissionSet()
+	if err != nil {
+		return nil, err
+	}
+
+	appIds := perset.ToSlice()
 	permissions := []*model.PermissionModel{}
-	if err := tx.Table("permissions").Where("app_id IN ?", appIds).Find(&permissions).Error; err != nil {
+	if err := res.Tx.Table("permissions").Where("app_id IN ?", appIds).Find(&permissions).Error; err != nil {
 		return nil, err
 	}
 

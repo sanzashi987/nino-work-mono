@@ -17,10 +17,10 @@ var RoleServiceWebImpl *RoleServiceWeb = &RoleServiceWeb{}
 
 // CreateRoleRequest 创建角色请求参数
 type CreateRoleRequest struct {
-	RoleName        string   `json:"role_name" binding:"required"`
-	RoleCode        string   `json:"role_code" binding:"required"`
-	RoleDescription string   `json:"role_description"`
-	PermissionIds   []uint64 `json:"permission_ids"`
+	Name          string   `json:"name" binding:"required"`
+	Code          string   `json:"code" binding:"required"`
+	Description   string   `json:"description"`
+	PermissionIds []uint64 `json:"permission_ids"`
 }
 
 var errNopermission = errors.New("user does not have any admin permission")
@@ -44,9 +44,9 @@ func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload 
 
 	// 创建角色
 	newRole := &model.RoleModel{
-		Name:        payload.RoleName,
-		Code:        payload.RoleCode,
-		Description: payload.RoleDescription,
+		Name:        payload.Name,
+		Code:        payload.Code,
+		Description: payload.Description,
 	}
 
 	if err := tx.Create(newRole).Error; err != nil {
@@ -186,14 +186,20 @@ func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *
 	var roles []model.RoleModel
 	var totalCount int64
 
-	query := tx.Model(&model.RoleModel{}).
-		Joins("JOIN permissions ON permissions.app_id IN ? AND permissions.id = role_permissions.permission_model_id", appIds).
-		Joins("JOIN role_permissions ON role_permissions.role_model_id = roles.id")
+	filteredPermissions := tx.Table("permissions").Where("app_id IN ?", appIds)
+
+	subQuery := tx.Table("(?) as filtered_permissions", filteredPermissions).
+		Select("DISTINCT role_permissions.role_model_id").
+		Joins("LEFT JOIN role_permissions ON role_permissions.permission_model_id = filtered_permissions.id")
+
+	query := tx.Table("(?) AS b", subQuery).
+		Select("b.role_model_id, roles.*").
+		Joins("LEFT JOIN roles ON b.role_model_id = roles.id").Where("roles.delete_time IS NULL")
 
 	if err := query.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}
-	if err := query.Order("roles.id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Find(&roles).Error; err != nil {
+	if err := query.Order("roles.id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Scan(&roles).Error; err != nil {
 		return nil, err
 	}
 

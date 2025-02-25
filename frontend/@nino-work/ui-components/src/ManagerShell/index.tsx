@@ -93,7 +93,7 @@ const ManagerShell = <Res, T>({
         : (
           <>
             <TableContainer component={Paper} elevation={10} sx={{ my: 3 }}>
-              <Table>
+              <Table size="small">
                 {tableHeader}
                 {content}
               </Table>

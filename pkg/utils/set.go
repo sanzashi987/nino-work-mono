@@ -74,3 +74,11 @@ func (s *Set[T]) Diff(other *Set[T]) (*Set[T], *Set[T]) {
 
 	return intersection, relativeComplement
 }
+
+func (s *Set[T]) ToSlice() []T {
+	result := []T{}
+	for key := range s.elements {
+		result = append(result, key)
+	}
+	return result
+}
