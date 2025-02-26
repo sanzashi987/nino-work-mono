@@ -21,23 +21,12 @@ const routes :RouteObject[] = [
       },
       {
         path: 'role',
-        children: [
-          {
-            index: true,
-            Component: lazy(() => import('./Roles/index'))
-          }
-        ]
+        Component: lazy(() => import('./Roles/index'))
 
       },
       {
-        path: 'role',
-        children: [
-          {
-            index: true,
-            Component: lazy(() => import('./Users/index'))
-          }
-        ]
-
+        path: 'user',
+        Component: lazy(() => import('./Users/index'))
       }
     ]
   },

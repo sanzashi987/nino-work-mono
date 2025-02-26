@@ -1,7 +1,7 @@
 import { Enum, ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
-const prefix = '/backend/user/v1';
+const prefix = '/backend/root/v1';
 
 export enum AppStatus {
   ENABLE = 0,
@@ -99,5 +99,15 @@ export const updateRole = defineApi<UpdateRoleRequest, void>({
 
 export const listAdminstratedPermissions = defineApi<void, Enum[]>({
   url: `${prefix}/apps/permission/admined-permission`,
+  method: 'POST'
+});
+
+type UserBio = {
+  id: string
+  username: string
+};
+
+export const listUsers = defineApi<PagninationRequest, PaginationResponse<UserBio>>({
+  url: `${prefix}/users/list`,
   method: 'POST'
 });

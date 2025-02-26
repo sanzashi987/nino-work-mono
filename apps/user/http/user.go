@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	userService "github.com/sanzashi987/nino-work/apps/user/service/user"
 	"github.com/sanzashi987/nino-work/pkg/controller"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 	"github.com/sanzashi987/nino-work/proto/user"
 )
 
@@ -81,11 +82,34 @@ func (c *UserController) UserInfo(ctx *gin.Context) {
 
 }
 
-func (c *UserController) ListServiceUsers(ctx *gin.Context) {
-	_ = ctx.GetUint64(controller.UserID)
+func (c *UserController) ListUser(ctx *gin.Context) {
+	var req shared.PaginationRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user list: Fail to read required fields "+err.Error())
+		return
+	}
+
+	res, err := userService.ListUser(ctx, &req)
+	if err != nil {
+		c.AbortServerError(ctx, "[http] user list: Fail to read user list "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, res)
 
 }
 
-func (c *UserController) TestToken(ctx *gin.Context) {
-	return
+func (c *UserController) BindUserRoles(ctx *gin.Context) {
+	var req userService.BindRoleRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user bind roles: Fail to read required fields "+err.Error())
+		return
+	}
+
+	if err := userService.BindUserRoles(ctx, &req); err != nil {
+		c.AbortServerError(ctx, "[http] user bind roles: Fail to bind user roles "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, nil)
 }

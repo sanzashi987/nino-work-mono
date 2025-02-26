@@ -10,9 +10,9 @@ type LoginResponse = {
   jwt_token: string
 };
 
-const prefix = '/backend/v1';
+const prefix = '/backend/root/v1';
 export const login = defineApi<LoginRequest, LoginResponse>({
-  url: `${prefix}/login`,
+  url: `${prefix}/users/login`,
   method: 'POST'
 });
 
@@ -45,5 +45,3 @@ export type UserInfoResponse = {
 };
 
 export const getUserInfo = defineApi<undefined, UserInfoResponse>({ url: `${prefix}/info` });
-
-export const testToken = defineApi<{}, void>({ url: `${prefix}/token` });

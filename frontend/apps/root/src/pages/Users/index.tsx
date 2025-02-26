@@ -2,7 +2,7 @@ import { Settings, Delete } from '@mui/icons-material';
 import { IconButton, Button } from '@mui/material';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import React, { useMemo } from 'react';
-import { listRoles } from '@/api';
+import { listUsers } from '@/api';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -38,12 +38,12 @@ const UserManagement: React.FC = () => {
     <ManagerShell
       deps={deps}
       schema={schema}
-      requester={listRoles}
-      ActionNode={(
-        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openUpsertRole(refresh)}>
-          + Create Role
-        </Button>
-      )}
+      requester={listUsers}
+      // ActionNode={(
+      //   <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openUpsertRole(refresh)}>
+      //     + Create User
+      //   </Button>
+      // )}
     />
   );
 };

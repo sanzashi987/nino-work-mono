@@ -2,6 +2,10 @@ package userService
 
 import (
 	"context"
+
+	"github.com/sanzashi987/nino-work/apps/user/db/model"
+	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type CodeName struct {
@@ -84,4 +88,72 @@ func GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) 
 		Roles:       resRoles,
 	}, nil
 
+}
+
+type UserBio struct {
+	Id       uint64 `json:"id"`
+	Username string `json:"username"`
+}
+
+type ListUserResponse struct {
+	Data []*UserBio `json:"data"`
+	shared.PaginationResponse
+}
+
+func ListUser(ctx context.Context, pagination *shared.PaginationRequest) (*ListUserResponse, error) {
+	tx := db.NewTx(ctx)
+
+	var users []*model.UserModel
+
+	var count int64
+
+	if err := tx.Model(&model.UserModel{}).Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	if err := tx.Scopes(db.Paginate(pagination.Page, pagination.Size)).Order("id DESC").Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	res := []*UserBio{}
+	for _, user := range users {
+		res = append(res, &UserBio{
+			Id:       user.Id,
+			Username: user.Username,
+		})
+	}
+
+	return &ListUserResponse{
+		Data: res,
+		PaginationResponse: shared.PaginationResponse{
+			PageIndex:   pagination.Page,
+			PageSize:    pagination.Size,
+			RecordTotal: int(count),
+		},
+	}, nil
+
+}
+
+type BindRoleRequest struct {
+	UserId  uint64   `json:"user_id"`
+	RoleIds []uint64 `json:"role_ids"`
+}
+
+func BindUserRoles(ctx context.Context, payload *BindRoleRequest) error {
+	tx := db.NewTx(ctx)
+
+	toBindUser := &model.UserModel{}
+	toBindUser.Id = payload.UserId
+	toBindRoles := []*model.RoleModel{}
+	for _, roleId := range payload.RoleIds {
+		role := &model.RoleModel{}
+		role.Id = roleId
+		toBindRoles = append(toBindRoles, role)
+	}
+
+	if err := tx.Model(toBindUser).Association("Roles").Replace(toBindRoles); err != nil {
+		return err
+	}
+
+	return nil
 }
