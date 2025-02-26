@@ -6,8 +6,8 @@ import { listUsers } from '@/api';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
-  { label: 'User Name', field: 'username' },
-  { label: 'Description', field: 'description' }
+  { label: 'Username', field: 'username' },
+  { label: 'Email', field: 'email' }
 ];
 
 const UserManagement: React.FC = () => {

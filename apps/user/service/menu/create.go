@@ -2,7 +2,6 @@ package menuService
 
 import (
 	"context"
-	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
@@ -19,9 +18,6 @@ type CreateMenuRequest struct {
 	Roles  []uint64 `json:"roles"`
 }
 
-var errNopermission = errors.New("user does not have any admin permission")
-var errOutsidepermission = errors.New("user cannot create roles outside the permission range of admined apps")
-
 func Create(ctx context.Context, userId uint64, req *CreateMenuRequest) error {
 	result, err := userService.GetUserAdmins(ctx, userId)
 	if err != nil {
@@ -29,7 +25,7 @@ func Create(ctx context.Context, userId uint64, req *CreateMenuRequest) error {
 	}
 
 	if !result.HasAnyAdmin() {
-		return errNopermission
+		return userService.ErrNopermission
 	}
 
 	hasPermission, err := result.ToPermissionSet()
@@ -45,7 +41,7 @@ func Create(ctx context.Context, userId uint64, req *CreateMenuRequest) error {
 			return err
 		}
 		if !hasPermission.IsStrictlyContains(tryToUsePermission) {
-			return errOutsidepermission
+			return userService.ErrOutsidepermission
 		}
 	}
 	toCreateMenu := model.MenuModel{

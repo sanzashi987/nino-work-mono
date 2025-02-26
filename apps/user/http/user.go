@@ -100,13 +100,15 @@ func (c *UserController) ListUser(ctx *gin.Context) {
 }
 
 func (c *UserController) BindUserRoles(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
 	var req userService.BindRoleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		c.AbortClientError(ctx, "[http] user bind roles: Fail to read required fields "+err.Error())
 		return
 	}
 
-	if err := userService.BindUserRoles(ctx, &req); err != nil {
+	if err := userService.BindUserRoles(ctx, userId, &req); err != nil {
 		c.AbortServerError(ctx, "[http] user bind roles: Fail to bind user roles "+err.Error())
 		return
 	}

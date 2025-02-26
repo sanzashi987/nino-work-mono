@@ -3,6 +3,7 @@ package userService
 import (
 	"context"
 
+	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
@@ -139,8 +140,32 @@ type BindRoleRequest struct {
 	RoleIds []uint64 `json:"role_ids"`
 }
 
-func BindUserRoles(ctx context.Context, payload *BindRoleRequest) error {
-	tx := db.NewTx(ctx)
+func BindUserRoles(ctx context.Context, operator uint64, payload *BindRoleRequest) error {
+	result, err := GetUserAdmins(ctx, operator)
+	if err != nil {
+		return err
+	}
+
+	if !result.HasAnyAdmin() {
+		return ErrNopermission
+	}
+
+	hasPermission, err := result.ToPermissionSet()
+	if err != nil {
+		return err
+	}
+
+	tx := result.Tx
+
+	tryToUsePermission, err := dao.FindAllPermissionsWithRoleIds(tx, payload.RoleIds)
+
+	if err != nil {
+		return err
+	}
+
+	if !hasPermission.IsStrictlyContains(tryToUsePermission) {
+		return ErrOutsidepermission
+	}
 
 	toBindUser := &model.UserModel{}
 	toBindUser.Id = payload.UserId

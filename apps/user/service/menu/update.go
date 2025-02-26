@@ -74,7 +74,7 @@ func Update(ctx context.Context, userId uint64, req *UpdateMenuRequest) error {
 		}
 
 		if !hasPermission.IsStrictlyContains(changed) {
-			return errOutsidepermission
+			return userService.ErrOutsidepermission
 		}
 	}
 

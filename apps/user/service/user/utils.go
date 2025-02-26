@@ -2,6 +2,7 @@ package userService
 
 import (
 	"context"
+	"errors"
 
 	"github.com/sanzashi987/nino-work/apps/user/db/dao"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
@@ -187,3 +188,6 @@ func UserIsAdmin(ctx context.Context, userId uint64, appId *uint64) (*AdminData,
 
 	return &data, nil
 }
+
+var ErrNopermission = errors.New("user does not have any admin permission")
+var ErrOutsidepermission = errors.New("user cannot create roles outside the permission range of admined apps")
