@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
 	"github.com/sanzashi987/nino-work/apps/user/service"
+	roleService "github.com/sanzashi987/nino-work/apps/user/service/role"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
@@ -25,7 +26,7 @@ func RegisterRoleRoutes(router gin.IRoutes) {
 }
 
 func (rc *RoleController) createRole(c *gin.Context) {
-	var req service.CreateRoleRequest
+	var req roleService.CreateRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		rc.AbortClientError(c, "[http] createRole: Fail to read required fields: "+err.Error())
 		return
@@ -33,7 +34,7 @@ func (rc *RoleController) createRole(c *gin.Context) {
 
 	userId := c.GetUint64(controller.UserID)
 
-	if err := service.RoleServiceWebImpl.CreateRole(c, userId, req); err != nil {
+	if err := roleService.CreateRole(c, userId, req); err != nil {
 		rc.AbortServerError(c, "[http] createRole: Fail to create role: "+err.Error())
 		return
 	}

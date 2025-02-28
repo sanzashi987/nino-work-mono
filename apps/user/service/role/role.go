@@ -1,4 +1,4 @@
-package service
+package roleService
 
 import (
 	"context"
@@ -15,61 +15,8 @@ type RoleServiceWeb struct{}
 
 var RoleServiceWebImpl *RoleServiceWeb = &RoleServiceWeb{}
 
-// CreateRoleRequest 创建角色请求参数
-type CreateRoleRequest struct {
-	Name          string   `json:"name" binding:"required"`
-	Code          string   `json:"code" binding:"required"`
-	Description   string   `json:"description"`
-	PermissionIds []uint64 `json:"permission_ids"`
-}
-
 var errNopermission = errors.New("user does not have any admin permission")
 var errEmptyPermission = errors.New("no permission to bind")
-
-// 创建角色
-func (r *RoleServiceWeb) CreateRole(ctx context.Context, userId uint64, payload CreateRoleRequest) error {
-	user, tx, err := userService.GetUserRolePermission(ctx, userId)
-	if err != nil {
-		return err
-	}
-
-	if len(user.Roles) == 0 {
-		return errNopermission
-	}
-	if len(payload.PermissionIds) == 0 {
-		return errEmptyPermission
-	}
-
-	tx = tx.Begin()
-
-	// 创建角色
-	newRole := &model.RoleModel{
-		Name:        payload.Name,
-		Code:        payload.Code,
-		Description: payload.Description,
-	}
-
-	if err := tx.Create(newRole).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	permissions := []*model.PermissionModel{}
-
-	for _, pid := range payload.PermissionIds {
-		permission := &model.PermissionModel{}
-		permission.Id = pid
-		permissions = append(permissions, permission)
-	}
-
-	if err := tx.Model(newRole).Association("Permissions").Replace(permissions); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	tx.Commit()
-	return nil
-}
 
 // 获取角色详情
 func (r *RoleServiceWeb) GetRoleDetail(ctx context.Context, roleId uint64) (*model.RoleModel, error) {
@@ -166,7 +113,6 @@ type ListRolesResponse struct {
 	shared.PaginationResponse
 }
 
-// 列出角色
 func (r *RoleServiceWeb) ListRoles(ctx context.Context, userId uint64, payload *shared.PaginationRequest) (*ListRolesResponse, error) {
 	result, err := userService.GetUserAdmins(ctx, userId)
 	if err != nil {
