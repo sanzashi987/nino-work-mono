@@ -2,7 +2,8 @@ import { Settings, Delete } from '@mui/icons-material';
 import { IconButton, Button } from '@mui/material';
 import { useDeps, ManagerShell } from '@nino-work/ui-components';
 import React, { useMemo } from 'react';
-import { listUsers } from '@/api';
+import { listUsers, UserBio } from '@/api';
+import openUserDetail from './detail';
 
 const staticSchema = [
   { label: 'Id', field: 'id' },
@@ -21,9 +22,12 @@ const UserManagement: React.FC = () => {
       headerCellProps: { align: 'center' as const },
       dataCellProps: {
         align: 'center' as const,
-        render: (row: any) => (
+        render: (row: UserBio) => (
           <>
-            <IconButton onClick={() => {}}>
+            <IconButton onClick={() => {
+              openUserDetail(row.id, refresh);
+            }}
+            >
               <Settings />
             </IconButton>
             <IconButton>

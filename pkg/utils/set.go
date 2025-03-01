@@ -21,7 +21,7 @@ func (s *Set[T]) Has(element T) bool {
 }
 
 func (s *Set[T]) IsStrictlyContains(other *Set[T]) bool {
-	if len(s.elements) <= len(other.elements) {
+	if len(s.elements) < len(other.elements) {
 		return false
 	}
 
@@ -81,4 +81,14 @@ func (s *Set[T]) ToSlice() []T {
 		result = append(result, key)
 	}
 	return result
+}
+
+func (s *Set[T]) Debug() {
+	println("--------------------")
+	for key := range s.elements {
+		print(key)
+		print(" ")
+	}
+	println("--------------------")
+
 }

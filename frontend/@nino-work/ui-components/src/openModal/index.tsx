@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({ title, content, onClose, action, contentP
     <OpenModalContext.Provider value={ctx}>
       <Dialog maxWidth="sm" fullWidth {...dialogProps} open>
         {title && <DialogTitle>{title}</DialogTitle>}
-        <DialogContent sx={{ p: 2 }} {...contentProps}>
+        <DialogContent sx={{ px: 2, pb: 0 }} {...contentProps}>
           {contentWithForm}
         </DialogContent>
         <DialogActions>

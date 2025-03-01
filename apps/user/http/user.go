@@ -22,7 +22,8 @@ func RegisterUserRoutes(public, authed gin.IRoutes) {
 	authed.GET("users/info", userController.UserInfo)
 	authed.GET("users/user-roles", userController.GetUserRoles)
 	authed.POST("users/list", userController.ListUser)
-	authed.POST("user/bind-roles", userController.BindUserRoles)
+	authed.POST("users/bind-roles", userController.BindUserRoles)
+	authed.POST("users/create", userController.CreateUserByAdmin)
 }
 
 type UserLoginRequest struct {
@@ -75,6 +76,25 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 
 // 	c.ResponseJson(ctx, &res)
 // }
+
+func (c *UserController) CreateUserByAdmin(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	req := userService.CreateUserRequest{}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user create: Fail to read required fields "+err.Error())
+		return
+	}
+
+	id, err := userService.CreateUserByAdmin(ctx, userId, &req)
+	if err != nil {
+		c.AbortServerError(ctx, "[rpc] user service: Create user error "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, gin.H{"id": id})
+}
 
 func (c *UserController) UserInfo(ctx *gin.Context) {
 
@@ -129,6 +149,11 @@ func (c *UserController) GetUserRoles(ctx *gin.Context) {
 
 	var req struct {
 		UserId uint64 `form:"id" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user get roles: Fail to read required fields "+err.Error())
+		return
 	}
 
 	res, err := userService.GetUserRoles(ctx, userId, req.UserId)

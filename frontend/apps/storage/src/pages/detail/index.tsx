@@ -23,7 +23,7 @@ import {
   ClickAwayListener
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import { loading, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
+import { Empty, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
 import { filesize } from 'filesize';
 import { DATE_TIME_FORMAT } from '@nino-work/shared';
 import {
@@ -161,7 +161,7 @@ const BucketDetail: React.FC = () => {
           </Stack>
         ) : null}
 
-      {!dirContents ? loading
+      {!dirContents ? Empty
         : (
           <>
             <Stack direction="row">
