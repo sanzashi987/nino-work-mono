@@ -15,7 +15,15 @@ type UserController struct {
 	controller.BaseController
 }
 
-var userController = UserController{}
+func RegisterUserRoutes(public, authed gin.IRoutes) {
+	var userController = UserController{}
+
+	public.POST("users/login", userController.UserLogin)
+	authed.GET("users/info", userController.UserInfo)
+	authed.GET("users/user-roles", userController.GetUserRoles)
+	authed.POST("users/list", userController.ListUser)
+	authed.POST("user/bind-roles", userController.BindUserRoles)
+}
 
 type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"`
@@ -113,5 +121,21 @@ func (c *UserController) BindUserRoles(ctx *gin.Context) {
 		return
 	}
 
-	c.ResponseJson(ctx, nil)
+	c.SuccessVoid(ctx)
+}
+
+func (c *UserController) GetUserRoles(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	var req struct {
+		UserId uint64 `form:"id" binding:"required"`
+	}
+
+	res, err := userService.GetUserRoles(ctx, userId, req.UserId)
+	if err != nil {
+		c.AbortServerError(ctx, "[http] user get roles: Fail to get user roles "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, res)
 }

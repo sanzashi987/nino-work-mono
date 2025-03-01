@@ -111,3 +111,14 @@ export const listUsers = defineApi<PagninationRequest, PaginationResponse<UserBi
   url: `${prefix}/users/list`,
   method: 'POST'
 });
+
+export const getUserRoles = defineApi<{ id: string }, Enum[]>({ url: `${prefix}/users/user-roles` });
+
+type BindRoleRequest = {
+  user_id: number
+  role_ids:number[]
+};
+export const bindRoles = defineApi<BindRoleRequest, void>({
+  url: `${prefix}/users/bind-roles`,
+  method: 'POST'
+});

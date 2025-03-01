@@ -22,8 +22,6 @@ type AppController struct {
 	controller.BaseController
 }
 
-var appController = AppController{}
-
 type AppInfo struct {
 	Id          uint64 `json:"id"`
 	Name        string `json:"name"`
@@ -35,6 +33,12 @@ type AppInfo struct {
 type ListAppResponse struct {
 	Data []*AppInfo `json:"data"`
 	shared.PaginationResponse
+}
+
+func RegisterAppRoutes(router gin.IRoutes) {
+	var appController = AppController{}
+	router.POST("apps/list", appController.ListApps)
+	router.POST("apps/create", appController.CreateApp)
 }
 
 func intoAppInfoMeta(app *model.ApplicationModel) *AppInfo {
