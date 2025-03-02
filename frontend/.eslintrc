@@ -117,6 +117,7 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
-    "react/destructuring-assignment": "off"
+    "react/destructuring-assignment": "off",
+    "no-plusplus": "off"
   }
 }

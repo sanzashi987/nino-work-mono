@@ -1,4 +1,4 @@
 packages:
   - 'apps/*'
   - '@nino-work/*'
-  - '@canvas/*'
+  - '@canvix/*'

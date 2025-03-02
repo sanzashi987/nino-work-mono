@@ -1,0 +1,9 @@
+{
+  "name": "@canvix/utils",
+  "private": true,
+  "main": "src/index",
+  "devDependencies": {},
+  "engines": {
+    "node": ">= 18.0"
+  }
+}
