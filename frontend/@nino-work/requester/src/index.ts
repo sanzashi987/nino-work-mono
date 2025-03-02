@@ -8,7 +8,7 @@ export type StandardResponse<T> = {
 export type DefineApiOptions = {
   method?: 'GET' | 'POST' | 'POSTFORM',
   url: string
-  onError?(input?: any): Promise<any>
+  onError?(message: string, payload?:any): Promise<any>
   headers?: Record<string, string>
 };
 
@@ -103,7 +103,7 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
 
     if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
       window.location.href = res.url;
-      return onError();
+      return onError(`Redirected to ${res.url}`);
     }
 
     if (!res.ok) {
@@ -114,7 +114,7 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     const data = await res.json() as StandardResponse<Res>;
 
     if (data.code !== 0) {
-      return onError(data?.msg);
+      return onError(data?.msg, data);
     }
 
     return data.data;
