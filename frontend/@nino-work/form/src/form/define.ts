@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-param-reassign */
 import React from 'react';
 import type { ValueEqualityFn } from '../signal/equality';
 import type { ValidatorRule } from './validators';

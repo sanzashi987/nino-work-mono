@@ -69,8 +69,7 @@ export type ComInfo = {
 } & ComInfoBasic;
 
 export type Identifier = {
-  dashboardId: string;
+  projectId: string;
   comId: string;
-  rakToken?: string;
   panelId: string;
 } & Pick<ComInfo, 'name' | 'version' | 'user' | 'isDebugger'>;

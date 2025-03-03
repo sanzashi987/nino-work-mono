@@ -58,9 +58,9 @@ export type UnifiedRenderOption = Record<string, any> & {
    * be read from the component top-level props `props.chain`.
    */
   nextChain: string;
-} /*  & {
+}; /*  & {
   [exntendableKeys: string]: string;
-} */;
+} */
 export type UnifiedRenderUtil = (opt: UnifiedRenderOption) => ReactNode;
 export type ResponsivePanelUtils = {
   render: UnifiedRenderUtil;
@@ -119,9 +119,9 @@ export type ControllerBasicProps<
   Children,
   OptionProps extends object = object,
 > = {
-  /** `dashboardId` will be used as the uid to make property requests */
-  projectCode: string | null;
-  dashboardId: string;
+  workspaceId: string | null;
+  /** `projectId` will be used as the uid to make property requests */
+  projectId: string;
   config: Config;
   userProps?: Record<string, any>;
   primitiveUtils: PrimitiveUtils<PanelUtils, UtilsOption>;

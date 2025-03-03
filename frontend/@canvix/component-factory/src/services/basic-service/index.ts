@@ -1,4 +1,4 @@
-import { isEmpty } from '@canvas/utilities/lodash';
+import { isEmpty } from '@canvix/utils';
 import ProtoService from '../proto-service';
 import { handler, service } from '../proto-service/annotations';
 import { AnnotationEndpointType } from '../proto-service/types';

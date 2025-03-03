@@ -1,7 +1,7 @@
 import React, { createRef } from 'react';
 import { createMemo, shallowEqual } from '@canvix/utils';
 import { Connector, ConnectorProps } from '@canvix/event-core';
-import { Identifier } from '@canvix/shared';
+import { type Identifier } from '@canvix/shared';
 import type {
   IDConfig,
   FullUtils,
@@ -123,7 +123,7 @@ abstract class Controller<
     const comInfo = this.props.config.com!;
     return {
       ...comInfo,
-      dashboardId: this.props.dashboardId,
+      projectId: this.props.dashboardId,
       comId: this.props.config.id,
       panelId: (this.props as any).panelId
     };
