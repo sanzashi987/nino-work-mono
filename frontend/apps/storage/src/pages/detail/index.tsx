@@ -82,7 +82,6 @@ const BucketDetail: React.FC = () => {
       const next = { files: last.files.concat(), map: { ...last.map } };
       return toAdd.reduce((l, c) => {
         l.files.push(c);
-        // eslint-disable-next-line no-param-reassign
         l.map[c.name] = true;
         return l;
       }, next);

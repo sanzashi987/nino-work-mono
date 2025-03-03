@@ -65,7 +65,7 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
 
   controls: { [K in keyof TValue]: AbstractControl<TValue[K]> };
 
-  override setValue(value: Partial<TRawValue>, options?: Object): void {
+  override setValue(value: Partial<TRawValue>, options?: object): void {
     if (!(value instanceof Array) && typeof value === 'object') {
       Object.keys(value).forEach((name) => {
         const control = this.controls[name];
@@ -79,7 +79,7 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
     }
   }
 
-  override patchValue(value: Partial<TRawValue>, options?: Object): void {
+  override patchValue(value: Partial<TRawValue>, options?: object): void {
     if (value == null) return;
     (Object.keys(value) as Array<keyof TValue>).forEach((name) => {
       const control = (this.controls as any)[name];
@@ -106,7 +106,6 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
   _reduceValue(): Partial<TValue> {
     const acc: Partial<TValue> = {};
     return this._reduceChildren(acc, (last, control, name) => {
-      // eslint-disable-next-line no-param-reassign
       last[name] = control.value;
       return last;
     });

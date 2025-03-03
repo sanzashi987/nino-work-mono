@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import { defaultEquals, ValueEqualityFn } from './equality';
 import { throwInvalidWriteToSignalError } from './errors';
 import {

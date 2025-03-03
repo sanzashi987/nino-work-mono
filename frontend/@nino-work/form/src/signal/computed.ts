@@ -1,5 +1,3 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable no-param-reassign */
 import { defaultEquals, ValueEqualityFn } from './equality';
 import {
   accessProducer,

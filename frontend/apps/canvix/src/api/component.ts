@@ -1,4 +1,4 @@
-import { ApiResponseType, FileType } from '@canvas/utilities';
+import { ApiResponseType, FileType } from '@canvix/shared';
 
 type UpdateComponentPayload = {
   componentCode: string;

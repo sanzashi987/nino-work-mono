@@ -1,0 +1,16 @@
+{
+  "name": "@canvix/component-factory",
+  "version": "0.1.0",
+  "main": "src/index",
+  "dependencies": {
+    "@canvix/shared": "workspace:*",
+    "@canvix/utils": "workspace:*",
+    "immer": "^9.0.1"
+  },
+  "devDependencies": {
+    "react": "^18.3.1"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}

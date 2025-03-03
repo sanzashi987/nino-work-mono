@@ -1,7 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-param-reassign */
 let activeConsumer: ReactiveNode | null = null;
 let inNotificationPhase = false;
 

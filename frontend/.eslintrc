@@ -16,10 +16,10 @@
   ],
   "extends": [
     "airbnb",
-    "airbnb-typescript"
+    "airbnb-typescript",
     // "eslint:recommended",
     // "plugin:react/recommended",
-    // "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "settings": {
     "react": {
@@ -101,6 +101,7 @@
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/comma-dangle": "off",
     "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "max-classes-per-file": "off",
     "max-len": [
       "warn",
@@ -118,6 +119,7 @@
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "react/destructuring-assignment": "off",
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "no-param-reassign": "off"
   }
 }
