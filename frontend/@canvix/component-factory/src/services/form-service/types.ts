@@ -1,10 +1,10 @@
 export type FormUtils =
   | {
-      registerField: (entity: any) => void;
-      getFormValue: () => any;
-      getFormKey: () => string;
-      updateFormValue: (value: any, isEmitEvent?: boolean, path?: Array<string | number>) => void;
-    }
+    registerField: (entity: any) => void;
+    getFormValue: () => any;
+    getFormKey: () => string;
+    updateFormValue: (value: any, isEmitEvent?: boolean, path?: Array<string | number>) => void;
+  }
   | Record<string, any>;
 
 export type FormConfigType = {

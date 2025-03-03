@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type { MutableRefObject, ReactNode } from 'react';
 import type ReactDOM from 'react-dom';
-import type { AxiosStatic } from 'axios';
-import type { BasicAssetParams, ComInfo, FileType } from '@canvas/utilities';
+// import type { BasicAssetParams, ComInfo, FileType } from '@canvas/utilities';
 import type { SandboxRunnerType } from '@canvas/script-sandbox';
+import { ComInfo, FileType } from '@canvix/shared';
 import type { Legacy, FormUtils, Default, Responsive } from '../services/types';
 
 export type PanelOption = {
@@ -20,36 +20,17 @@ export type ScreenOption = {
 };
 export type RenderPanelOption = PanelOption | ScreenOption;
 
-type RenderPanelType = (options: RenderPanelOption) => ReactNode;
-
 type BasicUtils = {
   getDomUtils: {
     createPortal: typeof ReactDOM.createPortal;
-    /**@deprecated from enc-map2d-* 1.1.0 */
+    /** @deprecated from enc-map2d-* 1.1.0 */
     renderPortal: typeof ReactDOM.render;
-    /**@deprecated from enc-map2d-* 1.1.0 */
+    /** @deprecated from enc-map2d-* 1.1.0 */
     unmountPortal: (container: Element) => ReturnType<typeof ReactDOM.unmountComponentAtNode>;
   };
 };
 
-export type LegacyUtils = {
-  /**@deprecated */
-  withContext?: (children: React.ReactNode) => React.ReactNode;
-  /**@deprecated  use local module installed instead */
-  axios: AxiosStatic;
-  ScaleConsumer: React.Consumer<number>;
-};
-
 export type StaticUtils<T> = T & BasicUtils;
-
-export type LegacyPanelUtils = {
-  /** @deprecated use `renderPanel` instead */
-  renderDynamicPanel?: (panelId: string) => ReactNode;
-  /** @deprecated use `renderPanel` instead */
-  renderControlledPanel?: (panelId: string, data: any[]) => ReactNode;
-  renderPanel: RenderPanelType;
-  renderSubCom: (comId: string, userProps: Record<string, any>) => ReactNode;
-};
 
 /**
  * Definition for responsive utils
@@ -86,8 +67,8 @@ export type ResponsivePanelUtils = {
 };
 
 export type UnifiedRenderOptionInsideWrapper = Pick<
-  UnifiedRenderOption,
-  'id' | 'data' | 'userProps'
+UnifiedRenderOption,
+'id' | 'data' | 'userProps'
 > & {
   key: number;
 };
@@ -127,16 +108,16 @@ export type LegacyComUtils = ComUtils & {
 };
 
 export type FullUtils<PanelUtils, UtilsOption> = ComUtils &
-  PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
-    getRuntimeConfig: (config: any) => any;
-  };
+PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
+  getRuntimeConfig: (config: any) => any;
+};
 
 export type ControllerBasicProps<
   Config,
   PanelUtils,
   UtilsOption,
   Children,
-  OptionProps extends {} = {},
+  OptionProps extends object = object,
 > = {
   /** `dashboardId` will be used as the uid to make property requests */
   projectCode: string | null;
@@ -149,9 +130,9 @@ export type ControllerBasicProps<
 
 export type ComponentRuntimeStaticProps<PanelUtils, UtilsOption> = {
   utils: ComUtils &
-    PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
-      containerRef: MutableRefObject<HTMLDivElement | null>;
-    };
+  PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
+    containerRef: MutableRefObject<HTMLDivElement | null>;
+  };
   userProps?: Record<string, any>;
 };
 
@@ -175,19 +156,9 @@ export type BasicStates<Config> = {
   form?: any;
 };
 
-export namespace LegacyController {
-  type Config = Legacy.ConfigTypeSupportedInControllerRuntime;
-  type UtilsOption = LegacyUtils;
-  export type Props = ControllerBasicProps<Config, LegacyPanelUtils, UtilsOption, ReactNode>;
-  export type States = BasicStates<Config>;
-  export type LoaderProps = LoaderRuntimeBasicProps<LegacyPanelUtils, UtilsOption> & States;
-  export type WrapperProps = ControllerCombinedBasicProps<Props, LoaderProps>;
-  export type KeyToNameEntries = [keyof Config, string];
-}
-
 export namespace ResponsiveController {
   export type Config = Responsive.ConfigTypeSupportedInControllerRuntime;
-  type UtilsOption = {};
+  type UtilsOption = object;
   export type OptionProps = {
     chain: string;
     panelId: string;
@@ -196,24 +167,24 @@ export namespace ResponsiveController {
   };
 
   export type Props<Children = ReactNode> = ControllerBasicProps<
-    Config,
-    ResponsivePanelUtils,
-    UtilsOption,
-    Children,
-    OptionProps
+  Config,
+  ResponsivePanelUtils,
+  UtilsOption,
+  Children,
+  OptionProps
   >;
   export type States = BasicStates<Config>;
   export type LoaderProps = LoaderRuntimeBasicProps<
-    ResponsivePanelUtilsInsideWrapper,
-    UtilsOption
+  ResponsivePanelUtilsInsideWrapper,
+  UtilsOption
   > &
-    States & {
-      // nullMode?: boolean;
-      chain: string;
-    };
+  States & {
+    // nullMode?: boolean;
+    chain: string;
+  };
   export type ContainerProps<Children = ReactNode> = ControllerCombinedBasicProps<
-    Props<Children>,
-    LoaderRuntimeBasicProps<ResponsivePanelUtilsInsideWrapper, UtilsOption> & States
+  Props<Children>,
+  LoaderRuntimeBasicProps<ResponsivePanelUtilsInsideWrapper, UtilsOption> & States
   >;
   export type KeyToNameEntries = [keyof Config, string];
   export type ComponentRuntimeProps = Omit<LoaderProps, 'mounted' | 'ref' | 'form'>;

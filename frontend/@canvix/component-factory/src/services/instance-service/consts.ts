@@ -4,7 +4,7 @@ const duration = {
   name: 'duration',
   type: 'number',
   default: 0,
-  description: '动画持续时间',
+  description: '动画持续时间'
 } as const;
 
 export const hide: AnnotationEndpointType = {
@@ -17,16 +17,16 @@ export const hide: AnnotationEndpointType = {
         name: 'type',
         type: 'string',
         default: 'fadeOut',
-        description: '出场动画类',
+        description: '出场动画类'
       },
-      duration,
-    },
-  },
+      duration
+    }
+  }
 };
 
 export const unmount: AnnotationEndpointType = {
   ...hide,
-  description: '卸载会禁用除"显示","隐藏"以外的所有动作事件',
+  description: '卸载会禁用除"显示","隐藏"以外的所有动作事件'
 };
 
 export const display: AnnotationEndpointType = {
@@ -39,11 +39,11 @@ export const display: AnnotationEndpointType = {
         name: 'type',
         type: 'string',
         default: 'fadeIn',
-        description: '入场动画类',
+        description: '入场动画类'
       },
-      duration,
-    },
-  },
+      duration
+    }
+  }
 };
 
 export const toggleVisible: AnnotationEndpointType = {
@@ -53,9 +53,9 @@ export const toggleVisible: AnnotationEndpointType = {
     type: 'object',
     children: {
       display: display.fields!,
-      hide: hide.fields!,
-    },
-  },
+      hide: hide.fields!
+    }
+  }
 };
 
 export const init: AnnotationEndpointType = {
@@ -63,9 +63,7 @@ export const init: AnnotationEndpointType = {
     name: '实例',
     description: "如逻辑节点的'设置实例'动作\"",
     type: 'pair',
-    pairType: 'instance',
+    pairType: 'instance'
   },
-  describer: {
-    pairType: 'instance',
-  },
+  describer: { pairType: 'instance' }
 };

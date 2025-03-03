@@ -4,6 +4,7 @@
   "main": "src/index",
   "dependencies": {
     "@canvix/shared": "workspace:*",
+    "@canvix/event-core": "workspace:*",
     "@canvix/utils": "workspace:*",
     "immer": "^9.0.1"
   },

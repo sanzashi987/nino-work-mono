@@ -67,3 +67,10 @@ export type ComInfo = {
    */
   isDebugger?: boolean;
 } & ComInfoBasic;
+
+export type Identifier = {
+  dashboardId: string;
+  comId: string;
+  rakToken?: string;
+  panelId: string;
+} & Pick<ComInfo, 'name' | 'version' | 'user' | 'isDebugger'>;

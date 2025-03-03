@@ -38,6 +38,9 @@ importers:
 
   '@canvix/component-factory':
     dependencies:
+      '@canvix/event-core':
+        specifier: workspace:*
+        version: link:../event-core
       '@canvix/shared':
         specifier: workspace:*
         version: link:../shared
@@ -75,10 +78,16 @@ importers:
 
   '@canvix/utils':
     dependencies:
+      lodash.isempty:
+        specifier: ^4.4.0
+        version: 4.4.0
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
     devDependencies:
+      '@types/lodash.isempty':
+        specifier: ^4.4.9
+        version: 4.4.9
       '@types/lodash.merge':
         specifier: ^4.6.9
         version: 4.6.9
@@ -2955,6 +2964,12 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  /@types/lodash.isempty@4.4.9:
+    resolution: {integrity: sha512-DPSFfnT2JmZiAWNWOU8IRZws/Ha6zyGF5m06TydfsY+0dVoQqby2J61Na2QU4YtwiZ+moC6cJS6zWYBJq4wBVw==}
+    dependencies:
+      '@types/lodash': 4.17.16
+    dev: true
 
   /@types/lodash.merge@4.6.9:
     resolution: {integrity: sha512-23sHDPmzd59kUgWyKGiOMO2Qb9YtqRO/x4IhkgNUiPQ1+5MUVqi6bCZeq9nBJ17msjIMbEIO5u+XW4Kz6aGUhQ==}
@@ -6663,6 +6678,10 @@ packages:
 
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
+    dev: false
+
+  /lodash.isempty@4.4.0:
+    resolution: {integrity: sha512-oKMuF3xEeqDltrGMfDxAPGIVMSSRv8tbRSODbrs4KGsRRLEhrW8N8Rd4DRgB2+621hY8A8XwwrTVhXWpxFvMzg==}
     dev: false
 
   /lodash.memoize@4.1.2:

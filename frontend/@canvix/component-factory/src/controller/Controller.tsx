@@ -1,6 +1,7 @@
 import React, { createRef } from 'react';
-import { createMemo, shallowEqual, Identifier } from '@canvas/utilities';
+import { createMemo, shallowEqual } from '@canvix/utils';
 import { Connector, ConnectorProps } from '@canvix/event-core';
+import { Identifier } from '@canvix/shared';
 import type {
   IDConfig,
   FullUtils,
@@ -11,11 +12,11 @@ import type {
 } from './types';
 import { typeToService, ServiceComponent } from '../services';
 
-export function parseConfig(typeToService: Record<string, ServiceComponent>, config: any) {
-  return Object.keys(typeToService)
+export function parseConfig(serviceMap: Record<string, ServiceComponent>, config: any) {
+  return Object.keys(serviceMap)
     .sort()
     .filter((key) => !!config[key])
-    .map((key) => typeToService[key]);
+    .map((key) => serviceMap[key]);
 }
 
 export abstract class ServiceConnector<P extends IDConfig, S extends IDConfig> extends Connector<
@@ -70,7 +71,6 @@ S
   renderServices() {
     return this.runtimeServices.map((Service) => (
       <Service
-        // @ts-ignores
         selfRef={this.serviceRef[Service.serviceName]}
         key={Service.configKey}
         $emit={this.scopedEmit}
@@ -91,8 +91,8 @@ abstract class Controller<
   PanelUtils,
   UtilsOption,
   Children,
-  OptionProps extends {} = {},
-  PanelUtilsRuntime extends {} = {},
+  OptionProps extends object = object,
+  PanelUtilsRuntime extends object = object,
 > extends ServiceConnector<
   ControllerBasicProps<Config, PanelUtils, UtilsOption, Children, OptionProps>,
   BasicStates<Config>
@@ -117,10 +117,7 @@ abstract class Controller<
     }
   );
 
-  protected constantProps; /* : Omit<
-    LoaderRuntimeBasicProps<PanelUtils, UtilsOption>,
-    'userProps' | 'config'
-  >; */
+  protected constantProps;
 
   getIdentifier() {
     const comInfo = this.props.config.com!;
