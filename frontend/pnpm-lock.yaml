@@ -41,6 +41,9 @@ importers:
       '@canvix/event-core':
         specifier: workspace:*
         version: link:../event-core
+      '@canvix/script-sandbox':
+        specifier: workspace:*
+        version: link:../script-sandbox
       '@canvix/shared':
         specifier: workspace:*
         version: link:../shared
@@ -73,6 +76,12 @@ importers:
       react:
         specifier: ^18.3.1
         version: 18.3.1
+
+  '@canvix/script-sandbox':
+    dependencies:
+      '@canvix/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   '@canvix/shared': {}
 

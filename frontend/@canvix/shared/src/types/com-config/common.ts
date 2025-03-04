@@ -1,4 +1,4 @@
-import type { FileType } from '../data-source';
+import type { FileType } from '../services';
 
 export type IDConfig = {
   config: { id: string };

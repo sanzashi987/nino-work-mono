@@ -6,12 +6,14 @@ import {
   NativeConnectableContextType,
   PostMethodType,
   PushMethodType,
-  ServiceHostInstance,
+  ServiceHostInstance
 } from '../types';
 
 class InteractionService extends CommonInteraction {
   bridgeId;
+
   instanceId;
+
   channel;
 
   constructor(
@@ -20,7 +22,7 @@ class InteractionService extends CommonInteraction {
       globalMeta: NativeConnectableContextType;
     }>,
     post: PostMethodType<InteractionPayloadType>,
-    push: PushMethodType<InteractionInputPayloadType>,
+    push: PushMethodType<InteractionInputPayloadType>
   ) {
     super(scope, post, push);
     const { getProcessEnv } = scope.props.globalMeta;
@@ -32,8 +34,7 @@ class InteractionService extends CommonInteraction {
     this.push = (id, payload) => {
       const { targetDescriber, target, targetNode, value } = payload.data;
       // flutter env specific logic
-      if (targetDescriber?.useChannel[platform] === true)
-        return this.sendMessageToNative(targetNode, target, value);
+      if (targetDescriber?.useChannel[platform] === true) return this.sendMessageToNative(targetNode, target, value);
       push(id, payload);
     };
 
@@ -57,8 +58,8 @@ class InteractionService extends CommonInteraction {
     this.channel.postMessage(
       JSON.stringify({
         type: 'message',
-        value: { instanceId: this.instanceId, node: nodeAlias, handler: handlerId, params },
-      }),
+        value: { instanceId: this.instanceId, node: nodeAlias, handler: handlerId, params }
+      })
     );
   };
 
@@ -67,4 +68,4 @@ class InteractionService extends CommonInteraction {
   }
 }
 
-export { InteractionService as InteractionService };
+export { InteractionService };

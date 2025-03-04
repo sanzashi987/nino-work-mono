@@ -1,4 +1,4 @@
-import type { ConfigType } from '../responsive/config';
+import type { ConfigType } from '../com-config/responsive';
 import type { TargetPlatformSpecifier } from './platform';
 
 type MappingTargetType = 'number' | 'string' | 'boolean';

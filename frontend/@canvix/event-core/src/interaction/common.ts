@@ -10,7 +10,7 @@ import type {
   PushMethodType,
   EdgeBasic,
   ConnectableContextType,
-  ServiceHostInstance,
+  ServiceHostInstance
 } from '../types';
 import type { ConnectorCore } from '../channel';
 
@@ -30,7 +30,7 @@ function composeEdge({
 
 function getSubscribers(
   publisher: SourceDesciption,
-  subMap: Map<string, TargetDescription[]>,
+  subMap: Map<string, TargetDescription[]>
 ): TargetDescription[] {
   const identifier = genIdentifier(publisher);
   return subMap.has(identifier) ? subMap.get(identifier)! : [];
@@ -38,13 +38,18 @@ function getSubscribers(
 
 class InteractionService implements PanelServiceInstance<InteractionPayloadType> {
   static $name = 'interaction';
+
   static $supportedEvents = /^(\w+\.)+\w+$/;
+
   static $responsive = true;
+
   // static $enhancer = InteractionEnhancer;
   static defaultEdgeDescriber: [string, TargetDescription[]][] = ENABLE_REFLECT_PANEL;
 
   private sourceTargetMap = new Map<string, TargetDescription[]>();
+
   private interactionConfig!: ConnectableContextType['interaction'];
+
   private dashboardComponents!: ConnectableContextType['components'];
 
   constructor(
@@ -52,7 +57,7 @@ class InteractionService implements PanelServiceInstance<InteractionPayloadType>
       panelMeta: ConnectableContextType;
     }>,
     private post: PostMethodType<InteractionPayloadType>,
-    protected push: PushMethodType<InteractionInputPayloadType>,
+    protected push: PushMethodType<InteractionInputPayloadType>
   ) {
     this.updateConfig();
   }
@@ -78,7 +83,7 @@ class InteractionService implements PanelServiceInstance<InteractionPayloadType>
         const outPayload = { ...subscriber, value: payload.value };
         this.push(subscriber.targetNode, {
           type: InteractionService.$name,
-          data: outPayload,
+          data: outPayload
         });
       });
   }
@@ -89,8 +94,8 @@ class InteractionService implements PanelServiceInstance<InteractionPayloadType>
       data: {
         value,
         source: eventName,
-        sourceNode: id,
-      },
+        sourceNode: id
+      }
     };
     this.post(payload);
   };

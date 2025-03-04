@@ -1,4 +1,4 @@
-import type { Identifier } from '../../common';
+import type { Identifier } from '../../com-config';
 import type { SourceType } from './source-type';
 
 // Data config types
