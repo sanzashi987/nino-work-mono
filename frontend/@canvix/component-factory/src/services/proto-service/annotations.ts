@@ -1,9 +1,8 @@
 import type {
-  FieldsType,
   HandlerCollectionVal,
   EventCollection,
   ServiceComponent,
-  AnnotationEndpointType,
+  AnnotationEndpointType
 } from './types';
 
 export const typeToService: Record<string, ServiceComponent> = {};
@@ -26,7 +25,7 @@ export function service(serviceName: string, configKey: string, supportTypes = [
   return function (ctor: any) {
     Object.defineProperties(ctor, {
       configKey: { value: configKey, writable: false },
-      serviceName: { value: serviceName, writable: false },
+      serviceName: { value: serviceName, writable: false }
     });
 
     // supportTypes.forEach((type) => {
@@ -44,27 +43,26 @@ export function service(serviceName: string, configKey: string, supportTypes = [
  * explicitly annotate the handler, and write to the service static variable `handlers`
  * Usage:
  * ```
- * import { handler, service } from 'proto-service/annotations'
+ * import { action, service } from 'proto-service/annotations'
  *
  * @service('DataService', configKey)
  * class DataService extends ProtoService{
- *   @handler('ActionToBeTirggered', false, dataRawType)
- *   public handler(){}
+ *   @action('ActionToBeTirggered', false, dataRawType)
+ *   public action(){}
  * }
  * ```
  * @param name The name (mostly in locale language) for the handler
  * @param fields Defines the handler argument in type
  * @param isPublic Flag that defines the handler will be exported as global handler
  */
-export function handler(name: string, endpoint: AnnotationEndpointType, isPublic = true): any {
+export function action(name: string, endpoint: AnnotationEndpointType, isPublic = true): any {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
-    if (!target.constructor.handlers)
-      target.constructor.handlers = new Map<string, HandlerCollectionVal>();
+    if (!target.constructor.handlers) target.constructor.handlers = new Map<string, HandlerCollectionVal>();
     target.constructor.handlers.set(`${methodName}`, {
       name,
       action: descriptor.value,
       isPublic,
-      ...endpoint,
+      ...endpoint
     });
   };
 }
@@ -102,12 +100,12 @@ export function event(name: string, endpoint: AnnotationEndpointType, isPublic =
       value: propertyName,
       configurable: false,
       writable: false,
-      enumerable: false,
+      enumerable: false
     });
   };
 }
 
 /** 用于画布编辑器以及预览面板中动态改数据服务 */
-export function updateTypeToService(configKey: string, service: ServiceComponent) {
-  typeToService[configKey] = service;
+export function updateTypeToService(configKey: string, serv: ServiceComponent) {
+  typeToService[configKey] = serv;
 }

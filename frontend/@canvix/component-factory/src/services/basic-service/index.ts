@@ -1,6 +1,6 @@
 import { isEmpty } from '@canvix/utils';
 import ProtoService from '../proto-service';
-import { handler, service } from '../proto-service/annotations';
+import { action, service } from '../proto-service/annotations';
 import { AnnotationEndpointType } from '../proto-service/types';
 // import { ExportAction, ProtoService, ServiceInit } from '../proto-service';
 // import type { ServiceDefaultProps, GetIdentifierType } from '../proto-service';
@@ -55,7 +55,7 @@ const SPRING_CONFIG_KEYS: Record<string, boolean> = {
 
 @service('basic', 'basic')
 class BasicService extends ProtoService {
-  @handler('设置基础属性', BasicValueType)
+  @action('设置基础属性', BasicValueType)
     setBasic = (basicValue: Record<string, any>) => {
     // detect new keys
       if (

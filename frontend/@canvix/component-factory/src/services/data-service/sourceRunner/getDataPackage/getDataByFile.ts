@@ -1,26 +1,23 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { IdentifierSource, ApiReturnType, GetValueEntryType } from '@canvix/shared';
 import { getErrorInfo } from './utils';
 import { canvasApiService } from '../../constants';
 import { post } from '../../requestService';
-import type { GetValueEntryType, ApiReturnType, IdentifierSource } from '../../types';
 
 const queryDataBySourceId = (
   sourceId: string,
   identifier: IdentifierSource,
-  config: AxiosRequestConfig = {},
-): Promise<any> => {
-  return post(
-    `${canvasApiService}/canvas-pro-mobile/V1/source-connect/getData?sourceId=${sourceId}&screenId=${identifier.dashboardId}&rak-token=${identifier.rakToken}`,
-    {},
-    config,
-  );
-};
+  config: object = {}
+): Promise<any> => post(
+  `${canvasApiService}/canvas-pro-mobile/V1/source-connect/getData?sourceId=${sourceId}&screenId=${identifier.projectId}`,
+  {},
+  config
+);
 
 async function getData(
   params: Record<string, any>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   identifier: IdentifierSource,
-  config: AxiosRequestConfig,
+  config: object
 ): Promise<ApiReturnType> {
   try {
     const res = await queryDataBySourceId(params.sourceId, identifier, config);
@@ -36,7 +33,7 @@ async function getData(
 const getDataByFile: GetValueEntryType<{ sourceId: string }> = async (
   source,
   identifier,
-  config,
+  config
 ) => {
   const { sourceId } = source;
   if (!sourceId) return { needUpdate: false, output: [] };

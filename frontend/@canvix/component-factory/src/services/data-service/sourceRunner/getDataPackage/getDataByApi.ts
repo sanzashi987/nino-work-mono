@@ -1,45 +1,35 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { ApiReturnType, GetValueEntryType, IdentifierSource, RequestApi } from '@canvix/shared';
 import { getErrorInfo } from './utils';
 import { canvasApiService } from '../../constants';
 import requestService, { post } from '../../requestService';
-import type { GetValueEntryType, ApiReturnType, IdentifierSource } from '../../types';
 
-export type RequestApi = {
-  sourceId: string;
-  body?: Record<string, any>;
-  headers?: Record<string, any>;
-  querys?: Record<string, any>;
-  path?: Record<string, any>;
-};
 type RequestType = 'get' | 'put' | 'post';
 const defaultApiParams: Omit<RequestApi, 'sourceId'> = {
   body: {},
   headers: {},
   querys: {},
-  path: {},
+  path: {}
 };
 
 const requestApi = (
   params: RequestApi,
   identifier: IdentifierSource,
-  config: AxiosRequestConfig = {},
-): Promise<any> => {
-  return post(
-    `${canvasApiService}/canvas-pro-mobile/V1/facade/request-api?screenId=${identifier.dashboardId}`,
-    params,
-    config,
-  );
-};
+  config: any = {}
+): Promise<any> => post(
+  `${canvasApiService}/canvas-pro-mobile/V1/facade/request-api?screenId=${identifier.projectId}`,
+  params,
+  config
+);
 
 async function getData(
   source: RequestApi,
   identifier: IdentifierSource,
-  config: AxiosRequestConfig,
+  config: any
 ): Promise<ApiReturnType> {
   try {
     const params = {
       ...defaultApiParams,
-      ...source,
+      ...source
     };
     const res = await requestApi(params, identifier, config);
     const { resultCode, data, resultMessage } = res;
@@ -59,7 +49,7 @@ async function getData(
         ...config,
         headers: { ...config.headers, ...params.headers },
         // data: params.body ?? {},
-        params: params.querys ?? {},
+        params: params.querys ?? {}
       });
       return { needUpdate: true, output: apiRes };
     } catch (e) {
@@ -75,7 +65,7 @@ async function getData(
 const getDataByApi: GetValueEntryType<{ sourceId: string }> = async (
   source,
   identifier,
-  config,
+  config
 ) => {
   const { sourceId } = source;
   if (!sourceId) return { needUpdate: false, output: [] };

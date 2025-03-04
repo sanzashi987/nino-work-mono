@@ -1,8 +1,9 @@
-import { AnnotationEndpointType, FieldsType } from '../proto-service/types';
+import type { AnnotationEndpointType } from '../proto-service/types';
 
 const systemFunction: Record<string, { label: string; content: string }> = {
   required: {
     label: '必填',
+    // eslint-disable-next-line max-len
     content: 'const type = Object.prototype.toString.call(value).slice(8, - 1).toLocaleLowerCase();\r\nif (type === "array") return value && value.length > 0;\r\nif (type === "number") return value || value === 0;\r\nreturn value;'
   },
   number: {

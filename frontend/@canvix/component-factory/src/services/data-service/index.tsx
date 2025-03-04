@@ -2,12 +2,12 @@ import React from 'react';
 import type { DataResponseType } from './types';
 import SourceRunnerWrapper from './sourceRunner';
 import ProtoService from '../proto-service';
-import { event, handler, service } from '../proto-service/annotations';
+import { event, action, service } from '../proto-service/annotations';
 import type {
   EventCollection,
   HandlerCollection,
   EndpointType,
-  AnnotationEndpointType,
+  AnnotationEndpointType
 } from '../proto-service/types';
 
 const dataRawType: AnnotationEndpointType = {
@@ -15,17 +15,17 @@ const dataRawType: AnnotationEndpointType = {
   fields: {
     type: 'array',
     name: 'data',
-    default: '$configData',
-  },
+    default: '$configData'
+  }
 };
 
 const dataFailureType: AnnotationEndpointType = {
   description: '标准数据为对象数组',
   fields: {
     type: 'any',
-    name: 'error',
+    name: 'error'
     // default: '$',
-  },
+  }
 };
 const IObjectType: AnnotationEndpointType = {
   description: '设置提供给过滤器的额外字段, 以非嵌套对象的形式提供',
@@ -35,10 +35,10 @@ const IObjectType: AnnotationEndpointType = {
     children: {
       任意字段: {
         type: 'any',
-        name: '任意字段',
-      },
-    },
-  },
+        name: '任意字段'
+      }
+    }
+  }
 };
 
 const linkValueType: AnnotationEndpointType = {
@@ -46,14 +46,14 @@ const linkValueType: AnnotationEndpointType = {
   fields: {
     type: 'object',
     name: 'source',
-    default: '$sourceConfig',
-  },
+    default: '$sourceConfig'
+  }
 };
 
 function getEndpointFromPackage(
   collection: HandlerCollection | EventCollection,
   prefix: string,
-  packageJSON: Record<string, any>,
+  packageJSON: Record<string, any>
 ) {
   const { apis } = packageJSON;
   const template = [...collection.entries()];
@@ -71,7 +71,7 @@ function getEndpointFromPackage(
          */
         id: `${prefix}.${actionName}.${sourceName}`,
         ...desc,
-        name: desc.name.replace('${}', name),
+        name: desc.name.replace('${}', name)
       });
     });
   });
@@ -85,7 +85,7 @@ class DataService extends ProtoService {
   static getComponentActions(
     actions: HandlerCollection,
     serviceName: string,
-    packageJSON: Record<string, any>,
+    packageJSON: Record<string, any>
   ) {
     return getEndpointFromPackage(actions, serviceName, packageJSON);
   }
@@ -93,73 +93,69 @@ class DataService extends ProtoService {
   static getComponentEvents(
     events: EventCollection,
     serviceName: string,
-    packageJSON: Record<string, any>,
+    packageJSON: Record<string, any>
   ) {
     return getEndpointFromPackage(events, serviceName, packageJSON);
   }
 
   subSources;
+
   handlerForward;
+
   $scopedEmit;
 
   constructor(props: ProtoService['props']) {
     super(props);
     this.subSources = Object.fromEntries(
-      Object.keys(props.config).map((key) => [key, React.createRef<any>()]),
+      Object.keys(props.config).map((key) => [key, React.createRef<any>()])
     );
     this.handlerForward = Object.fromEntries(
       handlers.map((key) => [
         key,
         Proxy.revocable(
           {},
-          {
-            get: (target, sourceName: string) => this.subSources[sourceName].current?.[key],
-          },
-        ),
-      ]),
+          { get: (target, sourceName: string) => this.subSources[sourceName].current?.[key] }
+        )
+      ])
     );
     this.$scopedEmit = this.$emit.bind(this);
   }
 
   setData = (sourceName: string, data: Record<string, any>[]) => {
-    this.props.setState((prev: any) => {
-      return { data: { ...prev.data, [sourceName]: data } };
-    });
+    this.props.setState((prev: any) => ({ data: { ...prev.data, [sourceName]: data } }));
   };
 
   @event('数据更新完成时(${})', dataRawType)
-  dataUpdated = 'dataUpdated';
+    dataUpdated = 'dataUpdated';
 
   @event('数据更新失败时(${})', dataFailureType)
-  dataFailure = 'dataFailure';
+    dataFailure = 'dataFailure';
 
-  @handler('设置数据(${})', dataRawType)
+  @action('设置数据(${})', dataRawType)
   get setDataRaw() {
-    return this.handlerForward['setDataRaw']?.proxy;
+    return this.handlerForward.setDataRaw?.proxy;
   }
 
-  @handler('请求数据(${})', linkValueType)
+  @action('请求数据(${})', linkValueType)
   get fetchData() {
-    return this.handlerForward['fetchData']?.proxy;
+    return this.handlerForward.fetchData?.proxy;
   }
 
-  @handler('调用过滤器(${})', IObjectType)
+  @action('调用过滤器(${})', IObjectType)
   get invokeFilter() {
-    return this.handlerForward['invokeFilter']?.proxy;
+    return this.handlerForward.invokeFilter?.proxy;
   }
 
-  @handler('设置所有数据', dataRawType, false)
-  setDataAll = (data: any) => {
-    Object.values(this.subSources).forEach((e) => {
-      e.current?.setDataRaw(data);
-    });
-  };
+  @action('设置所有数据', dataRawType, false)
+    setDataAll = (data: any) => {
+      Object.values(this.subSources).forEach((e) => {
+        e.current?.setDataRaw(data);
+      });
+    };
 
   get dataResponse(): DataResponseType {
     return Object.fromEntries(
-      Object.entries(this.subSources).map(([k, v]) => {
-        return [k, v.current.getDataResponse?.()];
-      }),
+      Object.entries(this.subSources).map(([k, v]) => [k, v.current.getDataResponse?.()])
     ) as DataResponseType;
   }
 
@@ -182,9 +178,9 @@ class DataService extends ProtoService {
   }
 
   componentWillUnmount() {
-    for (const key in this.handlerForward) {
+    Object.keys(this.handlerForward).forEach((key) => {
       this.handlerForward[key].revoke();
-    }
+    });
     this.handlerForward = {};
   }
 }

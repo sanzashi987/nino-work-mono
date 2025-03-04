@@ -1,13 +1,13 @@
-import { isEqual } from '@canvas/utilities/lodash';
-import sandbox from '@canvas/script-sandbox';
-import { GEN_UID } from '@canvas/utilities';
-import { SourceType } from '@canvas/types';
+/* eslint-disable no-await-in-loop */
+import sandbox from '@canvix/script-sandbox';
+import { uuid, isEqual } from '@canvix/utils';
+import type { IdentifierSource, SourceConfigRuntime, SourceRunnerProps } from '@canvix/shared';
+import { SourceType } from '@canvix/shared';
 import * as getDataPack from './getDataPackage';
 import RefreshTimer from '../requester/refreshTimer';
 import LinkList, { LinkNode } from '../utils/linkList';
 import { genCancelToken } from '../requestService';
 import { RES_ERR_NOT_FOUND, FILTER_ERR_TYPE_DISMATCH, MAPPING_ERR } from '../constants';
-import { IdentifierSource, SourceConfigRuntime, SourceRunnerProps } from '../types';
 import type { GetIdentifierType } from '../../proto-service/types';
 
 function sourceType2Method(sourceType: SourceType) {
@@ -33,10 +33,13 @@ class BaseSourceRunner {
   cancelToken: ReturnType<typeof genCancelToken> | null = null;
 
   dataRaw: Record<string, any>[] = [];
+
   dataFiltered: any;
+
   dataMapped: Record<string, any>[] = [];
 
   sourceOverrideCache: Record<string, any> = {};
+
   filterExternalCache: Record<string, any> = {};
 
   constructor(public props: SourceRunnerProps, public getIdentifier: GetIdentifierType) {}
@@ -58,7 +61,7 @@ class BaseSourceRunner {
     this.handleError(errorMessage);
   }
 
-  async *processData() {
+  async* processData() {
     yield this.filterData();
     yield this.mapData();
     this.notifyController();
@@ -87,7 +90,7 @@ class BaseSourceRunner {
   handleError(err: any = {}): void {
     this.props.$emit(this.dataFailureEvent, {
       sourceName: this.props.sourceName,
-      error: JSON.parse(JSON.stringify(err)),
+      error: JSON.parse(JSON.stringify(err))
     });
     this.props.$emit('throwError', err);
   }
@@ -100,10 +103,7 @@ class BaseSourceRunner {
     this.cancelToken = genCancelToken();
     const method = sourceType2Method(type);
     try {
-      const res = await method(source, identifier, {
-        cancelToken: this.cancelToken.token,
-        headers: { 'X-Gw-Accesskey': identifier.rakToken || '' },
-      });
+      const res = await method(source, identifier, { cancelToken: this.cancelToken.token });
       this.cancelToken = null;
       return res;
     } catch (e) {
@@ -119,13 +119,17 @@ class BaseSourceRunner {
     this.sourceOverrideCache = { ...this.sourceOverrideCache, ...(sourceValue ?? {}) };
     const sourceOverridden = { ...source, ...this.sourceOverrideCache };
     const originalData = source ? await this.pendingRequest(sourceOverridden, identifier) : null;
-    if (!originalData) return this.handleError(RES_ERR_NOT_FOUND);
+    if (!originalData) {
+      this.handleError(RES_ERR_NOT_FOUND);
+      return;
+    }
     const { needUpdate, output, error } = originalData;
     this.dataRaw = output as Record<string, any>[];
     if (!needUpdate) {
       // TODO output as the hint , error indicates the error type predefined
       this.dataMapped = error as any;
-      return this.handleError(error);
+      this.handleError(error);
+      return;
     }
     // this.processData();
     this.runProcessData();
@@ -145,7 +149,7 @@ class BaseSourceRunner {
         dataFiltered = await sandbox.runInSandbox({
           args: ['data', 'externalValue', filterStr],
           argsValue: [dataFiltered, this.filterExternalCache],
-          id: `${comId}@component_filter_${GEN_UID()}`,
+          id: `${comId}@component_filter_${uuid()}`
         });
       } catch (e) {
         this.dataFiltered = dataFiltered;
@@ -174,8 +178,8 @@ class BaseSourceRunner {
 
         for (const [mapKey, mapValue] of mapRules) {
           if (mapValue && Reflect.has(v.node, mapValue as string)) {
-            v.node[mapValue as string] !== undefined &&
-              (objItem[mapKey] = v.node[mapValue as string]);
+            v.node[mapValue as string] !== undefined
+              && (objItem[mapKey] = v.node[mapValue as string]);
           } else {
             objItem[mapKey] !== undefined && (objItem[mapKey] = v.node[mapKey]);
           }
@@ -210,7 +214,7 @@ class BaseSourceRunner {
     if (autoUpdate) {
       this.timer.setTimerForTarget({
         promiseMethod: this.fetchData,
-        times: autoUpdate * 1000,
+        times: autoUpdate * 1000
       })();
     } else {
       this.fetchData();

@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type { MutableRefObject, ReactNode } from 'react';
-import type ReactDOM from 'react-dom';
 // import type { BasicAssetParams, ComInfo, FileType } from '@canvas/utilities';
-import type { SandboxRunnerType } from '@canvas/script-sandbox';
-import { ComInfo, FileType } from '@canvix/shared';
-import type { Legacy, FormUtils, Default, Responsive } from '../services/types';
+import type { ConfigTypeSupportedInControllerRuntime, SandboxRunnerType } from '@canvix/shared';
 
 export type PanelOption = {
   panelId: string;
@@ -19,18 +16,6 @@ export type ScreenOption = {
   comId: string;
 };
 export type RenderPanelOption = PanelOption | ScreenOption;
-
-type BasicUtils = {
-  getDomUtils: {
-    createPortal: typeof ReactDOM.createPortal;
-    /** @deprecated from enc-map2d-* 1.1.0 */
-    renderPortal: typeof ReactDOM.render;
-    /** @deprecated from enc-map2d-* 1.1.0 */
-    unmountPortal: (container: Element) => ReturnType<typeof ReactDOM.unmountComponentAtNode>;
-  };
-};
-
-export type StaticUtils<T> = T & BasicUtils;
 
 /**
  * Definition for responsive utils
@@ -77,19 +62,8 @@ export type ResponsivePanelUtilsInsideWrapper = {
   render: (opt: UnifiedRenderOptionInsideWrapper) => ReactNode;
 };
 
-export type PrimitiveUtils<PanelUtils, T = LegacyUtils> = {
-  general: PanelUtils & StaticUtils<T>;
-};
-
-export type IDConfig = {
-  config: Default & { type: FileType };
-};
-
-export type IDComConfig = {
-  config: Default & {
-    type: FileType;
-    com?: ComInfo;
-  };
+export type PrimitiveUtils<PanelUtils> = {
+  general: PanelUtils
 };
 
 export type ComUtils = {
@@ -97,25 +71,16 @@ export type ComUtils = {
   getAssetsUrl: (fileName: string) => string;
   $emit: (name: string, payload: any) => void;
   runInSandbox: SandboxRunnerType;
-  // TODO getUpdateInput
 };
 
-export type LegacyComUtils = ComUtils & {
-  formUtils: {
-    context: React.Context<FormUtils>;
-    form?: FormUtils;
-  };
-};
-
-export type FullUtils<PanelUtils, UtilsOption> = ComUtils &
-PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
+export type FullUtils<PanelUtils> = ComUtils &
+PrimitiveUtils<PanelUtils>['general'] & {
   getRuntimeConfig: (config: any) => any;
 };
 
 export type ControllerBasicProps<
   Config,
   PanelUtils,
-  UtilsOption,
   Children,
   OptionProps extends object = object,
 > = {
@@ -124,22 +89,22 @@ export type ControllerBasicProps<
   projectId: string;
   config: Config;
   userProps?: Record<string, any>;
-  primitiveUtils: PrimitiveUtils<PanelUtils, UtilsOption>;
+  primitiveUtils: PrimitiveUtils<PanelUtils>;
   children?: Children;
 } & OptionProps;
 
-export type ComponentRuntimeStaticProps<PanelUtils, UtilsOption> = {
+export type ComponentRuntimeStaticProps<PanelUtils> = {
   utils: ComUtils &
-  PrimitiveUtils<PanelUtils, UtilsOption>['general'] & {
+  PrimitiveUtils<PanelUtils>['general'] & {
     containerRef: MutableRefObject<HTMLDivElement | null>;
   };
   userProps?: Record<string, any>;
 };
 
-export type LoaderRuntimeBasicProps<PanelUtils, UtilsOption> = {
+export type LoaderRuntimeBasicProps<PanelUtils> = {
   ref: MutableRefObject<any>;
   mounted: () => void;
-} & ComponentRuntimeStaticProps<PanelUtils, UtilsOption>;
+} & ComponentRuntimeStaticProps<PanelUtils>;
 
 type ControllerCombinedBasicProps<ControllerProps extends { config: any }, ComRuntimeProps> = {
   ready: boolean;
@@ -152,13 +117,10 @@ type ControllerCombinedBasicProps<ControllerProps extends { config: any }, ComRu
 export type BasicStates<Config> = {
   config: Config;
   data?: any;
-  /** @deprecated */
-  form?: any;
 };
 
 export namespace ResponsiveController {
-  export type Config = Responsive.ConfigTypeSupportedInControllerRuntime;
-  type UtilsOption = object;
+  export type Config = ConfigTypeSupportedInControllerRuntime;
   export type OptionProps = {
     chain: string;
     panelId: string;
@@ -169,22 +131,15 @@ export namespace ResponsiveController {
   export type Props<Children = ReactNode> = ControllerBasicProps<
   Config,
   ResponsivePanelUtils,
-  UtilsOption,
   Children,
   OptionProps
   >;
   export type States = BasicStates<Config>;
-  export type LoaderProps = LoaderRuntimeBasicProps<
-  ResponsivePanelUtilsInsideWrapper,
-  UtilsOption
-  > &
-  States & {
-    // nullMode?: boolean;
-    chain: string;
-  };
+  export type LoaderProps = LoaderRuntimeBasicProps<ResponsivePanelUtilsInsideWrapper> &
+  States & { chain: string; };
   export type ContainerProps<Children = ReactNode> = ControllerCombinedBasicProps<
   Props<Children>,
-  LoaderRuntimeBasicProps<ResponsivePanelUtilsInsideWrapper, UtilsOption> & States
+  LoaderRuntimeBasicProps<ResponsivePanelUtilsInsideWrapper> & States
   >;
   export type KeyToNameEntries = [keyof Config, string];
   export type ComponentRuntimeProps = Omit<LoaderProps, 'mounted' | 'ref' | 'form'>;

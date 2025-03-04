@@ -1,3 +1,4 @@
+import type { Identifier } from '../../common';
 import type { SourceType } from './source-type';
 
 // Data config types
@@ -49,3 +50,44 @@ export type SqlServerConfig = DatabaseConfig<{ dbName: string }>;
 
 // api configs
 type ApiConfg = Record<string, any>;
+
+export type DatabaseCollection = MySqlOracleConfig | PostgreSqlConfig | SqlServerConfig;
+
+export type IdentifierSource = {
+  sourceName: string;
+} & Identifier;
+
+export type SourceRunnerProps = {
+  setData(sourceName: string, data: Record<string, any>[]): void;
+  $emit(sourceName: string, payload: Record<string, any>): void;
+  sourceName: string;
+  sourceConfig: SourceConfigRuntime;
+};
+
+export type DataResponseType = Record<
+string,
+{
+  origin: Record<string, any>[];
+  value: Record<string, any>[];
+}
+>;
+
+export type ApiReturnType = {
+  needUpdate: boolean;
+  output: ResponseType | Record<string, any>[];
+  error?: any;
+};
+
+export type GetValueEntryType<T = any> = (
+  source: T,
+  identifier: IdentifierSource,
+  config: any,
+) => Promise<ApiReturnType>;
+
+export type RequestApi = {
+  sourceId: string;
+  body?: Record<string, any>;
+  headers?: Record<string, any>;
+  querys?: Record<string, any>;
+  path?: Record<string, any>;
+};

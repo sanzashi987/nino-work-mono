@@ -1,4 +1,5 @@
 export { type CanvixResponse, type Pagination } from './types/requests';
-export type * from './types/rwd/config';
+export type * from './types/responsive/config';
 export type * from './types/common';
-export type * from './types/data-source';
+export * from './types/services';
+export type * from './types/component';

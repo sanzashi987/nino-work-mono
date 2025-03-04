@@ -1,12 +1,14 @@
-export interface node<T> {
-  next: node<T> | null;
+export interface Node<T> {
+  next: Node<T> | null;
   node: T;
   key: string;
 }
 class LinkList<T> {
   length = 0;
-  head: node<T> | null = null;
-  append(node: node<T>): void {
+
+  head: Node<T> | null = null;
+
+  append(node: Node<T>): void {
     if (this.head === null) {
       this.head = node;
     } else {
@@ -19,7 +21,7 @@ class LinkList<T> {
     this.length++;
   }
 
-  *transverse(): any {
+  * transverse(): any {
     let node = this.head;
     while (node) {
       yield node;
@@ -27,7 +29,7 @@ class LinkList<T> {
     }
   }
 
-  search(key: string): node<T> | null {
+  search(key: string): Node<T> | null {
     let node = this.head;
     while (node !== null && node.key !== key) {
       node = node.next;
@@ -35,11 +37,14 @@ class LinkList<T> {
     return node;
   }
 }
-export class LinkNode<T> implements node<T> {
+export class LinkNode<T> implements Node<T> {
   node: T;
+
   key: string;
-  next: node<T> | null = null;
-  constructor(node: T, key: string, next: node<T> | null = null) {
+
+  next: Node<T> | null = null;
+
+  constructor(node: T, key: string, next: Node<T> | null = null) {
     this.node = node;
     this.next = next;
     this.key = key;

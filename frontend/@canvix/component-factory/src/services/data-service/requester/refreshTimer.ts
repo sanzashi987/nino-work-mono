@@ -12,8 +12,10 @@ export type TimerSetterProps = {
   times: number;
 };
 export default class RefreshTimer {
-  private current: NodeJS.Timeout | null = null;
+  private current: number | null = null;
+
   private promiseMethod: PromiseMethodType = async () => null;
+
   private timestamp = '';
 
   setTimer(cb: () => void, times: number): void {
@@ -33,22 +35,21 @@ export default class RefreshTimer {
 
   setTimerForTarget({
     promiseMethod,
-    times,
+    times
   }: TimerSetterProps): (args?: Record<string, any>) => Promise<any> {
-    
     const self = this;
     this.genTimestamp();
     this.promiseMethod = promiseMethod;
     return async function actuator(
       args?: Record<string, any>,
-      _timeStamp: string = self.timestamp,
+      _timeStamp: string = self.timestamp
     ): Promise<any> {
       if (_timeStamp !== self.timestamp) return;
       const timestamp = self.genTimestamp();
       try {
-        return await self.promiseMethod(args);
+        await self.promiseMethod(args);
       } catch (error) {
-        return Promise.reject(error);
+        Promise.reject(error);
       } finally {
         self.stop();
         self.setTimer(() => {

@@ -123,7 +123,7 @@ abstract class Controller<
     const comInfo = this.props.config.com!;
     return {
       ...comInfo,
-      projectId: this.props.dashboardId,
+      projectId: this.props.projectId,
       comId: this.props.config.id,
       panelId: (this.props as any).panelId
     };

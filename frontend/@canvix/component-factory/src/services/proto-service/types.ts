@@ -1,6 +1,5 @@
 import React from 'react';
-import { Identifier } from '@canvas/utilities';
-import type { TargetPlatformSpecifier } from '../types';
+import type { Identifier, TargetPlatformSpecifier } from '@canvix/shared';
 
 type FunctionalDesciber = {
   useChannel?: TargetPlatformSpecifier;

@@ -1,14 +1,10 @@
-import type { ComInfo, Default, DefaultAttr, SubpanelInfoDefault } from '../common/config-type';
+import type { ComInfo, ComDefault, DefaultAttr } from '../common/config-type';
 import type { DataConfigType, DataConfigTypeRuntime } from '../data-source/service';
 
 export const enum HiddenMode {
   visible,
   implicit,
   unmount,
-}
-
-export function isUnmounted(state: any) {
-  return state === HiddenMode.unmount;
 }
 
 type Basic<T extends object = any> = {
@@ -25,7 +21,7 @@ export type Com<Data extends DataConfigType = DataConfigType> = {
   type: 'com';
   lock?: boolean;
 } & ComBasic<Data> &
-Default;
+ComDefault;
 
 export type ComRuntime<Attr extends DefaultAttr = DefaultAttr> = Com<DataConfigTypeRuntime> &
 Basic & {
@@ -39,7 +35,7 @@ export type Subcom<
   > = {
     type: 'subcom';
   } & ComBasic<Data> &
-  Default & {
+  ComDefault & {
     attr: Attr;
   };
 
@@ -54,7 +50,7 @@ export type Container<Data extends DataConfigType = DataConfigType> = {
   type: 'container';
   lock?: boolean;
 } & ComBasic<Data> &
-Default;
+ComDefault;
 
 export type ContainerRuntime<Attr extends DefaultAttr = DefaultAttr> =
     Container<DataConfigTypeRuntime> &
@@ -67,9 +63,9 @@ export type Panel = {
   type: 'panel';
   com?: undefined;
   hide?: HiddenMode;
-} & Omit<Default, 'name'>;
+} & Omit<ComDefault, 'name'>;
 
-export type PanelRuntime = Panel & Basic & Default;
+export type PanelRuntime = Panel & Basic & ComDefault;
 
 export type ConfigType = Com | Subcom | Container | Panel;
 
@@ -77,6 +73,17 @@ export type ConfigTypeExcludePanel = Exclude<ConfigType, Panel>;
 
 export type ConfigTypeRuntime = ComRuntime | SubcomRuntime | ContainerRuntime | PanelRuntime;
 
-export type SubpanelInfo = Omit<SubpanelInfoDefault, 'viewControlled'>;
-
 export type ComItemType = ConfigType['type'];
+
+export type ConfigTypeSupportedInControllerRuntime =
+    | ComRuntime
+    | SubcomRuntime
+    | ContainerRuntime;
+
+export type ConfigTypeSupportedPackageRuntime = ComRuntime | SubcomRuntime | ContainerRuntime;
+
+export type ViewConfigTypeSupportedInControllerRuntime = ComRuntime | ContainerRuntime;
+
+export type ConfigTypeSupportedInViewControllerRuntime = ComRuntime | ContainerRuntime;
+
+export type ConfigTypeSupportedInController = Com | Subcom | Container;

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-class-component-methods */
 import React, { Component } from 'react';
 import { HandlerCollection, EventCollection, ServiceProps } from './types';
 
@@ -6,12 +7,13 @@ function defaultGetEndpoint(endpointMap: Map<string, any>, serviceName: string) 
     .filter((e) => e[1].isPublic)
     .map(([name, desc]) => ({
       id: `${serviceName}.${name}`,
-      ...desc,
+      ...desc
     }));
 }
 
 abstract class ProtoService<Props extends ServiceProps = ServiceProps> extends Component<Props> {
   declare static serviceName: string;
+
   declare static configKey: string;
 
   public $emit;
@@ -25,18 +27,16 @@ abstract class ProtoService<Props extends ServiceProps = ServiceProps> extends C
     };
   }
 
-  static getComponentActions = (e: HandlerCollection, s: string, p: Record<string, any>) =>
-    defaultGetEndpoint(e, s);
+  static getComponentActions = (e: HandlerCollection, s: string, p: Record<string, any>) => defaultGetEndpoint(e, s);
 
-  static getComponentEvents = (e: EventCollection, s: string, p: Record<string, any>) =>
-    defaultGetEndpoint(e, s);
-
-  shouldComponentUpdate(nextProps: ServiceProps) {
-    return nextProps.config !== this.props.config;
-  }
+  static getComponentEvents = (e: EventCollection, s: string, p: Record<string, any>) => defaultGetEndpoint(e, s);
 
   componentDidMount(): void {
     this.props.selfRef.current = this;
+  }
+
+  shouldComponentUpdate(nextProps: ServiceProps) {
+    return nextProps.config !== this.props.config;
   }
 
   componentWillUnmount(): void {

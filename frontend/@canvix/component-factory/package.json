@@ -6,6 +6,7 @@
     "@canvix/shared": "workspace:*",
     "@canvix/event-core": "workspace:*",
     "@canvix/utils": "workspace:*",
+    "@canvix/script-sandbox": "workspace:*",
     "immer": "^9.0.1"
   },
   "devDependencies": {

@@ -1,29 +1,29 @@
+import type { FileType } from '../data-source';
+
 export type IDConfig = {
   config: { id: string };
 };
+export type IDConfigType = {
+  config: {
+    id: string
+    type:FileType
+  } ;
+};
 
-export type Default = {
+export type IDComConfig = {
+  config: {
+    id: string
+    type: FileType;
+    com?: ComInfo;
+  };
+};
+
+export type ComDefault = {
   id: string;
   name: string;
 };
 
 export type DefaultAttr = Record<string, any>;
-
-export type SubpanelInfoDefault = {
-  controlType?: 'form' | 'data';
-  /**
-   * @description has higher priority than `height` & `width`
-   * when the value is set to `true`,
-   * the `width` and `height` property will be set to `100%`
-   */
-  viewControlled: boolean;
-  backgroundColor: string;
-  backgroundImage: string | null;
-  panelId: string;
-  parent: string;
-  width: number;
-  height: number;
-};
 
 export type ComInfoBasic = {
   /**

@@ -12,3 +12,14 @@ export type Pagination = {
   pageTotal: number;
   recordTotal: number;
 };
+
+type SandboxProps = {
+  args: string[];
+  // content: string;
+  argsValue: any[];
+  id: string;
+  /** 是否在控制台输出报错信息，过滤器测试时不输出 */
+  logVisible?: boolean;
+};
+
+export type SandboxRunnerType = (props: SandboxProps) => Promise<any | true>;

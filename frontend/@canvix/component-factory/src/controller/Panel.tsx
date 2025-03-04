@@ -2,8 +2,8 @@ import {
   ConnectorProps,
   DuplexChannelCore,
   InteractionService,
-  PanelServiceCtor,
-} from '@canvas/event-core';
+  PanelServiceCtor
+} from '@canvix/event-core';
 import { ServiceConnector } from './Controller';
 import type { PrimitiveUtils, StaticUtils } from './types';
 import { Default, Responsive } from '../services/types';
@@ -14,7 +14,7 @@ type PanelConfigType<T> = Default & {
   hide?: Responsive.HiddenMode;
 } & T;
 
-export type PanelConfigProps<T extends {} = {}> = {
+export type PanelConfigProps<T extends object = object> = {
   config: PanelConfigType<T>;
   data?: any;
 };
@@ -29,14 +29,16 @@ const services = [InteractionService];
 export abstract class BasicPanel<
   P extends PanelConfigProps,
   S extends PanelState,
-  PanelUtils extends {} = {},
-  UtilsType extends {} = {},
-  LogicalUtilsType extends {} = {},
+  PanelUtils extends object = object,
+  UtilsType extends object = object,
+  LogicalUtilsType extends object = object,
 > extends ServiceConnector<P, S> {
   state: S;
 
   duplexChannel;
+
   primitiveUtils: PrimitiveUtils<PanelUtils, UtilsType>;
+
   logicalUtils: LogicalUtilsType;
 
   constructor(props: ConnectorProps<P>) {

@@ -3,7 +3,7 @@ import {
   hide, display, toggleVisible, init, unmount
 } from './consts';
 import ProtoService from '../proto-service';
-import { event, handler, service } from '../proto-service/annotations';
+import { event, action, service } from '../proto-service/annotations';
 
 type TransitionInputType = {
   type: string;
@@ -14,7 +14,7 @@ class InstanceService extends ProtoService {
   @event('实例', init)
     init = 'init';
 
-  @handler('显示', display)
+  @action('显示', display)
     display = (config?: TransitionInputType) => {
       this.props.setState((prev: any) => {
         if (!prev.config.hide) return null;
@@ -27,7 +27,7 @@ class InstanceService extends ProtoService {
       });
     };
 
-  @handler('隐藏', hide)
+  @action('隐藏', hide)
     hide = (config?: TransitionInputType) => {
       this.props.setState((prev: any) => {
         if (prev.config.hide === 1) return null;
@@ -39,7 +39,7 @@ class InstanceService extends ProtoService {
       });
     };
 
-  @handler('卸载', unmount)
+  @action('卸载', unmount)
     unmount = (config?: TransitionInputType) => {
       this.props.setState((prev: any) => {
         if (prev.config.hide === 2) return null;
