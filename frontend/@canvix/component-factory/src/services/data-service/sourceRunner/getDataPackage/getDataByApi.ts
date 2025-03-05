@@ -1,7 +1,7 @@
 import type { ApiReturnType, GetValueEntryType, IdentifierSource, RequestApi } from '@canvix/shared';
 import { getErrorInfo } from './utils';
 import { canvasApiService } from '../../constants';
-import requestService, { post } from '../../requestService';
+import requestService, { post, RequestConfig } from '../../requestService';
 
 type RequestType = 'get' | 'put' | 'post';
 const defaultApiParams: Omit<RequestApi, 'sourceId'> = {
@@ -14,7 +14,7 @@ const defaultApiParams: Omit<RequestApi, 'sourceId'> = {
 const requestApi = (
   params: RequestApi,
   identifier: IdentifierSource,
-  config: any = {}
+  config: RequestConfig = {}
 ): Promise<any> => post(
   `${canvasApiService}/canvas-pro-mobile/V1/facade/request-api?screenId=${identifier.projectId}`,
   params,
@@ -22,18 +22,18 @@ const requestApi = (
 );
 
 async function getData(
-  source: RequestApi,
+  { parser, ...source }: RequestApi,
   identifier: IdentifierSource,
-  config: any
+  config: RequestConfig
 ): Promise<ApiReturnType> {
   try {
     const params = {
       ...defaultApiParams,
       ...source
     };
-    const res = await requestApi(params, identifier, config);
-    const { resultCode, data, resultMessage } = res;
-    if (resultCode !== 0 || !data) throw new Error(resultMessage);
+    const res = await requestApi(params, identifier, { ...config, parser });
+    const { code, data, msg } = res;
+    if (code !== 0 || !data) throw new Error(msg);
     const { data: resData, proxy } = data;
     if (proxy) {
       // 服务器代理请求
@@ -41,13 +41,13 @@ async function getData(
     }
     try {
       // 前端发送请求
-      const config = JSON.parse(resData);
-      const { method, url } = config || {};
+      const conf = JSON.parse(resData);
+      const { method, url } = conf || {};
       const requestType: RequestType = method.toLowerCase();
-      const data = requestType === 'get' ? {} : params.body;
-      const apiRes = await requestService[requestType]?.(url, data, {
-        ...config,
-        headers: { ...config.headers, ...params.headers },
+      const payload = requestType === 'get' ? {} : params.body;
+      const apiRes = await requestService[requestType]?.(url, payload, {
+        ...conf,
+        headers: { ...conf.headers, ...params.headers },
         // data: params.body ?? {},
         params: params.querys ?? {}
       });

@@ -46,7 +46,8 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
     ? (input?: null, opts?: RequestInit) => Promise<Res>
     : (input: Req, opts?: RequestInit) => Promise<Res>;
 
-  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   const requester: Requester = async (input: Record<string, any> = {}, opts: RequestInit = {}) => {
     const { headers: overrideHeaders, ...others } = opts;
     const inputNext = { ...input };

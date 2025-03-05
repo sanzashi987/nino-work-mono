@@ -37,6 +37,7 @@ export default class RefreshTimer {
     promiseMethod,
     times
   }: TimerSetterProps): (args?: Record<string, any>) => Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.genTimestamp();
     this.promiseMethod = promiseMethod;

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { ENABLE_REFLECT_PANEL, PANEL_LOCAL_ID } from '../consts';
 import type {
   PanelServiceInstance,
@@ -119,7 +120,9 @@ class InteractionService implements PanelServiceInstance<InteractionPayloadType>
 
   updateConfig() {
     const needInstall = this.loadData();
-    needInstall && this.install();
+    if (needInstall) {
+      this.install();
+    }
   }
 
   private loadData() {
@@ -139,9 +142,12 @@ class InteractionService implements PanelServiceInstance<InteractionPayloadType>
     Object.values(this.interactionConfig.edges).forEach((edge) => {
       if (edge.disable) return;
       const [identifier, target] = composeEdge(edge);
-      newMap.has(identifier)
-        ? newMap.get(identifier)?.push(target)
-        : newMap.set(identifier, [target]);
+
+      if (newMap.has(identifier)) {
+        newMap.get(identifier)?.push(target);
+      } else {
+        newMap.set(identifier, [target]);
+      }
     });
     this.sourceTargetMap = newMap;
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DataResponseType } from './types';
+import type { DataResponseType } from '@canvix/shared';
 import SourceRunnerWrapper from './sourceRunner';
 import ProtoService from '../proto-service';
 import { event, action, service } from '../proto-service/annotations';

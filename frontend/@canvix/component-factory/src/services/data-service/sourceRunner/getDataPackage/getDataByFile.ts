@@ -21,8 +21,8 @@ async function getData(
 ): Promise<ApiReturnType> {
   try {
     const res = await queryDataBySourceId(params.sourceId, identifier, config);
-    const { resultCode, data, resultMessage } = res;
-    if (resultCode !== 0 || !data) throw new Error(resultMessage);
+    const { code, data, msg } = res;
+    if (code !== 0 || !data) throw new Error(msg);
     return { needUpdate: true, output: data };
   } catch (e) {
     console.log(e);

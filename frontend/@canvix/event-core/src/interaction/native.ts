@@ -34,7 +34,10 @@ class InteractionService extends CommonInteraction {
     this.push = (id, payload) => {
       const { targetDescriber, target, targetNode, value } = payload.data;
       // flutter env specific logic
-      if (targetDescriber?.useChannel[platform] === true) return this.sendMessageToNative(targetNode, target, value);
+      if (targetDescriber?.useChannel[platform] === true) {
+        this.sendMessageToNative(targetNode, target, value);
+        return;
+      }
       push(id, payload);
     };
 
@@ -45,7 +48,7 @@ class InteractionService extends CommonInteraction {
     let res;
     try {
       res = JSON.parse(e.detail);
-    } catch (e) {
+    } catch (er) {
       return;
     }
     const { type, value } = res ?? {};

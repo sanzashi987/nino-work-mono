@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 import sandbox from '@canvix/script-sandbox';
 import { uuid, isEqual } from '@canvix/utils';
@@ -6,7 +7,6 @@ import { SourceType } from '@canvix/shared';
 import * as getDataPack from './getDataPackage';
 import RefreshTimer from '../requester/refreshTimer';
 import LinkList, { LinkNode } from '../utils/linkList';
-import { genCancelToken } from '../requestService';
 import { RES_ERR_NOT_FOUND, FILTER_ERR_TYPE_DISMATCH, MAPPING_ERR } from '../constants';
 import type { GetIdentifierType } from '../../proto-service/types';
 
@@ -15,7 +15,7 @@ function sourceType2Method(sourceType: SourceType) {
 }
 
 function ensureObject(a: any) {
-  if (!!a && typeof a === 'object' && !(a instanceof Array)) {
+  if (!!a && typeof a === 'object' && !Array.isArray(a)) {
     return a;
   }
   return {};
@@ -27,10 +27,27 @@ type ShortCircuitType = {
   dataMapped?: any;
   errorMessage?: any;
 };
+
+class CanvixAbortController extends AbortController {
+  public timeout;
+
+  constructor() {
+    super();
+    this.timeout = setTimeout(() => {
+      this.abort('request timeout');
+    }, 60000);
+  }
+
+  override abort(reason?: any): void {
+    clearTimeout(this.timeout);
+    super.abort(reason);
+  }
+}
+
 class BaseSourceRunner {
   timer: RefreshTimer = new RefreshTimer();
 
-  cancelToken: ReturnType<typeof genCancelToken> | null = null;
+  abortController :CanvixAbortController | null = null;
 
   dataRaw: Record<string, any>[] = [];
 
@@ -76,10 +93,10 @@ class BaseSourceRunner {
   }
 
   setDataRaw = (payload: Record<string, any>[]) => {
-    if (this.cancelToken) {
-      this.cancelToken.cancel();
-      // this.cancelToken();
-      this.cancelToken = null;
+    if (this.abortController) {
+      this.abortController.abort('abort due to setting raw data action');
+
+      this.abortController = null;
     }
     if (payload === undefined) return; //
     this.dataRaw = payload;
@@ -97,14 +114,14 @@ class BaseSourceRunner {
 
   pendingRequest = async (source: any, identifier: IdentifierSource) => {
     const { type } = this.props.sourceConfig;
-    if (this.cancelToken) {
-      this.cancelToken.cancel('Cancel pending request and retry');
+    if (this.abortController) {
+      this.abortController.abort('Cancel pending request and retry');
     }
-    this.cancelToken = genCancelToken();
+    this.abortController = new CanvixAbortController();
     const method = sourceType2Method(type);
     try {
-      const res = await method(source, identifier, { cancelToken: this.cancelToken.token });
-      this.cancelToken = null;
+      const res = await method(source, identifier, { signal: this.abortController.signal });
+      this.abortController = null;
       return res;
     } catch (e) {
       return { needUpdate: false, output: [], error: e };
@@ -178,13 +195,16 @@ class BaseSourceRunner {
 
         for (const [mapKey, mapValue] of mapRules) {
           if (mapValue && Reflect.has(v.node, mapValue as string)) {
-            v.node[mapValue as string] !== undefined
-              && (objItem[mapKey] = v.node[mapValue as string]);
-          } else {
-            objItem[mapKey] !== undefined && (objItem[mapKey] = v.node[mapKey]);
+            if (v.node[mapValue as string] !== undefined) {
+              objItem[mapKey] = v.node[mapValue as string];
+            }
+          } else if (objItem[mapKey] !== undefined) {
+            objItem[mapKey] = v.node[mapKey];
           }
         }
-        Object.keys(objItem).length && arr.push(objItem);
+        if (Object.keys(objItem).length > 0) {
+          arr.push(objItem);
+        }
       }
       this.dataMapped = arr;
       return { shortCircuit: false };

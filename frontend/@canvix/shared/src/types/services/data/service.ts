@@ -86,8 +86,11 @@ export type GetValueEntryType<T = any> = (
 
 export type RequestApi = {
   sourceId: string;
-  body?: Record<string, any>;
-  headers?: Record<string, any>;
-  querys?: Record<string, any>;
-  path?: Record<string, any>;
+  body?: Record<string, string>;
+  headers?: Record<string, string>;
+  querys?: Record<string, string>;
+  path?: Record<string, string>;
+  parser?: ParserOption;
 };
+
+export type ParserOption = 'json' | 'text' | 'blob' | 'formData' | 'arrayBuffer';
