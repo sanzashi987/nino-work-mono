@@ -8,8 +8,8 @@ import { TailEditorContext, TailEditorInterface } from '../../interface';
 const { 'logical-node-wrap': LClass } = Styles;
 
 const defaultColor = {
-  foregroundColor: '#2d2e2f', //'var(--canvas-widget-darker-bgcolor)',
-  backgroundColor: 'var(--canvas-ui-lvl1-bgcolor)',
+  foregroundColor: '#2d2e2f', //'var(--canvix-widget-darker-bgcolor)',
+  backgroundColor: 'var(--canvix-ui-lvl1-bgcolor)',
 };
 
 class LogicalNode extends BasicNode {

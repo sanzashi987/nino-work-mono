@@ -1,0 +1,286 @@
+// global variable
+$grid-border-colour: #03030320;
+// $grid-border-colour:black;
+
+/* varibale naming rules */
+/* 
+--canvas-[category/scope]-[color level]?-[attribute/element/description]-[type]-[color scheme]?
+ */
+
+:root {
+  --canvas-sub-main-color: #49485c;
+  --canvas-error-color: #ff4433;
+  --canvas-dark-color: #262c33;
+  --canvas-main-click-color: #fc7b21;
+  --canvas-ft-border: 1px solid #3a4659;
+  --canvas-cp-border: 1px solid #141210;
+  --canvas-button-default-bgcolor: rgba(127, 127, 128, 0.24);
+  --canvas-button-hover-bgcolor: #414750;
+  --canvas-panel-border-color: #282f3a;
+  --canvas-item-hover-color: rgba(143, 225, 255, 0.1);
+  --canvas-com-focus-color: #fc7b21;
+  --canvas-com-active-color: #fc7b218f;
+  --canvas-com-hover-color: #fc7b215f;
+  --canvas-com-focus-bg: rgba(36, 131, 255, 0.02);
+  --canvas-editor-readonly-color: #1f2329;
+  --canvas-input-bg: #262c33;
+  --canvas-common-outline-focus: 1px solid var(--canvix-primary-color);
+
+  //GUI
+  --canvas-gui-primary-color: #fc7b21;
+  --canvas-gui-error-color: #ff4f43;
+  --canvas-gui-hover-color: #fc7b21;
+  --canvas-gui-active-color: #fc7b21;
+  --canvas-gui-component-background-hover-color: #303640;
+  --canvas-gui-component-background-active-color: #262b33;
+  --canvas-gui-component-background-disabled-color: #13161a;
+  --canvas-gui-font-color-1: #fff;
+  --canvas-gui-font-color-2: #c3d3d9;
+  --canvas-gui-font-color-3: #737c80;
+  --canvas-gui-font-color-description: #5c6366;
+  --canvas-gui-border-color: rgba(52, 52, 52, 0.5);
+  --canvas-gui-component-slider-track-color: linear-gradient(to right, #74f0ff, #2681ff);
+  --canvas-gui-disabled-opacity: 0.5;
+  --canvas-gui-popover-shadow: 0 0 4px #000;
+  --canvas-gui-logo-color: rgba(255, 255, 255, 0.25);
+  --canvas-gui-font-size-large: 16px;
+  --canvas-gui-font-size-md: 13px;
+  --canvas-gui-icon-size-md: 14px;
+  --canvas-gui-component-border: 1px solid var(--canvix-widget-border-color);
+  --canvas-gui-transition-time: 0.3s;
+  --canvas-gui-transition-easing: ease-in-out;
+  --canvas-gui-slider-handle-bg: #fff;
+  --canvas-gui-padding-border-color: #737c80;
+  --canvas-gui-item-hover-color: #656667;
+
+  --canvas-gui-field-padding-right: 8px;
+  --canvas-gui-field-padding-top: 4px;
+  --canvas-gui-field-padding-bottom: 4px;
+  --canvas-gui-field-padding-left-level-1: 8px;
+  --canvas-gui-field-padding-left-level-2: 8px;
+  --canvas-gui-field-padding-left-level-3: 8px;
+  --canvas-gui-field-padding-left-level-4: 8px;
+  --canvas-gui-field-padding-left-level-5: 24px;
+  --canvas-gui-collection-padding-left-level-1: 8px;
+  --canvas-gui-component-title-width: 114px;
+  --canvas-gui-component-container-width: 210px;
+  --canvas-gui-menu-item-height: 30px;
+  --canvas-input-border-radius: 4px;
+
+  //CM
+  --canvas-cm-main-color: #fc7b21;
+  --canvas-cm-main-color-with-opacity: #005d80;
+  --canvas-cm-normal-highlight-text-color: #fff;
+  --canvas-cm-normal-text-color: #bcc9d4;
+  --canvas-cm-tip-text-color: #90a0ae;
+  --canvas-cm-disable-text-color: #647279;
+  --canvas-cm-title-bg-color: #1b1f25;
+  --canvas-cm-children-list-bg-color: #15171c;
+  --canvas-cm-input-bg-color: #0e1013;
+  --canvas-cm-list-cover-bg-color: rgba(0, 0, 0, 0.5);
+  --canvas-cm-add-list-bg-color: #21242b;
+  --canvas-cm-add-list-item-bg-color: #2e343b;
+  --canvas-cm-separator-border-color: #282f3a;
+  // --canvas-cm-sort-line-border-color: #4C4D83;
+  --canvas-cm-sort-line-border-color: #fc7b21;
+
+  //guide
+  --canvas-guide-primary-color: #d55f3c;
+  --canvas-guide-font-color-1: #ffffff;
+  --canvas-guide-font-color-2: #cfcfcf;
+  --canvas-guide-action-font-color: #98989e;
+  --canvas-guide-main-active-color: #ffffff;
+  --canvas-guide-border-radius: 5px;
+  --canvas-guide-list-title-font-color: #949eb7;
+  --canvas-guide-list-item-bg-color: rgba(120, 123, 147, 0.28);
+  --canvas-guide-list-item-bg-color-1: #25242e;
+  --canvas-guide-list-item-border-radius: 8px;
+  --canvas-guide-input-bg-color: #3a3b48;
+  --canvas-guide-input-font-color: #cfcfcf;
+  --canvas-guide-nav-font-color: rgba(255, 255, 255, 0.52);
+  --canvas-guide-nav-font-hover-color: #ffffff;
+  --canvas-guide-nav-border-color: rgba(151, 151, 151, 0.37);
+  --canvas-guide-search-bg-color: #434656;
+  --canvas-guide-search-font-color: #838da5;
+  --canvas-guide-panel-bg-color: #1c1e28;
+  --canvas-guide-panel-font-color: #a4a8ab;
+  --canvas-guide-db-item-bg-color: #1b1b23;
+  --canvas-guide-db-item-font-color-1: #ffffff;
+  --canvas-guide-db-item-font-color-2: #99a4c1;
+  --canvas-guide-db-item-icon-color: #676a79;
+
+  // modal
+  --canvas-modal-bg-color: #1c1e28;
+  --canvas-modal-font-color: #fff;
+  --canvas-modal-font-size: 12px;
+  --canvas-modal-input-bg-color: #272935;
+  --canvas-modal-info-color: #0288d1;
+  --canvas-modal-error-color: #d32f2f;
+  --canvas-modal-warning-color: #ed6c02;
+  --canvas-modal-success-color: #2e7d32;
+  --canvas-modal-select-font-color: #a4a8ab;
+
+  // interaction
+  // --canvas-interaction-active-color: #ff8637;
+  --canvas-interaction-active-color: #fc7b21;
+  --canvas-interaction-handle-bgcolor: #45484d;
+  --canvas-interaction-disable-color: #ff4235;
+  --canvas-interaction-node-disabled-color: #bcc9d4;
+  --canvas-interaction-node-title-color: #fff;
+  --canvas-interaction-node-type-color: #ffffff0b;
+  --canvas-interaction-deprecated-text-color: #ff4235;
+  --canvas-interaction-deprecated-bgcolor: #2a2f3699;
+  --canvas-interaction-item-disabled-color: #575757;
+  --canvas-interaction-handle-box-shadow: 0 0 0 4px var(--canvix-translucent-color);
+  --canvas-interaction-button-color: #ddd;
+  --canvas-interaction-button-front-color: #b1b1b1;
+  --canvas-interaction-section-title-icon-size: 13px;
+  --canvas-interaction-edge-color: #bfbfbf;
+  --canvas-interaction-edge-hover-color: #fff;
+  --canvas-interaction-nodeitem-base-bgcolor: #353535;
+
+  // config panel
+  --canvas-config-base-bgcolor: #1d1e21;
+  --canvas-config-font-base-color: #bcc9d4;
+
+  // contex menu
+  // --canvas-context-menu-bgcolor: #2b323b;
+  --canvas-context-menu-bgcolor: #181818;
+  --canvas-context-menu-divider-color: #3a4659;
+  --canvas-context-item-hover-bgcolor: #464646; //#1d262e;
+  // --canvas-context-item-hover-bgcolor: #fc7b210f; //#1d262e;
+
+  --canvas-context-item-disabled-color: #576369;
+
+  //layer-tree
+  // --canvas-layer-tree-item-bg-color: #1b1f25;
+
+  // global panel
+  --canvas-panel-main-bgcolor: #1a1b20;
+  // --canvas-panel-title-bgcolor: #1d1e21;
+  --canvas-panel-title-bgcolor: #191919;
+
+  // skectch ruler
+  --canvas-ruler-bg: #0e1013;
+  --canvas-ruler-tag-bgcolor: #fc7b21; // rgba(64, 116, 180, 1);
+  --canvas-ruler-line-bgcolor: #fc7b218c; //rgba(0, 173, 255, 0.84);
+  --canvas-ruler-mark-color: #3a4659;
+  --canvas-ruler-font-color: white;
+
+  // C Widgets
+  --canvas-widget-border-color: #0b0c0d;
+  --canvas-widget-border: 1px solid var(--canvix-widget-border-color);
+
+  --canvas-widget-bg-color: #242529;
+  --canvas-widget-font-description-color: #5c6366;
+  --canvas-widget-frontbg-color: #1c2026;
+  --canvas-widget-lighter-frontbg-color: #3d4652;
+  --canvas-widget-backbg-color: #111417;
+  --canvas-widget-darker-backbg-color: #000;
+  --canvas-widget-emphasis-color: #fff;
+  --canvas-widget-font-base-color: #a1aeb3;
+  --canvas-widget-item-base-height: 24px;
+  --canvas-widget-bgcolor: #242529;
+  --canvas-widget-darker-bgcolor: #262c33;
+  --canvas-widget-mask-color: rgba(0, 0, 0, 0.75);
+  --canvas-widget-font-disabled-color: #424447;
+
+  //select
+  --canvas-select-dropdown-bgcolor: #181818;
+
+  // input
+  --canvas-input-hover-bgcolor: #797979;
+  --canvas-input-border-radius: 2px;
+  --canvas-input-disabled-border: 1px solid #323437;
+
+  //slider
+  --canvas-slider-color: white;
+  --canvas-slider-handle-bg-color: #fff;
+
+  // checkbox
+  --canvas-checkbox-base-border: 1px solid #3a4659;
+  --canvas-base-outline: 1px solid #0b0c0d;
+  --canvas-checkbox-bgcolor: transparent;
+  //button
+  --canvas-button-border-radius: 2px;
+  --canvas-button-default-bgcolor: #2f2f2f;
+  --canvas-button-hover-bgcolor: #414750;
+  --canvas-button-boxshadow: inset 0 0 0 1px #ffebeb1a, 0 0 0 1px #181818;
+  --canvas-button-border: 1px solid #ffffff33;
+  //ui -base
+  --canvas-primary-color: #fc7b21;
+  --canvas-primary-active-color: #fc7b21;
+  --canvas-primary-hover-color: #fc7b21;
+  --canvas-primary-focus-color: #fc7b21;
+  --canvas-primary-border-color: #fc7b21;
+  --canvas-primary-active-color: #fc7b21;
+  --canvas-primary-disabled-color: #90a0ae;
+  --canvas-primary-disabled-bgcolor: #282f3a;
+  --canvas-inline-input-bgcolor: #363c48;
+  --canvas-translucent-color: #ffffff66;
+  --canvas-href-insite-color: #2483ff;
+  --canvas-section-divider-color: black;
+  // --canvas-select-area-border: #00adffd6;
+  --canvas-select-area-border: #fc7b21c6;
+  --canvas-ui-grid-border-color: #282828;
+  --canvas-ui-grid-bg: linear-gradient(var(--canvix-ui-grid-border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--canvix-ui-grid-border-color) 1px, transparent 1px),
+    linear-gradient(var(--canvix-ui-grid-border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--canvix-ui-grid-border-color) 1px, transparent 1px);
+  --canvas-ui-darkest-bgcolor: #000;
+  --canvas-ui-lvl0-bgcolor: #0d0d0d;
+  --canvas-ui-base-bgcolor: #1d1d1d;
+  --canvas-ui-lvl1-bgcolor: #232323;
+  --canvas-ui-lvl2-bgcolor: #292929;
+  --canvas-ui-lvl3-bgcolor: #2f2f2f;
+  // --canvas-ui-lvl3-bgcolor: #363636;
+  --canvas-ui-lvl4-bgcolor: #3d3d3d;
+  --canvas-ui-lvl5-bgcolor: #404040;
+  --canvas-ui-lvl6-bgcolor: #444444;
+  --canvas-ui-hover-transparent-bgcolor: #464646a0;
+  --canvas-ui-hover-bgcolor: #464646;
+  --canvas-ui-active-bgcolor: #525252;
+  --canvas-ui-emphasis-bgcolor: #656565;
+  --canvas-ui-primar-opacity-bgcolor: #fc7c2110;
+
+  --canvas-admin-toolbar-bgcolor: #181818;
+
+  // global font
+  --canvas-font-primary-color: #fc7b21;
+  --canvas-font-emphasis-color: #fff;
+  --canvas-font-active-color: #fff;
+  --canvas-font-mild-emphasis-color: #dfdfdf;
+  --canvas-font-mild-base-color: #939699;
+  --canvas-font-base-color: #bcc9d4;
+  --canvas-font-base-color-2: #c3d3d9;
+  --canvas-font-base-color-3: #737679;
+  --canvas-font-translucent-color: #bcc9d445;
+  --canvas-font-base-size: 12px;
+  --canvas-font-medium-size: 14px;
+  --canvas-font-large-size: 16px;
+
+  // monaco editor
+  --canvas-editor-reserved-keyword-bgcolor: #3a3d41;
+  --canvas-editor-text-color: #dcdcdc;
+  --canvas-editor-reserved-keyword-color: #569cd6;
+  --canvas-editor-sides-bgcolor: #1e1e1e;
+
+  // icon
+  --canvas-icon-small-size: 12px;
+  --canvas-icon-medium-size: 14px;
+  --canvas-icon-large-size: 16px;
+  --canvas-icon-xlarge-size: 18px;
+
+  // message
+  --canvas-error-color: #d32f2f;
+  --canvas-success-color: #2e7d32;
+  --canvas-info-color: #0288d1;
+  --canvas-warning-color: #ed6c02;
+
+  // saas user version
+  --canvas-user-level-default-color: #6f6f6f;
+  --canvas-user-level-0-color: rgb(46, 88, 154);
+  --canvas-user-level-1-color: rgb(109, 78, 255);
+  --canvas-user-level-2-color: var(--canvix-primary-color);
+  --canvas-user-level-3-color: #f00;
+}

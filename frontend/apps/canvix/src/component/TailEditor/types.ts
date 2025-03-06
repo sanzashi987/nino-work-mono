@@ -1,5 +1,6 @@
-import type { InteractionNodeType } from '@canvas/event-core';
-import type { EndpointType, Legacy, Responsive } from '@canvas/component-factory';
+import { ConfigType } from '@canvix/shared';
+import { InteractionNodeType } from '@canvix/event-core';
+import { EndpointType } from '@canvix/component-factory';
 import { MenuColorPaletteType } from './components/helpers';
 
 export type EndpointResType = {
@@ -19,7 +20,7 @@ type ToEndpointsReturnType = {
 
 type ToEndpointsType = (node: InteractionNodeType) => Promise<ToEndpointsReturnType>;
 type GetRefNodeEndpointsType = (id: string, refresh?: boolean) => Promise<ToEndpointsReturnType>;
-type FindComponentByIdType = (id: string) => Legacy.ConfigTypeRuntime | Responsive.ConfigType;
+type FindComponentByIdType = (id: string) => ConfigType;
 
 export type TailEditorInterface = {
   toEndpoints: ToEndpointsType;

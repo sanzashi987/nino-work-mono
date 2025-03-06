@@ -5,10 +5,10 @@
 .bezier-connecting-edge {
   transition: stroke-width 0.2s linear;
   &:global(.allow) {
-    stroke: var(--canvas-primary-color);
+    stroke: var(--canvix-primary-color);
   }
 
   &:global(.notAllow) {
-    stroke: var(--canvas-error-color);
+    stroke: var(--canvix-error-color);
   }
 }

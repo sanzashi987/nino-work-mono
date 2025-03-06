@@ -5,11 +5,10 @@ export { BezierShadow, BezierBasicEdge };
 
 const BezierEdgePackage = {
   default: BezierEdge,
-  shadow: BezierShadow,
+  shadow: BezierShadow
 };
 
-export const EdgeTemplate = {
-  endpoint: BezierEdgePackage, // compatible to the past data structure
+export const EdgeTemplate = { endpoint: BezierEdgePackage // compatible to the past data structure
 };
 
 export default BezierEdgePackage;

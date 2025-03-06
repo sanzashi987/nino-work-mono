@@ -1,0 +1,16 @@
+@import './flex.scss';
+/** quick access
+@import "@app/styles/mixins.scss";
+@include text-overflow();
+**/
+@mixin text-overflow {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@mixin deprecated-icon {
+  color: var(--canvix-interaction-deprecated-text-color);
+  // color: #ff423540;
+  font-size: 50px;
+}

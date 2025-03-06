@@ -36,11 +36,11 @@ const MiniMapStatic = (
   <MiniMap
     width={200}
     height={140}
-    activeColor="var(--canvas-primary-color)"
-    nodeColor="var(--canvas-ui-emphasis-bgcolor)"
-    viewportFrameColor="var(--canvas-primary-color)"
+    activeColor="var(--canvix-primary-color)"
+    nodeColor="var(--canvix-ui-emphasis-bgcolor)"
+    viewportFrameColor="var(--canvix-primary-color)"
     style={{
-      background: 'var(--canvas-ui-lvl1-bgcolor)',
+      background: 'var(--canvix-ui-lvl1-bgcolor)',
     }}
   />
 );

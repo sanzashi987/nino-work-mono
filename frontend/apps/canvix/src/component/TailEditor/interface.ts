@@ -10,12 +10,12 @@ async function defaultEndpoints() {
     endpoints: {
       source: [],
       target: [],
-      childList: [],
-    },
+      childList: []
+    }
   };
 }
 function noop() {
-  return;
+
 }
 
 export const defaultMethods: TailEditorInterface = {
@@ -29,7 +29,7 @@ export const defaultMethods: TailEditorInterface = {
     return {} as any;
   },
   getRefNodeEndpoints: defaultEndpoints,
-  menuPalette: {},
+  menuPalette: {}
 };
 
 export const TailEditorContext = createContext<TailEditorInterface>(defaultMethods);

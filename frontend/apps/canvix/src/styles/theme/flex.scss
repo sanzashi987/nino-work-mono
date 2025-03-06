@@ -1,0 +1,351 @@
+// Please follow the instructions to modify the output of this file
+
+/* 1. Define full options */
+// $direction: row, row-reverse, column, coloumn-reverse;
+// $direction-tag: r, w, c, n;
+// $justify: normal, flex-start, center, space-between, space-around, space-evenly, flex-end;
+// $justify-tag: n, s, c, b, a, v, e;
+// $align: normal, flex-start, center, flex-end;
+// $align-tag: n, s, c, e;
+
+/* 1. (optional) most used options to optimize the size */
+$direction: row, column;
+$direction-tag: r, c;
+$justify: normal, center, space-between, space-around, flex-end;
+$justify-tag: n, c, b, a, e;
+$align: normal, center, flex-end;
+$align-tag: n, c, e;
+
+/* 2. Run the script in comment  */
+/*
+  as scss does not support loop-creating mixins,
+  thus generate the css with the script below first
+  and manully transfer to the mixins
+  online css generator: https://www.sassmeister.com/
+*/
+
+// @each $dt in $direction {
+//   $di: index($direction, $dt);
+//   @each $jt in $justify {
+//     $ji: index($justify, $jt);
+//     @each $at in $align {
+//       $ai: index($align, $at);
+//       .f#{nth($direction-tag, $di)}#{nth($justify-tag, $ji)}#{nth($align-tag, $ai)} {
+//         display: flex;
+//         flex-direction: $dt;
+//         justify-content: $jt;
+//         align-items: $at;
+//       }
+//     }
+//   }
+// }
+
+/* 3. Paste the result and reshape to mixins   */
+/* 
+  quick reshape instructor (vscode)
+  select any '.f' and press ctrl+d / cmd+d multiple times to add cursor selection
+  move cursor ahead of class name, remove `.` and type `@mixin`
+  shift + ctrl/option + rightarrow select the class name and copy
+  move to a new line and execute paste to create a css class with corresponding name
+  type `@include` and paste the name again followed by parentheses and semicolon  
+ */
+@mixin frnn() {
+  display: flex;
+  flex-direction: row;
+  justify-content: normal;
+  align-items: normal;
+}
+.frnn {
+  @include frnn();
+}
+//
+@mixin frnc() {
+  display: flex;
+  flex-direction: row;
+  justify-content: normal;
+  align-items: center;
+}
+.frnc {
+  @include frnc();
+}
+//
+@mixin frne() {
+  display: flex;
+  flex-direction: row;
+  justify-content: normal;
+  align-items: flex-end;
+}
+.frne {
+  @include frne();
+}
+//
+@mixin frcn() {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: normal;
+}
+.frcn {
+  @include frcn();
+}
+//
+@mixin frcc() {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.frcc {
+  @include frcc();
+}
+//
+@mixin frce() {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+}
+.frce {
+  @include frce();
+}
+//
+@mixin frbn() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: normal;
+}
+.frbn {
+  @include frbn();
+}
+//
+@mixin frbc() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.frbc {
+  @include frbc();
+}
+//
+@mixin frbe() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.frbe {
+  @include frbe();
+}
+//
+@mixin fran() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: normal;
+}
+.fran {
+  @include fran();
+}
+//
+@mixin frac() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.frac {
+  @include frac();
+}
+//
+@mixin frae() {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+.frae {
+  @include frae();
+}
+//
+@mixin fren() {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: normal;
+}
+.fren {
+  @include fren();
+}
+//
+@mixin frec() {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+.frec {
+  @include frec();
+}
+//
+@mixin free() {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.free {
+  @include free();
+}
+//
+@mixin fcnn() {
+  display: flex;
+  flex-direction: column;
+  justify-content: normal;
+  align-items: normal;
+}
+.fcnn {
+  @include fcnn();
+}
+//
+@mixin fcnc() {
+  display: flex;
+  flex-direction: column;
+  justify-content: normal;
+  align-items: center;
+}
+.fcnc {
+  @include fcnc();
+}
+//
+@mixin fcne() {
+  display: flex;
+  flex-direction: column;
+  justify-content: normal;
+  align-items: flex-end;
+}
+.fcne {
+  @include fcne();
+}
+//
+@mixin fccn() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: normal;
+}
+.fccn {
+  @include fccn();
+}
+//
+@mixin fccc() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.fccc {
+  @include fccc();
+}
+//
+@mixin fcce() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+.fcce {
+  @include fcce();
+}
+//
+@mixin fcbn() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: normal;
+}
+.fcbn {
+  @include fcbn();
+}
+//
+@mixin fcbc() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.fcbc {
+  @include fcbc();
+}
+//
+@mixin fcbe() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.fcbe {
+  @include fcbe();
+}
+//
+@mixin fcan() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: normal;
+}
+.fcan {
+  @include fcan();
+}
+//
+@mixin fcac() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.fcac {
+  @include fcac();
+}
+//
+@mixin fcae() {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+.fcae {
+  @include fcae();
+}
+//
+@mixin fcen() {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: normal;
+}
+.fcen {
+  @include fcen();
+}
+//
+@mixin fcec() {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+.fcec {
+  @include fcec();
+}
+//
+@mixin fcee() {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.fcee {
+  @include fcee();
+}
+//

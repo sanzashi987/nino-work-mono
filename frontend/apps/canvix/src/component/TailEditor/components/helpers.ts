@@ -1,10 +1,10 @@
-import type { InteractionConfigType } from '@canvas/event-core';
+import { InteractionConfigType } from '@canvix/event-core';
 
 export const getItemSwitchable = (
   activeNodes: string[],
   activeEdges: string[],
   nodes: InteractionConfigType['nodes'],
-  edges: InteractionConfigType['edges'],
+  edges: InteractionConfigType['edges']
 ): null | boolean => {
   const edgeStatus = Array.from(new Set(activeEdges.map((e) => !!edges[e]?.disable)));
   const nodeStatus = Array.from(new Set(activeNodes.map((e) => !!nodes[e]?.disable)));
@@ -13,12 +13,12 @@ export const getItemSwitchable = (
   if (!nodeExport) return null;
   let res = null;
   if (edgeStatus.length === 1 && nodeStatus.length === 0) {
-    res = edgeStatus[0];
+    res = edgeStatus.at(0)!;
   } else if (edgeStatus.length === 0 && nodeStatus.length === 1) {
-    res = nodeStatus[0];
+    res = nodeStatus.at(0)!;
   } else if (edgeStatus.length === 1 && edgeStatus.length === nodeStatus.length) {
     if (edgeStatus[0] === nodeStatus[0]) {
-      res = edgeStatus[0];
+      res = edgeStatus.at(0)!;
     }
   }
   return res;
@@ -30,14 +30,11 @@ export const getCopyEnable = (activeNodes: string[], activeEdges: string[]): boo
   return newList.length === activeNodes.length;
 };
 
-export type MenuColorPaletteType = Record<
-  string,
-  {
-    name: string;
-    foregroundColor: string;
-    backgroundColor: string;
-  }
->;
+export type MenuColorPaletteType = Record<string, {
+  name: string;
+  foregroundColor: string;
+  backgroundColor: string;
+}>;
 
 export type MenuLogicalNodesType = {
   name: string;
@@ -52,28 +49,28 @@ export const menuConfig: MenuColorPaletteType = {
     name: '模块接口',
     foregroundColor: '#6d4eff',
     // backgroundColor: '#4823a4',
-    backgroundColor: '#3b217b',
+    backgroundColor: '#3b217b'
   },
 
   'global-node': {
     name: '面板功能',
-    foregroundColor: '#2d2e2f', //'var(--canvas-widget-darker-bgcolor)',
-    backgroundColor: 'var(--canvas-ui-lvl1-bgcolor)',
+    foregroundColor: '#2d2e2f', // 'var(--canvix-widget-darker-bgcolor)',
+    backgroundColor: 'var(--canvix-ui-lvl1-bgcolor)'
   },
   // 'local-node': {
   //   name: '面板节点',
-  //   foregroundColor: '#2d2e2f', //'var(--canvas-widget-darker-bgcolor)',
-  //   backgroundColor: 'var(--canvas-panel-main-bgcolor)',
+  //   foregroundColor: '#2d2e2f', //'var(--canvix-widget-darker-bgcolor)',
+  //   backgroundColor: 'var(--canvix-panel-main-bgcolor)',
   // },
   'process-control': {
     name: '流程控制',
-    foregroundColor: '#437C8E', //'#0d5dff',
-    backgroundColor: '#1C292C', //'#0941b3',
+    foregroundColor: '#437C8E', // '#0d5dff',
+    backgroundColor: '#1C292C' // '#0941b3',
   },
   'data-process': {
     name: '数据处理',
-    foregroundColor: '#6C9135', //'#139b00',
-    backgroundColor: '#252D1B', //'#0d6e00',
+    foregroundColor: '#6C9135', // '#139b00',
+    backgroundColor: '#252D1B' // '#0d6e00',
   },
   // 'input-device': {
   //   name: '输入设备',
@@ -83,6 +80,6 @@ export const menuConfig: MenuColorPaletteType = {
   'result-process': {
     name: '结果处理',
     foregroundColor: '#2e589a',
-    backgroundColor: '#2c3d58',
-  },
+    backgroundColor: '#2c3d58'
+  }
 };

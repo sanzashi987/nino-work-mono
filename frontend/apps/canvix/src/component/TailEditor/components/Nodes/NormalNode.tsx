@@ -1,11 +1,11 @@
 import React from 'react';
-import { ErrorOutline } from "@mui/icons-material";
+import { ErrorOutline } from '@mui/icons-material';
 import BasicNode, { renderVertical } from './BasicNode';
 import Styles from './index.module.scss';
 
 const { 'normal-node-wrap': NClass } = Styles;
 
-class NormalNode<T extends {} = {}> extends BasicNode<T> {
+class NormalNode<T extends object = object> extends BasicNode<T> {
   componentDidMount() {
     this.getEndpointList();
   }
@@ -32,11 +32,12 @@ class NormalNode<T extends {} = {}> extends BasicNode<T> {
     if (!this.state.endpoints) return null;
     const {
       node: { id, disable },
-      selected,
+      selected
     } = this.props;
     const { deprecated, isDelete } = this.state;
     const { source, target } = this.state.endpoints;
     const title = this.getTitle();
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const cn_name = this.getName();
     return (
       <div
@@ -46,19 +47,19 @@ class NormalNode<T extends {} = {}> extends BasicNode<T> {
       >
         <div className="node">
           <h2 className="title frnc">
-            <i className="font"></i>
+            <i className="font" />
             {this.renderIcon()}
             <span className="title-text">{cn_name}</span>
           </h2>
           {!isDelete ? (
             <div className="body-container">{renderVertical(id, source, target)}</div>
           ) : (
-            <div className="deleted-node"></div>
+            <div className="deleted-node" />
           )}
-          {disable && <div className="disabled"></div>}
+          {disable && <div className="disabled" />}
           {(deprecated || isDelete) && (
             <div className="deprecated">
-              <ErrorOutline className="error"/>
+              <ErrorOutline className="error" />
             </div>
           )}
         </div>

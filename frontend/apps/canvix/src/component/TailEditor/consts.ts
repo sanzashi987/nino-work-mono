@@ -2,7 +2,7 @@ const duration = {
   name: 'duration',
   type: 'number',
   default: 0,
-  description: '动画持续时间',
+  description: '动画持续时间'
 } as const;
 
 const hide = {
@@ -14,10 +14,10 @@ const hide = {
       name: 'type',
       type: 'string',
       default: 'fadeOut',
-      description: '出场动画类',
+      description: '出场动画类'
     },
-    duration,
-  },
+    duration
+  }
 } as const;
 
 const display = {
@@ -29,22 +29,22 @@ const display = {
       name: 'type',
       type: 'string',
       default: 'fadeIn',
-      description: '入场动画类',
+      description: '入场动画类'
     },
-    duration,
-  },
+    duration
+  }
 } as const;
 
 export const comReservedTargets = [
   {
     name: '显示',
     id: 'instance.display',
-    fields: display,
+    fields: display
   },
   {
     name: '隐藏',
     id: 'instance.hide',
-    fields: hide,
+    fields: hide
   },
   {
     name: '切换显隐',
@@ -55,8 +55,8 @@ export const comReservedTargets = [
       type: 'object',
       children: {
         display,
-        hide,
-      },
-    },
-  },
+        hide
+      }
+    }
+  }
 ];

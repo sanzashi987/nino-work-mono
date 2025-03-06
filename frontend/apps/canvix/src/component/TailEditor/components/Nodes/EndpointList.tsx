@@ -1,6 +1,6 @@
 import React, { PureComponent, FC } from 'react';
-import type { EndpointType } from '@canvas/component-factory';
 import { Handle } from 'tail-js';
+import { EndpointType } from '@canvix/component-factory';
 import Style from './index.module.scss';
 // import { SourcePoint, TargetPoint } from '../Point';
 
@@ -15,6 +15,7 @@ type SourceTarget = 'source' | 'target';
 
 class EndpointList extends PureComponent<EndpointListProps> {
   type: SourceTarget = 'source';
+
   render() {
     const { nodeId, endpoints } = this.props;
     return (
@@ -45,16 +46,14 @@ type ChildListProps = {
   childList: string[];
 };
 
-const ChildList: FC<ChildListProps> = ({ childList }) => {
-  return (
-    <ul className={childListStyle}>
-      {childList.map((e, i) => (
-        <li className="child-item" title={e} key={i}>
-          {e}
-        </li>
-      ))}
-    </ul>
-  );
-};
+const ChildList: FC<ChildListProps> = ({ childList }) => (
+  <ul className={childListStyle}>
+    {childList.map((e, i) => (
+      <li className="child-item" title={e} key={e}>
+        {e}
+      </li>
+    ))}
+  </ul>
+);
 
 export { SourceList, TargetList, ChildList };

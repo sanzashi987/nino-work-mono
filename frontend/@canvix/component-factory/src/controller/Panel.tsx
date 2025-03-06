@@ -45,14 +45,12 @@ export abstract class BasicPanel<
     this.state = { config: props.config, panelData: props.data ?? null } as S;
     this.duplexChannel = new DuplexChannelCore(this, this.getServicesCtor());
 
-    this.primitiveUtils = { general: { ...this.buildUtils(), ...this.getStaticUtils() } };
+    this.primitiveUtils = { general: this.buildUtils() };
     this.logicalUtils = this.getLogicalUtils();
   }
 
   abstract getLogicalUtils(): LogicalUtilsType;
   abstract buildUtils(): PanelUtils;
-  // abstract getPanelStyle(): CSSProperties;
-  abstract getStaticUtils(): StaticUtils<UtilsType>;
   abstract render(): React.ReactNode;
 
   getServicesCtor(): PanelServiceCtor<any, any>[] {

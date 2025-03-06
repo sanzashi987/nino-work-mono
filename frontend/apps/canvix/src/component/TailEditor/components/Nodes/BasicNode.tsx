@@ -1,7 +1,9 @@
+/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-unused-class-component-methods */
 import React, { Component } from 'react';
 import type { NodeProps } from 'tail-js';
-import type { InteractionNodeTypeRuntime } from '@canvas/event-core';
-import type { EndpointType } from '@canvas/component-factory';
+import { EndpointType } from '@canvix/component-factory';
+import { InteractionNodeTypeRuntime } from '@canvix/event-core';
 import { SourceList, TargetList } from './EndpointList';
 import type { EndpointsStatusType, EndpointResType, TailEditorInterface } from '../../types';
 import { TailEditorContext } from '../../interface';
@@ -11,14 +13,26 @@ type TemplateState = {
   endpoints: EndpointResType | null;
 } & EndpointsStatusType;
 
-class BasicNode<T extends {} = {}> extends Component<NodeProps<InteractionNodeTypeRuntime> & T> {
+class BasicNode<T extends object = object> extends Component<NodeProps<InteractionNodeTypeRuntime> & T> {
   static contextType?: React.Context<any> | undefined = TailEditorContext;
+
   declare context: TailEditorInterface;
+
   state: TemplateState = {
     endpoints: null,
     deprecated: false,
-    isVertical: false,
+    isVertical: false
   };
+
+  componentDidUpdate(lp: NodeProps<InteractionNodeTypeRuntime>, ls: TemplateState) {
+    if (lp.selected !== this.props.selected) {
+      this.props.setContainerStyle({ zIndex: this.props.selected ? 1 : 'unset' });
+    }
+
+    if (ls.endpoints !== this.state.endpoints) {
+      this.props.updateNodeHandles();
+    }
+  }
 
   getEndpointList() {
     this.context
@@ -29,17 +43,6 @@ class BasicNode<T extends {} = {}> extends Component<NodeProps<InteractionNodeTy
       .catch((e) => {
         console.log(e);
       });
-  }
-  componentDidUpdate(lp: NodeProps<InteractionNodeTypeRuntime>, ls: TemplateState) {
-    if (lp.selected !== this.props.selected) {
-      this.props.setContainerStyle({
-        zIndex: this.props.selected ? 1 : 'unset',
-      });
-    }
-
-    if (ls.endpoints !== this.state.endpoints) {
-      this.props.updateNodeHandles();
-    }
   }
 }
 

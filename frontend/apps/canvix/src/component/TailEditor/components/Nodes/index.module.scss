@@ -5,7 +5,7 @@
 }
 
 @mixin deprecated-icon {
-  color: var(--canvas-interaction-deprecated-text-color);
+  color: var(--canvix-interaction-deprecated-text-color);
   // color: #ff423540;
   font-size: 60px;
 }
@@ -17,13 +17,13 @@
 }
 
 @mixin nodeActive {
-  border: 2px solid var(--canvas-interaction-active-color);
+  border: 2px solid var(--canvix-interaction-active-color);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.8);
   :global {
     .endpoint-item {
       .point,
       .tail-handle__reserved {
-        border-color: var(--canvas-interaction-active-color) !important;
+        border-color: var(--canvix-interaction-active-color) !important;
       }
     }
   }
@@ -71,7 +71,7 @@
           border-radius: 100%;
           border: 2px solid #fff;
           box-sizing: border-box;
-          background: var(--canvas-interaction-handle-bgcolor);
+          background: var(--canvix-interaction-handle-bgcolor);
 
           &.source {
             top: 50%;
@@ -110,7 +110,7 @@
       width: 50px;
       height: 50px;
       display: inline-block;
-      border: 4px solid var(--canvas-interaction-node-disabled-color);
+      border: 4px solid var(--canvix-interaction-node-disabled-color);
       border-radius: 100%;
       top: 50%;
       transform: translate(-50%, -50%);
@@ -120,8 +120,8 @@
       background: linear-gradient(
         -45deg,
         transparent 49.5%,
-        var(--canvas-interaction-node-disabled-color) 45%,
-        var(--canvas-interaction-node-disabled-color) 55%,
+        var(--canvix-interaction-node-disabled-color) 45%,
+        var(--canvix-interaction-node-disabled-color) 55%,
         transparent 50.5%
       );
     }
@@ -134,15 +134,15 @@
   height: 26px;
   line-height: 26px;
   font-size: 12px;
-  color: var(--canvas-interaction-node-title-color);
+  color: var(--canvix-interaction-node-title-color);
   display: block;
   @include text-overflow();
 }
 
 @mixin endpointType {
   .endpoint-type {
-    // background: var(--canvas-widget-darker-bgcolor);
-    background: var(--canvas-interaction-node-type-color);
+    // background: var(--canvix-widget-darker-bgcolor);
+    background: var(--canvix-interaction-node-type-color);
     padding: 0 0 0 8px;
     line-height: 24px;
   }
@@ -208,22 +208,22 @@
     .node {
       // min-width: 160px;
       width: 160px;
-      color: var(--canvas-font-base-color);
-      background: var(--canvas-ui-lvl1-bgcolor);
+      color: var(--canvix-font-base-color);
+      background: var(--canvix-ui-lvl1-bgcolor);
       cursor: move;
       border-radius: 4px;
       border: 2px solid transparent;
       @include hoverBright();
       .refresh-icon {
-        color: var(--canvas-interaction-node-title-color);
+        color: var(--canvix-interaction-node-title-color);
         margin-left: 9px;
         font-size: 12px;
         &:hover {
-          color: var(--canvas-interaction-active-color);
+          color: var(--canvix-interaction-active-color);
         }
       }
       .title {
-        background: var(--canvas-ui-lvl2-bgcolor);
+        background: var(--canvix-ui-lvl2-bgcolor);
         margin-bottom: 0;
         .title-text {
           @include title();
@@ -241,7 +241,7 @@
         left: -6px;
         right: -6px;
         text-align: center;
-        background: var(--canvas-interaction-deprecated-bgcolor);
+        background: var(--canvix-interaction-deprecated-bgcolor);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -261,7 +261,7 @@
 .child-list {
   flex: 1;
   font-size: 12px;
-  color: var(--canvas-interaction-node-title-color);
+  color: var(--canvix-interaction-node-title-color);
   margin: 0;
   max-width: 124px;
   :global {
