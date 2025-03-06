@@ -121,6 +121,7 @@
     "react/destructuring-assignment": "off",
     "no-plusplus": "off",
     "no-param-reassign": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "no-restricted-exports": "off"
   }
 }

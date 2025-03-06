@@ -1,14 +1,12 @@
 import React, { createRef } from 'react';
 import { createMemo, shallowEqual } from '@canvix/utils';
 import { Connector, ConnectorProps } from '@canvix/event-core';
-import { type Identifier } from '@canvix/shared';
+import { IDComConfig, IDConfig, type Identifier } from '@canvix/shared';
 import type {
-  IDConfig,
   FullUtils,
   ControllerBasicProps,
   BasicStates,
-  LoaderRuntimeBasicProps,
-  IDComConfig
+  LoaderRuntimeBasicProps
 } from './types';
 import { typeToService, ServiceComponent } from '../services';
 
@@ -89,12 +87,11 @@ S
 abstract class Controller<
   Config extends IDComConfig['config'],
   PanelUtils,
-  UtilsOption,
   Children,
   OptionProps extends object = object,
   PanelUtilsRuntime extends object = object,
 > extends ServiceConnector<
-  ControllerBasicProps<Config, PanelUtils, UtilsOption, Children, OptionProps>,
+  ControllerBasicProps<Config, PanelUtils, Children, OptionProps>,
   BasicStates<Config>
   > {
   containerRef = createRef<HTMLDivElement | null>();
@@ -113,7 +110,7 @@ abstract class Controller<
         },
         userProps,
         ...other
-      } as LoaderRuntimeBasicProps<PanelUtilsRuntime, UtilsOption> & BasicStates<Config>;
+      } as LoaderRuntimeBasicProps<PanelUtilsRuntime> & BasicStates<Config>;
     }
   );
 
@@ -129,7 +126,7 @@ abstract class Controller<
     };
   }
 
-  abstract createUtils(): FullUtils<PanelUtilsRuntime, UtilsOption>;
+  abstract createUtils(): FullUtils<PanelUtilsRuntime>;
   // when the componentloader first render/mount the given view-components
   // but it can be triggered multiple times, as the unmount state will make the
   // component loader unmount as well.
@@ -137,7 +134,7 @@ abstract class Controller<
 
   constructor(
     props: ConnectorProps<
-    ControllerBasicProps<Config, PanelUtils, UtilsOption, Children, OptionProps>
+    ControllerBasicProps<Config, PanelUtils, Children, OptionProps>
     >
   ) {
     super(props);
@@ -155,7 +152,7 @@ abstract class Controller<
 
   shouldComponentUpdate(
     nextProps: ConnectorProps<
-    ControllerBasicProps<Config, PanelUtils, UtilsOption, Children, OptionProps>
+    ControllerBasicProps<Config, PanelUtils, Children, OptionProps>
     >,
     nextState: BasicStates<Config>
   ) {
@@ -188,10 +185,9 @@ abstract class Controller<
     this.cleanup();
   }
 
-  getRuntimeProps(): LoaderRuntimeBasicProps<PanelUtilsRuntime, UtilsOption> & BasicStates<Config> {
+  getRuntimeProps(): LoaderRuntimeBasicProps<PanelUtilsRuntime> & BasicStates<Config> {
     return this.memoProps(this.state, this.props.userProps);
   }
 }
 
 export default Controller;
-export { typeToService };

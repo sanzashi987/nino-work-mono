@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type { MutableRefObject, ReactNode } from 'react';
 // import type { BasicAssetParams, ComInfo, FileType } from '@canvas/utilities';
-import type { ConfigTypeSupportedInControllerRuntime, SandboxRunnerType } from '@canvix/shared';
+import type { ConfigTypeSupportedInControllerRuntime } from '@canvix/shared';
+import { SandboxRunnerType } from '@canvix/script-sandbox';
 
 export type PanelOption = {
   panelId: string;

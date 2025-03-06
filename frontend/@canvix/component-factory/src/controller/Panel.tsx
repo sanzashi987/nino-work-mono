@@ -4,14 +4,14 @@ import {
   InteractionService,
   PanelServiceCtor
 } from '@canvix/event-core';
+import { ComDefault, HiddenMode } from '@canvix/shared';
 import { ServiceConnector } from './Controller';
-import type { PrimitiveUtils, StaticUtils } from './types';
-import { Default, Responsive } from '../services/types';
+import type { PrimitiveUtils } from './types';
 
-type PanelConfigType<T> = Default & {
+type PanelConfigType<T> = ComDefault & {
   type: 'panel';
   basic: Record<string, any>;
-  hide?: Responsive.HiddenMode;
+  hide?: HiddenMode;
 } & T;
 
 export type PanelConfigProps<T extends object = object> = {
@@ -30,14 +30,13 @@ export abstract class BasicPanel<
   P extends PanelConfigProps,
   S extends PanelState,
   PanelUtils extends object = object,
-  UtilsType extends object = object,
   LogicalUtilsType extends object = object,
 > extends ServiceConnector<P, S> {
   state: S;
 
   duplexChannel;
 
-  primitiveUtils: PrimitiveUtils<PanelUtils, UtilsType>;
+  primitiveUtils: PrimitiveUtils<PanelUtils>;
 
   logicalUtils: LogicalUtilsType;
 

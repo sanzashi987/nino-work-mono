@@ -24,7 +24,7 @@ export type DataConfigPackage = {
   [sourceName: string]: SingleSourcePackage;
 };
 
-export type BasicCanvasFieldType = {
+export type BasicCanvixFieldType = {
   cn_name: string;
   icon: string;
   category: string;
@@ -160,7 +160,7 @@ export type PackageChildrenType = {
     };
   } & Record<string, Record<string, any>>;
 };
-export type CanvixFieldType = BasicCanvasFieldType & {
+export type CanvixFieldType = BasicCanvixFieldType & {
   children?: PackageChildrenType;
 };
 export type PackageJSONType = BasicPackageType & {

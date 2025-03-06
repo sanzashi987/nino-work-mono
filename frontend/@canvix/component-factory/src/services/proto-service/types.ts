@@ -33,6 +33,13 @@ export type EndpointType = {
   description?: string;
 };
 
+export type EndpointsType = Record<
+string,
+Omit<EndpointType, 'id'> & {
+  description?: string;
+}
+>;
+
 type BaseCollection = {
   name: string;
   isPublic: boolean;

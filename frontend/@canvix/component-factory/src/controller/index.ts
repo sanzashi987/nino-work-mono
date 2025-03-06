@@ -1,3 +1,2 @@
-export * from './Controller';
-export { default } from './Controller';
+export { default, parseConfig, ServiceConnector } from './Controller';
 export * from './Panel';

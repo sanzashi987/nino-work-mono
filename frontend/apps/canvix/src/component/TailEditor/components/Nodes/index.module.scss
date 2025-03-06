@@ -1,0 +1,279 @@
+@mixin text-overflow {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@mixin deprecated-icon {
+  color: var(--canvas-interaction-deprecated-text-color);
+  // color: #ff423540;
+  font-size: 60px;
+}
+
+@mixin hoverBright {
+  &:hover {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+@mixin nodeActive {
+  border: 2px solid var(--canvas-interaction-active-color);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.8);
+  :global {
+    .endpoint-item {
+      .point,
+      .tail-handle__reserved {
+        border-color: var(--canvas-interaction-active-color) !important;
+      }
+    }
+  }
+}
+
+@mixin endpointList {
+  .endpoint-list {
+    // max-width: 80px;
+    margin: 0;
+    // display: flex;
+    & > li {
+      line-height: 24px;
+      display: flex;
+      align-items: center;
+    }
+    &:global(.collapse) {
+      flex-grow: 0 !important;
+      flex-basis: 6px !important;
+    }
+
+    // :global {
+    .endpoint-item {
+      padding: 0 6px;
+      height: 2em;
+      position: relative;
+      margin-bottom: 1px;
+      .desc {
+        flex: 1;
+        @include text-overflow();
+        &.source {
+          text-align: right;
+        }
+        &.target {
+          text-align: left;
+        }
+      }
+
+      :global {
+        .tail-handle__reserved {
+          width: 8px;
+          height: 8px;
+          position: absolute;
+          display: block;
+          cursor: pointer;
+          border-radius: 100%;
+          border: 2px solid #fff;
+          box-sizing: border-box;
+          background: var(--canvas-interaction-handle-bgcolor);
+
+          &.source {
+            top: 50%;
+            right: -1px;
+            transform: translate(50%, -50%);
+            &:hover {
+              box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+            }
+          }
+          &.target {
+            left: -1px;
+            transform: translate(-50%, -50%);
+            &:hover {
+              box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+            }
+          }
+        }
+      }
+    }
+    // }
+  }
+}
+
+@mixin disable {
+  :global(.disabled) {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: -6px;
+    right: -6px;
+    background: rgba(42, 47, 54, 0.6);
+    z-index: 999;
+    &::after {
+      opacity: 0.3;
+      content: '';
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      border: 4px solid var(--canvas-interaction-node-disabled-color);
+      border-radius: 100%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      position: absolute;
+      left: 50%;
+      font-size: 50px;
+      background: linear-gradient(
+        -45deg,
+        transparent 49.5%,
+        var(--canvas-interaction-node-disabled-color) 45%,
+        var(--canvas-interaction-node-disabled-color) 55%,
+        transparent 50.5%
+      );
+    }
+  }
+}
+
+@mixin title {
+  padding: 0 9px 0 9px;
+  margin-bottom: 0;
+  height: 26px;
+  line-height: 26px;
+  font-size: 12px;
+  color: var(--canvas-interaction-node-title-color);
+  display: block;
+  @include text-overflow();
+}
+
+@mixin endpointType {
+  .endpoint-type {
+    // background: var(--canvas-widget-darker-bgcolor);
+    background: var(--canvas-interaction-node-type-color);
+    padding: 0 0 0 8px;
+    line-height: 24px;
+  }
+  .empty-placeholder {
+    padding: 10px;
+    text-align: center;
+  }
+}
+
+.logical-node-wrap {
+  min-width: 60px;
+  max-width: 180px;
+  display: inline-block;
+  color: #fff;
+  cursor: move;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  @include hoverBright();
+  &:global(.selected) {
+    @include nodeActive();
+  }
+  :global {
+    .title {
+      margin: 0;
+      max-width: 160px;
+      border-radius: 2px 2px 0 0;
+      .title-text {
+        @include title();
+      }
+    }
+    .body-container {
+      padding-top: 3px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      &.vertical {
+        display: block;
+        padding-top: 0px;
+        width: 160px;
+        .endpoint-list {
+          max-width: unset;
+        }
+      }
+      @include endpointType();
+
+      @include endpointList();
+      .endpoint-list {
+        max-width: 88px;
+        flex-grow: 1;
+      }
+    }
+    @include disable();
+  }
+}
+
+.normal-node-wrap {
+  &:global(.selected) {
+    :global(.node) {
+      @include nodeActive();
+    }
+  }
+  :global {
+    .node {
+      // min-width: 160px;
+      width: 160px;
+      color: var(--canvas-font-base-color);
+      background: var(--canvas-ui-lvl1-bgcolor);
+      cursor: move;
+      border-radius: 4px;
+      border: 2px solid transparent;
+      @include hoverBright();
+      .refresh-icon {
+        color: var(--canvas-interaction-node-title-color);
+        margin-left: 9px;
+        font-size: 12px;
+        &:hover {
+          color: var(--canvas-interaction-active-color);
+        }
+      }
+      .title {
+        background: var(--canvas-ui-lvl2-bgcolor);
+        margin-bottom: 0;
+        .title-text {
+          @include title();
+        }
+      }
+      .body-container {
+        @include endpointList();
+        @include endpointType();
+      }
+      @include disable();
+      .deprecated {
+        position: absolute;
+        top: -2px;
+        bottom: -2px;
+        left: -6px;
+        right: -6px;
+        text-align: center;
+        background: var(--canvas-interaction-deprecated-bgcolor);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .error {
+          @include deprecated-icon();
+        }
+      }
+    }
+    .deleted-node {
+      width: 100%;
+      height: 220px;
+    }
+  }
+}
+
+.child-list {
+  flex: 1;
+  font-size: 12px;
+  color: var(--canvas-interaction-node-title-color);
+  margin: 0;
+  max-width: 124px;
+  :global {
+    .child-item {
+      border-radius: 2px;
+      line-height: 24px;
+      padding: 0px 18px;
+      background: rgba(255, 255, 255, 0.2);
+      @include text-overflow();
+      &:not(:last-child) {
+        margin-bottom: 1px;
+      }
+    }
+  }
+}
