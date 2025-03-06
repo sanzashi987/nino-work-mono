@@ -1,6 +1,5 @@
 import type { ApiReturnType, GetValueEntryType, IdentifierSource, RequestApi } from '@canvix/shared';
-import { getErrorInfo } from './utils';
-import { canvasApiService } from '../../constants';
+import { getApiUrl, getErrorInfo } from './utils';
 import requestService, { post, RequestConfig } from '../../requestService';
 
 type RequestType = 'get' | 'put' | 'post';
@@ -16,7 +15,7 @@ const requestApi = (
   identifier: IdentifierSource,
   config: RequestConfig = {}
 ): Promise<any> => post(
-  `${canvasApiService}/canvas-pro-mobile/V1/facade/request-api?screenId=${identifier.projectId}`,
+  getApiUrl(identifier.projectId),
   params,
   config
 );

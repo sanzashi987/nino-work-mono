@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/utils"
+	"github.com/sanzashi987/nino-work/apps/canvix/consts"
+	"github.com/sanzashi987/nino-work/apps/canvix/utils"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"

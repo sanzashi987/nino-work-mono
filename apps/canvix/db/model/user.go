@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/utils"
+	"github.com/sanzashi987/nino-work/apps/canvix/utils"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"gorm.io/gorm"
 )

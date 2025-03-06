@@ -3,7 +3,7 @@ package dao
 import (
 	"errors"
 
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"gorm.io/gorm"
 )
 

@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvix/consts"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )

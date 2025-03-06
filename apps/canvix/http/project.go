@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/apps/canvix/service"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )

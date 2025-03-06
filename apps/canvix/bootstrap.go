@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/http"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvix/http"
 	"github.com/sanzashi987/nino-work/pkg/bootstrap"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )

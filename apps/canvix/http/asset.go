@@ -5,8 +5,8 @@ import (
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/consts"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/service"
+	"github.com/sanzashi987/nino-work/apps/canvix/consts"
+	"github.com/sanzashi987/nino-work/apps/canvix/service"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 

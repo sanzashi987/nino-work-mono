@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/dao"
-	"github.com/sanzashi987/nino-work/apps/canvas-pro/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 )
 
 type ThemeService struct{}

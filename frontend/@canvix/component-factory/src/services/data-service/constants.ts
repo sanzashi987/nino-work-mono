@@ -1,6 +1,5 @@
 // eslint-disable-next-line
 //@ts-ignore
-export const canvasApiService = `${window.conf?.canvasBackendBaseUrl ?? ''}`;
 
 export const RES_ERR_NOT_FOUND = { error: true, status: '404', message: 'Resource Not Found' };
 

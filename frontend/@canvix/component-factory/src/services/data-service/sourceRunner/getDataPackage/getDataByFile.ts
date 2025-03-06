@@ -1,6 +1,5 @@
 import type { IdentifierSource, ApiReturnType, GetValueEntryType } from '@canvix/shared';
-import { getErrorInfo } from './utils';
-import { canvasApiService } from '../../constants';
+import { getFileUrl, getErrorInfo } from './utils';
 import { post } from '../../requestService';
 
 const queryDataBySourceId = (
@@ -8,7 +7,7 @@ const queryDataBySourceId = (
   identifier: IdentifierSource,
   config: object = {}
 ): Promise<any> => post(
-  `${canvasApiService}/canvas-pro-mobile/V1/source-connect/getData?sourceId=${sourceId}&screenId=${identifier.projectId}`,
+  getFileUrl(sourceId, identifier.projectId),
   {},
   config
 );
