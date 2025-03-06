@@ -2,8 +2,7 @@ import {
   ServiceComponent, typeToService, parseConfig, EndpointsType, EndpointType
 } from '@canvix/component-factory';
 import { BLOCK_ACTION_ID, BLOCK_EVENT_ID, InteractionNodeType } from '@canvix/event-core';
-import { BasicCanvixFieldType, ComponentPackageType } from '@canvix/shared';
-import { ConfigType } from 'dayjs';
+import { BasicCanvixFieldType, ComponentPackageType, ConfigType } from '@canvix/shared';
 
 /** ****************** pure functions *****************  */
 export type EndpointResType = {

@@ -30,14 +30,14 @@ Basic & {
 };
 
 export type Subcom<
-    Attr extends DefaultAttr = DefaultAttr,
-    Data extends DataConfigType = DataConfigType,
-  > = {
-    type: 'subcom';
-  } & ComBasic<Data> &
-  ComDefault & {
-    attr: Attr;
-  };
+  Attr extends DefaultAttr = DefaultAttr,
+  Data extends DataConfigType = DataConfigType,
+> = {
+  type: 'subcom';
+} & ComBasic<Data> &
+ComDefault & {
+  attr: Attr;
+};
 
 export type SubcomRuntime<Attr extends DefaultAttr = DefaultAttr> = Subcom<
 Attr,
