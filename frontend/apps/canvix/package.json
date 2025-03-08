@@ -20,10 +20,10 @@
     ]
   },
   "dependencies": {
+    "@canvix/component-factory": "workspace:*",
+    "@canvix/event-core": "workspace:*",
     "@canvix/shared": "workspace:*",
     "@canvix/utils": "workspace:*",
-    "@canvix/event-core": "workspace:*",
-    "@canvix/component-factory": "workspace:*",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.0",
@@ -32,6 +32,7 @@
     "@nino-work/shared": "workspace:*",
     "@nino-work/ui-components": "workspace:*",
     "dayjs": "^1.11.13",
+    "immer": "^9.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
