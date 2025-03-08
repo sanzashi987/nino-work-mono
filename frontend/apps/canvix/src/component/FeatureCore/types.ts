@@ -26,17 +26,10 @@ export type FeatureItemBase<T> = T & {
 };
 
 export type FeatureItemProps = FeatureItemBase<{
-  shortcutWin?: string | string[];
-  shortcutMac?: string | string[];
-}>;
-
-export type FeatureItemRuntime = FeatureItemBase<{
-  shortcutWin?: string | string[];
-  shortcutMac?: string | string[];
   shortcutNode: ReactNode;
 }>;
 
-export type FeatureRuntimeMap = Record<string, FeatureItemRuntime>;
+export type FeatureRuntimeMap = Record<string, FeatureItemProps>;
 
 export type EditorFeaturesType = FeatureRuntimeMap;
 

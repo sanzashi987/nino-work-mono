@@ -123,6 +123,8 @@
     "@typescript-eslint/indent": [
       "error",
       2,
-    ]
+    ],
+    "react/sort-comp": "off",
+    "no-continue": "off"
   }
 }

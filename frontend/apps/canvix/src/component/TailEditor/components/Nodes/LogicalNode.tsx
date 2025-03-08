@@ -1,5 +1,5 @@
 import React from 'react';
-import type { InteractionNodeTypeRuntime } from '@canvas/event-core';
+import type { InteractionNodeTypeRuntime } from '@canvix/event-core';
 import BasicNode, { renderVertical } from './BasicNode';
 import Styles from './index.module.scss';
 import { SourceList, TargetList, ChildList } from './EndpointList';
@@ -8,8 +8,8 @@ import { TailEditorContext, TailEditorInterface } from '../../interface';
 const { 'logical-node-wrap': LClass } = Styles;
 
 const defaultColor = {
-  foregroundColor: '#2d2e2f', //'var(--canvix-widget-darker-bgcolor)',
-  backgroundColor: 'var(--canvix-ui-lvl1-bgcolor)',
+  foregroundColor: '#2d2e2f', // 'var(--canvix-widget-darker-bgcolor)',
+  backgroundColor: 'var(--canvix-ui-lvl1-bgcolor)'
 };
 
 class LogicalNode extends BasicNode {
@@ -28,7 +28,7 @@ class LogicalNode extends BasicNode {
     const { source, target, childList = [] } = this.state.endpoints!;
     const verticalLayout = this.state.isVertical && childList.length === 0;
     const { node, selected } = this.props;
-    const { name: cn_name, id, disable, com } = node;
+    const { name, id, disable, com } = node;
     const { foregroundColor, backgroundColor } = menuPalette[com!.category] ?? defaultColor;
     return (
       <div
@@ -36,8 +36,8 @@ class LogicalNode extends BasicNode {
         style={{ background: backgroundColor }}
       >
         <h2 className="title" style={{ background: foregroundColor }}>
-          <span className="title-text" title={cn_name}>
-            {cn_name}
+          <span className="title-text" title={name}>
+            {name}
           </span>
         </h2>
         <div className={`body-container ${verticalLayout ? 'vertical' : ''}`}>
@@ -51,7 +51,7 @@ class LogicalNode extends BasicNode {
             </>
           )}
         </div>
-        {disable && <div className="disabled"></div>}
+        {disable && <div className="disabled" />}
       </div>
     );
   };

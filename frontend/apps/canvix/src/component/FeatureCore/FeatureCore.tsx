@@ -1,7 +1,5 @@
 import React, { Component, createContext } from 'react';
-import produce from 'immer';
 import { noop, returnVoidObject } from '@nino-work/shared';
-import { isMac } from '@canvix/utils';
 import type { EditorFeaturesRegisterType, EditorFeaturesType, FeatureItemProps, FeatureRuntimeMap } from './types';
 
 export const EditorFeatures = createContext<EditorFeaturesType>({});
@@ -11,20 +9,12 @@ export const EditorFeaturesRegister = createContext<EditorFeaturesRegisterType>(
   getFeaturesAsync: returnVoidObject
 });
 
-const selectField = isMac ? 'shortcutMac' : 'shortcutWin';
-
 export const parseFeatures = (items: FeatureItemProps[]) => Object.fromEntries(
   items.map((item) => {
-    const { id, [selectField]: shortcut } = item;
-    return [id, { ...item, shortcutNode: shortcut ? getSymbolCombo(shortcut) : null }];
+    const { id, shortcutNode } = item;
+    return [id, { ...item, shortcutNode }];
   })
 );
-
-export const deleteFeatures = (last: FeatureRuntimeMap, ids: string[]) => {
-  ids.forEach((id) => {
-    delete last[id];
-  });
-};
 
 type FeatureCoreProps = {
   initFeatures: FeatureItemProps[];
@@ -61,8 +51,9 @@ class FeatureCore extends Component<FeatureCoreProps, FeatureCoreState> {
   };
 
   unregisterFeatures = (ids: string[]) => {
-    const nextFeature = produce(this.featuresLastest, (draft) => {
-      deleteFeatures(draft, ids);
+    const nextFeature = { ...this.featuresLastest };
+    ids.forEach((id) => {
+      delete nextFeature[id];
     });
     this.featuresLastest = nextFeature;
     this.setState(() => ({ features: nextFeature }));

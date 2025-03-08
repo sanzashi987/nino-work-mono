@@ -1,4 +1,4 @@
-import { InteractionConfigType } from '@canvix/event-core';
+import type { InteractionConfigType } from '@canvix/event-core';
 
 export const getItemSwitchable = (
   activeNodes: string[],
@@ -43,43 +43,3 @@ export type MenuLogicalNodesType = {
   category: string;
   type: string;
 }[];
-
-export const menuConfig: MenuColorPaletteType = {
-  block: {
-    name: '模块接口',
-    foregroundColor: '#6d4eff',
-    // backgroundColor: '#4823a4',
-    backgroundColor: '#3b217b'
-  },
-
-  'global-node': {
-    name: '面板功能',
-    foregroundColor: '#2d2e2f', // 'var(--canvix-widget-darker-bgcolor)',
-    backgroundColor: 'var(--canvix-ui-lvl1-bgcolor)'
-  },
-  // 'local-node': {
-  //   name: '面板节点',
-  //   foregroundColor: '#2d2e2f', //'var(--canvix-widget-darker-bgcolor)',
-  //   backgroundColor: 'var(--canvix-panel-main-bgcolor)',
-  // },
-  'process-control': {
-    name: '流程控制',
-    foregroundColor: '#437C8E', // '#0d5dff',
-    backgroundColor: '#1C292C' // '#0941b3',
-  },
-  'data-process': {
-    name: '数据处理',
-    foregroundColor: '#6C9135', // '#139b00',
-    backgroundColor: '#252D1B' // '#0d6e00',
-  },
-  // 'input-device': {
-  //   name: '输入设备',
-  //   foregroundColor: '#4C4D83', //'#6d4eff',
-  //   backgroundColor: '#1E1F2A', //'#4823a4',
-  // },
-  'result-process': {
-    name: '结果处理',
-    foregroundColor: '#2e589a',
-    backgroundColor: '#2c3d58'
-  }
-};

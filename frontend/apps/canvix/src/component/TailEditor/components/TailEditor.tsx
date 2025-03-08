@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-unused-class-component-methods */
 import React, { Component, createRef } from 'react';
 import Tail, {
   coordinates,
@@ -12,10 +14,10 @@ import Tail, {
   getConnectedEdgeByNode,
   NodeTemplatesType,
   HandleAttribute,
-  EdgePairedResult,
+  EdgePairedResult
 } from 'tail-js';
-import { createMemo } from '@canvas/utilities';
-import type { InteractionConfigType } from '@canvas/event-core';
+import { createMemo } from '@canvix/utils';
+import type { InteractionConfigType } from '@canvix/event-core';
 import { getCopyEnable, getItemSwitchable } from './helpers';
 import { Arrows, ArrowTemplates } from './Arrows';
 import { BezierConnectingEdge, EdgeTemplate } from './Edges';
@@ -29,7 +31,6 @@ type State = { scale: number };
 export type Props = {
   activeNodes: string[];
   activeEdges: string[];
-  // panelStatus: string;
 } & InteractionConfigType;
 
 const MiniMapStatic = (
@@ -39,19 +40,21 @@ const MiniMapStatic = (
     activeColor="var(--canvix-primary-color)"
     nodeColor="var(--canvix-ui-emphasis-bgcolor)"
     viewportFrameColor="var(--canvix-primary-color)"
-    style={{
-      background: 'var(--canvix-ui-lvl1-bgcolor)',
-    }}
+    style={{ background: 'var(--canvix-ui-lvl1-bgcolor)' }}
   />
 );
 
 abstract class TailEditor<T extends Props> extends Component<T, State> {
   ref = createRef<HTMLDivElement>();
+
   tail = createRef<CoreMethods>();
+
   state = { scale: 1 };
+
   mode: SelectModeType = SelectModeType.single;
 
   memoSwitch = createMemo(getItemSwitchable);
+
   memoCopy = createMemo(getCopyEnable);
 
   setScale = (scale: number) => {
@@ -64,7 +67,9 @@ abstract class TailEditor<T extends Props> extends Component<T, State> {
   };
 
   focusNode = (id: string) => this.tail.current?.focusNode(id);
+
   resetViewCenter = () => this.tail.current?.moveViewCenter(0, 0);
+
   switchSelectionMode = () => {
     this.mode = this.mode === SelectModeType.single ? SelectModeType.select : SelectModeType.single;
     return this.tail.current?.switchMode(this.mode);
