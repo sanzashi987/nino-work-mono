@@ -1,4 +1,4 @@
-import { PanelServiceInstance, PostMethodType, PushMethodType } from './types';
+import { PanelServiceInstance, PostMethodType, PushMethodType } from '@/types';
 import { Connector } from './channel';
 
 export const FetchInstance = 'observer.fetchInstance';

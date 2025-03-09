@@ -1,6 +1,5 @@
 import React, { createRef } from 'react';
-import { Connector, ConnectorProps } from '@canvix/event-core';
-import { IDComConfig, IDConfig, type Identifier } from '@/types';
+import { ConnectorProps, IDComConfig, IDConfig, type Identifier } from '@/types';
 import { createMemo, shallowEqual } from '@/utils';
 import type {
   FullUtils,
@@ -9,6 +8,7 @@ import type {
   LoaderRuntimeBasicProps
 } from './types';
 import { typeToService, ServiceComponent } from '../services';
+import { Connector } from '../EventChannel';
 
 export function parseConfig(serviceMap: Record<string, ServiceComponent>, config: any) {
   return Object.keys(serviceMap)

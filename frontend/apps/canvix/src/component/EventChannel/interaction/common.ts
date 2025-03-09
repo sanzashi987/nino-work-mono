@@ -12,7 +12,7 @@ import type {
   EdgeBasic,
   ConnectableContextType,
   ServiceHostInstance
-} from '../types';
+} from '@/types';
 import type { ConnectorCore } from '../channel';
 
 function genIdentifier({ sourceNode, source }: SourceDesciption) {
