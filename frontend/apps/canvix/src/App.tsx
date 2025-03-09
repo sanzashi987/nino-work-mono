@@ -1,6 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
-declare interface Window {
-
+declare global{
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    dub(name: string, deps: string[] | Function, callback: Function): void;
+  }
 }

@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ResponsiveController } from '@canvix/component-factory';
-// import { DubLoaderContext } from '@app/context';
 import { composeCacheId } from '@/component/dub';
-// import { isCc, isFcOrCc } from '@canvas/utilities';
 import WidthDebugWrapper from './debugComWrapper';
 import { RuntimeInterface } from '../context';
 
 function craeteComponentLoader({ loadModule, cachedComponents }: RuntimeInterface) {
   const ComponentLoader: React.ForwardRefRenderFunction<any, ResponsiveController.LoaderBasicProps> = ({ mounted, ...comProps }, ref) => {
-    const { com, id, type } = comProps.config;
+    const { com, id } = comProps.config;
     const { name, version, user, isDebugger } = com;
     const [component, setComponent] = useState<Record<string, React.ComponentType<any> | null>>({});
 

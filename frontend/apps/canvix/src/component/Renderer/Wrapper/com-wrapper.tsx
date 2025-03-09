@@ -8,39 +8,36 @@ import {
   ResponsivePanelUtils,
   ResponsivePanelUtilsInsideWrapper,
   ServiceConnector,
-  ServiceComponent,
+  ServiceComponent
 } from '@canvas/component-factory';
 import { Error } from '@canvas/runtime-components';
 import { Responsive } from '@canvas/types';
-import type { ConnectOuptut, LayerList, LogicalNodeProps, NodeComType } from '@app/types';
 import type { ConnectorProps } from '@canvas/event-core';
 import sandbox from '@canvas/script-sandbox';
 import { getRuntimeConfig } from '@app/utils';
 import { rakToken } from '@app/consts';
-import { createUtils } from './utils';
+import { ConfigTypeSupportedInControllerRuntime } from '@canvix/shared';
 import { connect } from './connector';
 import { createComponentLoader } from '../ComponentLoader';
 import type { RuntimeInterface } from '../context';
 import { createContainer } from '../Container/Static';
 
 export type ComWrapperInstance = Controller<
-  Responsive.ConfigTypeSupportedInControllerRuntime,
-  ResponsivePanelUtils,
-  {},
-  LayerList,
-  ResponsiveController.OptionProps,
-  ResponsivePanelUtilsInsideWrapper
+ConfigTypeSupportedInControllerRuntime,
+ResponsivePanelUtils,
+LayerList,
+ResponsiveController.OptionProps,
+ResponsivePanelUtilsInsideWrapper
 >;
 
 export type ComWrapperProps = ComWrapperInstance['props'];
 
 abstract class ComWrapperType extends Controller<
-  Responsive.ConfigTypeSupportedInControllerRuntime,
-  ResponsivePanelUtils,
-  {},
-  LayerList,
-  ResponsiveController.OptionProps,
-  ResponsivePanelUtilsInsideWrapper
+ConfigTypeSupportedInControllerRuntime,
+ResponsivePanelUtils,
+LayerList,
+ResponsiveController.OptionProps,
+ResponsivePanelUtilsInsideWrapper
 > {
   declare Container: ComponentType<ResponsiveController.ContainerProps>;
   // declare switchRenderer: (props: ComWrapperProps) => void;
@@ -63,13 +60,11 @@ const { isUnmountMode } = Responsive;
 export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
   const ComponentLoader = createComponentLoader(runtimeImpl);
   const { PreviewContainer, PreviewContainerMinimal } = createContainer(runtimeImpl);
-  class ComWrapper extends Controller<
-    Responsive.ConfigTypeSupportedInControllerRuntime,
-    ResponsivePanelUtils,
-    {},
-    LayerList,
-    ResponsiveController.OptionProps,
-    ResponsivePanelUtilsInsideWrapper
+  class ComWrapper extends Controller<ConfigTypeSupportedInControllerRuntime,
+  ResponsivePanelUtils,
+  LayerList,
+  ResponsiveController.OptionProps,
+  ResponsivePanelUtilsInsideWrapper
   > {
     isError = false;
 
@@ -143,16 +138,9 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       return createUtils(this, runtimeImpl.getAssetsUrl);
     }
 
-    getIdentifier() {
-      return {
-        ...super.getIdentifier(),
-        rakToken,
-      };
-    }
-
     render(): React.ReactNode {
       const runtimeProps = this.getRuntimeProps();
-      const Container = this.Container;
+      const { Container } = this;
       return (
         <>
           {this.renderServices()}
@@ -178,8 +166,8 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
   let nodeServices: Record<string, ServiceComponent> | null = null;
 
   class PreviewNode extends ServiceConnector<
-    LogicalNodeProps,
-    BasicStates<LogicalNodeProps['config']>
+  LogicalNodeProps,
+  BasicStates<LogicalNodeProps['config']>
   > {
     constantProps;
 
@@ -190,16 +178,16 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
         mounted: this.mounted.bind(this),
         utils: {
           ...props.logicalUtils,
-          $emit: this.emit,
-        },
+          $emit: this.emit
+        }
       };
     }
 
     getEnabledServices(): Record<string, ServiceComponent> {
       if (nodeServices) return nodeServices;
       nodeServices = { ...typeToService };
-      delete nodeServices['basic'];
-      delete nodeServices['attr'];
+      delete nodeServices.basic;
+      delete nodeServices.attr;
       return nodeServices;
     }
 
@@ -209,7 +197,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
         panelId: this.props.panelId,
         dashboardId: this.props.projectId,
         comId: this.props.config.id,
-        rakToken,
+        rakToken
       };
     }
 
@@ -221,7 +209,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       const runtimeConfig = getRuntimeConfig({
         input: this.props.config,
         runtimeKeys: ['attr'],
-        config: {},
+        config: {}
       });
 
       return (
@@ -243,6 +231,6 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
     PreviewWrapper: PreviewWrapper as ConnectOuptut,
     PreviewNode: PreviewNode as NodeComType,
     PreviewContainer,
-    PreviewContainerMinimal,
+    PreviewContainerMinimal
   };
 }

@@ -1,9 +1,0 @@
-{
-  "extends": "@nino-work/infra/tsconfig.base.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-  },
-  "include": [
-    "src"
-  ]
-}

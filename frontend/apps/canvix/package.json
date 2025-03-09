@@ -20,10 +20,6 @@
     ]
   },
   "dependencies": {
-    "@canvix/component-factory": "workspace:*",
-    "@canvix/event-core": "workspace:*",
-    "@canvix/shared": "workspace:*",
-    "@canvix/utils": "workspace:*",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.0",
@@ -34,14 +30,21 @@
     "dayjs": "^1.11.13",
     "immer": "^9.0.1",
     "keyboardjs": "^2.7.0",
+    "lodash.isempty": "^4.4.0",
+    "lodash.isequal": "^4.5.0",
+    "lodash.merge": "^4.6.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "react-router-dom": "^7.1.1",
+    "rxjs": "^7.5.6",
     "single-spa-react": "^6.0.2",
     "tail-js": "^1.3.3"
   },
   "devDependencies": {
-    "@types/keyboardjs": "^2.5.3"
+    "@types/keyboardjs": "^2.5.3",
+    "@types/lodash.isempty": "^4.4.9",
+    "@types/lodash.isequal": "^4.5.8",
+    "@types/lodash.merge": "^4.6.9"
   }
 }

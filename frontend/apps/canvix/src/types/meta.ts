@@ -1,6 +1,8 @@
-import type {
-  ComItemType, ConfigType, Default, DefaultAttr, HiddenMode
-} from '@canvix/shared';
+import { InteractionConfigType } from '@canvix/event-core';
+import {
+  ComDefault, ComItemType, ConfigType, DefaultAttr, HiddenMode
+} from './com-config';
+import { LocalVariableCollection } from './variable';
 
 /** Filters */
 export type FilterType = {
@@ -30,7 +32,7 @@ type ComId = string;
 type GlobalBreakpoint = string | '*';
 type LocalBreakpoint = GlobalBreakpoint;
 export type DeltaKey = `${GlobalBreakpoint}/${LocalBreakpoint}/${ThemeKey}/${ComId}`;
-type PanelInfo = Default;
+type PanelInfo = ComDefault;
 
 export type PanelBasic<T extends PanelInfo = PanelInfo> = {
   components: Record<string, ConfigType>;
