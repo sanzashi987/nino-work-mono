@@ -1,36 +1,17 @@
 import React, { ComponentType } from 'react';
-import {
-  BasicStates,
-  typeToService,
-  Controller,
-  FullUtils,
-  ResponsiveController,
-  ResponsivePanelUtils,
-  ResponsivePanelUtilsInsideWrapper,
-  ServiceConnector,
-  ServiceComponent
-} from '@canvas/component-factory';
-import { Error } from '@canvas/runtime-components';
-import { Responsive } from '@canvas/types';
-import type { ConnectorProps } from '@canvas/event-core';
-import sandbox from '@canvas/script-sandbox';
-import { getRuntimeConfig } from '@app/utils';
-import { rakToken } from '@app/consts';
-import { ConfigTypeSupportedInControllerRuntime } from '@canvix/shared';
 import { connect } from './connector';
 import { createComponentLoader } from '../ComponentLoader';
-import type { RuntimeInterface } from '../context';
-import { createContainer } from '../Container/Static';
+import { createContainer } from './Static';
+import Controller, {
+  BasicStates, FullUtils, ResponsiveController, ResponsivePanelUtils, ResponsivePanelUtilsInsideWrapper, ServiceConnector
+} from '@/component/Controller';
 
-export type ComWrapperInstance = Controller<
-ConfigTypeSupportedInControllerRuntime,
-ResponsivePanelUtils,
-LayerList,
-ResponsiveController.OptionProps,
-ResponsivePanelUtilsInsideWrapper
->;
-
-export type ComWrapperProps = ComWrapperInstance['props'];
+import sandbox from '@/component/ScriptSandbox';
+import { typeToService, ServiceComponent } from '@/component/services';
+import { ConfigTypeSupportedInControllerRuntime, LayerList, ConnectorProps, isUnmountMode } from '@/types';
+import { createUtils } from './utils';
+import { ComWrapperProps, RuntimeInterface } from '../types';
+import RuntimeError from '@/component/RuntimeError';
 
 abstract class ComWrapperType extends Controller<
 ConfigTypeSupportedInControllerRuntime,
@@ -42,20 +23,18 @@ ResponsivePanelUtilsInsideWrapper
   declare Container: ComponentType<ResponsiveController.ContainerProps>;
   // declare switchRenderer: (props: ComWrapperProps) => void;
 
-  declare createUtils: () => FullUtils<ResponsivePanelUtilsInsideWrapper, {}>;
+  declare createUtils: () => FullUtils<ResponsivePanelUtilsInsideWrapper>;
 
   declare mounted: () => void;
 }
 
-export interface ComWrapperClass {
+interface ComWrapperClass {
   new (props: ComWrapperProps): ComWrapperType;
 }
 
 const servicesKeptInUnmount = Object.entries(typeToService)
   .filter((val) => val[0] === 'com')
   .map((val) => val[1]);
-
-const { isUnmountMode } = Responsive;
 
 export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
   const ComponentLoader = createComponentLoader(runtimeImpl);
@@ -134,7 +113,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       this.errorForce(false);
     };
 
-    createUtils(): FullUtils<ResponsivePanelUtilsInsideWrapper, {}> {
+    createUtils(): FullUtils<ResponsivePanelUtilsInsideWrapper> {
       return createUtils(this, runtimeImpl.getAssetsUrl);
     }
 
@@ -151,7 +130,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
             transitionRef={this.transitionRef}
           >
             {this.isError ? (
-              <Error name={this.props.config?.name} retry={this.retry} />
+              <RuntimeError name={this.props.config?.name} retry={this.retry} />
             ) : (
               <ComponentLoader {...runtimeProps} chain={this.props.chain} />
             )}
@@ -196,8 +175,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
         ...this.props.config.com,
         panelId: this.props.panelId,
         dashboardId: this.props.projectId,
-        comId: this.props.config.id,
-        rakToken
+        comId: this.props.config.id
       };
     }
 

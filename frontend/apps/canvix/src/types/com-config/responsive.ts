@@ -7,6 +7,10 @@ export const enum HiddenMode {
   unmount,
 }
 
+export function isUnmountMode(state: any) {
+  return state === HiddenMode.unmount;
+}
+
 type Basic<T extends object = any> = {
   basic: T;
 };

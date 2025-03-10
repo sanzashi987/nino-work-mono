@@ -1,20 +1,19 @@
 import React, { useMemo } from 'react';
-import { Responsive, type ResponsiveController } from '@canvas/component-factory';
 import { useSpringBasic } from '@canvas/runtime-components';
-import { animated } from 'react-spring';
-
+import { animated } from '@react-spring/web';
 import styles from './container.module.scss';
-import type { RuntimeInterface } from '../context';
+import type { RuntimeInterface } from '../types';
+import type { ResponsiveController } from '@/component/Controller';
+import { HiddenMode } from '@/types';
 
-const CONTAINER_FINDER = 'canvas-container__reserved';
-const previewClass = styles['preview-box'] + ' ' + CONTAINER_FINDER;
+const previewClass = `${styles['preview-box']} canvix-container__reserved`;
 
 export type PreviewStaticMinimalProps = {
-  containerRef: React.MutableRefObject<HTMLDivElement | null>;
-  transitionRef: React.MutableRefObject<any>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  transitionRef: React.RefObject<any>;
   children: React.ReactNode;
   basic: Record<string, any>;
-  dashboardId: string;
+  projectId: string;
   className?: string;
   id?: string;
 } & Pick<ResponsiveController.Props['config'], 'type' | 'hide'>;
@@ -27,34 +26,29 @@ function createContainer({ getRealBasic }: RuntimeInterface) {
     type,
     hide,
     basic,
-    dashboardId,
+    projectId,
     id,
-    className,
+    className
   }) => {
-    // const _basic = useMemo(() => {
-    //   return type === 'subcom' ? {} : basic;
-    // }, [type, basic]);
-
     const { springBasic, normalBasic } = useMemo(
-      () => getRealBasic(basic, dashboardId),
-      [basic, dashboardId],
+      () => getRealBasic(basic, projectId),
+      [basic, projectId]
     );
 
     const style = { ...useSpringBasic(springBasic, !!hide, transitionRef), ...normalBasic };
-    if (hide === Responsive.HiddenMode.nonexistent) {
+    if (hide === HiddenMode.unmount) {
       containerRef.current = null;
       return null;
     }
     if (type === 'subcom') {
-      return <>{children}</>;
+      return children;
     }
 
     return (
       <animated.div
-        id={id ?? ''}
+        id={id}
         ref={containerRef}
         className={className ?? previewClass}
-        //@ts-ignore
         style={style}
       >
         {children}
@@ -66,12 +60,10 @@ function createContainer({ getRealBasic }: RuntimeInterface) {
     runtime: { config, utils },
     transitionRef,
     children,
-    outer,
+    outer
   }) => {
     const { type, hide } = config;
-    const basicEnsured = useMemo(() => {
-      return config.type === 'subcom' ? {} : config.basic;
-    }, [config]);
+    const basicEnsured = useMemo(() => (config.type === 'subcom' ? {} : config.basic), [config]);
 
     return (
       <PreviewContainerMinimal
@@ -80,7 +72,7 @@ function createContainer({ getRealBasic }: RuntimeInterface) {
         hide={hide}
         containerRef={utils.containerRef}
         transitionRef={transitionRef}
-        dashboardId={outer.dashboardId}
+        projectId={outer.projectId}
       >
         {children}
       </PreviewContainerMinimal>
@@ -88,7 +80,7 @@ function createContainer({ getRealBasic }: RuntimeInterface) {
   };
   return {
     PreviewContainer,
-    PreviewContainerMinimal,
+    PreviewContainerMinimal
   };
 }
 

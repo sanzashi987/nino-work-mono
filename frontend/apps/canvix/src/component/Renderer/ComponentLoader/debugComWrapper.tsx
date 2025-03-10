@@ -1,6 +1,6 @@
 import React, { Component, ComponentType } from 'react';
-import { uuid } from '@canvix/utils';
 import { eventHub, getComHubEvent } from '@app/statics';
+import { uuid } from '@/utils';
 
 type DebugWrapperState = {
   Block: ComponentType | null;

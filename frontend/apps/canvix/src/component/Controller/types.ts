@@ -129,5 +129,6 @@ export namespace ResponsiveController {
   >;
   export type KeyToNameEntries = [keyof Config, string];
   export type ComponentRuntimeProps = Omit<LoaderProps, 'mounted' | 'ref' | 'form'>;
-  export type LoaderBasicProps = Record<string, any> & Pick<LoaderProps, 'mounted'>;
+  export type LoaderBasicProps = Pick<LoaderProps, 'mounted'> & Record<string, any>;
+
 }

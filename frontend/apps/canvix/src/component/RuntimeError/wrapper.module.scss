@@ -1,0 +1,27 @@
+.full-size {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  &:global(.error) {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    overflow: hidden;
+    :global {
+      .error {
+        position: absolute;
+        opacity: 0.3;
+        color: var(--canvas-interaction-deprecated-text-color, #ff4235);
+        // color: #ff423540;
+        font-size: 60px;
+      }
+      .refresh {
+        line-height: 1;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        color: var(--canvas-primary-color, #fc7b21);
+      }
+    }
+  }
+}

@@ -4,3 +4,4 @@ export * from './services';
 export type * from './component';
 export * from './com-config';
 export * from './event-core';
+export * from './assets';

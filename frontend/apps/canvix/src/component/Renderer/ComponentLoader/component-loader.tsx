@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ResponsiveController } from '@canvix/component-factory';
 import { composeCacheId } from '@/component/dub';
 import WidthDebugWrapper from './debugComWrapper';
-import { RuntimeInterface } from '../context';
+import { RuntimeInterface } from '../types';
+import { ResponsiveController } from '@/component/Controller';
 
 function craeteComponentLoader({ loadModule, cachedComponents }: RuntimeInterface) {
-  const ComponentLoader: React.ForwardRefRenderFunction<any, ResponsiveController.LoaderBasicProps> = ({ mounted, ...comProps }, ref) => {
+  const ComponentLoader = React.forwardRef<any, ResponsiveController.LoaderBasicProps>(({ mounted, ...comProps }, ref:any) => {
     const { com, id } = comProps.config;
     const { name, version, user, isDebugger } = com;
     const [component, setComponent] = useState<Record<string, React.ComponentType<any> | null>>({});
@@ -40,9 +40,10 @@ function craeteComponentLoader({ loadModule, cachedComponents }: RuntimeInterfac
     const target = component[version];
     const Com = isDebugger ? WidthDebugWrapper(target!) : target;
     return Com ? <Com {...comProps} ref={ref} /> : null;
-  };
+  });
 
-  return React.forwardRef(ComponentLoader);
+  ComponentLoader.displayName = 'ComponentLoader';
+  return ComponentLoader;
 }
 
 export default craeteComponentLoader;

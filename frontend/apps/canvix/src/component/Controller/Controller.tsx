@@ -8,7 +8,7 @@ import type {
   LoaderRuntimeBasicProps
 } from './types';
 import { typeToService, ServiceComponent } from '../services';
-import { Connector } from '../EventChannel';
+import { Connector } from '../EventCore';
 
 export function parseConfig(serviceMap: Record<string, ServiceComponent>, config: any) {
   return Object.keys(serviceMap)

@@ -1,16 +1,12 @@
-import sandbox from '@canvas/script-sandbox';
-import { getRuntimeConfig } from '@app/utils/component';
-import { createMemo } from '@canvas/utilities';
-import type {
-  UnifiedRenderOption,
-  UnifiedRenderUtilInsideWrapper,
-} from '@canvas/component-factory';
-import { ComWrapperInstance } from './com-wrapper';
-import type { RuntimeInterface } from '../context';
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { UnifiedRenderUtilInsideWrapper, UnifiedRenderOption } from '@/component/Controller/types';
+import sandbox from '@/component/ScriptSandbox';
+import { createMemo } from '@/utils';
+import type { RuntimeInterface, ComWrapperInstance } from '../types';
 
 export function createUtils(
   scope: ComWrapperInstance,
-  getAssetsUrl: RuntimeInterface['getAssetsUrl'],
+  getAssetsUrl: RuntimeInterface['getAssetsUrl']
 ) {
   const { primitiveUtils: screenUtils, config } = scope.props;
   const _getAssetsUrl = (fileName: string) => {
@@ -20,8 +16,8 @@ export function createUtils(
       version,
       isDebugger,
       path: fileName,
-      user: scope.props.projectCode,
-      cType: user ? 1 : 0,
+      user: scope.props.workspaceId,
+      cType: user ? 1 : 0
     });
   };
 
@@ -39,37 +35,29 @@ export function createUtils(
       userProps: {
         ...(opt.userProps ?? {}),
         // the children always receive its parent's id
-        parentId: config.id,
-      },
+        parentId: config.id
+      }
     };
     return screenUtils.general.render(nextOpt);
   };
 
-  const memoBasic = createMemo((basic: Record<string, any>, com: any, type: any) => {
-    return getRuntimeConfig({
-      input: { basic, com, type },
-      runtimeKeys: ['basic'],
-      config: {
-        getAssetsUrl: _getAssetsUrl,
-      },
-    }).basic;
-  });
+  const memoBasic = createMemo((basic: Record<string, any>, com: any, type: any) => getRuntimeConfig({
+    input: { basic, com, type },
+    runtimeKeys: ['basic'],
+    config: { getAssetsUrl: _getAssetsUrl }
+  }).basic);
 
-  const memoAttr = createMemo((attr: Record<string, any>, com: any, type: any) => {
-    return getRuntimeConfig({
-      input: { attr, com, type },
-      runtimeKeys: ['attr'],
-      config: {
-        getAssetsUrl: _getAssetsUrl,
-      },
-    }).attr;
-  });
+  const memoAttr = createMemo((attr: Record<string, any>, com: any, type: any) => getRuntimeConfig({
+    input: { attr, com, type },
+    runtimeKeys: ['attr'],
+    config: { getAssetsUrl: _getAssetsUrl }
+  }).attr);
 
   const _getRuntimeConfig = (input: Record<string, any>) => {
     const { com, type } = input;
     return {
       attr: memoAttr(input.attr, com, type),
-      basic: memoBasic(input.basic, com, type),
+      basic: memoBasic(input.basic, com, type)
     };
   };
 
@@ -79,6 +67,6 @@ export function createUtils(
     render,
     $emit: scope.emit,
     runInSandbox: sandbox.runInSandbox,
-    getRuntimeConfig: _getRuntimeConfig,
+    getRuntimeConfig: _getRuntimeConfig
   };
 }

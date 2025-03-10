@@ -1,4 +1,4 @@
-import { GEN_UID } from '@canvas/utilities';
+import { uuid } from '@/utils';
 
 type RunInSandboxProps = {
   args: string[];
@@ -39,9 +39,9 @@ class ScriptSandbox {
   //   (Component.prototype as any).runInSandbox = this.runInSandbox;
   // }
 
-  getIdleWorker = (): undefined | WorkerItem => {
+  getIdleWorker = (): WorkerItem | undefined => {
     const workerList = Object.values(this.workers);
-    if (workerList.length < 1) return;
+    if (workerList.length < 1) return undefined;
     return workerList.find((item) => item.state === 'idle');
   };
 
@@ -55,10 +55,10 @@ class ScriptSandbox {
     this._runInSandbox(task!, worker);
   };
 
-  createWorker = () => {
-    if (Object.keys(this.workers).length >= maxWorkers) return;
+  createWorker = () :WorkerItem | null => {
+    if (Object.keys(this.workers).length >= maxWorkers) return null;
     const newWorker = new Worker('/sandbox.worker.js');
-    const id = `worker_${GEN_UID(5)}`;
+    const id = `worker_${uuid(5)}`;
     const worker: WorkerItem = {
       id,
       worker: newWorker,
@@ -76,7 +76,9 @@ class ScriptSandbox {
     if (this.taskQueue.length < 1) return;
     // 如果任务队列非空，新增worker并执行
     const newWorker = this.createWorker();
-    newWorker && this.deQueueAndRun(newWorker);
+    if (newWorker) {
+      this.deQueueAndRun(newWorker);
+    }
   };
 
   afetrWorkerReturn = (workerId: string) => {
