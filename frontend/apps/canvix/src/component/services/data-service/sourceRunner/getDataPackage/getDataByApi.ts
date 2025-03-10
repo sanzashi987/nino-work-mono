@@ -1,6 +1,6 @@
-import type { ApiReturnType, GetValueEntryType, IdentifierSource, RequestApi } from '@canvix/shared';
+import type { ApiReturnType, GetValueEntryType, IdentifierSource, RequestApi } from '@/types';
 import { getApiUrl, getErrorInfo } from './utils';
-import requestService, { post, RequestConfig } from '../../requestService';
+import requestService, { post, RequestConfig } from '../../requester';
 
 type RequestType = 'get' | 'put' | 'post';
 const defaultApiParams: Omit<RequestApi, 'sourceId'> = {

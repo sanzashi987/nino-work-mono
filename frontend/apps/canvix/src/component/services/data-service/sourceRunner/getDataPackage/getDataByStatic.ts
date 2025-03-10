@@ -1,7 +1,7 @@
-import type { IdentifierSource, GetValueEntryType } from '@canvix/shared';
+import type { IdentifierSource, GetValueEntryType } from '@/types';
 import { getDebugUrl, getDefaultStaticSource, getErrorInfo, getFileUrl } from './utils';
 import { RES_ERR_NOT_FOUND } from '../../constants';
-import { get } from '../../requestService';
+import { get } from '../../requester';
 
 const staticDataCache: Record<string, any> = {};
 

@@ -1,4 +1,4 @@
-import { queryStringify } from '@canvix/utils';
+import { queryStringify } from '@/utils';
 import { CacheComponentType, LoadStatus } from './type';
 
 class Dub {

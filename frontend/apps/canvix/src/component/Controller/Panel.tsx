@@ -1,12 +1,7 @@
-import {
-  ConnectorProps,
-  DuplexChannelCore,
-  InteractionService,
-  PanelServiceCtor
-} from '@canvix/event-core';
-import { ComDefault, HiddenMode } from '@canvix/shared';
+import { ComDefault, ConnectorProps, HiddenMode, PanelServiceCtor } from '@/types';
 import { ServiceConnector } from './Controller';
 import type { PrimitiveUtils } from './types';
+import { InteractionService, DuplexChannelCore } from '../EventChannel';
 
 type PanelConfigType<T> = ComDefault & {
   type: 'panel';

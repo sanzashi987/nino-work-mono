@@ -1,4 +1,4 @@
-import { IdentifierSource } from '@canvix/shared';
+import { IdentifierSource } from '@/types';
 
 export const getErrorInfo = (error: DOMException & { msg?: string }) => ({
   name: error?.name,

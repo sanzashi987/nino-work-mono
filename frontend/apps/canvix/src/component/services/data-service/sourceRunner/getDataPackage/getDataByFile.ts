@@ -1,6 +1,6 @@
-import type { IdentifierSource, ApiReturnType, GetValueEntryType } from '@canvix/shared';
+import type { IdentifierSource, ApiReturnType, GetValueEntryType } from '@/types';
 import { getFileUrl, getErrorInfo } from './utils';
-import { post } from '../../requestService';
+import { post } from '../../requester';
 
 const queryDataBySourceId = (
   sourceId: string,

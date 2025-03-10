@@ -1,21 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import type { MutableRefObject, ReactNode } from 'react';
-import type { ConfigTypeSupportedInControllerRuntime } from '@canvix/shared';
-import { SandboxRunnerType } from '@canvix/script-sandbox';
-
-export type PanelOption = {
-  panelId: string;
-  data?: any[];
-};
-
-export type ScreenOption = {
-  screenId: number;
-  publishToken?: string;
-  width: number;
-  height: number;
-  comId: string;
-};
-export type RenderPanelOption = PanelOption | ScreenOption;
+import type { ReactNode, RefObject } from 'react';
+import type { ConfigTypeSupportedInControllerRuntime } from '@/types';
+import { SandboxRunnerType } from '../ScriptSandbox';
 
 /**
  * Definition for responsive utils
@@ -96,13 +82,13 @@ export type ControllerBasicProps<
 export type ComponentRuntimeStaticProps<PanelUtils> = {
   utils: ComUtils &
   PrimitiveUtils<PanelUtils>['general'] & {
-    containerRef: MutableRefObject<HTMLDivElement | null>;
+    containerRef: RefObject<HTMLDivElement | null>;
   };
   userProps?: Record<string, any>;
 };
 
 export type LoaderRuntimeBasicProps<PanelUtils> = {
-  ref: MutableRefObject<any>;
+  ref: RefObject<any>;
   mounted: () => void;
 } & ComponentRuntimeStaticProps<PanelUtils>;
 
@@ -110,7 +96,7 @@ type ControllerCombinedBasicProps<ControllerProps extends { config: any }, ComRu
   ready: boolean;
   outer: ControllerProps;
   runtime: BasicStates<ControllerProps['config']> & ComRuntimeProps;
-  transitionRef: MutableRefObject<any>;
+  transitionRef: RefObject<any>;
   children: ReactNode;
 };
 

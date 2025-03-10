@@ -1,3 +1,5 @@
+import { TargetDescription } from '@/types';
+
 export const BLOCK_EVENT_PREFIX = 'block-event';
 export const BLOCK_ACTION_PREFIX = 'block-action';
 
@@ -7,7 +9,7 @@ export const PANEL_NODE_ID = '@nodes/panel-node';
 
 export const BLOCK_ACTION_INVOKE_FORWARD = 'instance.invokeForward';
 
-export const PANEL_LOCAL_ID = 'canvas-panel';
+export const PANEL_LOCAL_ID = 'canvix-panel';
 export const PANEL_ACTION_SET_PANEL_DATA = 'setPanelData';
 export const PANEL_NODE_ENTRY = 'entry';
 

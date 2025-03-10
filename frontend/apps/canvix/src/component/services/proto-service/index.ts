@@ -49,5 +49,7 @@ abstract class ProtoService<Props extends ServiceProps = ServiceProps> extends C
 }
 
 export default ProtoService;
-export { typeToService, updateTypeToService } from './annotations';
+export {
+  typeToService, updateTypeToService, service, action, event
+} from './annotations';
 export type { ServiceComponent, GetIdentifierType, EndpointsType, EndpointType } from './types';
