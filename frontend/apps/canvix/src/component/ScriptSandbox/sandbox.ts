@@ -88,12 +88,16 @@ class ScriptSandbox {
     this.deQueueAndRun(this.workers[workerId]);
   };
 
-  onReturn = (e: any, timer: NodeJS.Timeout) => {
+  onReturn = (e: any, timer: number) => {
     clearTimeout(timer);
     const { id, res, error, workerId } = e.data as ReturnMessageType;
     if (this.pending[id]) {
       const [resolve, reject] = this.pending[id];
-      error === false ? resolve?.(res) : reject(error);
+      if (error === false) {
+        resolve?.(res);
+      } else {
+        reject(error);
+      }
     }
     delete this.pending[id];
     this.afetrWorkerReturn(workerId);
@@ -103,11 +107,11 @@ class ScriptSandbox {
     const { id, worker: sandbox } = worker;
     this.workers[id].state = 'running';
     sandbox.onerror = function (err) {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
       throw err;
     };
     const timer = setTimeout(() => {
-      const { id } = props;
-      delete this.pending[id];
+      delete this.pending[props.id];
       this.afterWorkerTimeout(worker.id);
       // rej(new Error('运行超时'));
       console.log(
@@ -129,7 +133,10 @@ class ScriptSandbox {
       } else if (Object.keys(this.workers).length < maxWorkers) {
         // worker未达上限，创建新worker并执行
         const newWorker = this.createWorker();
-        newWorker && this._runInSandbox(props, newWorker);
+
+        if (newWorker) {
+          this._runInSandbox(props, newWorker);
+        }
       } else {
         // 无空闲worker并且worker上限，进入队列等待
         this.enQueue(props);

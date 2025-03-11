@@ -1,5 +1,5 @@
 import React, { useContext, FC, useMemo, useReducer } from 'react';
-import memoize from 'proxy-memoize';
+import { memoize } from 'proxy-memoize';
 import produce from 'immer';
 import type {
   ConnectInput,

@@ -28,6 +28,7 @@
     "@nino-work/shared": "workspace:*",
     "@nino-work/ui-components": "workspace:*",
     "@react-spring/web": "^9.7.5",
+    "classnames": "^2.5.1",
     "dayjs": "^1.11.13",
     "immer": "^9.0.1",
     "keyboardjs": "^2.7.0",

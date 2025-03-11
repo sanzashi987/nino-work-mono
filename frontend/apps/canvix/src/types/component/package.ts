@@ -1,4 +1,5 @@
-import type { ConfigType } from '../com-config/responsive';
+import type { ComItemType } from '../com-config';
+import type { EndpointsType } from './interaction';
 import type { TargetPlatformSpecifier } from './platform';
 
 type MappingTargetType = 'number' | 'string' | 'boolean';
@@ -28,7 +29,7 @@ export type BasicCanvixFieldType = {
   cn_name: string;
   icon: string;
   category: string;
-  type: ConfigType['type'];
+  type: ComItemType;
   view?: {
     width: number;
     height: number;
@@ -163,7 +164,17 @@ export type PackageChildrenType = {
 export type CanvixFieldType = BasicCanvixFieldType & {
   children?: PackageChildrenType;
 };
+
 export type PackageJSONType = BasicPackageType & {
   canvas: CanvixFieldType;
 };
+
 export type ComponentPackageType = BasicPackageType & CanvixFieldType;
+
+export type PackagePath = {
+  assets?: Record<string, string>;
+  palette?: Record<string, string>;
+  parse?: Record<string, string>;
+  merge?: Record<string, string>;
+};
+export type PackagePaths = Record<string, PackagePath>;

@@ -1,8 +1,10 @@
-import { InteractionConfigType } from '@canvix/event-core';
+import type { InteractionConfigType } from './event-core';
 import {
   ComDefault, ComItemType, ConfigType, DefaultAttr, HiddenMode
 } from './com-config';
 import { LocalVariableCollection } from './variable';
+import { ActiveBreakpoint, ActiveTheme } from './stateless';
+import { EnvVariables } from './env';
 
 /** Filters */
 export type FilterType = {
@@ -57,3 +59,39 @@ export type PanelBasic<T extends PanelInfo = PanelInfo> = {
   filters: FiltersType;
   variables: LocalVariableCollection;
 };
+
+export type SysMethods = {
+  /** system Value getter */
+  getProcessEnv: <T>() => EnvVariables<T>;
+};
+
+export type DynamicPanelMeta = PanelBasic<PanelInfo>;
+
+/** for project editor & block editor */
+export type PanelMetaType = {
+  default: DynamicPanelMeta;
+} & Record<string, DynamicPanelMeta>;
+
+export type PanelMetaRuntime = DynamicPanelMeta;
+
+type BreakpointValue =
+  | {
+    id: string;
+    lower: number;
+  }
+  | { id: 'default'; lower: 0 };
+
+export type BreakpointMetaType = BreakpointValue[];
+
+export type RootMetaType = {
+  panels: PanelMetaType;
+  theme: ActiveTheme;
+  /** global screen breakpoint */
+  breakpoint: ActiveBreakpoint;
+  /** won't change after assigned */
+  projectId: string;
+  breakpoints: BreakpointMetaType;
+  /** globalValue getter */
+  getGlobalVariable: (id: string) => any;
+  setGlobalVariable: (id: string, val: any) => void;
+} & SysMethods;

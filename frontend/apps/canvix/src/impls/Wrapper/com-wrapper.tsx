@@ -10,7 +10,7 @@ import sandbox from '@/component/ScriptSandbox';
 import { typeToService, ServiceComponent } from '@/component/services';
 import { ConfigTypeSupportedInControllerRuntime, LayerList, ConnectorProps, isUnmountMode } from '@/types';
 import { createUtils } from './utils';
-import { ComWrapperProps, RuntimeInterface } from '../types';
+import { ComWrapperProps, RuntimeInterface } from './types';
 import RuntimeError from '@/component/RuntimeError';
 
 abstract class ComWrapperType extends Controller<
