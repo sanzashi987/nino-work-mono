@@ -1,6 +1,6 @@
 import type { ComItemType } from '../com-config';
 import type { EndpointsType } from './interaction';
-import type { TargetPlatformSpecifier } from './platform';
+import type { TargetPlatformSpecifier } from '../panel';
 
 type MappingTargetType = 'number' | 'string' | 'boolean';
 

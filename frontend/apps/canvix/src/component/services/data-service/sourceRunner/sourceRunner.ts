@@ -1,14 +1,13 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
-import sandbox from '@/component/ScriptSandbox';
-import type { IdentifierSource, SourceConfigRuntime, SourceRunnerProps } from '@/types';
+import sandbox from '@/component/sandbox';
+import type { GetIdentifierType, IdentifierSource, SourceConfigRuntime, SourceRunnerProps } from '@/types';
 import { SourceType } from '@/types';
 import { uuid, isEqual } from '@/utils';
 import * as getDataPack from './getDataPackage';
 import { RefreshTimer } from '../requester';
 import LinkList, { LinkNode } from '../utils/linkList';
 import { RES_ERR_NOT_FOUND, FILTER_ERR_TYPE_DISMATCH, MAPPING_ERR } from '../constants';
-import type { GetIdentifierType } from '../../proto-service/types';
 
 function sourceType2Method(sourceType: SourceType) {
   return getDataPack[sourceType];

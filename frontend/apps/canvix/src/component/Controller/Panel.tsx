@@ -1,7 +1,8 @@
-import { ComDefault, ConnectorProps, HiddenMode, PanelServiceCtor } from '@/types';
+import {
+  ComDefault, ConnectorProps, HiddenMode, PanelServiceCtor, PrimitiveUtils
+} from '@/types';
 import { ServiceConnector } from './Controller';
-import type { PrimitiveUtils } from './types';
-import { InteractionService, DuplexChannelCore } from '../EventChannel';
+import { InteractionService, DuplexChannelCore } from '../EventCore';
 
 type PanelConfigType<T> = ComDefault & {
   type: 'panel';

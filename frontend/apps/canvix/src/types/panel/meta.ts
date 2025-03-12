@@ -1,10 +1,11 @@
-import type { InteractionConfigType } from './event-core';
-import {
+import type { InteractionConfigType } from '../event-core';
+import type {
   ComDefault, ComItemType, ConfigType, DefaultAttr, HiddenMode
-} from './com-config';
-import { LocalVariableCollection } from './variable';
-import { ActiveBreakpoint, ActiveTheme } from './stateless';
-import { EnvVariables } from './env';
+} from '../com-config';
+import type { LocalVariableCollection } from './variable';
+import type { ActiveBreakpoint, ActiveTheme } from '../stateless';
+import type { EnvVariables } from '../env';
+import { BreakpointMetaType } from './responsive';
 
 /** Filters */
 export type FilterType = {
@@ -73,15 +74,6 @@ export type PanelMetaType = {
 } & Record<string, DynamicPanelMeta>;
 
 export type PanelMetaRuntime = DynamicPanelMeta;
-
-type BreakpointValue =
-  | {
-    id: string;
-    lower: number;
-  }
-  | { id: 'default'; lower: 0 };
-
-export type BreakpointMetaType = BreakpointValue[];
 
 export type RootMetaType = {
   panels: PanelMetaType;

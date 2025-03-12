@@ -1,6 +1,6 @@
 import React, { createContext, FC, useEffect } from 'react';
-import { noop } from '@canvix/utils';
 import keyboardJS from 'keyboardjs';
+import { noop } from '@/utils';
 import { mergeCallback, ShortcutItem } from './utils';
 
 declare module 'keyboardjs' {

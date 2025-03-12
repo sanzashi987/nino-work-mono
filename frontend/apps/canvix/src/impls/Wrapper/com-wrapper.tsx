@@ -1,4 +1,5 @@
 import React, { ComponentType } from 'react';
+import sandbox from '@/component/sandbox';
 import { connect } from './connector';
 import { createComponentLoader } from '../ComponentLoader';
 import { createContainer } from './Static';
@@ -6,11 +7,10 @@ import Controller, {
   BasicStates, FullUtils, ResponsiveController, ResponsivePanelUtils, ResponsivePanelUtilsInsideWrapper, ServiceConnector
 } from '@/component/Controller';
 
-import sandbox from '@/component/ScriptSandbox';
 import { typeToService, ServiceComponent } from '@/component/services';
 import { ConfigTypeSupportedInControllerRuntime, LayerList, ConnectorProps, isUnmountMode } from '@/types';
 import { createUtils } from './utils';
-import { ComWrapperProps, RuntimeInterface } from './types';
+import { ComWrapperProps, RuntimeInterface } from '../../types/com-config/connector';
 import RuntimeError from '@/component/RuntimeError';
 
 abstract class ComWrapperType extends Controller<

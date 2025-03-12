@@ -1,4 +1,4 @@
-import { DataConfigType, DataConfigTypeRuntime } from '../services';
+import { DataConfigType, DataConfigTypeRuntime } from '../services/data-service';
 import { ComInfo, ComDefault, DefaultAttr } from './common';
 
 export const enum HiddenMode {

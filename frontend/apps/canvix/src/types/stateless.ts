@@ -1,5 +1,6 @@
-import { ComItemType } from './com-config';
-import { LogicalType, EdgeType } from './event-core';
+import type { ComItemType } from './com-config';
+import type { ConfigMode } from './component';
+import type { LogicalNodeType, EdgeType } from './event-core';
 
 export type ActiveDescriber = {
   id: string;
@@ -7,7 +8,7 @@ export type ActiveDescriber = {
   /** 父组件id,视图组件激活时需要该字段，用于复制时判断组件是否是同一层级 */
   parentId?: string;
   // type: string;
-  type: ComItemType | LogicalType | EdgeType;
+  type: ComItemType | LogicalNodeType | EdgeType;
 };
 
 export type CrossPanelLayerItem = {
@@ -61,7 +62,7 @@ export type LayoutStatus = {
   configPanel: boolean;
   historyPanel: boolean;
   previewPanel: boolean;
-  configMode: CWidgets.ConfigMode;
+  configMode: ConfigMode;
 };
 
 export type LayoutPanelName = Exclude<keyof LayoutStatus, 'configMode'>;

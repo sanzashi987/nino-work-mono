@@ -1,26 +1,5 @@
+import { WorkerItem, RunInSandboxProps, ReturnMessageType, SandboxRunnerType } from '@/types';
 import { uuid } from '@/utils';
-
-type RunInSandboxProps = {
-  args: string[];
-  // content: string;
-  argsValue: any[];
-  id: string;
-  /** 是否在控制台输出报错信息，过滤器测试时不输出 */
-  logVisible?: boolean;
-};
-
-type ReturnMessageType = {
-  id: string;
-  res: any;
-  error: boolean;
-  workerId: string;
-};
-
-type WorkerItem = {
-  id: string;
-  state: 'running' | 'idle';
-  worker: Worker;
-};
 
 type PromisePair = [(val: any) => void, (val: any) => void];
 
@@ -124,7 +103,7 @@ class ScriptSandbox {
     sandbox?.postMessage({ ...props, workerId: id });
   };
 
-  runInSandbox = (props: RunInSandboxProps) => new Promise((res, rej) => {
+  runInSandbox: SandboxRunnerType = (props) => new Promise((res, rej) => {
     try {
       const idleWorker = this.getIdleWorker();
       if (idleWorker) {
@@ -147,7 +126,5 @@ class ScriptSandbox {
     this.pending[props.id] = [res, rej];
   });
 }
-
-export type SandboxRunnerType = ScriptSandbox['runInSandbox'];
 
 export default new ScriptSandbox();

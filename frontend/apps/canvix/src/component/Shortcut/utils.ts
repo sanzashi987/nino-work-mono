@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable no-restricted-syntax */
-import { isMac } from '@canvix/utils';
 import keyboard from 'keyboardjs';
+import { isMac } from '@/utils';
 
 type KeyEventCallback = (e?: keyboard.KeyEvent) => void;
 

@@ -3,9 +3,9 @@ import { ComInfo } from '../com-config';
 import { FileType, DataConfigType } from '../services';
 import { WithDescriber } from './core';
 
-export type NodeFileType = FileType | LogicalType;
+export type NodeFileType = FileType | LogicalNodeType;
 
-export type LogicalType = 'logical';
+export type LogicalNodeType = 'logical';
 export type EdgeType = 'edge';
 
 type AnyObject = Record<string, any>;
@@ -34,7 +34,7 @@ export type InteractionNodeTypeRuntime<T extends AnyObject = AnyObject> = NodeBa
 export type LogicalNodeConfig<T extends AnyObject = AnyObject> = {
   name: string;
   attr: T;
-  type: LogicalType;
+  type: LogicalNodeType;
 } & Omit<NodeBaseType<T>, 'com'> &
 Required<Pick<NodeBaseType<T>, 'com'>>;
 

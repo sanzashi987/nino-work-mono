@@ -1,4 +1,4 @@
-import type { TargetPlatformSpecifier } from './platform';
+import type { TargetPlatformSpecifier } from '../panel';
 
 type FunctionalDesciber = {
   useChannel?: TargetPlatformSpecifier;

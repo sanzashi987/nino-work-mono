@@ -1,12 +1,16 @@
 import React, { createRef } from 'react';
-import { ConnectorProps, IDComConfig, IDConfig, type Identifier } from '@/types';
-import { createMemo, shallowEqual } from '@/utils';
 import type {
+  ConnectorProps,
+  IDComConfig,
+  IDConfig,
+  Identifier,
   FullUtils,
   ControllerBasicProps,
   BasicStates,
   LoaderRuntimeBasicProps
-} from './types';
+} from '@/types';
+import { createMemo, shallowEqual } from '@/utils';
+
 import { typeToService, ServiceComponent } from '../services';
 import { Connector } from '../EventCore';
 

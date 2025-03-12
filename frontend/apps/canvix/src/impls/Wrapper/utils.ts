@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { UnifiedRenderUtilInsideWrapper, UnifiedRenderOption } from '@/component/Controller/types';
-import sandbox from '@/component/ScriptSandbox';
+import sandbox from '@/component/sandbox';
+import type { UnifiedRenderUtilInsideWrapper, UnifiedRenderOption } from '@/types/com-config/controller';
 import { createMemo } from '@/utils';
-import type { RuntimeInterface, ComWrapperInstance } from '../types';
+import { ComWrapperInstance, RuntimeInterface } from '../../types/com-config/connector';
 
 export function createUtils(
   scope: ComWrapperInstance,

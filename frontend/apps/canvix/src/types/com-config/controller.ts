@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type { ReactNode, RefObject } from 'react';
-import type { ConfigTypeSupportedInControllerRuntime } from '@/types';
-import { SandboxRunnerType } from '../ScriptSandbox';
+import type { SandboxRunnerType } from '@/types';
+import type { ConfigTypeSupportedInControllerRuntime } from './responsive';
 
 /**
  * Definition for responsive utils

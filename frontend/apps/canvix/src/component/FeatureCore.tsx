@@ -1,6 +1,6 @@
 import React, { Component, createContext } from 'react';
 import { noop, returnVoidObject } from '@nino-work/shared';
-import type { EditorFeaturesRegisterType, EditorFeaturesType, FeatureItemProps, FeatureRuntimeMap } from './types';
+import type { EditorFeaturesRegisterType, EditorFeaturesType, FeatureItemProps, FeatureRuntimeMap } from '@/types';
 
 export const EditorFeatures = createContext<EditorFeaturesType>({});
 export const EditorFeaturesRegister = createContext<EditorFeaturesRegisterType>({
