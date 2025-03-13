@@ -73,3 +73,8 @@ export type Identifier = {
   comId: string;
   panelId: string;
 } & Pick<ComInfo, 'name' | 'version' | 'user' | 'isDebugger'>;
+
+export type PackageComInfo = ComInfo & {
+  /** 组件type */
+  type: Exclude<FileType, 'group' | 'subpanel'>;
+};

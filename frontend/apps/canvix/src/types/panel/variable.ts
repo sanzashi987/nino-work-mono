@@ -62,3 +62,28 @@ export enum VariableSourceName {
   shared = '持久化变量',
   sqlite = 'sqlite数据查询',
 }
+
+type Updater = (x: any) => void;
+
+export type VariableContextValue = {
+  join(variableId: string, updater: Updater): void;
+  leave(variableId: string, updater: Updater): void;
+  getVariable(variableId: string): any;
+  setVariable(variableId: string, value: any): void;
+};
+
+export type VariableContextType = React.Context<VariableContextValue>;
+
+export type VariableDepotProps<T> = {
+  configs: GetVariableType<T>[];
+  children?: React.ReactNode;
+};
+export interface TypedVariableMutator<T> {
+  getValue(conf: GetVariableType<T>): any;
+  setValue(conf: GetVariableType<T>, value: any): void;
+}
+
+export interface TypedVariableMutatorCtor<T> {
+  type: T;
+  new (): TypedVariableMutator<T>;
+}

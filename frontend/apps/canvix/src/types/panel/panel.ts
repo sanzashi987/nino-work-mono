@@ -1,13 +1,15 @@
-import { ComWrapperProps, ConnectOuptut } from '../com-config';
-import { UnifiedRenderUtil } from '../com-config/controller';
-import { InteractionConfigType, LogicalNodeConfig, PanelPropsType } from '../event-core';
-import { DynamicPanelMeta, LayerList, RootMetaType } from './meta';
-import { Dimension, ThemeMetaType } from './responsive';
+import type { Emitter } from 'mitt';
+import type {
+  ComDefault, ComWrapperProps, ConnectOuptut, HiddenMode, ResponsivePanelUtils, UnifiedRenderUtil
+} from '../com-config';
+import type { InteractionConfigType, LogicalNodeConfig, PanelPropsType } from '../event-core';
+import type { DynamicPanelMeta, LayerList, RootMetaType } from './meta';
+import type { Dimension, ThemeMetaType } from './responsive';
 
 export type PanelProps = Omit<PanelPropsType, 'scale'>;
 
 type EventHubProps = {
-  eventHub: EventEmitter;
+  eventHub: Emitter<Record<string, any>>;
 };
 
 export type DynamicEditorPanelProps = PanelProps & EventHubProps;
@@ -122,6 +124,22 @@ export type PanelOnlyProps = {
   renderBy?: string;
 };
 
+type PanelConfigType<T> = ComDefault & {
+  type: 'panel';
+  basic: Record<string, any>;
+  hide?: HiddenMode;
+} & T;
+
+export type PanelConfigProps<T extends object = object> = {
+  config: PanelConfigType<T>;
+  data?: any;
+};
+
+export type PanelState = {
+  panelData: any;
+  config: PanelConfigProps['config'];
+};
+
 export type PanelRuntimeProps = Pick<PanelConfigProps, 'config'> & PanelPropsFromContext;
 
 export type PanelMinimalProps = PanelRuntimeProps & PanelOnlyProps;
@@ -139,7 +157,7 @@ PanelLogicalUtilsType
 
 type RuntimePropsKey = keyof PanelRuntimeProps;
 
-export type PanelInputProps = PanelMinimal['props'];
+export type PanelInputProps = PanelMinimalProps;
 
 export type PanelOutputProps = Omit<PanelInputProps, RuntimePropsKey>;
 

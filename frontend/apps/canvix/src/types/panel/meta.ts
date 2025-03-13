@@ -1,11 +1,10 @@
 import type { InteractionConfigType } from '../event-core';
-import type {
-  ComDefault, ComItemType, ConfigType, DefaultAttr, HiddenMode
-} from '../com-config';
+import type { ComDefault, ConfigType, DefaultAttr, HiddenMode } from '../com-config';
 import type { LocalVariableCollection } from './variable';
 import type { ActiveBreakpoint, ActiveTheme } from '../stateless';
 import type { EnvVariables } from '../env';
 import { BreakpointMetaType } from './responsive';
+import { LayerList } from './layer';
 
 /** Filters */
 export type FilterType = {
@@ -19,15 +18,6 @@ export type FilterType = {
 
 export type FiltersType = Record<string, FilterType>;
 export type FilterDepInfo = Record<string, Array<{ id: string; name: string }>>;
-
-/** Layers */
-export type LayerItem = {
-  id: string;
-  children?: LayerItem[];
-  type: ComItemType; // | RWDType;
-};
-
-export type LayerList = LayerItem[];
 
 /** Panel Infos */
 type ThemeKey = string; // 'dark' | '*';

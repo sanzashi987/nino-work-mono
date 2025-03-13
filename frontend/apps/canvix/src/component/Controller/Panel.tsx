@@ -1,24 +1,8 @@
 import {
-  ComDefault, ConnectorProps, HiddenMode, PanelServiceCtor, PrimitiveUtils
+  ConnectorProps, PanelConfigProps, PanelServiceCtor, PanelState, PrimitiveUtils
 } from '@/types';
 import { ServiceConnector } from './Controller';
 import { InteractionService, DuplexChannelCore } from '../EventCore';
-
-type PanelConfigType<T> = ComDefault & {
-  type: 'panel';
-  basic: Record<string, any>;
-  hide?: HiddenMode;
-} & T;
-
-export type PanelConfigProps<T extends object = object> = {
-  config: PanelConfigType<T>;
-  data?: any;
-};
-
-export type PanelState = {
-  panelData: any;
-  config: PanelConfigProps['config'];
-};
 
 const services = [InteractionService];
 

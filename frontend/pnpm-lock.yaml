@@ -279,6 +279,9 @@ importers:
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
+      mitt:
+        specifier: ^3.0.1
+        version: 3.0.1
       proxy-memoize:
         specifier: ^3.0.1
         version: 3.0.1
@@ -6957,6 +6960,10 @@ packages:
   /minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
+    dev: false
+
+  /mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
     dev: false
 
   /mkdirp@0.5.6:

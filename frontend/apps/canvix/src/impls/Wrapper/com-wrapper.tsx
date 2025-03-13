@@ -3,30 +3,25 @@ import sandbox from '@/component/sandbox';
 import { connect } from './connector';
 import { createComponentLoader } from '../ComponentLoader';
 import { createContainer } from './Static';
-import Controller, {
-  BasicStates, FullUtils, ResponsiveController, ResponsivePanelUtils, ResponsivePanelUtilsInsideWrapper, ServiceConnector
-} from '@/component/Controller';
+import Controller, { ServiceConnector } from '@/component/Controller';
 
 import { typeToService, ServiceComponent } from '@/component/services';
-import { ConfigTypeSupportedInControllerRuntime, LayerList, ConnectorProps, isUnmountMode } from '@/types';
+import {
+  ConfigTypeSupportedInControllerRuntime,
+  LayerList,
+  ConnectorProps,
+  isUnmountMode,
+  ResponsivePanelUtils,
+  BasicStates,
+  FullUtils,
+  LogicalNodeProps,
+  ResponsiveController,
+  ResponsivePanelUtilsInsideWrapper,
+  ComWrapperType
+} from '@/types';
 import { createUtils } from './utils';
-import { ComWrapperProps, RuntimeInterface } from '../../types/com-config/connector';
+import { ComWrapperProps, ConnectOuptut, NodeComType, RuntimeInterface } from '../../types/com-config/connector';
 import RuntimeError from '@/component/RuntimeError';
-
-abstract class ComWrapperType extends Controller<
-ConfigTypeSupportedInControllerRuntime,
-ResponsivePanelUtils,
-LayerList,
-ResponsiveController.OptionProps,
-ResponsivePanelUtilsInsideWrapper
-> {
-  declare Container: ComponentType<ResponsiveController.ContainerProps>;
-  // declare switchRenderer: (props: ComWrapperProps) => void;
-
-  declare createUtils: () => FullUtils<ResponsivePanelUtilsInsideWrapper>;
-
-  declare mounted: () => void;
-}
 
 interface ComWrapperClass {
   new (props: ComWrapperProps): ComWrapperType;
@@ -44,12 +39,12 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
   LayerList,
   ResponsiveController.OptionProps,
   ResponsivePanelUtilsInsideWrapper
-  > {
+  > implements ComWrapperType {
     isError = false;
 
     Container: ComponentType<ResponsiveController.ContainerProps> = PreviewContainer;
 
-    constructor(props: ComWrapper['props']) {
+    constructor(props: ComWrapperProps) {
       super(props);
       if (isUnmountMode(props.config.hide)) {
         this.runtimeServices = this.getServicesKeptInUnmount();
@@ -60,7 +55,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       return servicesKeptInUnmount;
     }
 
-    shouldComponentUpdate(nextProps: ComWrapper['props'], nextState: any) {
+    shouldComponentUpdate(nextProps: ComWrapperProps, nextState: any) {
       const shouldRender = super.shouldComponentUpdate(nextProps, nextState);
       return shouldRender || nextProps.chain !== this.props.chain;
     }
@@ -78,7 +73,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       }
     }
 
-    componentDidUpdate(prevProps: ComWrapper['props'], prevState: ComWrapper['state']): void {
+    componentDidUpdate(prevProps: ComWrapperProps, prevState: ComWrapper['state']): void {
       const { hide } = this.state.config;
       if (hide !== prevState.config.hide) {
         // switch to unmount mode
@@ -174,7 +169,7 @@ export function createComponentWrapper(runtimeImpl: RuntimeInterface) {
       return {
         ...this.props.config.com,
         panelId: this.props.panelId,
-        dashboardId: this.props.projectId,
+        projectId: this.props.projectId,
         comId: this.props.config.id
       };
     }

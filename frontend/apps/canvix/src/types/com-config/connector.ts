@@ -1,9 +1,8 @@
-import { ComponentClass, ComponentProps, ComponentType } from 'react';
-
+import { ComponentClass, ComponentType } from 'react';
 import { LogicalNodeProps, BasicAssetParams, LayerList } from '../panel';
 import { ComInfo, IDComConfig, Identifier } from './common';
 import {
-  BasicStates, ControllerBasicProps, FullUtils, LoaderRuntimeBasicProps, ResponsiveController, ResponsivePanelUtils, ResponsivePanelUtilsInsideWrapper
+  BasicStates, ControllerBasicProps, FullUtils, ResponsiveController, ResponsivePanelUtils, ResponsivePanelUtilsInsideWrapper
 } from './controller';
 import { ConfigTypeSupportedInControllerRuntime } from './responsive';
 import { ConnectorProps } from '../event-core';
@@ -31,15 +30,12 @@ export interface Controller<
   Children,
   OptionProps extends object = object,
   PanelUtilsRuntime extends object = object,
-> extends ComponentClass<
-  ConnectorProps<ControllerBasicProps<Config, PanelUtils, Children, OptionProps>>,
-  BasicStates<Config>
-  > {
-  memoProps():LoaderRuntimeBasicProps<PanelUtilsRuntime> & BasicStates<Config>;
+> {
+  props: ConnectorProps<ControllerBasicProps<Config, PanelUtils, Children, OptionProps>>
+  state: BasicStates<Config>
   createUtils(): FullUtils<PanelUtilsRuntime>;
-  mounted(): void;
+  emit(event: string, value: any): void
   getIdentifier(): Identifier
-  getRuntimeProps(): LoaderRuntimeBasicProps<PanelUtilsRuntime> & BasicStates<Config>
 }
 
 export type ComWrapperInstance = Controller<
@@ -50,7 +46,16 @@ ResponsiveController.OptionProps,
 ResponsivePanelUtilsInsideWrapper
 >;
 
-export type ComWrapperProps = ComponentProps<ComWrapperInstance>;
+export type ComWrapperProps = ComWrapperInstance['props'];
+
+export interface ComWrapperType extends ComWrapperInstance {
+
+  Container: ComponentType<ResponsiveController.ContainerProps>;
+
+  createUtils: () => FullUtils<ResponsivePanelUtilsInsideWrapper>;
+
+  mounted: () => void;
+}
 
 type ConnectInputProps = ComWrapperProps;
 
