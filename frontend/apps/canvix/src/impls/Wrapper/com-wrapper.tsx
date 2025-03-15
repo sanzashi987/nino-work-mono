@@ -22,6 +22,7 @@ import {
 import { createUtils } from './utils';
 import { ComWrapperProps, ConnectOuptut, NodeComType, RuntimeInterface } from '../../types/com-config/connector';
 import RuntimeError from '@/component/RuntimeError';
+import { getRuntimeConfig } from '@/statics/config';
 
 interface ComWrapperClass {
   new (props: ComWrapperProps): ComWrapperType;

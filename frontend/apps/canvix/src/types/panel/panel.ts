@@ -1,10 +1,11 @@
 import type { Emitter } from 'mitt';
 import type {
-  ComDefault, ComWrapperProps, ConnectOuptut, HiddenMode, ResponsivePanelUtils, UnifiedRenderUtil
+  ComDefault, ComWrapperProps, ConnectOuptut, HiddenMode, UnifiedRenderUtil
 } from '../com-config';
 import type { InteractionConfigType, LogicalNodeConfig, PanelPropsType } from '../event-core';
-import type { DynamicPanelMeta, LayerList, RootMetaType } from './meta';
+import type { DynamicPanelMeta, RootMetaType } from './meta';
 import type { Dimension, ThemeMetaType } from './responsive';
+import { LayerList } from './layer';
 
 export type PanelProps = Omit<PanelPropsType, 'scale'>;
 
@@ -143,17 +144,6 @@ export type PanelState = {
 export type PanelRuntimeProps = Pick<PanelConfigProps, 'config'> & PanelPropsFromContext;
 
 export type PanelMinimalProps = PanelRuntimeProps & PanelOnlyProps;
-
-export abstract class PanelMinimal extends BasicPanel<
-PanelMinimalProps,
-PanelState,
-ResponsivePanelUtils,
-PanelLogicalUtilsType
-> {
-  declare depotRef: React.RefObject<LocalVariableDepot>;
-
-  declare render: () => React.ReactNode;
-}
 
 type RuntimePropsKey = keyof PanelRuntimeProps;
 

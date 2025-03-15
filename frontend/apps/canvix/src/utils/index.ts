@@ -8,3 +8,4 @@ export { BlankLoadable, Loadable } from './lazyLoad';
 export { getOS, isMac, sort } from './system';
 export { queryStringify } from './url';
 export { walkAlongTree, initArrayWith, sortPath } from './tree';
+export { isGradientColor, isSolidColor, tinycolor } from './color';

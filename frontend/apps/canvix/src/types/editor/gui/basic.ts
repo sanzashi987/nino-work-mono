@@ -1,5 +1,5 @@
-import { ConfigMode, PackageConfigType } from './basic';
-import { ShowInPanel } from './logic';
+import { ConfigMode, PackageConfigType } from '../../component/basic';
+import { ShowInPanel } from '../../component/logic';
 
 export type ValueType = number | string;
 

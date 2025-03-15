@@ -1,23 +1,17 @@
 import React, { useContext, FC, useMemo, useReducer } from 'react';
 import { memoize } from 'proxy-memoize';
 import produce from 'immer';
-import type {
-  ConnectInput,
-  ConnectOuptut,
-  ConnectOuptutProps,
-  FiltersType,
-  LayerItem
-} from '@app/types';
-import { PanelMetaContext, RootMetaContext, ScreenConfigContext } from '@app/context';
-import type { DataConfigTypeRuntime } from '@canvas/component-factory';
-import { parseLayerString } from '@app/utils/split-key';
-import { mergeConfig, createDeltaIdList, MergeParams } from '@app/utils/component';
-import { Responsive } from '@canvas/types';
+import { PanelMetaContext, RootMetaContext, ScreenConfigContext } from '@/context';
 import { walkAlongTree } from '@/utils';
+import {
+  ConfigTypeSupportedInController, ConfigTypeSupportedInControllerRuntime, ConnectInput, ConnectOuptut, ConnectOuptutProps, DataConfigTypeRuntime, FiltersType, LayerItem, MergeParams
+} from '@/types';
+import { parseLayerString } from '@/statics/keys';
+import { createDeltaIdList, mergeConfig } from '@/statics/config';
 
 type ConnectRuntimeInput = {
   filters: FiltersType;
-  config: Responsive.ConfigTypeSupportedInController;
+  config: ConfigTypeSupportedInController;
 };
 
 const computeLocalFilters = ({ config, filters }: ConnectRuntimeInput) => Object.entries(config.data ?? {}).reduce<Record<string, string[]>>((lastOuter, [key, val]) => {
@@ -38,7 +32,7 @@ function memoLocalFilterCreator() {
 }
 
 function useMergedDataConfig(
-  config: Responsive.ConfigTypeSupportedInController,
+  config: ConfigTypeSupportedInController,
   filters: FiltersType
 ) {
   const memoFilterSelector = useMemo(memoLocalFilterCreator, []);
@@ -61,12 +55,12 @@ export function useMergeConfig(params: MergeParams) {
 }
 
 export function connect(InputCom: ConnectInput): ConnectOuptut {
-  const Fc: FC<ConnectOuptutProps> = ({ id, userProps, connect, primitiveUtils, chain }) => {
+  const Fc: FC<ConnectOuptutProps> = ({ id, userProps, connect: cnt, primitiveUtils, chain }) => {
     const [, forceUpdate] = useReducer((state) => state++, 0);
-    const { theme, breakpoint, breakpoints, projectId: dashboardId } = useContext(RootMetaContext)!;
-    const { projectCode } = useContext(ScreenConfigContext)!;
+    const { theme, breakpoint, breakpoints, projectId } = useContext(RootMetaContext)!;
+    const { workspaceId } = useContext(ScreenConfigContext)!;
     const { components, core, delta, filters, layers, info } = useContext(PanelMetaContext)!;
-    const config = components[id] as Responsive.ConfigTypeSupportedInController;
+    const config = components[id] as ConfigTypeSupportedInController;
 
     const memoData = useMergedDataConfig(config, filters);
 
@@ -93,7 +87,7 @@ export function connect(InputCom: ConnectInput): ConnectOuptut {
       return { configChildren: children, childrenAllowed: allowed };
     }, [chain, layers]);
 
-    const configRuntime = useMemo(() => produce(config as Responsive.ConfigTypeSupportedInControllerRuntime, (draft) => {
+    const configRuntime = useMemo(() => produce(config as ConfigTypeSupportedInControllerRuntime, (draft) => {
       draft.data = memoData;
       draft.children = configChildren;
       if (draft.type !== 'subcom') {
@@ -111,11 +105,11 @@ export function connect(InputCom: ConnectInput): ConnectOuptut {
           panelId={info.id}
           chain={chain}
           config={configRuntime}
-          connect={connect}
+          connect={cnt}
           primitiveUtils={primitiveUtils}
           userProps={userProps}
-          dashboardId={dashboardId}
-          projectCode={projectCode}
+          projectId={projectId}
+          workspaceId={workspaceId}
         />
       ),
       [configRuntime, chain, userProps, info.id], //eslint-disable-line

@@ -5,9 +5,10 @@ import type {
   RootMetaType,
   EditorFeaturesType,
   EditorFeaturesRegisterType,
-  ThemeContextType
-} from '@app/types';
-import type { SourceKey } from '@/types';
+  ThemeContextType,
+  SourceKey
+} from '@/types';
+
 import { noop } from '@/utils';
 
 function returnVoidObject() {
@@ -49,14 +50,14 @@ export const UpdateBreakPointEditor = createContext<(width: number) => void>(noo
 
 export type ScreenType = 'screen' | 'model' | 'template';
 export type ScreenConfigContextType = {
-  screenCode: string;
+  // screenCode: string;
   userIdentify: string;
-  projectCode: string | null;
+  workspaceId: string | null;
 };
 export const ScreenConfigContext = createContext<ScreenConfigContextType>({
-  projectCode: '',
-  userIdentify: '',
-  screenCode: ''
+  workspaceId: '',
+  userIdentify: ''
+  // screenCode: ''
 });
 
 /**

@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "examples": [
+    {
+      "type": "CBackgroundImage",
+      "name": "背景图",
+      "default": ""
+    }
+  ],
+  "properties": {
+    "default": {
+      "type": "string",
+      "description": "默认值"
+    }
+  }
+}
