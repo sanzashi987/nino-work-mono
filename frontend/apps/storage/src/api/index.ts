@@ -1,8 +1,6 @@
 import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
-const prefix = '/backend/storage/v1';
-
 type BucketData = {
   id: number,
   code: string,
@@ -11,7 +9,7 @@ type BucketData = {
 };
 
 export const listBucket = defineApi<PagninationRequest, PaginationResponse<BucketData>>({
-  url: `${prefix}/bucket/list`,
+  url: 'bucket/list',
   method: 'POST'
 });
 
@@ -42,24 +40,24 @@ export type BucketInfo = {
   dir_contents: DirResponse
   root_path_id: number
 };
-export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: `${prefix}/bucket/info` });
+export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: 'bucket/info' });
 
 type ListBucketDirRequest = {
   bucket_id: number | string
   path_id: number
 };
 
-export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({ url: `${prefix}/bucket/dir/list` });
+export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({ url: 'bucket/dir/list' });
 
 export type BucketMeta = Omit<ModelMeta, 'name'>;
 
 export const createBucket = defineApi<{ code: string }, { id: number }>({
-  url: `${prefix}/bucket/create`,
+  url: 'bucket/create',
   method: 'POST'
 });
 
 export const createDir = defineApi<{ bucket_id: number, parent_id: number, name: string }, void>({
-  url: `${prefix}/bucket/dir/create`,
+  url: 'bucket/dir/create',
   method: 'POST'
 });
 
@@ -70,11 +68,11 @@ export type UploadFileRequest = {
 };
 
 export const uploadFiles = defineApi<UploadFileRequest, { file_ids: string[] }>({
-  url: `${prefix}/asset/upload`,
+  url: 'asset/upload',
   method: 'POSTFORM'
 });
 
 export const deleteFile = defineApi<{ bucket_id:number, file_id:string }, void>({
-  url: `${prefix}/asset/delete`,
+  url: 'asset/delete',
   method: 'POST'
 });

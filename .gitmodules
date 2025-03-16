@@ -1,0 +1,3 @@
+[submodule "frontend/apps/canvix/src"]
+	path = frontend/apps/canvix/src
+	url = git@github.com:sanzashi987/canvix.git

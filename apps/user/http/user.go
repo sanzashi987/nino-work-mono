@@ -15,7 +15,16 @@ type UserController struct {
 	controller.BaseController
 }
 
-var userController = UserController{}
+func RegisterUserRoutes(public, authed gin.IRoutes) {
+	var userController = UserController{}
+
+	public.POST("users/login", userController.UserLogin)
+	authed.GET("users/info", userController.UserInfo)
+	authed.GET("users/user-roles", userController.GetUserRoles)
+	authed.POST("users/list", userController.ListUser)
+	authed.POST("users/bind-roles", userController.BindUserRoles)
+	authed.POST("users/create", userController.CreateUserByAdmin)
+}
 
 type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"`
@@ -68,6 +77,25 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 // 	c.ResponseJson(ctx, &res)
 // }
 
+func (c *UserController) CreateUserByAdmin(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	req := userService.CreateUserRequest{}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user create: Fail to read required fields "+err.Error())
+		return
+	}
+
+	id, err := userService.CreateUserByAdmin(ctx, userId, &req)
+	if err != nil {
+		c.AbortServerError(ctx, "[rpc] user service: Create user error "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, gin.H{"id": id})
+}
+
 func (c *UserController) UserInfo(ctx *gin.Context) {
 
 	userId := ctx.GetUint64(controller.UserID)
@@ -113,5 +141,26 @@ func (c *UserController) BindUserRoles(ctx *gin.Context) {
 		return
 	}
 
-	c.ResponseJson(ctx, nil)
+	c.SuccessVoid(ctx)
+}
+
+func (c *UserController) GetUserRoles(ctx *gin.Context) {
+	userId := ctx.GetUint64(controller.UserID)
+
+	var req struct {
+		UserId uint64 `form:"id" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		c.AbortClientError(ctx, "[http] user get roles: Fail to read required fields "+err.Error())
+		return
+	}
+
+	res, err := userService.GetUserRoles(ctx, userId, req.UserId)
+	if err != nil {
+		c.AbortServerError(ctx, "[http] user get roles: Fail to get user roles "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, res)
 }

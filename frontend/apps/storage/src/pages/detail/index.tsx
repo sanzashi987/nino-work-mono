@@ -23,7 +23,7 @@ import {
   ClickAwayListener
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import { loading, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
+import { Empty, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
 import { filesize } from 'filesize';
 import { DATE_TIME_FORMAT } from '@nino-work/shared';
 import {
@@ -82,7 +82,6 @@ const BucketDetail: React.FC = () => {
       const next = { files: last.files.concat(), map: { ...last.map } };
       return toAdd.reduce((l, c) => {
         l.files.push(c);
-        // eslint-disable-next-line no-param-reassign
         l.map[c.name] = true;
         return l;
       }, next);
@@ -161,7 +160,7 @@ const BucketDetail: React.FC = () => {
           </Stack>
         ) : null}
 
-      {!dirContents ? loading
+      {!dirContents ? Empty
         : (
           <>
             <Stack direction="row">

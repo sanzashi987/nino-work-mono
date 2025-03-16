@@ -10,20 +10,20 @@
     "**/public/**",
     "**/webpack.config.js",
     "**/rollup.config.js",
-    "**/canvas-icons.js",
     "**/@nino-work/infra/**",
-    "**/infra.config.js",
+    "**/infra.config.js"
   ],
   "extends": [
     "airbnb",
-    "airbnb-typescript"
+    "airbnb-typescript",
     // "eslint:recommended",
     // "plugin:react/recommended",
-    // "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended",
+    // "plugin:@stylistic/eslint-plugin-ts"
   ],
   "settings": {
     "react": {
-      "version": "19.0"
+      "version": "18.0"
     }
   },
   "plugins": [
@@ -47,10 +47,7 @@
     "project": true
   },
   "rules": {
-    "indent": [
-      "warn",
-      2
-    ],
+    "indent": "off",
     "linebreak-style": "off",
     "object-curly-newline": [
       "warn",
@@ -101,6 +98,7 @@
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/comma-dangle": "off",
     "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "max-classes-per-file": "off",
     "max-len": [
       "warn",
@@ -117,6 +115,16 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
-    "react/destructuring-assignment": "off"
+    "react/destructuring-assignment": "off",
+    "no-plusplus": "off",
+    "no-param-reassign": "off",
+    "import/prefer-default-export": "off",
+    "no-restricted-exports": "off",
+    "@typescript-eslint/indent": [
+      "error",
+      2,
+    ],
+    "react/sort-comp": "off",
+    "no-continue": "off"
   }
 }

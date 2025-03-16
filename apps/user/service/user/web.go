@@ -101,6 +101,7 @@ type ListUserResponse struct {
 	shared.PaginationResponse
 }
 
+// TODO specific permission check for the operator
 func ListUser(ctx context.Context, pagination *shared.PaginationRequest) (*ListUserResponse, error) {
 	tx := db.NewTx(ctx)
 
@@ -181,4 +182,54 @@ func BindUserRoles(ctx context.Context, operator uint64, payload *BindRoleReques
 	}
 
 	return nil
+}
+
+// TODO specific permission check for the operator
+func GetUserRoles(ctx context.Context, user, targetUser uint64) ([]*shared.EnumMeta, error) {
+
+	targetUserModel := &model.UserModel{}
+	targetUserModel.Id = targetUser
+
+	tx := db.NewTx(ctx)
+	if err := tx.Model(targetUserModel).Association("Roles").Find(&targetUserModel.Roles); err != nil {
+		return nil, err
+	}
+
+	result := []*shared.EnumMeta{}
+	for _, role := range targetUserModel.Roles {
+		result = append(result, &shared.EnumMeta{
+			Name:  role.Name,
+			Value: role.Id,
+		})
+	}
+	return result, nil
+}
+
+type CreateUserRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func CreateUserByAdmin(ctx context.Context, user uint64, payload *CreateUserRequest) (uint64, error) {
+	result, err := GetUserAdmins(ctx, user)
+	if err != nil {
+		return 0, err
+	}
+
+	if !result.HasAnyAdmin() {
+		return 0, ErrNopermission
+	}
+
+	tx := result.Tx
+
+	userModel := &model.UserModel{
+		Username: payload.Username,
+		Password: payload.Password,
+	}
+
+	if err := dao.CreateUser(tx, userModel); err != nil {
+		return 0, err
+	}
+
+	return userModel.Id, nil
 }

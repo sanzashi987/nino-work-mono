@@ -19,7 +19,7 @@ export default function AutoSelect<Value>({ requester, ...others }: AutoSelectPr
   }, [requester]);
 
   return (
-    <Select {...others}>
+    <Select variant="standard" {...others}>
       {requester
         ? loading
           ? (
@@ -27,6 +27,7 @@ export default function AutoSelect<Value>({ requester, ...others }: AutoSelectPr
               <CircularProgress />
             </Stack>
           )
+          // @ts-ignore
           : options.map((e) => <MenuItem key={`${e.value}`} value={e.value}>{e.label}</MenuItem>)
         : others.children}
     </Select>

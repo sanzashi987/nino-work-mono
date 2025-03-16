@@ -102,12 +102,28 @@ export const listAdminstratedPermissions = defineApi<void, Enum[]>({
   method: 'POST'
 });
 
-type UserBio = {
-  id: string
+export type UserBio = {
+  id: number
   username: string
 };
 
 export const listUsers = defineApi<PagninationRequest, PaginationResponse<UserBio>>({
   url: `${prefix}/users/list`,
+  method: 'POST'
+});
+
+export const getUserRoles = defineApi<{ id: number }, Enum<number>[]>({ url: `${prefix}/users/user-roles` });
+
+export type BindRoleRequest = {
+  user_id: number
+  role_ids:number[]
+};
+export const bindRoles = defineApi<BindRoleRequest, void>({
+  url: `${prefix}/users/bind-roles`,
+  method: 'POST'
+});
+
+export const listRolesAll = defineApi<void, Enum<number>[]>({
+  url: `${prefix}/roles/list-all`,
   method: 'POST'
 });

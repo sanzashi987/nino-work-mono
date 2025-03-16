@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/user/db/model"
-	"github.com/sanzashi987/nino-work/apps/user/service"
 	roleService "github.com/sanzashi987/nino-work/apps/user/service/role"
 	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
@@ -20,6 +19,7 @@ func RegisterRoleRoutes(router gin.IRoutes) {
 	var roleController = RoleController{}
 	router.POST("roles/create", roleController.createRole)
 	router.POST("roles/list", roleController.listManagedRoles)
+	router.POST("roles/list-all", roleController.listAllRoles)
 	router.POST("roles/update", roleController.updateRole)
 	router.POST("roles/delete", roleController.deleteRole)
 	router.GET("roles/suggest", roleController.suggest)
@@ -42,6 +42,16 @@ func (rc *RoleController) createRole(c *gin.Context) {
 	rc.SuccessVoid(c)
 }
 
+func (rc *RoleController) listAllRoles(c *gin.Context) {
+	userId := c.GetUint64(controller.UserID)
+	res, err := roleService.ListAllRoles(c, userId)
+	if err != nil {
+		rc.AbortServerError(c, "[http] listManagedRoles: Fail to get role detail: "+err.Error())
+		return
+	}
+	rc.ResponseJson(c, res)
+}
+
 func (rc *RoleController) listManagedRoles(c *gin.Context) {
 	userId := c.GetUint64(controller.UserID)
 
@@ -51,7 +61,7 @@ func (rc *RoleController) listManagedRoles(c *gin.Context) {
 		return
 	}
 
-	res, err := service.RoleServiceWebImpl.ListRoles(c, userId, &req)
+	res, err := roleService.ListRoles(c, userId, &req)
 	if err != nil {
 		rc.AbortServerError(c, "[http] listManagedRoles: Fail to get role detail: "+err.Error())
 		return
@@ -61,13 +71,13 @@ func (rc *RoleController) listManagedRoles(c *gin.Context) {
 }
 
 func (rc *RoleController) updateRole(c *gin.Context) {
-	var req service.UpdateRoleRequest
+	var req roleService.UpdateRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		rc.AbortClientError(c, "[http] updateRole: Fail to read required fields: "+err.Error())
 		return
 	}
 
-	if err := service.RoleServiceWebImpl.UpdateRole(c, req); err != nil {
+	if err := roleService.UpdateRole(c, req); err != nil {
 		rc.AbortServerError(c, "[http] updateRole: Fail to update role: "+err.Error())
 		return
 	}
@@ -82,7 +92,7 @@ func (rc *RoleController) deleteRole(c *gin.Context) {
 		return
 	}
 
-	if err := service.RoleServiceWebImpl.DeleteRole(c, roleId); err != nil {
+	if err := roleService.DeleteRole(c, roleId); err != nil {
 		rc.AbortServerError(c, "[http] deleteRole: Fail to delete role: "+err.Error())
 		return
 	}

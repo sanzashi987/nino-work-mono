@@ -76,18 +76,12 @@ func NewRouter(loginPageUrl string) *gin.Engine {
 	}
 
 	v1 := apiEngine.Group("/backend/root/v1")
+	authed := v1.Use(enhancedAuth)
 	{
 		v1.GET("misc/importmap", miscController.GetImportMap)
 
-		v1.POST("users/login", userController.UserLogin)
-		
-		authed := v1.Use(enhancedAuth)
-		authed.GET("users/info", userController.UserInfo)
-		authed.POST("users/list", userController.ListUser)
-
-		authed.POST("apps/list", appController.ListApps)
-		authed.POST("apps/create", appController.CreateApp)
-
+		RegisterUserRoutes(v1, authed)
+		RegisterAppRoutes(authed)
 		RegisterAppPermissionRoutes(authed)
 		RegisterRoleRoutes(authed)
 
