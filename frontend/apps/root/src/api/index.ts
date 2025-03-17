@@ -1,8 +1,6 @@
 import { Enum, ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
 import defineApi from './impls';
 
-const prefix = '/backend/root/v1';
-
 export enum AppStatus {
   ENABLE = 0,
   DISABLE = 1,
@@ -19,7 +17,7 @@ type AppModel = {
 export type AppListResponse = PaginationResponse<AppModel>;
 
 export const getAppList = defineApi<PagninationRequest, AppListResponse>({
-  url: `${prefix}/apps/list`,
+  url: 'apps/list',
   method: 'POST'
 });
 
@@ -28,7 +26,7 @@ export type CreateAppRequest = Pick<AppModel, 'code' | 'name' | 'description'>;
 export type CreateAppResponse = AppModel;
 
 export const createApp = defineApi<CreateAppRequest, CreateAppResponse>({
-  url: `${prefix}/apps/create`,
+  url: 'apps/create',
   method: 'POST'
 });
 
@@ -49,7 +47,7 @@ export type ListPermissionsResponse = {
 };
 
 export const listPermissions = defineApi<ListPermissionsRequest, ListPermissionsResponse>(
-  { url: `${prefix}/apps/permission/list` }
+  { url: 'apps/permission/list' }
 );
 
 export type CreatePermissionRequest = {
@@ -58,7 +56,7 @@ export type CreatePermissionRequest = {
 };
 
 export const createPermission = defineApi<CreatePermissionRequest, void>({
-  url: `${prefix}/apps/permission/create`,
+  url: 'apps/permission/create',
   method: 'POST'
 });
 
@@ -69,7 +67,7 @@ type RoleInfo = {
 };
 
 export const listRoles = defineApi<PagninationRequest, PaginationResponse<RoleInfo>>({
-  url: `${prefix}/roles/list`,
+  url: 'roles/list',
   method: 'POST'
 });
 
@@ -81,7 +79,7 @@ export type CreateRoleRequest = {
 };
 
 export const createRole = defineApi<CreateRoleRequest, void>({
-  url: `${prefix}/roles/create`,
+  url: 'roles/create',
   method: 'POST'
 });
 
@@ -93,12 +91,12 @@ type UpdateRoleRequest = {
 };
 
 export const updateRole = defineApi<UpdateRoleRequest, void>({
-  url: `${prefix}/roles/update`,
+  url: 'roles/update',
   method: 'POST'
 });
 
 export const listAdminstratedPermissions = defineApi<void, Enum[]>({
-  url: `${prefix}/apps/permission/admined-permission`,
+  url: 'apps/permission/admined-permission',
   method: 'POST'
 });
 
@@ -108,22 +106,22 @@ export type UserBio = {
 };
 
 export const listUsers = defineApi<PagninationRequest, PaginationResponse<UserBio>>({
-  url: `${prefix}/users/list`,
+  url: 'users/list',
   method: 'POST'
 });
 
-export const getUserRoles = defineApi<{ id: number }, Enum<number>[]>({ url: `${prefix}/users/user-roles` });
+export const getUserRoles = defineApi<{ id: number }, Enum<number>[]>({ url: 'users/user-roles' });
 
 export type BindRoleRequest = {
   user_id: number
   role_ids:number[]
 };
 export const bindRoles = defineApi<BindRoleRequest, void>({
-  url: `${prefix}/users/bind-roles`,
+  url: 'users/bind-roles',
   method: 'POST'
 });
 
 export const listRolesAll = defineApi<void, Enum<number>[]>({
-  url: `${prefix}/roles/list-all`,
+  url: 'roles/list-all',
   method: 'POST'
 });

@@ -9,11 +9,11 @@ import (
 const grouped_project_prefix = "group"
 
 type GroupController struct {
-	CanvasController
+	CanvixController
 }
 
 var groupController = &GroupController{
-	CanvasController: createCanvasController("[http] canvas asset group handler "),
+	CanvixController: createCanvixController("[http] canvas asset group handler "),
 }
 
 func (c *GroupController) listAssetGroup(ctx *gin.Context) {

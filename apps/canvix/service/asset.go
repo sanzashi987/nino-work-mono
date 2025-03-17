@@ -172,3 +172,15 @@ func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.S
 
 	return &result, err
 }
+
+func DeleteAssets(ctx context.Context, workspaceId uint64, assetCode []string) error {
+	// if err := consts.IsLegalName(assetName); err != nil {
+	// 	return err
+	// }
+	// assetId, _, _ := consts.GetIdFromCode(assetCode)
+
+	// tx := db.NewTx(ctx)
+
+	// return dao.UpdateAssetName(tx, workspaceId, assetId, assetName)
+
+}

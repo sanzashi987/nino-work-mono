@@ -8,11 +8,11 @@ import (
 const data_source_prefix = "data-source"
 
 type DataSourceController struct {
-	CanvasController
+	CanvixController
 }
 
 var dataSourceController = &DataSourceController{
-	CanvasController: createCanvasController("[http] canvas data-source handler "),
+	CanvixController: createCanvixController("[http] canvas data-source handler "),
 }
 
 func (c *DataSourceController) list(ctx *gin.Context) {

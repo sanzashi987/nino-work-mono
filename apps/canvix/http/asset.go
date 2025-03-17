@@ -1,7 +1,6 @@
 package http
 
 import (
-	"math"
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
@@ -13,11 +12,11 @@ import (
 const asset_prefix = "assets"
 
 type AssetController struct {
-	CanvasController
+	CanvixController
 }
 
 var assetController = &AssetController{
-	CanvasController: createCanvasController("[http] canvas asset handler "),
+	CanvixController: createCanvixController("[http] canvas asset handler "),
 }
 
 type ListAssetResponse struct {
@@ -42,7 +41,6 @@ func (c *AssetController) list(ctx *gin.Context) {
 			PaginationResponse: shared.PaginationResponse{
 				PageIndex:   reqBody.Page,
 				PageSize:    reqBody.Size,
-				PageTotal:   int(math.Floor(float64(recordTotal) / float64(reqBody.Size))),
 				RecordTotal: int(recordTotal),
 			},
 		})
@@ -99,7 +97,21 @@ func (c *AssetController) update(ctx *gin.Context) {
 
 }
 func (c *AssetController) delete(ctx *gin.Context) {
+	var req struct {
+		Data []string `json:"data" binding:"required"`
+	}
 
+	if workspaceId, err := c.BindRequestJson(ctx, &req, "delete"); err != nil {
+		return
+	} else {
+
+		if err := service.DeleteAssets(ctx, workspaceId, req.Data); err != nil {
+			c.AbortServerError(ctx, "delete: "+err.Error())
+			return
+		}
+		c.SuccessVoid(ctx)
+
+	}
 }
 
 type UploadAssetForm struct {

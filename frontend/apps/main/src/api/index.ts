@@ -10,9 +10,8 @@ type LoginResponse = {
   jwt_token: string
 };
 
-const prefix = '/backend/root/v1';
 export const login = defineApi<LoginRequest, LoginResponse>({
-  url: `${prefix}/users/login`,
+  url: 'users/login',
   method: 'POST'
 });
 
@@ -44,4 +43,4 @@ export type UserInfoResponse = {
   roles: EnumType[]
 };
 
-export const getUserInfo = defineApi<undefined, UserInfoResponse>({ url: `${prefix}/info` });
+export const getUserInfo = defineApi<undefined, UserInfoResponse>({ url: 'info' });

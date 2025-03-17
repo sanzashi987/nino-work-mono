@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CanvasController struct {
+type CanvixController struct {
 	controller.BaseController
 }
 
 /** Also return the workspaceId */
-func (c CanvasController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
+func (c CanvixController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
 	if err := ctx.ShouldBindJSON(reqBody); err != nil {
 		c.AbortClientError(ctx, funcName+" "+err.Error())
 		return 0, err
@@ -21,8 +21,8 @@ func (c CanvasController) BindRequestJson(ctx *gin.Context, reqBody any, funcNam
 	return workspaceId, nil
 }
 
-func createCanvasController(errorPrefix string) CanvasController {
-	return CanvasController{
+func createCanvixController(errorPrefix string) CanvixController {
+	return CanvixController{
 		controller.BaseController{
 			ErrorPrefix: errorPrefix,
 		},

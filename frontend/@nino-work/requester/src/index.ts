@@ -5,10 +5,11 @@ export type StandardResponse<T> = {
   code: number
 };
 
-export type DefineApiOptions = {
-  method?: 'GET' | 'POST' | 'POSTFORM',
+export type DefineApiOptions<Res, Out> = {
+  method?: 'GET' | 'POST' | 'POSTFORM' | 'DELETE',
   url: string
-  onError?(message: string, payload?:any): Promise<any>
+  onError?(payload?: any): Promise<any>
+  onResponse?(input: StandardResponse<Res>): Promise<Out>
   headers?: Record<string, string>
 };
 
@@ -23,8 +24,19 @@ type PathMeta = {
   optional: boolean
 };
 
-export const defineApi = <Req, Res>(options: DefineApiOptions) => {
-  const { method = 'GET', url, onError = Promise.reject, headers = defaultHeaders } = options;
+function defaultOnResponse<Input, Output>(input: Input): Promise<Output> {
+  if (typeof input === 'object') {
+    if ('code' in input) {
+      if (input.code === 0 && 'data' in input) {
+        return Promise.resolve(input.data as Output);
+      }
+    }
+  }
+  return Promise.reject(input);
+}
+
+export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<Res, Out>) => {
+  const { method = 'GET', url, onError = Promise.reject, headers = defaultHeaders, onResponse = defaultOnResponse } = options;
   const pathMetas = url.split('/').map((param) => {
     const meta: PathMeta = { dynamic: false, optional: false, name: param };
     let name = param;
@@ -114,11 +126,7 @@ export const defineApi = <Req, Res>(options: DefineApiOptions) => {
 
     const data = await res.json() as StandardResponse<Res>;
 
-    if (data.code !== 0) {
-      return onError(data?.msg, data);
-    }
-
-    return data.data;
+    return onResponse(data).catch(onError);
   };
   return requester;
 };
