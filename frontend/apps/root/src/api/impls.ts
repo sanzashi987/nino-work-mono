@@ -1,7 +1,7 @@
 import { defineApi as _d, DefineApiOptions } from '@nino-work/requester';
 import { message } from '@nino-work/ui-components';
 
-const showErrorNotification = async (payload:any) => {
+const showErrorNotification = async (payload: any) => {
   message.error(payload?.msg, 7000);
   return Promise.reject(payload);
 };

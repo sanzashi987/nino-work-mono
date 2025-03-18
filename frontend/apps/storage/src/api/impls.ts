@@ -6,7 +6,7 @@ const showErrorNotification = async (payload: any) => {
   return Promise.reject(payload);
 };
 
-export default function defineApi<Req, Res, Out>(options: DefineApiOptions<Res, Out>) {
+export default function defineApi<Req, Res, Out = Res>(options: DefineApiOptions<Res, Out>) {
   const url = `/backend/storage/v1/${options.url}`;
 
   return _d<Req, Res, Out>({ onError: showErrorNotification, ...options, url });
