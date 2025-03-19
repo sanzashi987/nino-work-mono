@@ -22,6 +22,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
     "@nino-work/requester": "workspace:*",
@@ -32,6 +33,7 @@
     "dayjs": "^1.11.13",
     "immer": "^9.0.1",
     "keyboardjs": "^2.7.0",
+    "lodash.debounce": "^4.0.8",
     "lodash.isempty": "^4.4.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
@@ -50,6 +52,7 @@
   },
   "devDependencies": {
     "@types/keyboardjs": "^2.5.3",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.isempty": "^4.4.9",
     "@types/lodash.isequal": "^4.5.8",
     "@types/lodash.merge": "^4.6.9",

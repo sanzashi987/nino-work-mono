@@ -25,7 +25,7 @@ const StyledMessageContainer = styled('div')({
   }
 });
 
-class EncMessage {
+class NinoMessage {
   private maxSnack = 5;
 
   messageRef = React.createRef<MessageInstance>();
@@ -88,7 +88,7 @@ class EncMessage {
   };
 }
 
-const message = new EncMessage() as unknown as MessageType;
+const message = new NinoMessage() as unknown as MessageType;
 
 export { MessageContent } from './Message';
 export type { SnackbarKey } from 'notistack';
