@@ -5,7 +5,7 @@ import React, {
 
 // type ButtonProps = React.ComponentProps<typeof Button>['onClick'];
 
-type RequestButtonProps = ButtonProps & {
+export type RequestButtonProps = ButtonProps & {
   onClick: (e: React.MouseEvent) => Promise<any> | any
 };
 const LoadingContext = createContext<{ loading:boolean, setLoading:(loading:boolean)=>void } | null>(null);

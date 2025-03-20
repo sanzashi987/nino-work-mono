@@ -1,0 +1,52 @@
+// Confirm Modal
+.canvas-modal-confirm {
+  :global {
+    .confirm-content {
+      width: 350px;
+      max-width: 350px;
+      text-align: center;
+      .confirm-icon {
+        font-size: 65px;
+        margin: 30px 0 20px 0;
+        &.--error,
+        &.--confirm {
+          color: var(--canvas-modal-error-color);
+        }
+        &.--warning {
+          color: var(--canvas-modal-warning-color);
+        }
+        &.--info {
+          color: var(--canvas-modal-info-color);
+        }
+        &.--success {
+          color: var(--canvas-modal-success-color);
+        }
+      }
+      .confirm-text-wp {
+        font-size: 12px;
+      }
+    }
+    .canvas-modal-footer {
+      padding: 14px 18px;
+    }
+  }
+}
+
+.canvas-modal {
+  :global {
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+    .canvas-modal-title {
+      color: rgb(188, 201, 212);
+      // color: var(--canvas-modal-font-color);
+    }
+    .canvas-modal-content {
+      .canvas-modal-footer {
+        padding: 20px 0 0 0;
+      }
+    }
+  }
+}
