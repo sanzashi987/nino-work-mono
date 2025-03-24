@@ -32,6 +32,9 @@ importers:
       eslint-config-airbnb-typescript:
         specifier: ^18.0.0
         version: 18.0.0(@typescript-eslint/eslint-plugin@7.18.0)(@typescript-eslint/parser@7.18.0)(eslint-plugin-import@2.31.0)(eslint@8.57.1)
+      eslint-plugin-import-newlines:
+        specifier: ^1.4.0
+        version: 1.4.0(eslint@8.57.1)
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -5224,6 +5227,16 @@ packages:
       lodash: 4.17.21
       string-natural-compare: 3.0.1
     dev: false
+
+  /eslint-plugin-import-newlines@1.4.0(eslint@8.57.1):
+    resolution: {integrity: sha512-+Cz1x2xBLtI9gJbmuYEpvY7F8K75wskBmJ7rk4VRObIJo+jklUJaejFJgtnWeL0dCFWabGEkhausrikXaNbtoQ==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=6.0.0'
+    dependencies:
+      eslint: 8.57.1
+    dev: true
 
   /eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0)(eslint@8.57.1):
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}

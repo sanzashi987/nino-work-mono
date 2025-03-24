@@ -28,6 +28,7 @@
   },
   "plugins": [
     "import",
+    "import-newlines",
     "react",
     "react-hooks"
   ],
@@ -49,6 +50,13 @@
   "rules": {
     "indent": "off",
     "linebreak-style": "off",
+    "import-newlines/enforce": [
+      "error",
+      {
+        "items": 40,
+        "max-len": 120
+      }
+    ],
     "object-curly-newline": [
       "warn",
       {
@@ -58,10 +66,6 @@
         },
         "ObjectPattern": {
           "multiline": true
-        },
-        "ImportDeclaration": {
-          "multiline": true,
-          "minProperties": 5
         },
         "ExportDeclaration": {
           "multiline": true,
