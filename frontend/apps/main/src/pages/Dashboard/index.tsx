@@ -7,7 +7,7 @@ import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import { AccountCircle } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { Outlet, useNavigate } from 'react-router-dom';
-import PageContainer from '@/components/PageContainer';
+import PageContainer from '@/componentss/PageContainer';
 import SideBar from './SideBar';
 
 type DashboardProps = {};

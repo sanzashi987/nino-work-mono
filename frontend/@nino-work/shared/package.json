@@ -2,5 +2,8 @@
   "name": "@nino-work/shared",
   "version": "0.0.1",
   "author": "ziao chen",
-  "main": "src/index"
+  "main": "src/index",
+  "devDependencies": {
+    "@types/node": "^22.13.14"
+  }
 }
