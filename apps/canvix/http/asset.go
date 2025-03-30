@@ -54,8 +54,10 @@ type ReadQuery struct {
 
 /*CRUD*/
 func (c *AssetController) read(ctx *gin.Context) {
-	query := &ReadQuery{}
-	if err := ctx.BindQuery(query); err != nil {
+	var query struct {
+		FileId string `form:"fileId" binding:"required"`
+	}
+	if err := ctx.ShouldBindQuery(&query); err != nil {
 		c.AbortClientError(ctx, "read: "+err.Error())
 		return
 	}
@@ -142,25 +144,23 @@ func (c *AssetController) download(ctx *gin.Context) {
 func (c *AssetController) _import(ctx *gin.Context) {
 }
 
-type MoveGroupReq struct {
-	FileIds []string `json:"fileIds" binding:"required"`
-}
-
 func (c *AssetController) moveGroup(ctx *gin.Context) {
-	groupCode := ctx.Query("groupCode")
-	groupName := ctx.Query("groupName")
 
-	reqBody := MoveGroupReq{}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "move"); err != nil {
+	var req struct {
+		FileIds   []string `json:"fileIds" binding:"required"`
+		GroupCode string   `json:"groupCode"`
+		GroupName string   `json:"groupName"`
+	}
+	if workspaceId, err := c.BindRequestJson(ctx, &req, "move"); err != nil {
 		return
 	} else {
 
-		if groupCode == "" && groupName == "" {
+		if req.GroupCode == "" && req.GroupName == "" {
 			c.AbortClientError(ctx, "move: groupCode or groupName is required")
 			return
 		}
 
-		if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.FileIds, groupName, groupCode); err != nil {
+		if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, req.FileIds, req.GroupName, req.GroupCode); err != nil {
 			c.AbortServerError(ctx, "move: "+err.Error())
 			return
 		}
