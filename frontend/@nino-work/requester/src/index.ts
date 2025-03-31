@@ -7,7 +7,15 @@ export type StandardResponse<T> = {
   code: number
 };
 
-export interface DefineApiOptions<Res, Out> extends AbortConfig {
+export type ParserOption = {
+  [K in keyof Body]: Body[K] extends (...args: any) => Promise<any> ? K : never;
+}[keyof Body];
+
+export type ParserConfig = {
+  parser ?: ParserOption
+};
+
+export interface DefineApiOptions<Res, Out> extends AbortConfig, ParserConfig {
   method?: 'GET' | 'POST' | 'POSTFORM' | 'DELETE',
   url: string
   onError?(payload?: any): Promise<any>
@@ -37,11 +45,7 @@ function defaultOnResponse<Input, Output>(input: Input): Promise<Output> {
   return Promise.reject(input);
 }
 
-export interface NinoRequestInit extends RequestInit, AbortConfig {}
-
-export type ParserOption = {
-  [K in keyof Body]: Body[K] extends (...args: any) => Promise<any> ? K : never;
-}[keyof Body];
+export interface NinoRequestInit extends RequestInit, AbortConfig, ParserConfig { }
 
 export async function autoParseResponse(response: Response, parser?: ParserOption) {
   if (parser) {
@@ -163,7 +167,7 @@ export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<
     }
 
     // const data = await res.json() as StandardResponse<Res>;
-    const data = await autoParseResponse(res) as StandardResponse<Res>;
+    const data = await autoParseResponse(res, options.parser ?? opts.parser) as StandardResponse<Res>;
 
     return onResponse(data).catch(onError);
   };

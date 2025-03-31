@@ -118,7 +118,7 @@ func (c *ProjectController) update(ctx *gin.Context) {
 type BatchMoveProjectGroupRequest struct {
 	GroupName string   `json:"groupName"`
 	GroupCode string   `json:"groupCode"`
-	Ids       []string `json:"codes" binding:"required"`
+	Ids       []string `json:"ids" binding:"required"`
 }
 
 func (c *ProjectController) moveGroup(ctx *gin.Context) {

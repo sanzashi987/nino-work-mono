@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/service"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const grouped_project_prefix = "group"
@@ -25,7 +26,9 @@ func (c *GroupController) listProjectGroup(ctx *gin.Context) {
 }
 
 type ListGroupReq struct {
-	GroupName string `json:"groupName"`
+	GroupCode string `json:"code"`
+	GroupName string `json:"name"`
+	shared.PaginationRequest
 }
 
 func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
@@ -47,7 +50,7 @@ func (c *GroupController) listByType(ctx *gin.Context, typeTag string) {
 
 /*CRUD*/
 type CreateAssetGroupReq struct {
-	GroupName string `json:"groupName" binding:"required"`
+	GroupName string `json:"name" binding:"required"`
 	//TypeTag string `json:"type" binding:"required"`
 }
 
@@ -98,7 +101,7 @@ func (c *GroupController) rename(ctx *gin.Context, typeTag string) {
 }
 
 type DeleteAssetGroupReq struct {
-	GroupCode string `json:"groupCode" binding:"required"`
+	GroupCode string `json:"code" binding:"required"`
 }
 
 func (c *GroupController) deleteProjectGroup(ctx *gin.Context) {
