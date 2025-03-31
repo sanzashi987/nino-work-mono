@@ -51,9 +51,9 @@ func (c *ProjectController) list(ctx *gin.Context) {
 type CreateProjectRequest struct {
 	Name string `json:"name" binding:"required"`
 	// Version     string
-	Config      string  `json:"rootConfig" binding:"required"`
-	GroupCode   *string `json:"groupCode"`
-	UseTemplate *string `json:"useTemplate"` //template Id
+	Config      string  `json:"root_config" binding:"required"`
+	GroupCode   *string `json:"group_code"`
+	UseTemplate *string `json:"template_id"` //template Id
 }
 
 func (c *ProjectController) create(ctx *gin.Context) {
@@ -158,12 +158,14 @@ func (c *ProjectController) delete(ctx *gin.Context) {
 
 // features
 func (c *ProjectController) duplicate(ctx *gin.Context) {
-	query := ReadProjectQuery{}
+	var req struct {
+		Id string `json:"id" binding:"required"`
+	}
 
-	if err := ctx.ShouldBindUri(&query); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		return
 	}
-	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, query.Id)
+	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, req.Id)
 	if err != nil {
 		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
@@ -172,9 +174,9 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 }
 
 type ProjectPublishRequest struct {
-	Code             string  `json:"code"`
-	PublishFlag      int     `json:"publishFlag"`
-	PublishSecretKey *string `json:"publishSecretKey"`
+	Code             string  `json:"id"`
+	PublishFlag      int     `json:"publish_flag"`
+	PublishSecretKey *string `json:"public_secret_key"`
 }
 
 const publishPrefix = "publish: "
@@ -199,6 +201,13 @@ func (c *ProjectController) export(ctx *gin.Context) {
 
 func (c *ProjectController) _import(ctx *gin.Context) {
 
+}
+
+func (c *ProjectController) compile(ctx *gin.Context) {
+	var req struct {
+		Code string `json:"id" binding:"required"`
+		Type string `json:"type" binding:"required"`
+	}
 }
 
 // func (c *ProjectController) getInteraction(ctx *gin.Context) {
