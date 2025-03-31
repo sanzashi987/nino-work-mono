@@ -80,22 +80,17 @@ func (c *ThemeController) update(ctx *gin.Context) {
 	c.SuccessVoid(ctx)
 }
 
-type CreateThemeReq struct {
-	Name   string `json:"name" binding:"required"`
-	Config string `json:"theme" binding:"required"`
-}
-
 func (c *ThemeController) create(ctx *gin.Context) {
 
-	req := CreateThemeReq{}
-	if err := ctx.BindJSON(&req); err != nil {
+	var req service.CreateThemeReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}
 
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	if err := service.ThemeServiceImpl.CreateTheme(ctx, workspaceId, req.Name, req.Config); err != nil {
+	if err := service.CreateTheme(ctx, workspaceId, &req); err != nil {
 		c.AbortServerError(ctx, createPrefix+err.Error())
 		return
 	}

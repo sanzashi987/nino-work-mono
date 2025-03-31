@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 
-	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
@@ -20,18 +19,6 @@ var themeTableName = model.ThemeModel{}.TableName()
 
 func (dao ThemeDao) BatchDeleleTheme(workspaceId uint64, ids []uint64) error {
 	return dao.GetOrm().Table(themeTableName).Where("id in ? AND workspace = ?", ids, workspaceId).Delete(&model.ThemeModel{}).Error
-}
-
-func (dao ThemeDao) CreateUserTheme(workspaceId uint64, name, config string) error {
-
-	toCreate := model.ThemeModel{
-		Type:   consts.CustomizedTheme,
-		Config: config,
-	}
-	toCreate.Workspace = workspaceId
-	toCreate.Name, toCreate.TypeTag = name, consts.THEME
-
-	return dao.GetOrm().Create(&toCreate).Error
 }
 
 func (dao ThemeDao) UpdateUserTheme(workspaceId, id uint64, name, config *string) error {
