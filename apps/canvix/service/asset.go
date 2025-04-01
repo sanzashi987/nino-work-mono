@@ -111,16 +111,24 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 
 const chunkSize = 1024 * 1024 / 2
 
-func (serv AssetService) UpdateName(ctx context.Context, workspaceId uint64, assetName, assetCode string) error {
-	if err := consts.IsLegalName(assetName); err != nil {
+type UpdateAssetReq struct {
+	FileId   string `json:"fileId"`
+	FileName string `json:"fileName"`
+}
+
+func UpdateName(ctx context.Context, workspaceId uint64, req *UpdateAssetReq) error {
+	if err := consts.IsLegalName(req.FileName); err != nil {
 		return err
 	}
-	assetId, _, _ := consts.GetIdFromCode(assetCode)
+	assetId, _, _ := consts.GetIdFromCode(req.FileId)
 
-	tx := db.NewTx(ctx)
+	tx := db.NewTx(ctx).Begin()
 
-	return dao.UpdateAssetName(tx, workspaceId, assetId, assetName)
-
+	if err := tx.Model(&model.AssetModel{}).Where("id = ? AND workspace = ?", assetId, workspaceId).Update("name", assetName).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
 }
 
 type AssetDetailResponse struct {

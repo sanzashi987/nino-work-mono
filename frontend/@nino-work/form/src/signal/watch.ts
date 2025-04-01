@@ -2,7 +2,12 @@ import {
   consumerBeginWork,
   consumerCompleteWork,
   consumerPollProducersForChange,
-  destroyConsumer, isInNotificationPhase, markConsumerDirty, REACTIVE_NODE, ReactiveNode, SIGNAL
+  destroyConsumer,
+  isInNotificationPhase,
+  markConsumerDirty,
+  REACTIVE_NODE,
+  ReactiveNode,
+  SIGNAL
 } from './reactive';
 import { defaultScheduler, Schedulable, Scheduler } from './scheduler';
 

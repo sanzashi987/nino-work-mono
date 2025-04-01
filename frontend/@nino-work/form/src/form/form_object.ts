@@ -1,8 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { decideControl, type IModel, type ObjectModel } from './define';
-import {
-  AbstractControl, ControlStatus, FormRawValue, FormValue, IsAny, TypedOrUntyped
-} from './control';
+import { AbstractControl, ControlStatus, FormRawValue, FormValue, TypedOrUntyped } from './control';
 import { Path } from './validators';
 
 export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<

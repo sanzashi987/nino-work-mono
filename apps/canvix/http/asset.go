@@ -75,22 +75,12 @@ func (c *AssetController) read(ctx *gin.Context) {
 
 }
 
-type UpdateAssetQuery struct {
-	GroupCode string `json:"groupCode"`
-	GroupName string `json:"groupName"`
-}
-
-type UpdateAssetParam struct {
-	FileId   string `json:"fileId"`
-	FIleName string `json:"fileName"`
-}
-
 func (c *AssetController) update(ctx *gin.Context) {
-	reqBody := UpdateAssetParam{}
+	reqBody := service.UpdateAssetReq{}
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "update"); err != nil {
 		return
 	} else {
-		if err := service.AssetServiceImpl.UpdateName(ctx, workspaceId, reqBody.FIleName, reqBody.FileId); err != nil {
+		if err := service.UpdateName(ctx, workspaceId, &reqBody); err != nil {
 			c.AbortServerError(ctx, "update: "+err.Error())
 			return
 		}

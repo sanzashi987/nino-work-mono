@@ -1,7 +1,14 @@
 import { defaultEquals, ValueEqualityFn } from './equality';
 import { throwInvalidWriteToSignalError } from './errors';
 import {
-  accessProducer, producerIncrementEpoch, producerNotifyConsumers, producerUpdatesAllowed, REACTIVE_NODE, ReactiveNode, Signal, SIGNAL
+  accessProducer,
+  producerIncrementEpoch,
+  producerNotifyConsumers,
+  producerUpdatesAllowed,
+  REACTIVE_NODE,
+  ReactiveNode,
+  Signal,
+  SIGNAL
 } from './reactive';
 
 let postSignalSetFn: (() => void) | null = null;

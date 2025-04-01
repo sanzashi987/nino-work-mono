@@ -7,7 +7,7 @@ class FormPrimitive <TValue = any> extends AbstractControl<TValue> {
     return this.status === ControlStatus.DISABLED;
   }
 
-  override setValue(value: TValue, opts: Object): void {
+  override setValue(value: TValue, opts: object): void {
     this.valueReactive.set(value);
     this.updateValueAndValidity(opts);
   }

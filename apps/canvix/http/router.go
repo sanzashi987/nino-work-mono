@@ -61,14 +61,6 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 	root.Use(mergeRpcMiddleware)
 
 	{
-		loginGroup := root.Group(login_prefix)
-		loginGroup.POST("login", loginController.login)
-		loginGroup.GET("login-verification/get-uuidkey", loginController.getUuid)
-		loginGroup.GET("login-verification/get-verification-code", loginController.getVerifyCode)
-		loginGroup.GET("logout", loginController.logout)
-	}
-
-	{
 		commonRoutes := root.Group(common_prefix).Use(canvasAuthMiddleWare...)
 		commonRoutes.POST("search", commonController.searchComponents)
 		commonRoutes.GET("userInfo", commonController.getUserInfo)

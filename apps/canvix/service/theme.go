@@ -4,18 +4,30 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
-type ThemeService struct{}
+type UpdateThemeReq struct {
+	Id     uint64  `json:"id" binding:"required"`
+	Name   *string `json:"name"`
+	Config *string `json:"config"`
+}
 
-var ThemeServiceImpl *ThemeService = &ThemeService{}
+func UpdateTheme(ctx context.Context, workspaceId uint64, req *UpdateThemeReq) error {
+	tx := db.NewTx(ctx)
+	toUpdate := map[string]string{}
 
-func (serv ThemeService) UpdateTheme(ctx context.Context, workspaceId, themeId uint64, name, config *string) error {
-	themeDao := dao.NewThemeDao(ctx)
-	return themeDao.UpdateUserTheme(workspaceId, themeId, name, config)
+	if req.Name != nil {
+		toUpdate["name"] = *req.Name
+	}
+
+	if req.Config != nil {
+		toUpdate["config"] = *req.Config
+	}
+
+	return tx.Model(&model.ThemeModel{}).Where("id = ? and workspace = ?", req.Id, workspaceId).Updates(toUpdate).Error
 }
 
 type CreateThemeReq struct {
@@ -49,12 +61,47 @@ func CreateTheme(ctx context.Context, workspaceId uint64, req *CreateThemeReq) e
 	return nil
 }
 
-func (serv ThemeService) GetThemes(ctx context.Context, workspaceId uint64) ([]model.ThemeModel, error) {
-	themeDao := dao.NewThemeDao(ctx)
-	return themeDao.GetWorkspaceThemes(workspaceId)
+type ThemeItem struct {
+	Name  string `json:"name"`
+	Theme string `json:"theme"`
+	Id    uint64 `json:"id"`
+	shared.DBTime
 }
 
-func (serv ThemeService) DeleteThemes(ctx context.Context, workspaceId uint64, ids []uint64) error {
-	themeDao := dao.NewThemeDao(ctx)
-	return themeDao.BatchDeleleTheme(workspaceId, ids)
+func GetThemes(ctx context.Context, workspaceId uint64) ([]*ThemeItem, error) {
+	tx := db.NewTx(ctx)
+	models := []model.ThemeModel{}
+	if err := tx.Where("workspace = ? ", workspaceId).Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	res := []*ThemeItem{}
+
+	for _, model := range models {
+		res = append(res, &ThemeItem{
+			DBTime: shared.DBTime{
+				CreateTime: model.GetCreatedDate(),
+				UpdateTime: model.GetUpdatedDate(),
+			},
+			Name:  model.Name,
+			Id:    model.Id,
+			Theme: model.Config,
+		})
+	}
+
+	return res, nil
+}
+
+type DeleteThemeReq struct {
+	Data []uint64 `json:"data" binding:"required"`
+}
+
+func DeleteThemes(ctx context.Context, workspaceId uint64, ids []uint64) error {
+	tx := db.NewTx(ctx)
+	tx = tx.Begin()
+	if err := tx.Model(&model.ThemeModel{}).Where("id in ? AND workspace = ?", ids, workspaceId).Delete(&model.ThemeModel{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
 }

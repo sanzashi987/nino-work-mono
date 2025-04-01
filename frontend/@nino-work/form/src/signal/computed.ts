@@ -1,7 +1,13 @@
 import { defaultEquals, ValueEqualityFn } from './equality';
 import {
   accessProducer,
-  consumerBeginWork, consumerCompleteWork, REACTIVE_NODE, ReactiveNode, setActiveConsumer, Signal, SIGNAL,
+  consumerBeginWork,
+  consumerCompleteWork,
+  REACTIVE_NODE,
+  ReactiveNode,
+  setActiveConsumer,
+  Signal,
+  SIGNAL,
   updateProducerValueVersion
 } from './reactive';
 

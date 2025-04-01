@@ -183,7 +183,7 @@ const publishPrefix = "publish: "
 
 func (c *ProjectController) publish(ctx *gin.Context) {
 	req := &ProjectPublishRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		c.AbortClientError(ctx, publishPrefix+err.Error())
 		return
 	}
