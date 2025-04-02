@@ -1,5 +1,5 @@
 // Confirm Modal
-.canvas-modal-confirm {
+.canvix-modal-confirm {
   :global {
     .confirm-content {
       width: 350px;
@@ -10,41 +10,41 @@
         margin: 30px 0 20px 0;
         &.--error,
         &.--confirm {
-          color: var(--canvas-modal-error-color);
+          color: var(--canvix-modal-error-color);
         }
         &.--warning {
-          color: var(--canvas-modal-warning-color);
+          color: var(--canvix-modal-warning-color);
         }
         &.--info {
-          color: var(--canvas-modal-info-color);
+          color: var(--canvix-modal-info-color);
         }
         &.--success {
-          color: var(--canvas-modal-success-color);
+          color: var(--canvix-modal-success-color);
         }
       }
       .confirm-text-wp {
         font-size: 12px;
       }
     }
-    .canvas-modal-footer {
+    .canvix-modal-footer {
       padding: 14px 18px;
     }
   }
 }
 
-.canvas-modal {
+.canvix-modal {
   :global {
     .close-btn {
       position: absolute;
       top: 8px;
       right: 8px;
     }
-    .canvas-modal-title {
+    .canvix-modal-title {
       color: rgb(188, 201, 212);
-      // color: var(--canvas-modal-font-color);
+      // color: var(--canvix-modal-font-color);
     }
-    .canvas-modal-content {
-      .canvas-modal-footer {
+    .canvix-modal-content {
+      .canvix-modal-footer {
         padding: 20px 0 0 0;
       }
     }

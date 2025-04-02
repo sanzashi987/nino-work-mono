@@ -15,22 +15,26 @@ const modalFuncIcons = {
 
 const loadingHandler = (
   fn?: (...args: any[]) => any | Promise<any>,
-  setLoading?: (value: boolean) => void,
   close?: (...args: any) => void
-) => (...args: any[]) => {
-  if (!fn) { close?.(); return; }
+) => async (...args: any[]) => {
+  if (!fn) {
+    close?.();
+    return undefined;
+  }
   const returnValue = fn(...args);
-  if (!returnValue || typeof returnValue.then !== 'function') return close?.();
-  setLoading?.(true);
+  if (!returnValue || typeof returnValue.then !== 'function') {
+    close?.();
+    return undefined;
+  }
   return returnValue.then((...result: any[]) => {
     close?.(...result);
-  }).finally(() => { setLoading?.(false); });
+  });
 };
 
 class ConfirmDialog extends BasicDialog<ConfirmModalProps> {
-  handleOkClick: ActionClickCallback = (e, { setLoading }) => {
+  handleOkClick: ActionClickCallback = (e) => {
     const { onClose, onOk } = this.props;
-    loadingHandler(onOk, setLoading, onClose)(e);
+    return loadingHandler(onOk, onClose)(e);
   };
 
   renderFooter = (props: ConfirmActionsProps) => this.renderOkCancelActions({ ...props, onOk: this.handleOkClick });

@@ -1,40 +1,37 @@
-import React from "react";
-import { GEN_UID } from "@canvas/utilities";
-import activate, { collections } from "./activate";
-import { ConfirmDialog, NormalDialog } from "./templates";
-import type { CModalConfig, CModalFuncProps, CModalFuncTypes, CModalTemplatesTypes } from "./types";
+import { uuid } from '@nino-work/shared';
+import activate, { collections } from './activate';
+import { ConfirmDialog, NormalDialog } from './templates';
+import type { CModalConfig, CModalFuncProps, CModalFuncTypes, CModalTemplatesTypes } from './types';
 import Style from './index.module.scss';
 
-const DialogTemplates = {
-  NormalDialog,
-  ConfirmDialog
-};
-
 function createModalProvider(templates: CModalTemplatesTypes) {
-  const { NormalDialog, ConfirmDialog } = templates;
-
   const show = (options: CModalConfig) => {
-    const { id = `cmodal_${GEN_UID()}`, dialogProps = {} } = options;
+    const { id = `cmodal_${uuid()}`, dialogProps = {} } = options;
     const dialogConfig = { fullWidth: true, ...dialogProps };
     const props = { ...options, dialogProps: dialogConfig, id };
-    return activate(NormalDialog, props);
+    return activate(templates.NormalDialog, props);
   };
 
   const confirm = (type: CModalFuncTypes) => (options: CModalFuncProps) => {
-    const { id = `cmodal_confirm`, dialogProps = {}, ...other } = options;
-    const className = `${Style['canvas-modal-confirm']} ${other?.className || ''}`;
-    const props = { ...other, dialogProps, id, className, type };
-    return activate(ConfirmDialog, props);
+    const { id = 'cmodal_confirm', dialogProps = {}, ...other } = options;
+    const className = `${Style['canvix-modal-confirm']} ${other?.className || ''}`;
+    const props = {
+      ...other, dialogProps, id, className, type
+    };
+    return activate(templates.ConfirmDialog, props);
   };
 
   const closeAll = () => {
     Object.values(collections)
-      .filter(modal => modal.visible)
-      .forEach(modal => { modal.onClose(); });
+      .filter((modal) => modal.visible)
+      .forEach((modal) => { modal.onClose(); });
   };
 
   const close = (id?: string) => {
-    if (!id) { return closeAll(); }
+    if (!id) {
+      closeAll();
+      return;
+    }
     const modal = collections[id];
     modal?.onClose();
   };
@@ -46,7 +43,10 @@ function createModalProvider(templates: CModalTemplatesTypes) {
 // info: confirm('info'),
 // warning: confirm('warning')
 
-const ModalBase = createModalProvider(DialogTemplates);
+const ModalBase = createModalProvider({
+  NormalDialog,
+  ConfirmDialog
+});
 
 export * from './templates';
 export * from './types';

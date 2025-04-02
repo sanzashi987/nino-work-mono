@@ -8,7 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Box, Stack } from '@mui/material';
 import { useForm, UseFormReturn } from 'react-hook-form';
-import RequestButton from '../RequestButton';
+import RequestButton, { LoadingGroup } from '../RequestButton';
 import FormBuilder, { type FormBuilderProps } from '../FormBuilder';
 
 type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
@@ -16,13 +16,13 @@ type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
   content: React.ReactNode;
   contentProps?:DialogContentProps
   action?: React.ReactNode;
-  onClose: () => void;
+  onClose: () => Promise<void>;
 };
 
 export const OpenModalContext = React.createContext<
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-throw-literal
-{ close: VoidFunction, form: UseFormReturn }>({ close: () => { throw 'not inside context'; }, form: {} });
+{ close:()=>Promise<void>, form: UseFormReturn }>({ close: async () => { throw 'not inside context'; }, form: {} });
 
 const Modal: React.FC<ModalProps> = ({ title, content, onClose, action, contentProps = {}, ...dialogProps }) => {
   const defaultActions = action ?? <Button onClick={onClose}>Close</Button>;
@@ -55,24 +55,22 @@ type SimpleFormSubmit<FormData> = {
 };
 
 const SimpleFormAction = <FormData, >({ onOk }: SimpleFormSubmit<FormData>) => {
-  const [loading, setLoading] = useState(false);
   const { close, form } = useContext(OpenModalContext);
 
-  const onSubmit = useCallback(() => {
-    setLoading(true);
-    onOk(form as any).then(close).finally(() => {
-      setLoading(false);
-    });
+  const onSubmit = useCallback(async () => {
+    onOk(form as any).then(close);
   }, []);
 
   return (
     <Stack flexDirection="row-reverse">
-      <RequestButton loading={loading} variant="contained" size="medium" type="submit" onClick={onSubmit}>
-        Submit
-      </RequestButton>
-      <Box mr={1}>
-        <RequestButton loading={loading} variant="outlined" onClick={close}>Cancel</RequestButton>
-      </Box>
+      <LoadingGroup>
+        <RequestButton variant="contained" size="medium" type="submit" onClick={onSubmit}>
+          Submit
+        </RequestButton>
+        <Box mr={1}>
+          <RequestButton variant="outlined" onClick={close}>Cancel</RequestButton>
+        </Box>
+      </LoadingGroup>
     </Stack>
   );
 };

@@ -1,12 +1,10 @@
 import { Button, ButtonProps } from '@mui/material';
-import React, {
-  createContext, useCallback, useContext, useMemo, useState
-} from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 // type ButtonProps = React.ComponentProps<typeof Button>['onClick'];
 
 export type RequestButtonProps = ButtonProps & {
-  onClick: (e: React.MouseEvent) => Promise<any> | any
+  onClick?: (e: React.MouseEvent) => Promise<any>
 };
 const LoadingContext = createContext<{ loading:boolean, setLoading:(loading:boolean)=>void } | null>(null);
 
@@ -28,7 +26,7 @@ const RequestButton: React.FC<RequestButtonProps> = ({ onClick, ...rest }) => {
   const handleClick = useCallback((e:React.MouseEvent) => {
     (inCtx?.setLoading ?? setLoading)(true);
 
-    Promise.resolve().then(() => onClick(e)).finally(() => {
+    Promise.resolve().then(() => onClick?.(e)).finally(() => {
       (inCtx?.setLoading ?? setLoading)(false);
     });
   }, [inCtx?.setLoading, onClick]);

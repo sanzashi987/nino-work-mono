@@ -55,8 +55,11 @@ export type ModalComponent<T = BaseModalProps> = ComponentType<ModalComponentPro
 type StandardProps = Omit<DialogProps, keyof BaseConfig | 'open' | 'children'>;
 export interface CModalConfig<T = StandardProps> extends Partial<BaseConfig> { dialogProps?: T }
 export interface CModalProps<T = StandardProps> extends ModalComponentProps { dialogProps?: T }
-export type CModalTemplatesTypes = Record<string, ModalComponent<CModalProps>>;
-export type ContainerProps<T = {}> = T & {
+export type CModalTemplatesTypes = {
+  NormalDialog: ModalComponent<CModalProps>,
+  ConfirmDialog: ModalComponent<CModalProps>,
+};
+export type ContainerProps<T = object> = T & {
   /**
    * Callback passed into content component to control dialog close.
    */
@@ -67,11 +70,9 @@ export type ContainerProps<T = {}> = T & {
   renderFooter?: (props: ConfirmActionsProps) => React.ReactNode;
 };
 
-export type ActionHandlers = { setLoading: (value: boolean) => void; };
 export type ActionClickCallback = (
   e: React.MouseEvent,
-  handlers: ActionHandlers
-) => void | Promise<any>;
+) => Promise<any>;
 export interface ActionProps extends Omit<RequestButtonProps, 'onClick'> {
   text?: React.ReactNode;
   onClick?: ActionClickCallback;
@@ -87,8 +88,8 @@ type ConfirmProps = {
   cancelButton?: boolean;
   okButtonProps?: ActionProps;
   cancelButtonProps?: ActionProps;
-  onOk?: (e: React.MouseEvent) => void | Promise<any>;
-  onCancel?: (e: React.MouseEvent) => void | Promise<any>;
+  onOk?: (e: React.MouseEvent) => Promise<any>;
+  onCancel?: (e: React.MouseEvent) => Promise<any>;
 };
 
 export type CModalFuncTypes = 'info' | 'success' | 'error' | 'warning' | 'confirm';

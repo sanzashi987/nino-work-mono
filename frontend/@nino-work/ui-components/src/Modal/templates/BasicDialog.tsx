@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogTitle, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { blockKeyEvent } from '@canvas/utilities';
+import { blockKeyEvent } from '@nino-work/shared';
 import type { CModalProps, ConfirmActionsProps } from '../types';
 import { renderOkCancelActions, titleClass } from '../utils';
 import Style from '../index.module.scss';
@@ -17,6 +17,7 @@ abstract class BasicDialog<P extends CModalProps = CModalProps> extends React.Pu
     );
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   renderOkCancelActions = renderOkCancelActions(this.props.onClose);
 
   renderTitle() {

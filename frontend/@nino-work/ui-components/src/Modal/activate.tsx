@@ -39,6 +39,24 @@ const createContainer = (id: string) => {
 function activate(Component: ModalComponent, config: BaseConfig) {
   let options: BaseConfigRuntime = { ...config, visible: true };
 
+  function afterClose() {
+    if (!options.keepMounted) {
+      destroy(options.id);
+    }
+    options.afterClose?.();
+  }
+
+  function render(props: BaseConfigRuntime) {
+    const modal = collections[props.id];
+    if (!modal?.root) return;
+    const { visible, content, ...other } = props;
+    modal.config = { ...other, content };
+    modal.visible = visible;
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    const params = { ...other, visible, onClose, afterClose };
+    modal.root.render(<Component {...params}>{content}</Component>);
+  }
+
   function onClose(...args: any) {
     const modal = collections[options.id];
     if (!modal?.visible) return;
@@ -51,23 +69,6 @@ function activate(Component: ModalComponent, config: BaseConfig) {
     render(options);
     options.onClose?.(...args);
   }
-
-  function afterClose() {
-    if (!options.keepMounted) {
-      destroy(options.id);
-    }
-    options.afterClose?.();
-  }
-
-  const render = (props: BaseConfigRuntime) => {
-    const modal = collections[props.id];
-    if (!modal?.root) return;
-    const { visible, content, ...other } = props;
-    modal.config = { ...other, content };
-    modal.visible = visible;
-    const params = { ...other, visible, onClose, afterClose };
-    modal.root.render(<Component {...params}>{content}</Component>);
-  };
 
   function update(conf: Omit<BaseConfig, 'id'>) {
     options = { ...options, ...conf };

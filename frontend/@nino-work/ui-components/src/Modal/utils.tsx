@@ -4,15 +4,16 @@ import { DialogActions } from '@mui/material';
 import type { ActionProps, ConfirmActionsProps } from './types';
 import RequestButton from '../RequestButton';
 
-export const contentClass = 'canvas-modal-content';
-export const titleClass = 'canvas-modal-title';
-export const footerClass = 'canvas-modal-footer';
+export const contentClass = 'canvix-modal-content';
+export const titleClass = 'canvix-modal-title';
+export const footerClass = 'canvix-modal-footer';
 
 export const renderActions = (actions: ActionProps[]): React.ReactNode => {
   if (!actions.length) return null;
   const footNodes = actions.map((action, index) => {
     const { text, ...props } = action;
     return (
+      // eslint-disable-next-line react/no-array-index-key
       <RequestButton key={index} variant="outlined" {...props}>
         {text}
       </RequestButton>
