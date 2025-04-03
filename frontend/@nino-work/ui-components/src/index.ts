@@ -10,4 +10,3 @@ export { default as createSubApp } from './createSubApp';
 export { default as FormBuilder } from './FormBuilder';
 export type { Model } from './ManagerShell/defineModel';
 export { default as AutoSelect } from './AutoSelect';
-export { createModalProvider, NormalDialog, ConfirmDialog } from './Modal';
