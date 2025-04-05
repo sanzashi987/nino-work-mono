@@ -28,6 +28,7 @@
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
     "@nino-work/assets": "workspace:*",
+    "@nino-work/mf": "workspace:*",
     "@nino-work/requester": "workspace:*",
     "@nino-work/shared": "workspace:*",
     "@nino-work/ui-components": "workspace:*",

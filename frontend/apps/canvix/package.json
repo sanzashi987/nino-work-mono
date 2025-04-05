@@ -26,6 +26,7 @@
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
     "@mui/system": "^7.0.1",
+    "@nino-work/mf": "workspace:*",
     "@nino-work/requester": "workspace:*",
     "@nino-work/shared": "workspace:*",
     "@nino-work/ui-components": "workspace:*",

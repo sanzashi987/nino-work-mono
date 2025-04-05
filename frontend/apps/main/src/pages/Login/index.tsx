@@ -1,9 +1,8 @@
 import React from 'react';
 import { Box, Card, Grid2, useColorScheme } from '@mui/material';
-// components
 import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import AuthLogin from './Login';
-import PageContainer from '@/componentss/PageContainer';
+import PageContainer from '@/components/PageContainer';
 
 function Login() {
   const { mode } = useColorScheme();

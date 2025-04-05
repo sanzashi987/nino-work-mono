@@ -206,6 +206,15 @@ importers:
         specifier: ^6.4.1
         version: 6.6.0(webpack@5.97.1)
 
+  '@nino-work/mf':
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.14
+        version: 22.13.14
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+
   '@nino-work/requester': {}
 
   '@nino-work/shared':
@@ -259,6 +268,9 @@ importers:
       '@mui/system':
         specifier: ^7.0.1
         version: 7.0.1(@emotion/react@11.14.0)(@emotion/styled@11.14.0)(@types/react@19.0.2)(react@18.3.1)
+      '@nino-work/mf':
+        specifier: workspace:*
+        version: link:../../@nino-work/mf
       '@nino-work/requester':
         specifier: workspace:*
         version: link:../../@nino-work/requester
@@ -380,6 +392,9 @@ importers:
       '@nino-work/assets':
         specifier: workspace:*
         version: link:../../@nino-work/assets
+      '@nino-work/mf':
+        specifier: workspace:*
+        version: link:../../@nino-work/mf
       '@nino-work/requester':
         specifier: workspace:*
         version: link:../../@nino-work/requester

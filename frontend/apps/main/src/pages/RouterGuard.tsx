@@ -1,23 +1,11 @@
-import React, { createContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { loading } from '@nino-work/ui-components';
-import { getUserInfo, MenuMeta, MenuType, UserInfoResponse } from '@/api';
-import { usePromise } from '@/utils';
+import { usePromise } from '@nino-work/shared';
+import { getUserInfo, MenuType, UserContext } from '@nino-work/mf';
 
-type AuthGuardProps = {};
-
-type UserContextType = {
-  info: UserInfoResponse | null
-  menus: MenuMeta[]
-};
-
-export const UserContext = createContext<UserContextType>({
-  info: null,
-  menus: []
-});
-
-const AuthGuard: React.FC<AuthGuardProps> = (props) => {
-  const { data: userInfo } = usePromise(() => getUserInfo());
+const AuthGuard: React.FC = () => {
+  const { data: userInfo } = usePromise(getUserInfo);
   const menus = useMemo(
     () => {
       if (!userInfo) {
@@ -31,23 +19,27 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
 
   const location = useLocation();
 
-  const authed = useMemo(() => {
+  const matched = useMemo(() => {
     if (!userInfo) {
-      return true;
+      return null;
     }
     if (location.pathname === '/home') {
-      return true;
+      return null;
     }
 
-    return menus.map((e) => e.path).some((e) => location.pathname.startsWith(e) || e.startsWith(location.pathname));
+    return menus.find((e) => {
+      const { path } = e;
+      return location.pathname.startsWith(path) || path.startsWith(location.pathname);
+    }) ?? null;
+    // return menus.map((e) => e.path).some((e) => location.pathname.startsWith(e) || e.startsWith(location.pathname));
   }, [location.pathname, menus, userInfo]);
 
   const ctx = useMemo(() => {
     if (!userInfo) {
       return null;
     }
-    return ({ info: userInfo, menus });
-  }, [userInfo, menus]);
+    return ({ info: userInfo, menus, matched });
+  }, [userInfo, menus, matched]);
 
   if (userInfo === null || ctx === null) {
     return loading;
@@ -55,8 +47,8 @@ const AuthGuard: React.FC<AuthGuardProps> = (props) => {
 
   return (
     <UserContext.Provider value={ctx}>
-      {/* {authed ? <Outlet /> : <Navigate to="/home" />} */}
-      <Outlet />
+      {matched ? <Outlet /> : <Navigate to="/home" />}
+      {/* <Outlet /> */}
     </UserContext.Provider>
   );
 };

@@ -9,3 +9,5 @@ export type * from './types';
 export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export * from './env';
 export { stop, blockKeyEvent } from './event';
+export { default as usePromise } from './usePromise';
+export { queryStringify, parseQuery } from './url';

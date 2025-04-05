@@ -17,8 +17,7 @@ export type ModelMeta = {
 };
 
 export type SubAppInjectProps = {
-  basename?:string
-
+  basename?: string
 };
 
 export type Enum<T = string> = {

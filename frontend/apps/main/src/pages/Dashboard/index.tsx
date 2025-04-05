@@ -1,18 +1,16 @@
-import {
-  AppBar, Box, IconButton, Menu, MenuItem, Stack, Toolbar,
-  useColorScheme
-} from '@mui/material';
-import React from 'react';
+import { AppBar, Box, IconButton, Menu, MenuItem, Stack, Toolbar, useColorScheme } from '@mui/material';
+import React, { useContext } from 'react';
 import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import { AccountCircle } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { Outlet, useNavigate } from 'react-router-dom';
-import PageContainer from '@/componentss/PageContainer';
+import { UserContext } from '@nino-work/mf';
+import PageContainer from '@/components/PageContainer';
 import SideBar from './SideBar';
 
-type DashboardProps = {};
+// type DashboardProps = {};
 
-const Dashboard: React.FC<DashboardProps> = () => {
+const Dashboard: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { mode } = useColorScheme();
   const isLight = mode !== 'dark';
@@ -31,8 +29,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
     handleClose();
   };
 
+  const { matched } = useContext(UserContext);
+
   return (
-    <PageContainer title="Dashboard" description="user dashboard">
+    <PageContainer title={matched?.name ?? 'Dashboard'}>
       <Stack height="100%">
         <AppBar position="relative">
           <Toolbar style={{ minHeight: 48 }}>

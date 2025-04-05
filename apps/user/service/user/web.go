@@ -9,10 +9,6 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
-type CodeName struct {
-	Name string `json:"name"`
-	Code string `json:"code"`
-}
 type MenuMeta struct {
 	Name  string `json:"name"`
 	Code  string `json:"code"`
@@ -23,11 +19,11 @@ type MenuMeta struct {
 }
 
 type UserInfoResponse struct {
-	UserId      uint64      `json:"user_id"`
-	Username    string      `json:"username"`
-	Menus       []*MenuMeta `json:"menus"`
-	Permissions []*CodeName `json:"permissions"`
-	Roles       []*CodeName `json:"roles"`
+	UserId      uint64             `json:"user_id"`
+	Username    string             `json:"username"`
+	Menus       []*MenuMeta        `json:"menus"`
+	Permissions []*shared.EnumMeta `json:"permissions"`
+	Roles       []*shared.EnumMeta `json:"roles"`
 }
 
 func GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) {
@@ -36,19 +32,19 @@ func GetUserInfo(ctx context.Context, userId uint64) (*UserInfoResponse, error) 
 	if err != nil {
 		return nil, err
 	}
-	resRoles := []*CodeName{}
-	resPermissions := []*CodeName{}
+	resRoles := []*shared.EnumMeta{}
+	resPermissions := []*shared.EnumMeta{}
 	permissions := map[uint64]bool{}
 	for _, role := range user.Roles {
-		resRoles = append(resRoles, &CodeName{
-			Name: role.Name,
-			Code: role.Code,
+		resRoles = append(resRoles, &shared.EnumMeta{
+			Name:  role.Name,
+			Value: role.Code,
 		})
 		for _, permission := range role.Permissions {
 			permissions[permission.Id] = true
-			resPermissions = append(resPermissions, &CodeName{
-				Name: permission.Name,
-				Code: permission.Code,
+			resPermissions = append(resPermissions, &shared.EnumMeta{
+				Name:  permission.Name,
+				Value: permission.Code,
 			})
 		}
 	}

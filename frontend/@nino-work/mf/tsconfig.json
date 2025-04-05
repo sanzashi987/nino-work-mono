@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "baseUrl": ".",
+  },
+  "include": [
+    "src"
+  ]
+}
