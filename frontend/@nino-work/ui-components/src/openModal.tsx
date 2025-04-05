@@ -7,8 +7,8 @@ import DialogActions from '@mui/material/DialogActions';
 import { ButtonProps } from '@mui/material/Button';
 import { Box, Stack } from '@mui/material';
 import { useForm, UseFormReturn } from 'react-hook-form';
-import RequestButton, { LoadingGroup } from '../RequestButton';
-import FormBuilder, { type FormBuilderProps } from '../FormBuilder';
+import RequestButton, { LoadingGroup } from './RequestButton';
+import FormBuilder, { type FormBuilderProps } from './FormBuilder';
 
 type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
   title?: React.ReactNode;
