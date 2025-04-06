@@ -30,11 +30,12 @@ const Dashboard: React.FC = () => {
   };
 
   const { matched } = useContext(UserContext);
+  const style = matched?.fullpage ? { display: 'none' } : undefined;
 
   return (
     <PageContainer title={matched?.name ?? 'Dashboard'}>
       <Stack height="100%">
-        <AppBar position="relative">
+        <AppBar position="relative" style={style}>
           <Toolbar style={{ minHeight: 48 }}>
             <Logo width="35" height="35" />
             <div style={{ flexGrow: 1 }} />
@@ -55,8 +56,8 @@ const Dashboard: React.FC = () => {
           </Toolbar>
         </AppBar>
         <Stack minHeight={0} flexGrow={1} direction="row">
-          <SideBar />
-          <Box p={3} flexGrow={1} overflow="auto">
+          <SideBar style={style} />
+          <Box flexGrow={1} overflow="auto">
             <Outlet />
             <div id="nino-sub-app" />
           </Box>

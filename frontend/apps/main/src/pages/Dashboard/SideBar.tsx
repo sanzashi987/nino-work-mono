@@ -1,19 +1,20 @@
-import {
-  List, ListItem, ListItemButton, ListItemText,
-  Paper
-} from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemText, Paper } from '@mui/material';
+import { UserContext } from '@nino-work/mf';
 import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { UserContext } from '../RouterGuard';
 
-const SideBar: React.FC = () => {
+type SideBarProps = {
+  style?:React.CSSProperties
+};
+
+const SideBar: React.FC<SideBarProps> = ({ style }) => {
   const { menus } = useContext(UserContext);
 
   const localtion = useLocation();
   const navigate = useNavigate();
 
   return (
-    <Paper elevation={9} sx={{ overflow: 'auto', height: '100%', width: 'fit-content' }}>
+    <Paper elevation={9} style={style} sx={{ overflow: 'auto', height: '100%', width: 'fit-content' }}>
       <List>
         {
           menus.map((menu) => (

@@ -13,6 +13,7 @@ export type MenuMeta = {
   path: string
   type: MenuType
   order: number
+  fullpage?:boolean
 };
 
 type EnumType = {
