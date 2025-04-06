@@ -3,7 +3,7 @@ import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
 const routes :RouteObject[] = [
   {
-    path: 'oss',
+    path: '/oss',
     children: [
       {
         index: true,

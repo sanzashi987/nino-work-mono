@@ -10,8 +10,8 @@ const createSubApp = (renderRouter: (props:SubAppInjectProps) => React.ReactNode
     const children = useMemo(() => {
       const { basename = '/' } = props;
       const withDefaults = { ...props, basename };
-      return renderRouter(withDefaults);
-    }, []);
+      return React.createElement(renderRouter, withDefaults);
+    }, [props]);
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -21,4 +21,5 @@ const createSubApp = (renderRouter: (props:SubAppInjectProps) => React.ReactNode
   };
   return App;
 };
+
 export default createSubApp;
