@@ -11,8 +11,8 @@ const theme = {
     // text: { primary: '#bcc9d4' }
   },
   typography: {
-    fontSize: 10,
-    htmlFontSize: 14,
+    // fontSize: 12,
+    // htmlFontSize: 12,
     button: { textTransform: 'none' }
   }
 } as const;

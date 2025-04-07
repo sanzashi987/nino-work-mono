@@ -116,7 +116,7 @@ func (c *GroupController) delete(ctx *gin.Context, typeTag string) {
 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "delete"); err != nil {
 		return
 	} else if err := service.GroupServiceImpl.Delete(ctx, workspaceId, reqBody.GroupCode, typeTag); err != nil {
-		c.AbortClientError(ctx, err.Error())
+		c.AbortServerError(ctx, err.Error())
 		return
 	}
 	c.SuccessVoid(ctx)

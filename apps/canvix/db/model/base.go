@@ -7,7 +7,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/utils"
 	"github.com/sanzashi987/nino-work/pkg/db"
-	"github.com/sanzashi987/nino-work/pkg/utils"
+	uts "github.com/sanzashi987/nino-work/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -55,13 +55,13 @@ func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
 }
 
 func FilterRecordsInUse[T db.GetDeleteTime](records []T) []T {
-	return utils.Filter(records, func(e T) bool {
+	return uts.Filter(records, func(e T) bool {
 		return e.GetDeleteTime() == nil
 	})
 }
 
 func FilterRecordsByTypeTag[T GetTypeTag](records []T, typeTag string) []T {
-	return utils.Filter(records, func(e T) bool {
+	return uts.Filter(records, func(e T) bool {
 		return e.GetTypeTag() == typeTag
 	})
 }

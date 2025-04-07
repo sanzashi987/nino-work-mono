@@ -58,7 +58,7 @@ type CreateProjectRequest struct {
 
 func (c *ProjectController) create(ctx *gin.Context) {
 	param := &CreateProjectRequest{}
-	if err := ctx.BindJSON(param); err != nil {
+	if err := ctx.ShouldBindJSON(param); err != nil {
 		c.AbortClientError(ctx, createPrefix+err.Error())
 		return
 	}

@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-type AssetPrefix struct{}
-
 const (
 	PREFIX        = "cVs"
 	PROJECT       = "A"
@@ -22,6 +20,15 @@ const (
 	GROUP         = "R"
 )
 
+var TagToName = map[string]string{
+	PROJECT:    "project",
+	BLOCK:      "block",
+	DESIGN:     "design",
+	FONT:       "font",
+	COMPONENT:  "component",
+	DATASOURCE: "datasource",
+}
+
 var supportedTags = [7]string{
 	PROJECT,
 	BLOCK,
@@ -29,7 +36,7 @@ var supportedTags = [7]string{
 	FONT,
 	COMPONENT,
 	DATASOURCE,
-	STATIC_SOURCE,
+	// STATIC_SOURCE,
 }
 
 // may useful in the future
