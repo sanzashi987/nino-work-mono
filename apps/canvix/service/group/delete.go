@@ -26,7 +26,13 @@ var typeTagToChainedHandler = map[string]DeleleGroupEffect{
 	consts.DESIGN:  dao.AssetDeleleGroupEffect,
 }
 
-func Delete(ctx context.Context, workspaceId uint64, groupCode, typeTag string) (err error) {
+type DeleteAssetGroupReq struct {
+	GroupCode string `json:"code" binding:"required"`
+	TypeTag   string `json:"type" binding:"required"`
+}
+
+func Delete(ctx context.Context, workspaceId uint64, req *DeleteAssetGroupReq) (err error) {
+	groupCode, typeTag := req.GroupCode, req.TypeTag
 	tx := db.NewTx(ctx).Begin()
 	groupId, _, _ := consts.GetIdFromCode(groupCode)
 

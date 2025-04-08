@@ -10,8 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateGroup(tx *gorm.DB, workspaceId uint64, groupName, typeTag string) (*model.GroupModel, error) {
+type CreateAssetGroupReq struct {
+	GroupName string `json:"name" binding:"required"`
+	TypeTag   string `json:"type" binding:"required"`
+}
 
+func CreateGroup(tx *gorm.DB, workspaceId uint64, req *CreateAssetGroupReq) (*model.GroupModel, error) {
+	groupName, typeTag := req.GroupName, req.TypeTag
 	if groupName != "" {
 		if err := consts.IsLegalName(groupName); err != nil {
 			tx.Rollback()
@@ -30,7 +35,8 @@ func CreateGroup(tx *gorm.DB, workspaceId uint64, groupName, typeTag string) (*m
 
 }
 
-func Create(ctx context.Context, workspaceId uint64, name, typeTag string) (*model.GroupModel, error) {
+func Create(ctx context.Context, workspaceId uint64, req *CreateAssetGroupReq) (*model.GroupModel, error) {
+
 	tx := db.NewTx(ctx).Begin()
-	return CreateGroup(tx, workspaceId, name, typeTag)
+	return CreateGroup(tx, workspaceId, req)
 }

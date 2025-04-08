@@ -3,20 +3,13 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/service"
-	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 const project_prefix = "screen-operation"
 
 type ProjectController struct {
-	controller.BaseController
-}
-
-var projectController = &ProjectController{
-	controller.BaseController{
-		ErrorPrefix: "[http] canvas project handler ",
-	},
+	CanvixController
 }
 
 type GetProjectListRequest struct {
@@ -27,21 +20,17 @@ type GetProjectListRequest struct {
 }
 
 func (c *ProjectController) list(ctx *gin.Context) {
-	requestBody := &GetProjectListRequest{}
-	if err := ctx.BindJSON(&requestBody); err != nil {
-		c.AbortClientError(ctx, listPrefix+err.Error())
+	req := &GetProjectListRequest{}
+
+	workspaceId, err := c.BindRequestJson(ctx, &req, "project list")
+
+	if err != nil {
 		return
 	}
 
-	// userId, exists := ctx.Get(auth.UserID)
-	// if !exists {
-	// 	c.AbortClientError(ctx, listPrefix+" userId does not exist in http context")
-	// 	return
-	// }
-	_, workspaceId := getWorkspaceCode(ctx)
-	infoList, err := service.ProjectServiceImpl.GetList(ctx, workspaceId, requestBody.Page, requestBody.Size, requestBody.Name, requestBody.Group)
+	infoList, err := service.ProjectServiceImpl.GetList(ctx, workspaceId, req.Page, req.Size, req.Name, req.Group)
 	if err != nil {
-		c.AbortServerError(ctx, listPrefix+err.Error())
+		c.AbortServerError(ctx, "project list error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, infoList)
@@ -57,14 +46,14 @@ type CreateProjectRequest struct {
 }
 
 func (c *ProjectController) create(ctx *gin.Context) {
-	param := &CreateProjectRequest{}
-	if err := ctx.ShouldBindJSON(param); err != nil {
-		c.AbortClientError(ctx, createPrefix+err.Error())
+	req := &CreateProjectRequest{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		c.AbortClientError(ctx, "create read error: "+err.Error())
 		return
 	}
-	projectCode, err := service.ProjectServiceImpl.Create(ctx, param.Name, param.Config, param.GroupCode, param.UseTemplate)
+	projectCode, err := service.ProjectServiceImpl.Create(ctx, req.Name, req.Config, req.GroupCode, req.UseTemplate)
 	if err != nil {
-		c.AbortServerError(ctx, createPrefix+err.Error())
+		c.AbortServerError(ctx, "create read error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, projectCode)
@@ -78,13 +67,13 @@ func (c *ProjectController) read(ctx *gin.Context) {
 	query := ReadProjectQuery{}
 
 	if err := ctx.ShouldBindUri(&query); err != nil {
-		c.AbortClientError(ctx, createPrefix+err.Error())
+		c.AbortClientError(ctx, "project read error: "+err.Error())
 		return
 	}
 
 	projectDetail, err := service.ProjectServiceImpl.GetInfoById(ctx, query.Id)
 	if err != nil {
-		c.AbortServerError(ctx, createPrefix+err.Error())
+		c.AbortServerError(ctx, "project read error: "+err.Error())
 		return
 	}
 
@@ -101,14 +90,14 @@ type ProjectUpdateRequest struct {
 
 func (c *ProjectController) update(ctx *gin.Context) {
 	param := ProjectUpdateRequest{}
-	err := ctx.BindJSON(&param)
-	if err != nil {
-		c.AbortClientError(ctx, updatePrefix+err.Error())
+
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		c.AbortClientError(ctx, "project update error: "+err.Error())
 		return
 	}
 
 	if err := service.ProjectServiceImpl.Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
-		c.AbortServerError(ctx, updatePrefix+err.Error())
+		c.AbortServerError(ctx, "project update error: "+err.Error())
 		return
 	}
 
@@ -122,15 +111,15 @@ type BatchMoveProjectGroupRequest struct {
 }
 
 func (c *ProjectController) moveGroup(ctx *gin.Context) {
-	reqBody := BatchMoveProjectGroupRequest{}
+	req := BatchMoveProjectGroupRequest{}
 
-	if err := ctx.BindJSON(&reqBody); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
+	workspaceId, err := c.BindRequestJson(ctx, &req, "project move group")
+
+	if err != nil {
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
 
-	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, reqBody.Ids, reqBody.GroupName, reqBody.GroupCode); err != nil {
+	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, req.Ids, req.GroupName, req.GroupCode); err != nil {
 		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
@@ -143,14 +132,15 @@ type ProjectDeleteRequest struct {
 }
 
 func (c *ProjectController) delete(ctx *gin.Context) {
-	param := ProjectDeleteRequest{}
-	if err := ctx.BindJSON(&param); err != nil {
-		c.AbortClientError(ctx, deletePrefix+err.Error())
+	req := ProjectDeleteRequest{}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "project delete error: "+err.Error())
 		return
 	}
 
-	if err := service.ProjectServiceImpl.LogicalDeletion(ctx, param.Ids); err != nil {
-		c.AbortServerError(ctx, deletePrefix+err.Error())
+	if err := service.ProjectServiceImpl.LogicalDeletion(ctx, req.Ids); err != nil {
+		c.AbortServerError(ctx, "project delete error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, nil)
@@ -167,7 +157,7 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 	}
 	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, req.Id)
 	if err != nil {
-		c.AbortServerError(ctx, createPrefix+err.Error())
+		c.AbortServerError(ctx, "project create error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, projectCode)
@@ -204,10 +194,10 @@ func (c *ProjectController) _import(ctx *gin.Context) {
 }
 
 func (c *ProjectController) compile(ctx *gin.Context) {
-	var req struct {
-		Code string `json:"id" binding:"required"`
-		Type string `json:"type" binding:"required"`
-	}
+	// var req struct {
+	// 	Code string `json:"id" binding:"required"`
+	// 	Type string `json:"type" binding:"required"`
+	// }
 }
 
 // func (c *ProjectController) getInteraction(ctx *gin.Context) {

@@ -88,34 +88,35 @@ func (c *AssetController) read(ctx *gin.Context) {
 }
 
 func (c *AssetController) update(ctx *gin.Context) {
-	reqBody := service.UpdateAssetReq{}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "update"); err != nil {
+	req := service.UpdateAssetReq{}
+	workspaceId, err := c.BindRequestJson(ctx, &req, "asset update")
+	if err != nil {
 		return
-	} else {
-		if err := service.UpdateName(ctx, workspaceId, &reqBody); err != nil {
-			c.AbortServerError(ctx, "update: "+err.Error())
-			return
-		}
-		c.SuccessVoid(ctx)
 	}
+
+	if err := service.UpdateName(ctx, workspaceId, &req); err != nil {
+		c.AbortServerError(ctx, "update: "+err.Error())
+		return
+	}
+	c.SuccessVoid(ctx)
+
 }
 
 func (c *AssetController) delete(ctx *gin.Context) {
 	var req struct {
 		Data []string `json:"data" binding:"required"`
 	}
-
-	if workspaceId, err := c.BindRequestJson(ctx, &req, "delete"); err != nil {
+	workspaceId, err := c.BindRequestJson(ctx, &req, "asset delete")
+	if err != nil {
 		return
-	} else {
-
-		if err := service.DeleteAssets(ctx, workspaceId, req.Data); err != nil {
-			c.AbortServerError(ctx, "delete: "+err.Error())
-			return
-		}
-		c.SuccessVoid(ctx)
-
 	}
+
+	if err := service.DeleteAssets(ctx, workspaceId, req.Data); err != nil {
+		c.AbortServerError(ctx, "delete: "+err.Error())
+		return
+	}
+	c.SuccessVoid(ctx)
+
 }
 
 type UploadAssetForm struct {

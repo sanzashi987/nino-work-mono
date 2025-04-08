@@ -3,8 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/service"
-	"github.com/sanzashi987/nino-work/pkg/shared"
+	"github.com/sanzashi987/nino-work/apps/canvix/service/group"
 )
 
 type GroupController struct {
@@ -24,22 +23,15 @@ func registerGroupRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 	}
 }
 
-type ListGroupReq struct {
-	GroupCode string `json:"code"`
-	GroupName string `json:"name"`
-	TypeTag   string `json:"type" binding:"required"`
-	shared.PaginationRequest
-}
-
 func (c *GroupController) list(ctx *gin.Context) {
 
-	req := ListGroupReq{}
+	req := group.ListGroupReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "list")
 	if err != nil {
 		return
 	}
 
-	output, err := service.GroupServiceImpl.ListGroups(ctx, workspaceId, req.GroupName, typeTag)
+	output, err := group.List(ctx, workspaceId, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "[http] list group error "+err.Error())
 		return
@@ -49,39 +41,30 @@ func (c *GroupController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
-type CreateAssetGroupReq struct {
-	GroupName string `json:"name" binding:"required"`
-	TypeTag   string `json:"type" binding:"required"`
-}
 
 func (c *GroupController) create(ctx *gin.Context) {
-	req := CreateAssetGroupReq{}
+	req := group.CreateAssetGroupReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "create")
 	if err != nil {
 		return
 	}
 
-	if _, err := service.GroupServiceImpl.Create(ctx, workspaceId, req.GroupName, typeTag); err != nil {
+	if _, err := group.Create(ctx, workspaceId, &req); err != nil {
 		c.AbortClientError(ctx, "[http] create group error "+err.Error())
 		return
 	}
 	c.SuccessVoid(ctx)
 }
 
-type UpdateAssetGroupReq struct {
-	CreateAssetGroupReq
-	DeleteAssetGroupReq
-}
-
 // rename
 func (c *GroupController) rename(ctx *gin.Context) {
-	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(typeTag)
-	req := &UpdateAssetGroupReq{}
+	req := &group.UpdateAssetGroupReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "rename")
+	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(req.TypeTag)
 	if err != nil {
 		return
 	}
-	if err := service.GroupServiceImpl.Rename(ctx, workspaceId, req.GroupCode, req.GroupName, groupTypeTag); err != nil {
+	if err := group.Rename(ctx, workspaceId, req.GroupCode, req.GroupName, groupTypeTag); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}
@@ -89,19 +72,14 @@ func (c *GroupController) rename(ctx *gin.Context) {
 	c.SuccessVoid(ctx)
 }
 
-type DeleteAssetGroupReq struct {
-	GroupCode string `json:"code" binding:"required"`
-	TypeTag   string `json:"type" binding:"required"`
-}
-
 func (c *GroupController) delete(ctx *gin.Context) {
-	req := &DeleteAssetGroupReq{}
+	req := &group.DeleteAssetGroupReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "delete")
 	if err != nil {
 		return
 	}
 
-	if err := service.GroupServiceImpl.Delete(ctx, workspaceId, req.GroupCode, typeTag); err != nil {
+	if err := group.Delete(ctx, workspaceId, req); err != nil {
 		c.AbortServerError(ctx, err.Error())
 		return
 	}
@@ -109,6 +87,6 @@ func (c *GroupController) delete(ctx *gin.Context) {
 }
 
 type MoveProjectReq struct {
-	DeleteAssetGroupReq
+	group.DeleteAssetGroupReq
 	Ids []string `json:"fileIds" binding:"required"`
 }

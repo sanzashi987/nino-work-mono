@@ -12,6 +12,12 @@ import (
 
 var ErrorFailToRename = errors.New("Fail to rename group")
 
+type UpdateAssetGroupReq struct {
+	GroupName string `json:"name" binding:"required"`
+	GroupCode string `json:"code" binding:"required"`
+	TypeTag   string `json:"type" binding:"required"`
+}
+
 func Rename(ctx context.Context, workspaceId uint64, groupCode, groupName, typeTag string) error {
 
 	if err := consts.IsLegalName(groupName); err != nil {

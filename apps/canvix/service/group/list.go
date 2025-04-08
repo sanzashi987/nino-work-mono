@@ -9,6 +9,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
+	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type ListGroupOutput struct {
@@ -46,17 +47,24 @@ type GroupCount struct {
 
 var errTagNotSupported = errors.New("Not find a corresponding interface related to the give type tag")
 
-func List(ctx context.Context, workspaceId uint64, groupName, typeTag string) (ListGroupOutputs, error) {
-	groupTypeTag, err := consts.GetGroupTypeTagFromBasic(typeTag)
+type ListGroupReq struct {
+	GroupCode string `json:"code"`
+	GroupName string `json:"name"`
+	TypeTag   string `json:"type" binding:"required"`
+	shared.PaginationRequest
+}
+
+func List(ctx context.Context, workspaceId uint64, req *ListGroupReq) (ListGroupOutputs, error) {
+	groupTypeTag, err := consts.GetGroupTypeTagFromBasic(req.TypeTag)
 
 	tx := db.NewTx(ctx)
 
-	records, err := dao.FindByNameAndWorkspace(tx, groupName, workspaceId, groupTypeTag)
+	records, err := dao.FindByNameAndWorkspace(tx, req.GroupName, workspaceId, groupTypeTag)
 	if err != nil {
 		return nil, err
 	}
 
-	m, exist := typeTagToGroupCountHandler[typeTag]
+	m, exist := typeTagToGroupCountHandler[req.TypeTag]
 	if !exist {
 		err = errTagNotSupported
 		return nil, err
