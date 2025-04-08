@@ -9,14 +9,26 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
-const asset_prefix = "assets"
-
 type AssetController struct {
 	CanvixController
 }
 
-var assetController = &AssetController{
-	CanvixController: createCanvixController("[http] canvas asset handler "),
+func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
+	assetController := AssetController{}
+
+	assetGroup := router.Group("assets")
+	// assetGroup.Use(loggedMiddleware, workspaceMiddleware)
+	{
+		assetGroup.POST("selectMyAssets", assetController.list)
+		assetGroup.POST("updateMyAssetsName", assetController.update)
+		assetGroup.POST("updateAssetsGroup", assetController.moveGroup)
+		assetGroup.DELETE("deleteAssets", assetController.delete)
+		assetGroup.POST("upload", assetController.upload)
+		assetGroup.POST("detail", assetController.read)
+		assetGroup.POST("replace", assetController.replace)
+		assetGroup.POST("loadAsset", assetController.download)
+		assetGroup.POST("importAsset", assetController._import)
+	}
 }
 
 type ListAssetResponse struct {
@@ -25,26 +37,26 @@ type ListAssetResponse struct {
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
-	reqBody := service.ListAssetReq{}
-
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list"); err != nil {
+	req := service.ListAssetReq{}
+	workspaceId, err := c.BindRequestJson(ctx, &req, "list asset")
+	if err != nil {
 		return
-	} else {
-		recordTotal, res, err := service.AssetServiceImpl.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &reqBody)
-		if err != nil {
-			c.AbortServerError(ctx, "list: "+err.Error())
-			return
-		}
-
-		c.ResponseJson(ctx, ListAssetResponse{
-			Data: res,
-			PaginationResponse: shared.PaginationResponse{
-				PageIndex:   reqBody.Page,
-				PageSize:    reqBody.Size,
-				RecordTotal: int(recordTotal),
-			},
-		})
 	}
+
+	recordTotal, res, err := service.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
+	if err != nil {
+		c.AbortServerError(ctx, "list: "+err.Error())
+		return
+	}
+
+	c.ResponseJson(ctx, ListAssetResponse{
+		Data: res,
+		PaginationResponse: shared.PaginationResponse{
+			PageIndex:   req.Page,
+			PageSize:    req.Size,
+			RecordTotal: int(recordTotal),
+		},
+	})
 
 }
 
@@ -65,7 +77,7 @@ func (c *AssetController) read(ctx *gin.Context) {
 
 	uploadRpc := getUploadRpcService(ctx)
 
-	res, err := service.AssetServiceImpl.GetAssetDetail(ctx, uploadRpc, workspaceId, query.FileId)
+	res, err := service.GetAssetDetail(ctx, uploadRpc, workspaceId, query.FileId)
 	if err != nil {
 		c.AbortServerError(ctx, "read: "+err.Error())
 		return
@@ -86,8 +98,8 @@ func (c *AssetController) update(ctx *gin.Context) {
 		}
 		c.SuccessVoid(ctx)
 	}
-
 }
+
 func (c *AssetController) delete(ctx *gin.Context) {
 	var req struct {
 		Data []string `json:"data" binding:"required"`
@@ -150,7 +162,7 @@ func (c *AssetController) moveGroup(ctx *gin.Context) {
 			return
 		}
 
-		if err := service.AssetServiceImpl.BatchMoveGroup(ctx, workspaceId, req.FileIds, req.GroupName, req.GroupCode); err != nil {
+		if err := service.BatchMoveGroup(ctx, workspaceId, req.FileIds, req.GroupName, req.GroupCode); err != nil {
 			c.AbortServerError(ctx, "move: "+err.Error())
 			return
 		}

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +8,13 @@ import (
 
 type BaseController struct {
 	ErrorPrefix string
+}
+
+func (controler *BaseController) GetErrorPrefix() string {
+	if controler.ErrorPrefix == "" {
+		return "[http] "
+	}
+	return controler.ErrorPrefix
 }
 
 func (controler *BaseController) ResponseJson(ctx *gin.Context, data interface{}) {
@@ -30,36 +36,26 @@ func (controler *BaseController) SuccessVoid(ctx *gin.Context) {
 
 }
 
-func (controller *BaseController) AbortClientError(ctx *gin.Context, errMsg string) {
+func (c *BaseController) AbortClientError(ctx *gin.Context, errMsg string) {
 	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-		"msg":  controller.ErrorPrefix + errMsg,
+		"msg":  c.GetErrorPrefix() + errMsg,
 		"data": nil,
 		"code": http.StatusBadRequest,
 	})
 }
 
-func (controller *BaseController) AbortServerError(ctx *gin.Context, errMsg string) {
+func (c *BaseController) AbortServerError(ctx *gin.Context, errMsg string) {
 	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-		"msg":  controller.ErrorPrefix + errMsg,
+		"msg":  c.GetErrorPrefix() + errMsg,
 		"data": nil,
 		"code": http.StatusInternalServerError,
 	})
 }
 
-func (controller *BaseController) AbortJson(ctx *gin.Context, reasonCode int, msg string) {
+func (c *BaseController) AbortServerErrorWithCode(ctx *gin.Context, reasonCode int, msg string) {
 	ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
 		"msg":  msg,
 		"data": nil,
 		"code": reasonCode,
 	})
-}
-
-func (controller *BaseController) MustGetParam(ctx *gin.Context, key string) (string, error) {
-	value := ctx.Param(key)
-	if value == "" {
-		resultStr := key + " is not provided in url"
-		controller.AbortClientError(ctx, resultStr)
-		return "", errors.New(resultStr)
-	}
-	return value, nil
 }

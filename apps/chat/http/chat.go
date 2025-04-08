@@ -21,7 +21,7 @@ func (c *ChatController) Chat(ctx *gin.Context) {
 	rpcInstance := service.GetChatServiceRpc()
 
 	if err := rpcInstance.Chat(ctx, &req, &res); err != nil {
-		c.AbortJson(ctx, int(res.Reason), "[rpc] chat service: fail to get required field, "+err.Error())
+		c.AbortServerErrorWithCode(ctx, int(res.Reason), "[rpc] chat service: fail to get required field, "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, &res)

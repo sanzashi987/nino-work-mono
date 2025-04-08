@@ -6,14 +6,11 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvix/service/group"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 	"github.com/sanzashi987/nino-work/proto/storage"
 )
-
-type AssetService struct{}
-
-var AssetServiceImpl *AssetService = &AssetService{}
 
 type ListAssetRes struct {
 	FileCode string `json:"fileId"`
@@ -33,7 +30,7 @@ type ListAssetReq struct {
 	shared.PaginationRequest
 }
 
-func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, payload *ListAssetReq) (int64, []*ListAssetRes, error) {
+func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, payload *ListAssetReq) (int64, []*ListAssetRes, error) {
 
 	var groupId *uint64
 	if payload.GroupCode != "" {
@@ -71,24 +68,11 @@ func (serv *AssetService) ListAssetByType(ctx context.Context, workspaceId uint6
 
 }
 
-type GroupCount struct {
-	Id    uint64 `gorm:"column:id"`
-	Count uint64 `gorm:"column:count"`
-}
-
-func (serv AssetService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]*GroupCount, error) {
-	tx := db.NewTx(ctx)
-	res := []*GroupCount{}
-	var assetTableName = model.ProjectModel{}.TableName()
-	err := tx.Table(assetTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupId).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
-	return res, err
-}
-
-func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
+func BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
 	code := groupCode
 	tx := db.NewTx(ctx).Begin()
 
-	if newGroup, err := createGroup(tx, workspaceId, groupName, consts.DESIGN); err != nil {
+	if newGroup, err := group.CreateGroup(tx, workspaceId, groupName, consts.DESIGN); err != nil {
 		return err
 	} else if newGroup != nil {
 		code = newGroup.Code
@@ -112,8 +96,8 @@ func (serv *AssetService) BatchMoveGroup(ctx context.Context, workspaceId uint64
 const chunkSize = 1024 * 1024 / 2
 
 type UpdateAssetReq struct {
-	FileId   string `json:"fileId"`
-	FileName string `json:"fileName"`
+	FileId   string `json:"fileId" binding:"required"`
+	FileName string `json:"fileName" binding:"required"`
 }
 
 func UpdateName(ctx context.Context, workspaceId uint64, req *UpdateAssetReq) error {
@@ -124,7 +108,7 @@ func UpdateName(ctx context.Context, workspaceId uint64, req *UpdateAssetReq) er
 
 	tx := db.NewTx(ctx).Begin()
 
-	if err := tx.Model(&model.AssetModel{}).Where("id = ? AND workspace = ?", assetId, workspaceId).Update("name", assetName).Error; err != nil {
+	if err := tx.Model(&model.AssetModel{}).Where("id = ? AND workspace = ?", assetId, workspaceId).Update("name", req.FileName).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -143,7 +127,7 @@ type AssetDetailResponse struct {
 	shared.DBTime
 }
 
-func (serv AssetService) GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
+func GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, workspaceId uint64, assetCode string) (*AssetDetailResponse, error) {
 
 	tx := db.NewTx(ctx)
 	assetId, _, _ := consts.GetIdFromCode(assetCode)
@@ -190,5 +174,6 @@ func DeleteAssets(ctx context.Context, workspaceId uint64, assetCode []string) e
 	// tx := db.NewTx(ctx)
 
 	// return dao.UpdateAssetName(tx, workspaceId, assetId, assetName)
+	return nil
 
 }

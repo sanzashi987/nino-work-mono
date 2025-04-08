@@ -227,12 +227,3 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 	return nil
 
 }
-
-func (serv ProjectService) GetCountFromGroupId(ctx context.Context, workspaceId uint64, groupId []uint64) ([]*GroupCount, error) {
-	res := []*GroupCount{}
-	tx := db.NewTx(ctx)
-	err := tx.Table(projectTableName).Where("workspace = ?", workspaceId).Where("group_id IN ?", groupId).Select("id", "COUNT(id) as count").Group("group_id").Find(&res).Error
-
-	return res, err
-
-}

@@ -11,9 +11,6 @@ type DataSourceController struct {
 	CanvixController
 }
 
-var dataSourceController = &DataSourceController{
-	CanvixController: createCanvixController("[http] canvas data-source handler "),
-}
 
 func (c *DataSourceController) list(ctx *gin.Context) {
 

@@ -30,7 +30,7 @@ func getUploadRpcService(ctx *gin.Context) storage.StorageService {
 	return m["storage"].(storage.StorageService)
 }
 
-func UserWorkspace(ctx *gin.Context) {
+func workspaceMiddleware(ctx *gin.Context) {
 	userId := getCurrentUser(ctx)
 	workspaceCode, _ := getWorkspaceCode(ctx)
 	if service.UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode) {
@@ -53,9 +53,11 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		ctx.Set(RPCKEY, rpcServices)
 	}
 
+	loggedInMiddleware := middleware.CanvasUserLoggedIn(loginPageUrl)
+
 	canvasAuthMiddleWare := []gin.HandlerFunc{
-		middleware.CanvasUserLoggedIn(loginPageUrl),
-		UserWorkspace,
+		loggedInMiddleware,
+		workspaceMiddleware,
 	}
 
 	root.Use(mergeRpcMiddleware)
@@ -105,33 +107,16 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 
 	}
 
-	{
-		assetRoutes := root.Group(asset_prefix).Use(canvasAuthMiddleWare...)
-		assetRoutes.POST("selectMyAssets", assetController.list)
-		assetRoutes.POST("updateMyAssetsName", assetController.update)
-		assetRoutes.POST("updateAssetsGroup", assetController.moveGroup)
-		assetRoutes.DELETE("deleteAssets", assetController.delete)
-		assetRoutes.POST("upload", assetController.upload)
-		assetRoutes.POST("detail", assetController.read)
-		assetRoutes.POST("replace", assetController.replace)
-		assetRoutes.POST("loadAsset", assetController.download)
-		assetRoutes.POST("importAsset", assetController._import)
+	registerAssetRoutes(root, loggedInMiddleware, workspaceMiddleware)
 
+	{
 		assetRoutes.POST("addGroup", groupController.createDesginGroup)
 		assetRoutes.GET("deleteGroup", groupController.deleteAssetGroup)
 		assetRoutes.POST("updateGroupsName", groupController.assetRename)
 		assetRoutes.POST("selectGroup", groupController.listAssetGroup)
 	}
 
-	{
-		themeRoutes := root.Group(theme_prefix).Use(canvasAuthMiddleWare...)
-
-		themeRoutes.POST("list", themeController.list)
-		themeRoutes.POST("create", themeController.create)
-		themeRoutes.POST("update", themeController.update)
-		themeRoutes.DELETE("delete", themeController.delete)
-
-	}
+	registerThemeRoutes(root, loggedInMiddleware, workspaceMiddleware)
 
 	return router
 }

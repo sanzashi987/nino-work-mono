@@ -3,26 +3,30 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/service"
-	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
 type ThemeController struct {
-	controller.BaseController
+	CanvixController
 }
 
-const theme_prefix = "system-theme"
+func registerThemeRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
+	themeController := ThemeController{}
 
-var themeController = &ThemeController{
-	controller.BaseController{
-		ErrorPrefix: "[http] canvas theme handler ",
-	},
+	themeRoutes := router.Group("system-theme")
+	themeRoutes.Use(loggedMiddleware, workspaceMiddleware)
+	{
+		themeRoutes.POST("list", themeController.list)
+		themeRoutes.POST("create", themeController.create)
+		themeRoutes.POST("update", themeController.update)
+		themeRoutes.DELETE("delete", themeController.delete)
+	}
 }
 
 func (c *ThemeController) list(ctx *gin.Context) {
 	_, workspaceId := getWorkspaceCode(ctx)
 	res, err := service.GetThemes(ctx, workspaceId)
 	if err != nil {
-		c.AbortServerError(ctx, updatePrefix+err.Error())
+		c.AbortServerError(ctx, "theme list error: "+err.Error())
 		return
 	}
 
@@ -30,22 +34,22 @@ func (c *ThemeController) list(ctx *gin.Context) {
 }
 
 func (c *ThemeController) update(ctx *gin.Context) {
-	_, workspaceId := getWorkspaceCode(ctx)
 
 	var req service.UpdateThemeReq
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		c.AbortClientError(ctx, updatePrefix+err.Error())
+	workspaceId, err := c.BindRequestJson(ctx, &req, "theme update")
+
+	if err != nil {
 		return
 	}
 
 	if req.Config == nil && req.Name == nil {
-		c.AbortClientError(ctx, "update: should at least provide one property")
+		c.AbortClientError(ctx, "theme update error: should at least provide one property")
 		return
 	}
 
 	if err := service.UpdateTheme(ctx, workspaceId, &req); err != nil {
-		c.AbortServerError(ctx, updatePrefix+err.Error())
+		c.AbortServerError(ctx, "theme update error: "+err.Error())
 		return
 	}
 
@@ -55,36 +59,33 @@ func (c *ThemeController) update(ctx *gin.Context) {
 func (c *ThemeController) create(ctx *gin.Context) {
 
 	var req service.CreateThemeReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		c.AbortClientError(ctx, createPrefix+err.Error())
+
+	workspaceId, err := c.BindRequestJson(ctx, &req, "theme create")
+
+	if err != nil {
 		return
 	}
 
-	_, workspaceId := getWorkspaceCode(ctx)
-
 	if err := service.CreateTheme(ctx, workspaceId, &req); err != nil {
-		c.AbortServerError(ctx, createPrefix+err.Error())
+		c.AbortServerError(ctx, "theme create error: "+err.Error())
 		return
 	}
 
 	c.SuccessVoid(ctx)
-
 }
 
 func (c *ThemeController) delete(ctx *gin.Context) {
 
 	var req service.DeleteThemeReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		c.AbortClientError(ctx, deletePrefix+err.Error())
+	workspaceId, err := c.BindRequestJson(ctx, &req, "theme delete")
+	if err != nil {
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
 
 	if err := service.DeleteThemes(ctx, workspaceId, req.Data); err != nil {
-		c.AbortServerError(ctx, deletePrefix+err.Error())
+		c.AbortServerError(ctx, "theme delete error: "+err.Error())
 		return
 	}
 
 	c.SuccessVoid(ctx)
-
 }

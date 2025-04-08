@@ -47,7 +47,7 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 	}
 
 	if err := userService.UserServiceRpcImpl.UserLogin(ctx, &rpcReq, &res); err != nil {
-		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Login Error "+err.Error())
+		c.AbortServerErrorWithCode(ctx, int(res.Reason), "[rpc] user service: Login Error "+err.Error())
 		return
 	}
 
@@ -70,7 +70,7 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 // 	}
 
 // 	if err := userService.UserServiceRpcImpl.UserRegister(ctx, &req, &res); err != nil {
-// 		c.AbortJson(ctx, int(res.Reason), "[rpc] user service: Register error")
+// 		c.AbortServerErrorWithCode(ctx, int(res.Reason), "[rpc] user service: Register error")
 // 		return
 // 	}
 
