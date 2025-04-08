@@ -6,10 +6,28 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
-const project_prefix = "screen-operation"
-
 type ProjectController struct {
 	CanvixController
+}
+
+func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
+	projectController := ProjectController{}
+
+	projectRoutes := router.Group("screen-operation")
+	projectRoutes.Use(loggedMiddleware, workspaceMiddleware)
+
+	projectRoutes.POST("create", projectController.create)
+	projectRoutes.POST("createByTemplate", projectController.create)
+	projectRoutes.GET("info/:id", projectController.read)
+	projectRoutes.POST("update", projectController.update)
+	projectRoutes.DELETE("delete", projectController.delete)
+	projectRoutes.POST("list", projectController.list)
+	projectRoutes.POST("copy", projectController.duplicate)
+	projectRoutes.POST("publish", projectController.publish)
+	projectRoutes.POST("downloadScreen", projectController.export)
+	projectRoutes.POST("downloadApp", projectController.compile)
+	projectRoutes.POST("importScreen", projectController._import)
+	projectRoutes.POST("move", projectController.moveGroup)
 }
 
 type GetProjectListRequest struct {
@@ -152,7 +170,8 @@ func (c *ProjectController) duplicate(ctx *gin.Context) {
 		Id string `json:"id" binding:"required"`
 	}
 
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.AbortClientError(ctx, "project create error: "+err.Error())
 		return
 	}
 	projectCode, err := service.ProjectServiceImpl.Duplicate(ctx, req.Id)
@@ -169,17 +188,15 @@ type ProjectPublishRequest struct {
 	PublishSecretKey *string `json:"public_secret_key"`
 }
 
-const publishPrefix = "publish: "
-
 func (c *ProjectController) publish(ctx *gin.Context) {
 	req := &ProjectPublishRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		c.AbortClientError(ctx, publishPrefix+err.Error())
+		c.AbortClientError(ctx, "project publish error: "+err.Error())
 		return
 	}
 
 	if err := service.ProjectServiceImpl.PublishProject(ctx, req.Code, req.PublishFlag, req.PublishSecretKey); err != nil {
-		c.AbortServerError(ctx, publishPrefix+err.Error())
+		c.AbortServerError(ctx, "project publish error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, nil)

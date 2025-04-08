@@ -81,25 +81,9 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		dataSourceRoutes.POST("searchByIp", dataSourceController.search)
 	}
 
+	registerProjectRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	{
-		projectScreenRoutes := root.Group(project_prefix).Use(canvasAuthMiddleWare...)
-
-		projectScreenRoutes.POST("create", projectController.create)
-		projectScreenRoutes.POST("createByTemplate", projectController.create)
-		projectScreenRoutes.GET("info/:id", projectController.read)
-		projectScreenRoutes.POST("update", projectController.update)
-		projectScreenRoutes.DELETE("delete", projectController.delete)
-		projectScreenRoutes.POST("list", projectController.list)
-		projectScreenRoutes.POST("copy", projectController.duplicate)
-		projectScreenRoutes.POST("publish", projectController.publish)
-		projectScreenRoutes.POST("downloadScreen", projectController.export)
-		projectScreenRoutes.POST("downloadApp", projectController.compile)
-		projectScreenRoutes.POST("importScreen", projectController._import)
-		// projectScreenRoutes.POST("checkRef", projectController.getInteraction)
-		projectScreenRoutes.POST("move", projectController.moveGroup)
-
 		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)
-
 		groupedProjectRoutes.POST("list", groupController.listProjectGroup)
 		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
 		groupedProjectRoutes.POST("update", groupController.projectRename)

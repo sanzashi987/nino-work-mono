@@ -11,7 +11,6 @@ type DataSourceController struct {
 	CanvixController
 }
 
-
 func (c *DataSourceController) list(ctx *gin.Context) {
 
 	reqBody := service.QueryDataSourceRequest{}
@@ -52,14 +51,14 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 		SourceId string `uri:"sourceId" binding:"required"`
 	}
 	if err := ctx.ShouldBindUri(&query); err != nil {
-		c.AbortClientError(ctx, readPreix+err.Error())
+		c.AbortClientError(ctx, "data read error: "+err.Error())
 		return
 	}
 	_, workspaceId := getWorkspaceCode(ctx)
 
 	dataSource, err := service.DataSourceServiceImpl.GetDataSourceById(ctx, workspaceId, query.SourceId)
 	if err != nil {
-		c.AbortServerError(ctx, readPreix+err.Error())
+		c.AbortServerError(ctx, "data read error: "+err.Error())
 		return
 	}
 
@@ -85,7 +84,7 @@ func (c *DataSourceController) delete(ctx *gin.Context) {
 	var reqBody struct {
 		SourceId []string `json:"sourceId" binding:"required"`
 	}
-	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "delete")
+	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "data delete")
 	if err != nil {
 		return
 	}
