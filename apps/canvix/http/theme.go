@@ -12,14 +12,13 @@ type ThemeController struct {
 func registerThemeRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 	themeController := ThemeController{}
 
-	themeRoutes := router.Group("system-theme")
-	themeRoutes.Use(loggedMiddleware, workspaceMiddleware)
-	{
-		themeRoutes.POST("list", themeController.list)
-		themeRoutes.POST("create", themeController.create)
-		themeRoutes.POST("update", themeController.update)
-		themeRoutes.DELETE("delete", themeController.delete)
-	}
+	themeRoutes := router.Group("system-theme").Use(loggedMiddleware, workspaceMiddleware)
+
+	themeRoutes.POST("list", themeController.list)
+	themeRoutes.POST("create", themeController.create)
+	themeRoutes.POST("update", themeController.update)
+	themeRoutes.DELETE("delete", themeController.delete)
+
 }
 
 func (c *ThemeController) list(ctx *gin.Context) {

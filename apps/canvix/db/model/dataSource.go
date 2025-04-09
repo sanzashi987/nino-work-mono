@@ -28,7 +28,6 @@ func init() {
 	for index, str := range SourceTypeIntToString {
 		SourceTypeStringToEnum[str] = uint8(index)
 	}
-
 }
 
 type DataSourceModel struct {

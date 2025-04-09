@@ -2,23 +2,43 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvix/service"
+	"github.com/sanzashi987/nino-work/apps/canvix/service/dataSource"
 )
-
-const data_source_prefix = "data-source"
 
 type DataSourceController struct {
 	CanvixController
 }
 
+func registerDataSourceRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
+	dataSourceController := DataSourceController{}
+
+	nonAuthed := router.Group("data-source")
+
+	authed := nonAuthed.Use(loggedMiddleware, workspaceMiddleware)
+
+	authed.POST("list", dataSourceController.list)
+	authed.POST("create", dataSourceController.create)
+	authed.POST("update", dataSourceController.update)
+	authed.DELETE("delete", dataSourceController.delete)
+	// authed.POST("replace-ip", dataSourceController.replaceIp)
+	authed.GET("info/:sourceId", dataSourceController.read)
+	authed.POST("search", dataSourceController.search)
+	authed.POST("preview-file", dataSourceController.previewFile)
+
+	nonAuthed.POST("file", dataSourceController.getFileFromPublic)
+	nonAuthed.POST("api", dataSourceController.getApiFromPublic)
+	nonAuthed.GET("static", dataSourceController.getStaticFromPublic)
+
+}
+
 func (c *DataSourceController) list(ctx *gin.Context) {
 
-	reqBody := service.QueryDataSourceRequest{}
-	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "list")
+	req := dataSource.ListReq{}
+	workspaceId, err := c.BindRequestJson(ctx, &req, "list")
 	if err != nil {
 		return
 	}
-	dataSourceList, err := service.DataSourceServiceImpl.ListDataSources(ctx, workspaceId, &reqBody)
+	dataSourceList, err := dataSource.List(ctx, workspaceId, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "list "+err.Error())
 		return
@@ -29,17 +49,16 @@ func (c *DataSourceController) list(ctx *gin.Context) {
 }
 
 /*CRUD*/
-
 func (c *DataSourceController) create(ctx *gin.Context) {
-	reqBody := service.CreateDataSourceRequest{}
-	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "create")
+	req := dataSource.CreateReq{}
+	workspaceId, err := c.BindRequestJson(ctx, &req, "create")
 	if err != nil {
 		return
 	}
 
-	dataSource, err := service.DataSourceServiceImpl.Create(ctx, workspaceId, &reqBody)
+	dataSource, err := dataSource.Create(ctx, workspaceId, &req)
 	if err != nil {
-		c.AbortServerError(ctx, createPrefix+err.Error())
+		c.AbortServerError(ctx, "data create error: "+err.Error())
 		return
 	}
 
@@ -56,7 +75,7 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 	}
 	_, workspaceId := getWorkspaceCode(ctx)
 
-	dataSource, err := service.DataSourceServiceImpl.GetDataSourceById(ctx, workspaceId, query.SourceId)
+	dataSource, err := dataSource.GetDataSourceById(ctx, workspaceId, query.SourceId)
 	if err != nil {
 		c.AbortServerError(ctx, "data read error: "+err.Error())
 		return
@@ -66,14 +85,14 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 }
 
 func (c *DataSourceController) update(ctx *gin.Context) {
-	reqBody := service.UpdateDataSourceRequest{}
-	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "udpate")
+	req := dataSource.UpdateReq{}
+	workspaceId, err := c.BindRequestJson(ctx, &req, "udpate")
 	if err != nil {
 		return
 	}
-	dataSource, err := service.DataSourceServiceImpl.Update(ctx, workspaceId, &reqBody)
+	dataSource, err := dataSource.Update(ctx, workspaceId, &req)
 	if err != nil {
-		c.AbortServerError(ctx, updatePrefix+err.Error())
+		c.AbortServerError(ctx, "data update error: "+err.Error())
 		return
 	}
 
@@ -81,42 +100,59 @@ func (c *DataSourceController) update(ctx *gin.Context) {
 }
 
 func (c *DataSourceController) delete(ctx *gin.Context) {
-	var reqBody struct {
+	var req struct {
 		SourceId []string `json:"sourceId" binding:"required"`
 	}
-	workspaceId, err := c.BindRequestJson(ctx, &reqBody, "data delete")
+	workspaceId, err := c.BindRequestJson(ctx, &req, "data delete")
 	if err != nil {
 		return
 	}
 
-	err = service.DataSourceServiceImpl.Delete(ctx, workspaceId, reqBody.SourceId)
+	err = dataSource.Delete(ctx, workspaceId, req.SourceId)
 	if err != nil {
-		c.AbortServerError(ctx, deletePrefix+err.Error())
+		c.AbortServerError(ctx, "data delete error: "+err.Error())
 		return
 	}
 
 	c.SuccessVoid(ctx)
 }
 
-func (c *DataSourceController) replaceIp(ctx *gin.Context) {
-	var reqBody struct {
-		Search   string   `json:"search"`
-		Target   string   `json:"target"`
-		SourceId []string `json:"sourceId"`
+// func (c *DataSourceController) replaceIp(ctx *gin.Context) {
+// 	var reqBody struct {
+// 		Search   string   `json:"search"`
+// 		Target   string   `json:"target"`
+// 		SourceId []string `json:"sourceId"`
+// 	}
+// 	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "replaceIp"); err != nil {
+// 		return
+// 	}
+
+// }
+
+func (c *DataSourceController) search(ctx *gin.Context) {
+	var req struct {
+		SourceTypes []string `json:"sourceType"`
+		Search      string   `json:"search"`
 	}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "replaceIp"); err != nil {
+	if workspaceId, err := c.BindRequestJson(ctx, &req, "search"); err != nil {
 		return
 	}
 
 }
 
-func (c *DataSourceController) search(ctx *gin.Context) {
-	var reqBody struct {
-		SourceTypes []string `json:"sourceType"`
-		Search      string   `json:"search"`
+func (c *DataSourceController) previewFile(ctx *gin.Context) {
+	var req struct {
+		SourceId string `json:"sourceId" binding:"required"`
 	}
-	if workspaceId, err := c.BindRequestJson(ctx, &reqBody, "search"); err != nil {
+	if workspaceId, err := c.BindRequestJson(ctx, &req, "previewFile"); err != nil {
 		return
 	}
 
+}
+
+func (c *DataSourceController) getFileFromPublic(ctx *gin.Context) {
+}
+func (c *DataSourceController) getApiFromPublic(ctx *gin.Context) {
+}
+func (c *DataSourceController) getStaticFromPublic(ctx *gin.Context) {
 }

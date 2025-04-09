@@ -2,21 +2,31 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
-const common_prefix = "common"
-
 type CommonController struct {
-	controller.BaseController
+	CanvixController
 }
 
-var commonController = &CommonController{}
+func registerCommonRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 
-func (c *CommonController) searchComponents(ctx *gin.Context) {
+	commonController := CommonController{}
+	nonAuthed := router.Group("common")
+	authed := nonAuthed.Use(loggedMiddleware)
+
+	authed.GET("user", commonController.getUserInfo)
+	authed.GET("workspace", commonController.GetWorkspaceInfo)
 
 }
+
+// func (c *CommonController) searchComponents(ctx *gin.Context) {
+
+// }
 
 func (c *CommonController) getUserInfo(ctx *gin.Context) {
+
+}
+
+func (c *CommonController) GetWorkspaceInfo(ctx *gin.Context) {
 
 }

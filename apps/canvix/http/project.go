@@ -13,8 +13,7 @@ type ProjectController struct {
 func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 	projectController := ProjectController{}
 
-	projectRoutes := router.Group("screen-operation")
-	projectRoutes.Use(loggedMiddleware, workspaceMiddleware)
+	projectRoutes := router.Group("screen-operation").Use(loggedMiddleware, workspaceMiddleware)
 
 	projectRoutes.POST("create", projectController.create)
 	projectRoutes.POST("createByTemplate", projectController.create)

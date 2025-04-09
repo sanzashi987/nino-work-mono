@@ -55,51 +55,12 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 
 	loggedInMiddleware := middleware.CanvasUserLoggedIn(loginPageUrl)
 
-	canvasAuthMiddleWare := []gin.HandlerFunc{
-		loggedInMiddleware,
-		workspaceMiddleware,
-	}
-
 	root.Use(mergeRpcMiddleware)
 
-	{
-		commonRoutes := root.Group(common_prefix).Use(canvasAuthMiddleWare...)
-		commonRoutes.POST("search", commonController.searchComponents)
-		commonRoutes.GET("userInfo", commonController.getUserInfo)
-	}
-
-	{
-		dataSourceRoutes := root.Group(data_source_prefix).Use(canvasAuthMiddleWare...)
-
-		dataSourceRoutes.POST("create", dataSourceController.create)
-		dataSourceRoutes.GET("info/:sourceId", dataSourceController.read)
-		dataSourceRoutes.POST("update", dataSourceController.update)
-		dataSourceRoutes.DELETE("delete", dataSourceController.delete)
-		dataSourceRoutes.POST("replaceIp", dataSourceController.replaceIp)
-		dataSourceRoutes.POST("list-all", dataSourceController.list)
-		dataSourceRoutes.POST("list-page", dataSourceController.list)
-		dataSourceRoutes.POST("searchByIp", dataSourceController.search)
-	}
-
+	registerDataSourceRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	registerProjectRoutes(root, loggedInMiddleware, workspaceMiddleware)
-	{
-		groupedProjectRoutes := root.Group(grouped_project_prefix).Use(canvasAuthMiddleWare...)
-		groupedProjectRoutes.POST("list", groupController.listProjectGroup)
-		groupedProjectRoutes.POST("create", groupController.createProjectGroup)
-		groupedProjectRoutes.POST("update", groupController.projectRename)
-		groupedProjectRoutes.DELETE("delete", groupController.deleteProjectGroup)
-
-	}
-
+	registerGroupRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	registerAssetRoutes(root, loggedInMiddleware, workspaceMiddleware)
-
-	{
-		assetRoutes.POST("addGroup", groupController.createDesginGroup)
-		assetRoutes.GET("deleteGroup", groupController.deleteAssetGroup)
-		assetRoutes.POST("updateGroupsName", groupController.assetRename)
-		assetRoutes.POST("selectGroup", groupController.listAssetGroup)
-	}
-
 	registerThemeRoutes(root, loggedInMiddleware, workspaceMiddleware)
 
 	return router

@@ -18,15 +18,15 @@ type UpdateAssetGroupReq struct {
 	TypeTag   string `json:"type" binding:"required"`
 }
 
-func Rename(ctx context.Context, workspaceId uint64, groupCode, groupName, typeTag string) error {
-
+func Rename(ctx context.Context, workspaceId uint64, req *UpdateAssetGroupReq) error {
+	groupName, groupCode, typeTag := req.GroupName, req.GroupCode, req.TypeTag
 	if err := consts.IsLegalName(groupName); err != nil {
 		return err
 	}
 
 	tx := db.NewTx(ctx)
 
-	groups, err := dao.FindByNameAndWorkspace(tx, groupName, workspaceId, typeTag)
+	groups, err := dao.FindByNameAndWorkspace(tx, workspaceId, groupName, typeTag)
 	if err != nil {
 		return err
 	}

@@ -29,7 +29,7 @@ var TagToName = map[string]string{
 	DATASOURCE: "datasource",
 }
 
-var supportedTags = [7]string{
+var supportedTags = []string{
 	PROJECT,
 	BLOCK,
 	DESIGN,
@@ -51,22 +51,6 @@ var basicToGroup = map[string]string{}
 var groupToBasic = map[string]string{}
 
 const groupStandard = rune('R')
-
-func GetGroupTypeTagFromBasic(typeTag string) (string, error) {
-	res, exist := basicToGroup[typeTag]
-	if !exist {
-		return "", errors.New("input is not a basic type tag")
-	}
-	return res, nil
-}
-
-func GetBasicTypeTagFromGroup(typeTag string) (string, error) {
-	res, exist := groupToBasic[typeTag]
-	if !exist {
-		return "", errors.New("input is not a basic type tag")
-	}
-	return res, nil
-}
 
 func initGroupTypeTagFromBasic(typeTag string, index int) string {
 	charList := []rune(typeTag)

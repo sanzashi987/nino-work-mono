@@ -18,17 +18,17 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 
 	assetGroup := router.Group("assets")
 	// assetGroup.Use(loggedMiddleware, workspaceMiddleware)
-	{
-		assetGroup.POST("selectMyAssets", assetController.list)
-		assetGroup.POST("updateMyAssetsName", assetController.update)
-		assetGroup.POST("updateAssetsGroup", assetController.moveGroup)
-		assetGroup.DELETE("deleteAssets", assetController.delete)
-		assetGroup.POST("upload", assetController.upload)
-		assetGroup.POST("detail", assetController.read)
-		assetGroup.POST("replace", assetController.replace)
-		assetGroup.POST("loadAsset", assetController.download)
-		assetGroup.POST("importAsset", assetController._import)
-	}
+
+	assetGroup.POST("selectMyAssets", assetController.list)
+	assetGroup.POST("updateMyAssetsName", assetController.update)
+	assetGroup.POST("updateAssetsGroup", assetController.moveGroup)
+	assetGroup.DELETE("deleteAssets", assetController.delete)
+	assetGroup.POST("upload", assetController.upload)
+	assetGroup.POST("detail", assetController.read)
+	assetGroup.POST("replace", assetController.replace)
+	assetGroup.POST("loadAsset", assetController.download)
+	assetGroup.POST("importAsset", assetController._import)
+
 }
 
 type ListAssetResponse struct {

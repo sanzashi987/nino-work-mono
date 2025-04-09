@@ -55,11 +55,10 @@ type ListGroupReq struct {
 }
 
 func List(ctx context.Context, workspaceId uint64, req *ListGroupReq) (ListGroupOutputs, error) {
-	groupTypeTag, err := consts.GetGroupTypeTagFromBasic(req.TypeTag)
 
 	tx := db.NewTx(ctx)
 
-	records, err := dao.FindByNameAndWorkspace(tx, req.GroupName, workspaceId, groupTypeTag)
+	records, err := dao.FindByNameAndWorkspace(tx, workspaceId, req.GroupName, req.TypeTag)
 	if err != nil {
 		return nil, err
 	}

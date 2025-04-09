@@ -2,7 +2,6 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/service/group"
 )
 
@@ -13,14 +12,13 @@ type GroupController struct {
 func registerGroupRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 	groupController := GroupController{}
 
-	groupRoutes := router.Group("group")
-	groupRoutes.Use(loggedMiddleware, workspaceMiddleware)
-	{
-		groupRoutes.POST("list", groupController.list)
-		groupRoutes.POST("create", groupController.create)
-		groupRoutes.POST("update", groupController.rename)
-		groupRoutes.DELETE("delete", groupController.delete)
-	}
+	groupRoutes := router.Group("group").Use(loggedMiddleware, workspaceMiddleware)
+
+	groupRoutes.POST("list", groupController.list)
+	groupRoutes.POST("create", groupController.create)
+	groupRoutes.POST("update", groupController.rename)
+	groupRoutes.DELETE("delete", groupController.delete)
+
 }
 
 func (c *GroupController) list(ctx *gin.Context) {
@@ -58,13 +56,12 @@ func (c *GroupController) create(ctx *gin.Context) {
 
 // rename
 func (c *GroupController) rename(ctx *gin.Context) {
-	req := &group.UpdateAssetGroupReq{}
+	req := group.UpdateAssetGroupReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "rename")
-	groupTypeTag, _ := consts.GetGroupTypeTagFromBasic(req.TypeTag)
 	if err != nil {
 		return
 	}
-	if err := group.Rename(ctx, workspaceId, req.GroupCode, req.GroupName, groupTypeTag); err != nil {
+	if err := group.Rename(ctx, workspaceId, &req); err != nil {
 		c.AbortClientError(ctx, err.Error())
 		return
 	}

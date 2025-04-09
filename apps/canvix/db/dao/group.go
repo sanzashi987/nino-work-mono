@@ -7,9 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func FindByNameAndWorkspace(tx *gorm.DB, name string, workspace uint64, groupTypeTag string) ([]*model.GroupModel, error) {
+func FindByNameAndWorkspace(tx *gorm.DB, workspace uint64, name, typeTag string) ([]*model.GroupModel, error) {
 
-	orm := tx.Where("workspace = ? AND type_tag = ?", workspace, groupTypeTag)
+	orm := tx.Where("workspace = ? AND type_tag = ?", workspace, typeTag)
 	if name != "" {
 		orm = orm.Where("name = ?", name)
 	}
@@ -23,7 +23,7 @@ func FindByNameAndWorkspace(tx *gorm.DB, name string, workspace uint64, groupTyp
 var ErrorNameExisted = errors.New("error group name is exist")
 
 func Create(tx *gorm.DB, workspaceId uint64, name, typeTag string) (*model.GroupModel, error) {
-	records, err := FindByNameAndWorkspace(tx, name, workspaceId, typeTag)
+	records, err := FindByNameAndWorkspace(tx, workspaceId, name, typeTag)
 	if records != nil && err == nil {
 		if len(records) > 0 {
 			err = ErrorNameExisted
