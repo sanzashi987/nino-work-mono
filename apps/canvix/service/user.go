@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
+	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
 type UserService struct{}
@@ -11,8 +12,9 @@ type UserService struct{}
 var UserServiceImpl *UserService = &UserService{}
 
 func (serv UserService) ValidateUserWorkspace(ctx context.Context, userId uint64, workspaceCode string) bool {
-	userDao := dao.NewUserDao(ctx)
-	user, err := userDao.GetUserWorkspaces(userId)
+	tx := db.NewTx(ctx)
+
+	user, err := dao.GetUserWorkspaces(tx, userId)
 	if err != nil {
 		return false
 	}
@@ -26,7 +28,6 @@ func (serv UserService) ValidateUserWorkspace(ctx context.Context, userId uint64
 }
 
 func (serv UserService) UserOnBoard(ctx context.Context, userId uint64) {
-	userDao := dao.NewUserDao(ctx)
-	userDao.BeginTransaction()
-	
+	tx := db.NewTx(ctx).Begin()
+
 }

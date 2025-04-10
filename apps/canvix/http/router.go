@@ -56,7 +56,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 	loggedInMiddleware := middleware.CanvasUserLoggedIn(loginPageUrl)
 
 	root.Use(mergeRpcMiddleware)
-
+	registerCommonRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	registerDataSourceRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	registerProjectRoutes(root, loggedInMiddleware, workspaceMiddleware)
 	registerGroupRoutes(root, loggedInMiddleware, workspaceMiddleware)

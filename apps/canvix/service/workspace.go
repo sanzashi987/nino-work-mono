@@ -8,7 +8,7 @@ import (
 )
 
 type GetWorkspaceInfoReq struct {
-	WorkspaceCode string `json:"workspaceCode" binding:"required"`
+	WorkspaceCode string `json:"workspaceCode"`
 }
 
 type GroupInfo struct {
@@ -23,7 +23,12 @@ type GetWorkspaceInfoRes struct {
 }
 
 func GetWorkspaceInfo(ctx *gin.Context, req *GetWorkspaceInfoReq) ([]*GetWorkspaceInfoRes, error) {
-	workspaceId, _, err := consts.GetIdFromCode(req.WorkspaceCode)
+	var workspaceCode string = req.WorkspaceCode
+	if workspaceCode == "" {
+		
+	}
+
+	workspaceId, _, err := consts.GetIdFromCode(workspaceCode)
 	if err != nil {
 		return nil, err
 	}

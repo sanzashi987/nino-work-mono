@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sanzashi987/nino-work/apps/canvix/service"
 )
 
 type CommonController struct {
@@ -28,5 +29,17 @@ func (c *CommonController) getUserInfo(ctx *gin.Context) {
 }
 
 func (c *CommonController) GetWorkspaceInfo(ctx *gin.Context) {
+	req := service.GetWorkspaceInfoReq{}
 
+	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
+		c.AbortClientError(ctx, "get workspace info error: "+err.Error())
+		return
+	}
+
+	res, err := service.GetWorkspaceInfo(ctx, &req)
+	if err != nil {
+		c.AbortClientError(ctx, "get workspace info error: "+err.Error())
+		return
+	}
+	c.ResponseJson(ctx, res)
 }
