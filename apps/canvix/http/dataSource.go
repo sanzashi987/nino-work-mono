@@ -130,23 +130,23 @@ func (c *DataSourceController) delete(ctx *gin.Context) {
 // }
 
 func (c *DataSourceController) search(ctx *gin.Context) {
-	var req struct {
-		SourceTypes []string `json:"sourceType"`
-		Search      string   `json:"search"`
-	}
-	if workspaceId, err := c.BindRequestJson(ctx, &req, "search"); err != nil {
-		return
-	}
+	// var req struct {
+	// 	SourceTypes []string `json:"sourceType"`
+	// 	Search      string   `json:"search"`
+	// }
+	// if workspaceId, err := c.BindRequestJson(ctx, &req, "search"); err != nil {
+	// return
+	// }
 
 }
 
 func (c *DataSourceController) previewFile(ctx *gin.Context) {
-	var req struct {
-		SourceId string `json:"sourceId" binding:"required"`
-	}
-	if workspaceId, err := c.BindRequestJson(ctx, &req, "previewFile"); err != nil {
-		return
-	}
+	// var req struct {
+	// 	SourceId string `json:"sourceId" binding:"required"`
+	// }
+	// if workspaceId, err := c.BindRequestJson(ctx, &req, "previewFile"); err != nil {
+	// return
+	// }
 
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
+	"github.com/sanzashi987/nino-work/apps/canvix/service/group"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
@@ -208,7 +209,10 @@ func (serv *ProjectService) BatchMoveGroup(ctx context.Context, workspaceId uint
 	code := groupCode
 	tx := db.NewTx(ctx).Begin()
 
-	if newGroup, err := createGroup(tx, workspaceId, groupName, consts.PROJECT); err != nil {
+	if newGroup, err := group.CreateGroup(tx, workspaceId, &group.CreateAssetGroupReq{
+		GroupName: groupName,
+		TypeTag:   consts.PROJECT,
+	}); err != nil {
 		return err
 	} else if newGroup != nil {
 		code = newGroup.Code

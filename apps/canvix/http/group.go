@@ -18,7 +18,7 @@ func registerGroupRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 	groupRoutes.POST("create", groupController.create)
 	groupRoutes.POST("update", groupController.rename)
 	groupRoutes.DELETE("delete", groupController.delete)
-
+	groupRoutes.POST("move", groupController.move)
 }
 
 func (c *GroupController) list(ctx *gin.Context) {
@@ -83,7 +83,24 @@ func (c *GroupController) delete(ctx *gin.Context) {
 	c.SuccessVoid(ctx)
 }
 
-type MoveProjectReq struct {
-	group.DeleteAssetGroupReq
-	Ids []string `json:"fileIds" binding:"required"`
+func (c *GroupController) move(ctx *gin.Context) {
+	req := group.BatchMoveProjectGroupReq{}
+
+	workspaceId, err := c.BindRequestJson(ctx, &req, "move group")
+
+	if err != nil {
+		return
+	}
+
+	if req.GroupCode == "" && req.GroupName == "" {
+		c.AbortClientError(ctx, "move: groupCode or groupName is required")
+		return
+	}
+
+	if err := group.BatchMoveGroup(ctx, workspaceId, &req); err != nil {
+		c.AbortServerError(ctx, "move: "+err.Error())
+		return
+	}
+
+	c.SuccessVoid(ctx)
 }

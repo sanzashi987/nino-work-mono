@@ -72,7 +72,10 @@ func BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string
 	code := groupCode
 	tx := db.NewTx(ctx).Begin()
 
-	if newGroup, err := group.CreateGroup(tx, workspaceId, groupName, consts.DESIGN); err != nil {
+	if newGroup, err := group.CreateGroup(tx, workspaceId, &group.CreateAssetGroupReq{
+		GroupName: groupName,
+		TypeTag:   consts.DESIGN,
+	}); err != nil {
 		return err
 	} else if newGroup != nil {
 		code = newGroup.Code

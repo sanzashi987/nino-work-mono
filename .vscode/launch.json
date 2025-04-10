@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch user service",
+      "name": "user service",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -17,19 +17,7 @@
       "program": "apps/user/bootstrap.go",
     },
     {
-      "name": "Launch user development service",
-      "type": "go",
-      "request": "launch",
-      "mode": "exec",
-      "cwd": ".",
-      "args": [
-        "fresh",
-        "-c"
-      ],
-      "program": "apps/user/runner.conf",
-    },
-    {
-      "name": "Launch chat service",
+      "name": "chat service",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -41,7 +29,7 @@
       "program": "apps/chat/bootstrap.go",
     },
     {
-      "name": "Launch Canvas service",
+      "name": "canvix service",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -50,10 +38,10 @@
         "go",
         "run"
       ],
-      "program": "apps/canvas-pro/bootstrap.go",
+      "program": "apps/canvix/bootstrap.go",
     },
     {
-      "name": "Launch storage service",
+      "name": "storage service",
       "type": "go",
       "request": "launch",
       "mode": "auto",

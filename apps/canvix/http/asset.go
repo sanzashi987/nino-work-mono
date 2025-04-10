@@ -21,7 +21,6 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 
 	assetGroup.POST("selectMyAssets", assetController.list)
 	assetGroup.POST("updateMyAssetsName", assetController.update)
-	assetGroup.POST("updateAssetsGroup", assetController.moveGroup)
 	assetGroup.DELETE("deleteAssets", assetController.delete)
 	assetGroup.POST("upload", assetController.upload)
 	assetGroup.POST("detail", assetController.read)
@@ -145,30 +144,4 @@ func (c *AssetController) replace(ctx *gin.Context) {
 func (c *AssetController) download(ctx *gin.Context) {
 }
 func (c *AssetController) _import(ctx *gin.Context) {
-}
-
-func (c *AssetController) moveGroup(ctx *gin.Context) {
-
-	var req struct {
-		FileIds   []string `json:"fileIds" binding:"required"`
-		GroupCode string   `json:"groupCode"`
-		GroupName string   `json:"groupName"`
-	}
-	if workspaceId, err := c.BindRequestJson(ctx, &req, "move"); err != nil {
-		return
-	} else {
-
-		if req.GroupCode == "" && req.GroupName == "" {
-			c.AbortClientError(ctx, "move: groupCode or groupName is required")
-			return
-		}
-
-		if err := service.BatchMoveGroup(ctx, workspaceId, req.FileIds, req.GroupName, req.GroupCode); err != nil {
-			c.AbortServerError(ctx, "move: "+err.Error())
-			return
-		}
-
-		c.SuccessVoid(ctx)
-	}
-
 }

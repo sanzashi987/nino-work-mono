@@ -2,10 +2,8 @@ package group
 
 import (
 	"context"
-	"errors"
 	"sort"
 
-	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
@@ -31,21 +29,11 @@ func (p ListGroupOutputs) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
-var typeTagToGroupCountHandler = map[string]any{
-	consts.PROJECT:    model.ProjectModel{},
-	consts.BLOCK:      model.BaseModel{},
-	consts.DESIGN:     model.AssetModel{},
-	consts.FONT:       model.AssetModel{},
-	consts.COMPONENT:  model.AssetModel{},
-	consts.DATASOURCE: model.DataSourceModel{},
-}
-
 type GroupCount struct {
 	Id    uint64 `gorm:"column:id"`
 	Count uint64 `gorm:"column:count"`
 }
 
-var errTagNotSupported = errors.New("Not find a corresponding interface related to the give type tag")
 
 type ListGroupReq struct {
 	GroupCode string `json:"code"`

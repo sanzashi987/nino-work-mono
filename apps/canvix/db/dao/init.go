@@ -9,8 +9,8 @@ type AnyDao[T any] struct {
 	db.BaseDao[T]
 }
 
-func ConnectDB() {
-	instance := db.ConnectDB()
+func ConnectDB(name ...string) {
+	instance := db.ConnectDB(name...)
 	instance.AutoMigrate(
 		&model.ThemeModel{},
 		&model.WorkspaceModel{},

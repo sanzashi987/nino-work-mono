@@ -26,6 +26,15 @@ And you should be able to use following command to generate pb.go & micro.pb.go
 protoc --micro_out=. --go_out=. -I=./proto
 ```
 
+### Install `delve` (golang debugger)
+```bash
+go env -w GOARCH=amd64
+go install github.com/go-delve/delve/cmd/dlv@latest
+```
+Go to `GOPATH` and add the `dlv` into system path
+
+
+
 #### Install `fresh` (golang hot reload dev server)
 Run the config locates at the `apps` directories
 ```bash

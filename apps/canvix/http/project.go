@@ -26,7 +26,6 @@ func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceM
 	projectRoutes.POST("downloadScreen", projectController.export)
 	projectRoutes.POST("downloadApp", projectController.compile)
 	projectRoutes.POST("importScreen", projectController._import)
-	projectRoutes.POST("move", projectController.moveGroup)
 }
 
 type GetProjectListRequest struct {
@@ -115,29 +114,6 @@ func (c *ProjectController) update(ctx *gin.Context) {
 
 	if err := service.ProjectServiceImpl.Update(ctx, param.Code, param.Name, param.Config, param.Thumbnail, param.GroupCode); err != nil {
 		c.AbortServerError(ctx, "project update error: "+err.Error())
-		return
-	}
-
-	c.SuccessVoid(ctx)
-}
-
-type BatchMoveProjectGroupRequest struct {
-	GroupName string   `json:"groupName"`
-	GroupCode string   `json:"groupCode"`
-	Ids       []string `json:"ids" binding:"required"`
-}
-
-func (c *ProjectController) moveGroup(ctx *gin.Context) {
-	req := BatchMoveProjectGroupRequest{}
-
-	workspaceId, err := c.BindRequestJson(ctx, &req, "project move group")
-
-	if err != nil {
-		return
-	}
-
-	if err := service.ProjectServiceImpl.BatchMoveGroup(ctx, workspaceId, req.Ids, req.GroupName, req.GroupCode); err != nil {
-		c.AbortClientError(ctx, "move: "+err.Error())
 		return
 	}
 
