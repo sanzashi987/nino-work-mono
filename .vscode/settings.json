@@ -6,7 +6,7 @@
   "eslint.options": {
     "overrideConfigFile": "./frontend/.eslintrc"
   },
-  "eslint.run": "onType",
+  "eslint.run": "onSave",
   "[javascriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },

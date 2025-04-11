@@ -38,7 +38,7 @@ func (c *CommonController) GetWorkspaceInfo(ctx *gin.Context) {
 
 	res, err := service.GetWorkspaceInfo(ctx, &req)
 	if err != nil {
-		c.AbortClientError(ctx, "get workspace info error: "+err.Error())
+		c.AbortServerError(ctx, "get workspace info error: "+err.Error())
 		return
 	}
 	c.ResponseJson(ctx, res)

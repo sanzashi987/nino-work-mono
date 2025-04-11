@@ -6,7 +6,6 @@ import (
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
-	"github.com/sanzashi987/nino-work/apps/canvix/service/group"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 	"github.com/sanzashi987/nino-work/proto/storage"
@@ -66,34 +65,6 @@ func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, pa
 
 	return recordTotal, res, nil
 
-}
-
-func BatchMoveGroup(ctx context.Context, workspaceId uint64, assetCodes []string, groupName, groupCode string) error {
-	code := groupCode
-	tx := db.NewTx(ctx).Begin()
-
-	if newGroup, err := group.CreateGroup(tx, workspaceId, &group.CreateAssetGroupReq{
-		GroupName: groupName,
-		TypeTag:   consts.DESIGN,
-	}); err != nil {
-		return err
-	} else if newGroup != nil {
-		code = newGroup.Code
-	}
-
-	groupId, projectIds, err := commonMoveGroup(assetCodes, code)
-	if err != nil {
-		return err
-	}
-
-	if dao.AssetBatchMoveGroup(tx, groupId, workspaceId, projectIds); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	tx.Commit()
-
-	return nil
 }
 
 const chunkSize = 1024 * 1024 / 2

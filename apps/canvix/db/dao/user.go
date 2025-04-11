@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetUserWorkspaces(tx *gorm.DB, userId uint64) (*model.CanvasUserModel, error) {
-	canvasUser := model.CanvasUserModel{UnifiedUserId: userId}
+func GetUserWorkspaces(tx *gorm.DB, userId uint64) (*model.CanvixUserModel, error) {
+	canvasUser := model.CanvixUserModel{UnifiedUserId: userId}
 	if err := tx.Model(&canvasUser).Association("Workspaces").Find(&canvasUser.Workspaces); err != nil {
 		return nil, err
 	}
@@ -14,6 +14,6 @@ func GetUserWorkspaces(tx *gorm.DB, userId uint64) (*model.CanvasUserModel, erro
 }
 
 func CreateUser(tx *gorm.DB, userId uint64) error {
-	canvasUser := model.CanvasUserModel{UnifiedUserId: userId}
+	canvasUser := model.CanvixUserModel{UnifiedUserId: userId}
 	return tx.Create(&canvasUser).Error
 }

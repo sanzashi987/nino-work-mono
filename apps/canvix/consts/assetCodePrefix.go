@@ -132,3 +132,15 @@ func GetIdFromCode(canvasCode string) (id uint64, typeTag string, err error) {
 func GetCodeFromId(typeTag string, id uint64) string {
 	return fmt.Sprintf("%s%s%s", PREFIX, typeTag, Encode(id))
 }
+
+func CodesIntoIds(codes []string) ([]uint64, error) {
+	ids := make([]uint64, len(codes))
+	for i, code := range codes {
+		id, _, err := GetIdFromCode(code)
+		if err != nil {
+			return nil, err
+		}
+		ids[i] = id
+	}
+	return ids, nil
+}

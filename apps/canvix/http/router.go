@@ -20,8 +20,8 @@ func getWorkspaceCode(ctx *gin.Context) (string, uint64) {
 }
 
 func getCurrentUser(ctx *gin.Context) uint64 {
-	userId, _ := ctx.Get(controller.UserID)
-	return userId.(uint64)
+	userId := ctx.GetUint64(controller.UserID)
+	return userId
 }
 
 func getUploadRpcService(ctx *gin.Context) storage.StorageService {
@@ -33,7 +33,7 @@ func getUploadRpcService(ctx *gin.Context) storage.StorageService {
 func workspaceMiddleware(ctx *gin.Context) {
 	userId := getCurrentUser(ctx)
 	workspaceCode, _ := getWorkspaceCode(ctx)
-	if service.UserServiceImpl.ValidateUserWorkspace(ctx, userId, workspaceCode) {
+	if service.ValidateUserWorkspace(ctx, userId, workspaceCode) {
 		ctx.Next()
 	} else {
 		ctx.AbortWithStatusJSON(http.StatusOK, gin.H{

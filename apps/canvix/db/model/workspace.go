@@ -6,7 +6,7 @@ type WorkspaceModel struct {
 	Owner      uint64
 	Capacity   uint64
 	Permission uint64
-	Members    []CanvasUserModel `gorm:"many2many:canvas_workspace_user;foreignKey:Id;joinForeginKey:WorkspaceId;joinReferences:CanvasUserId;References:Id"`
+	Members    []CanvixUserModel `gorm:"many2many:canvas_workspace_user;foreignKey:Id;joinForeginKey:WorkspaceId;joinReferences:CanvasUserId;References:Id"`
 }
 
 func (s WorkspaceModel) TableName() string {

@@ -13,14 +13,9 @@ func commonMoveGroup(codes []string, groupCode string) (uint64, []uint64, error)
 		return 0, nil, err
 	}
 
-	ids := []uint64{}
-	for _, code := range codes {
-		id, _, errInside := consts.GetIdFromCode(code)
-		if errInside != nil {
-			err = errInside
-			return 0, nil, err
-		}
-		ids = append(ids, id)
+	ids, err := consts.CodesIntoIds(codes)
+	if err != nil {
+		return 0, nil, err
 	}
 	return groupId, ids, nil
 }

@@ -1,9 +1,14 @@
 package service
 
 import (
+	"errors"
+	"sort"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
+	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
+	"github.com/sanzashi987/nino-work/pkg/controller"
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
@@ -22,18 +27,34 @@ type GetWorkspaceInfoRes struct {
 	Groups []*GroupInfo `json:"groups"`
 }
 
+var userHasNoWorkspace = errors.New("user does not belong to any workspace")
+
 func GetWorkspaceInfo(ctx *gin.Context, req *GetWorkspaceInfoReq) ([]*GetWorkspaceInfoRes, error) {
-	var workspaceCode string = req.WorkspaceCode
+	workspaceCode := req.WorkspaceCode
+	tx := db.NewTx(ctx)
+
 	if workspaceCode == "" {
-		
+		userId := ctx.GetUint64(controller.UserID)
+		userModel, err := dao.GetUserWorkspaces(tx, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(userModel.Workspaces) == 0 {
+			return nil, userHasNoWorkspace
+		}
+
+		sort.SliceStable(userModel.Workspaces, func(i, j int) bool {
+			return userModel.Workspaces[i].Id < userModel.Workspaces[j].Id
+		})
+
+		workspaceCode = userModel.Workspaces[0].Code
 	}
 
 	workspaceId, _, err := consts.GetIdFromCode(workspaceCode)
 	if err != nil {
 		return nil, err
 	}
-
-	tx := db.NewTx(ctx)
 
 	allGroups := []*model.GroupModel{}
 

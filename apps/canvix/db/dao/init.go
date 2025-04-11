@@ -15,7 +15,7 @@ func ConnectDB(name ...string) {
 		&model.ThemeModel{},
 		&model.WorkspaceModel{},
 		&model.AssetModel{},
-		&model.CanvasUserModel{},
+		&model.CanvixUserModel{},
 		&model.ProjectModel{},
 		&model.GroupModel{},
 		&model.TemplateModel{},
