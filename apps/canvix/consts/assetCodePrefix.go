@@ -20,6 +20,11 @@ const (
 	GROUP         = "R"
 )
 
+type CanvixCodeEnum struct {
+	Code string `json:"code"`
+	Name string `json:"name"`
+}
+
 var TagToName = map[string]string{
 	PROJECT:    "project",
 	BLOCK:      "block",

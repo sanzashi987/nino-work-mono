@@ -12,33 +12,35 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
-type GetWorkspaceInfoReq struct {
-	WorkspaceCode string `json:"workspaceCode"`
+type GetConsolenfoReq struct {
+	WorkspaceCode string `uri:"workspace_code"`
 }
 
 type GroupInfo struct {
-	Name string `json:"name"`
-	Id   uint64 `json:"id"`
+	consts.CanvixCodeEnum
+	Type string `json:"type"`
 }
 
-type GetWorkspaceInfoRes struct {
-	Name   string       `json:"name"`
-	Type   string       `json:"type"`
-	Groups []*GroupInfo `json:"groups"`
+type WorkspaceInfo = consts.CanvixCodeEnum
+
+type GetConsoleInfoRes struct {
+	consts.CanvixCodeEnum
+	Groups     []*GroupInfo     `json:"groups"`
+	Workspaces []*WorkspaceInfo `json:"workspaces"`
 }
 
 var userHasNoWorkspace = errors.New("user does not belong to any workspace")
 
-func GetWorkspaceInfo(ctx *gin.Context, req *GetWorkspaceInfoReq) ([]*GetWorkspaceInfoRes, error) {
+func GetConsoleInfo(ctx *gin.Context, req *GetConsolenfoReq) (*GetConsoleInfoRes, error) {
 	workspaceCode := req.WorkspaceCode
 	tx := db.NewTx(ctx)
+	userId := ctx.GetUint64(controller.UserID)
+	userModel, err := dao.GetUserWorkspaces(tx, userId)
+	if err != nil {
+		return nil, err
+	}
 
 	if workspaceCode == "" {
-		userId := ctx.GetUint64(controller.UserID)
-		userModel, err := dao.GetUserWorkspaces(tx, userId)
-		if err != nil {
-			return nil, err
-		}
 
 		if len(userModel.Workspaces) == 0 {
 			return nil, userHasNoWorkspace
@@ -49,6 +51,18 @@ func GetWorkspaceInfo(ctx *gin.Context, req *GetWorkspaceInfoReq) ([]*GetWorkspa
 		})
 
 		workspaceCode = userModel.Workspaces[0].Code
+	}
+
+	var activeWorkspace *model.WorkspaceModel
+	for _, w := range userModel.Workspaces {
+		if w.Code == workspaceCode {
+			activeWorkspace = &w
+			break
+		}
+	}
+
+	if activeWorkspace == nil {
+		return nil, userHasNoWorkspace
 	}
 
 	workspaceId, _, err := consts.GetIdFromCode(workspaceCode)
@@ -62,27 +76,26 @@ func GetWorkspaceInfo(ctx *gin.Context, req *GetWorkspaceInfoReq) ([]*GetWorkspa
 		return nil, err
 	}
 
-	resMap := map[string]*GetWorkspaceInfoRes{}
-
-	for _, group := range allGroups {
-		if _, ok := resMap[group.TypeTag]; !ok {
-			resMap[group.TypeTag] = &GetWorkspaceInfoRes{
-				Name:   group.Name,
-				Type:   consts.TagToName[group.TypeTag],
-				Groups: []*GroupInfo{},
-			}
-		}
-
-		resMap[group.TypeTag].Groups = append(resMap[group.TypeTag].Groups, &GroupInfo{
-			Name: group.Name,
-			Id:   group.Id,
+	workspaces := []*WorkspaceInfo{}
+	for _, workspace := range userModel.Workspaces {
+		workspaces = append(workspaces, &WorkspaceInfo{
+			Name: workspace.Name,
+			Code: workspace.Code,
 		})
 	}
 
-	res := []*GetWorkspaceInfoRes{}
-	for _, group := range resMap {
-		res = append(res, group)
+	groups := []*GroupInfo{}
+	for _, group := range allGroups {
+		g := &GroupInfo{Type: group.TypeTag}
+		g.Name, g.Code = group.Name, group.Code
+		groups = append(groups, g)
 	}
 
-	return res, nil
+	res := GetConsoleInfoRes{
+		Groups:     groups,
+		Workspaces: workspaces,
+	}
+	res.Name, res.Code = activeWorkspace.Name, activeWorkspace.Code
+
+	return &res, nil
 }

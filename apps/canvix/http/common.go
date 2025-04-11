@@ -16,7 +16,7 @@ func registerCommonRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMi
 	authed := nonAuthed.Use(loggedMiddleware)
 
 	authed.GET("user", commonController.getUserInfo)
-	authed.GET("workspace", commonController.GetWorkspaceInfo)
+	authed.GET("console", commonController.GetConsoleInfo)
 
 }
 
@@ -28,15 +28,15 @@ func (c *CommonController) getUserInfo(ctx *gin.Context) {
 
 }
 
-func (c *CommonController) GetWorkspaceInfo(ctx *gin.Context) {
-	req := service.GetWorkspaceInfoReq{}
+func (c *CommonController) GetConsoleInfo(ctx *gin.Context) {
+	req := service.GetConsolenfoReq{}
 
-	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		c.AbortClientError(ctx, "get workspace info error: "+err.Error())
 		return
 	}
 
-	res, err := service.GetWorkspaceInfo(ctx, &req)
+	res, err := service.GetConsoleInfo(ctx, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "get workspace info error: "+err.Error())
 		return

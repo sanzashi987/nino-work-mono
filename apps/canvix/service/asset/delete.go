@@ -1,4 +1,4 @@
-package project
+package asset
 
 import (
 	"context"
@@ -14,9 +14,10 @@ func Delete(ctx context.Context, workspaceId uint64, codes []string) error {
 	if err != nil {
 		return err
 	}
+
 	tx := db.NewTx(ctx).Begin()
 
-	if err := tx.Model(&model.ProjectModel{}).Where("workspace = ? AND id in ?", workspaceId, ids).Delete(&model.ProjectModel{}).Error; err != nil {
+	if err := tx.Model(&model.AssetModel{}).Where("workspace = ? AND id in ?", workspaceId, ids).Delete(&model.ProjectModel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

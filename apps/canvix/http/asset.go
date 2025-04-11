@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/service"
+	"github.com/sanzashi987/nino-work/apps/canvix/service/asset"
 	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
@@ -21,7 +21,7 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 
 	assetGroup.POST("selectMyAssets", assetController.list)
 	assetGroup.POST("updateMyAssetsName", assetController.update)
-	assetGroup.DELETE("deleteAssets", assetController.delete)
+	assetGroup.DELETE("delete", assetController.delete)
 	assetGroup.POST("upload", assetController.upload)
 	assetGroup.POST("detail", assetController.read)
 	assetGroup.POST("replace", assetController.replace)
@@ -31,18 +31,18 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 }
 
 type ListAssetResponse struct {
-	Data []*service.ListAssetRes `json:"data"`
+	Data []*asset.ListAssetRes `json:"data"`
 	shared.PaginationResponse
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
-	req := service.ListAssetReq{}
+	req := asset.ListAssetReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "list asset")
 	if err != nil {
 		return
 	}
 
-	recordTotal, res, err := service.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
+	recordTotal, res, err := asset.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "list: "+err.Error())
 		return
@@ -76,7 +76,7 @@ func (c *AssetController) read(ctx *gin.Context) {
 
 	uploadRpc := getUploadRpcService(ctx)
 
-	res, err := service.GetAssetDetail(ctx, uploadRpc, workspaceId, query.FileId)
+	res, err := asset.GetAssetDetail(ctx, uploadRpc, workspaceId, query.FileId)
 	if err != nil {
 		c.AbortServerError(ctx, "read: "+err.Error())
 		return
@@ -87,13 +87,13 @@ func (c *AssetController) read(ctx *gin.Context) {
 }
 
 func (c *AssetController) update(ctx *gin.Context) {
-	req := service.UpdateAssetReq{}
+	req := asset.UpdateAssetReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "asset update")
 	if err != nil {
 		return
 	}
 
-	if err := service.UpdateName(ctx, workspaceId, &req); err != nil {
+	if err := asset.UpdateName(ctx, workspaceId, &req); err != nil {
 		c.AbortServerError(ctx, "update: "+err.Error())
 		return
 	}
@@ -103,14 +103,14 @@ func (c *AssetController) update(ctx *gin.Context) {
 
 func (c *AssetController) delete(ctx *gin.Context) {
 	var req struct {
-		Data []string `json:"data" binding:"required"`
+		Ids []string `json:"ids" binding:"required"`
 	}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "asset delete")
 	if err != nil {
 		return
 	}
 
-	if err := service.DeleteAssets(ctx, workspaceId, req.Data); err != nil {
+	if err := asset.Delete(ctx, workspaceId, req.Ids); err != nil {
 		c.AbortServerError(ctx, "delete: "+err.Error())
 		return
 	}

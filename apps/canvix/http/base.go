@@ -11,7 +11,7 @@ type CanvixController struct {
 }
 
 /** Also return the workspaceId */
-func (c CanvixController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
+func (c *CanvixController) BindRequestJson(ctx *gin.Context, reqBody any, funcName string) (uint64, error) {
 	if err := ctx.ShouldBindJSON(reqBody); err != nil {
 		c.AbortClientError(ctx, "[http] "+funcName+" error: "+err.Error())
 		return 0, err
