@@ -74,7 +74,7 @@ export async function autoParseResponse(response: Response, parser?: ParserOptio
   return response.json();
 }
 
-export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<Res, Out>) => {
+export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<Res, Out>, mock?: Res) => {
   const { method = 'GET', url, onError = Promise.reject, headers = defaultHeaders, onResponse = defaultOnResponse, timeout } = options;
   const pathMetas = url.split('/').map((param) => {
     const meta: PathMeta = { dynamic: false, optional: false, name: param };
@@ -171,5 +171,10 @@ export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<
 
     return onResponse(data).catch(onError);
   };
+
+  if (mock) {
+    return (() => Promise.resolve(mock)) as unknown as Requester;
+  }
+
   return requester;
 };

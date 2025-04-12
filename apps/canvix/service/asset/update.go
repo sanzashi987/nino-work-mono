@@ -13,8 +13,6 @@ type UpdateAssetReq struct {
 	FileName string `json:"fileName" binding:"required"`
 }
 
-const chunkSize = 1024 * 1024 / 2
-
 func UpdateName(ctx context.Context, workspaceId uint64, req *UpdateAssetReq) error {
 	if err := consts.IsLegalName(req.FileName); err != nil {
 		return err

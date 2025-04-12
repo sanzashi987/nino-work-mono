@@ -84,6 +84,11 @@ func GetConsoleInfo(ctx *gin.Context, req *GetConsolenfoReq) (*GetConsoleInfoRes
 		})
 	}
 
+	// sort allgroups by its update time
+	sort.SliceStable(allGroups, func(i, j int) bool {
+		return allGroups[i].UpdateTime.Before(allGroups[j].UpdateTime)
+	})
+
 	groups := []*GroupInfo{}
 	for _, group := range allGroups {
 		g := &GroupInfo{Type: group.TypeTag}

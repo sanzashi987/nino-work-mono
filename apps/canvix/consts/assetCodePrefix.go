@@ -34,6 +34,15 @@ var TagToName = map[string]string{
 	DATASOURCE: "datasource",
 }
 
+var CategorySupportsGroup = []string{
+	PROJECT,
+	BLOCK,
+	DESIGN,
+	FONT,
+	COMPONENT,
+	DATASOURCE,
+}
+
 var supportedTags = []string{
 	PROJECT,
 	BLOCK,
@@ -44,43 +53,18 @@ var supportedTags = []string{
 	// STATIC_SOURCE,
 }
 
-// may useful in the future
-var supportedGroupTags = []string{}
-
 const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const length = len(charset)
 
 var runeToIndex = map[rune]int{}
 var supportedTagMap = map[string]int{}
-var basicToGroup = map[string]string{}
-var groupToBasic = map[string]string{}
-
-const groupStandard = rune('R')
-
-func initGroupTypeTagFromBasic(typeTag string, index int) string {
-	charList := []rune(typeTag)
-	charList[0] += rune(index) + groupStandard
-	groupTypeTag := string(charList)
-	basicToGroup[typeTag] = groupTypeTag
-	groupToBasic[groupTypeTag] = typeTag
-	return groupTypeTag
-}
-
-func IsGroup(tag string) bool {
-	_, exist := groupToBasic[tag]
-	return exist
-}
 
 func init() {
 	for i, typeTag := range charset {
 		runeToIndex[typeTag] = i
 	}
-	basicTagListLength := len(supportedTags)
 	for i, typeTag := range supportedTags {
 		supportedTagMap[typeTag] = i
-		groupTypeTag := initGroupTypeTagFromBasic(typeTag, i)
-		supportedTagMap[groupTypeTag] = basicTagListLength + i
-		supportedGroupTags = append(supportedGroupTags, groupTypeTag)
 	}
 }
 
