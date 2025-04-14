@@ -13,7 +13,7 @@ type ProjectController struct {
 func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 	projectController := ProjectController{}
 
-	projectRoutes := router.Group("screen-operation").Use(loggedMiddleware, workspaceMiddleware)
+	projectRoutes := router.Group("project").Use(loggedMiddleware, workspaceMiddleware)
 
 	projectRoutes.POST("create", projectController.create)
 	projectRoutes.POST("createByTemplate", projectController.create)
@@ -82,7 +82,7 @@ func (c *ProjectController) read(ctx *gin.Context) {
 		c.AbortClientError(ctx, "project read error: "+err.Error())
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
+	workspaceId := c.MustGetWorkspaceId(ctx)
 
 	projectDetail, err := project.GetInfoById(ctx, workspaceId, query.Id)
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *ProjectController) update(ctx *gin.Context) {
 		c.AbortClientError(ctx, "project update error: "+err.Error())
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
+	workspaceId := c.MustGetWorkspaceId(ctx)
 
 	if err := project.Update(ctx, workspaceId, &req); err != nil {
 		c.AbortServerError(ctx, "project update error: "+err.Error())

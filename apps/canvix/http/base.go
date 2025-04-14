@@ -16,7 +16,12 @@ func (c *CanvixController) BindRequestJson(ctx *gin.Context, reqBody any, funcNa
 		c.AbortClientError(ctx, "[http] "+funcName+" error: "+err.Error())
 		return 0, err
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
+	workspaceId := c.MustGetWorkspaceId(ctx)
 
 	return workspaceId, nil
+}
+
+func (c *CanvixController) MustGetWorkspaceId(ctx *gin.Context) uint64 {
+	workspaceId := ctx.MustGet(WORKSPACE_ID).(uint64)
+	return workspaceId
 }

@@ -1,9 +1,7 @@
 import { Enum } from '@nino-work/shared';
 import { FormLabel, openModal, OpenModalContext } from '@nino-work/ui-components';
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  Box, Button, MenuItem, Paper, Select, Stack
-} from '@mui/material';
+import { Box, Button, MenuItem, Paper, Select, Stack } from '@mui/material';
 import { bindRoles, getUserRoles, listRolesAll } from '@/api';
 
 type UserDetailProps = {

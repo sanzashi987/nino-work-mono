@@ -72,7 +72,7 @@ func (c *AssetController) read(ctx *gin.Context) {
 		c.AbortClientError(ctx, "read: "+err.Error())
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
+	workspaceId := c.MustGetWorkspaceId(ctx)
 
 	uploadRpc := getUploadRpcService(ctx)
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -42,7 +42,7 @@ const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cance
       <LoadingGroup>
         {onOk
           ? (
-            <RequestButton {...{ variant: 'outlined', type: 'submit', children: 'Ok', ...okButtonProps }} onClick={onSubmit} />
+            <RequestButton {...{ variant: 'contained', type: 'submit', children: 'Ok', ...okButtonProps }} onClick={onSubmit} />
           ) : null}
         <Box mr={1}>
           <RequestButton {...{ variant: 'outlined', children: 'Cancel', ...cancelButtonProps }} onClick={close} />
@@ -59,20 +59,34 @@ const Modal: React.FC<ModalProps> = ({
   ...dialogProps
 }) => {
   const defaultActions = action ?? <DefaultAction onOk={onOk} okButtonProps={okButtonProps} cancelButtonProps={cancelButtonProps} />;
+  const [open, setOpen] = useState(true);
   const defaultForm = useForm();
   const { form, content: contentWithForm } = useMemo(() => {
+    if (typeof content === 'string') {
+      return { form: defaultForm, content };
+    }
+
     if (React.isValidElement(content) && 'form' in (content as any).props) {
       return { form: (content.props as any).form as UseFormReturn, content };
     }
     return { form: defaultForm, content: React.cloneElement(content as any, { form: defaultForm }) };
   }, [content, defaultForm]);
 
-  const ctx = useMemo(() => ({ close: onClose, form }), []);
+  const ctx = useMemo(() => ({
+    close: async () => { setOpen(false); },
+    form
+  }), []);
+
+  const afterCloseMerged = useCallback(() => {
+    afterClose?.();
+    onClose();
+  }, [afterClose, onClose]);
+
   return (
     <OpenModalContext.Provider value={ctx}>
-      <Dialog maxWidth="sm" fullWidth TransitionProps={{ onExited: afterClose }} {...dialogProps} open>
+      <Dialog maxWidth="sm" fullWidth TransitionProps={{ onExited: afterCloseMerged }} {...dialogProps} open={open}>
         {title && <DialogTitle>{title}</DialogTitle>}
-        <DialogContent sx={{ px: 2, pb: 0 }} {...contentProps}>
+        <DialogContent sx={{ px: 3, pb: 0 }} {...contentProps}>
           {contentWithForm}
         </DialogContent>
         {action === false ? null
@@ -96,14 +110,17 @@ const openModal = (props:Omit<ModalProps, 'onClose'>) => {
 
   const root = ReactDOM.createRoot(modalRoot);
 
+  const { promise, resolve } = Promise.withResolvers<void>();
+
   const handleClose = async () => {
     root.unmount();
     document.body.removeChild(modalRoot);
+    resolve();
   };
 
   root.render(<Modal {...props} onClose={handleClose} />);
 
-  return { close: handleClose };
+  return { close: handleClose, isClose: promise };
 };
 
 type OpenSimpleFormProps<FormData> = {

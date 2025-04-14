@@ -13,10 +13,13 @@ import (
 
 const RPCKEY = "RPCCLIENTS"
 
-func getWorkspaceCode(ctx *gin.Context) (string, uint64) {
-	workspaceCode := ctx.GetHeader("Projectcode")
-	workspaceId, _, _ := consts.GetIdFromCode(workspaceCode)
-	return workspaceCode, workspaceId
+const WORKSPACE_ID = "workspaceId"
+const WORKSPACE_CODE = "workspaceId"
+
+func getWorkspaceCode(ctx *gin.Context) (string, uint64, error) {
+	workspaceCode := ctx.GetHeader("workspace")
+	workspaceId, _, err := consts.GetIdFromCode(workspaceCode)
+	return workspaceCode, workspaceId, err
 }
 
 func getCurrentUser(ctx *gin.Context) uint64 {
@@ -32,8 +35,18 @@ func getUploadRpcService(ctx *gin.Context) storage.StorageService {
 
 func workspaceMiddleware(ctx *gin.Context) {
 	userId := getCurrentUser(ctx)
-	workspaceCode, _ := getWorkspaceCode(ctx)
+	workspaceCode, workspaceId, err := getWorkspaceCode(ctx)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  "Fail to parse workspace code",
+			"data": nil,
+		})
+		return
+	}
 	if service.ValidateUserWorkspace(ctx, userId, workspaceCode) {
+		ctx.Set(WORKSPACE_CODE, workspaceCode)
+		ctx.Set(WORKSPACE_ID, workspaceId)
 		ctx.Next()
 	} else {
 		ctx.AbortWithStatusJSON(http.StatusOK, gin.H{

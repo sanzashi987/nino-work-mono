@@ -22,7 +22,7 @@ func registerThemeRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 }
 
 func (c *ThemeController) list(ctx *gin.Context) {
-	_, workspaceId := getWorkspaceCode(ctx)
+	workspaceId := c.MustGetWorkspaceId(ctx)
 	res, err := service.GetThemes(ctx, workspaceId)
 	if err != nil {
 		c.AbortServerError(ctx, "theme list error: "+err.Error())

@@ -73,7 +73,8 @@ func (c *DataSourceController) read(ctx *gin.Context) {
 		c.AbortClientError(ctx, "data read error: "+err.Error())
 		return
 	}
-	_, workspaceId := getWorkspaceCode(ctx)
+
+	workspaceId := c.MustGetWorkspaceId(ctx)
 
 	dataSource, err := dataSource.GetDataSourceById(ctx, workspaceId, query.SourceId)
 	if err != nil {
