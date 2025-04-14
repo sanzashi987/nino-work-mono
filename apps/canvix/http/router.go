@@ -14,7 +14,7 @@ import (
 const RPCKEY = "RPCCLIENTS"
 
 const WORKSPACE_ID = "workspaceId"
-const WORKSPACE_CODE = "workspaceId"
+const WORKSPACE_CODE = "workspaceCode"
 
 func getWorkspaceCode(ctx *gin.Context) (string, uint64, error) {
 	workspaceCode := ctx.GetHeader("workspace")
