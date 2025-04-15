@@ -10,7 +10,8 @@ type ProjectDetail struct {
 }
 
 type ProjectInfo struct {
+	Code      string `json:"code"`
 	Name      string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
-	shared.DBTime
+	shared.DBTimestamp
 }

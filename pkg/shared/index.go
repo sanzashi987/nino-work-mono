@@ -16,6 +16,11 @@ type DBTime struct {
 	UpdateTime string `json:"update_time"`
 }
 
+type DBTimestamp struct {
+	CreateTime int64 `json:"create_time"`
+	UpdateTime int64 `json:"update_time"`
+}
+
 type EnumMeta struct {
 	Name  string `json:"name"`
 	Value any    `json:"value"`

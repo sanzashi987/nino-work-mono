@@ -2,11 +2,13 @@
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded } from '@mui/icons-material';
 import {
-  ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded
-} from '@mui/icons-material';
-import {
-  Stack, IconButton, Typography, Breadcrumbs, Link,
+  Stack,
+  IconButton,
+  Typography,
+  Breadcrumbs,
+  Link,
   Table,
   TableRow,
   TableBody,
@@ -27,7 +29,13 @@ import { Empty, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-comp
 import { filesize } from 'filesize';
 import { DATE_TIME_FORMAT } from '@nino-work/shared';
 import {
-  BucketInfo, createDir, deleteFile, DirInfo, DirResponse, getBucketInfo, listBucketDir,
+  BucketInfo,
+  createDir,
+  deleteFile,
+  DirInfo,
+  DirResponse,
+  getBucketInfo,
+  listBucketDir,
   uploadFiles
 } from '@/api';
 

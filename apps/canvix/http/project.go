@@ -31,8 +31,8 @@ func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceM
 type GetProjectListRequest struct {
 	shared.PaginationRequest
 	// Workspace string
-	Name  *string
-	Group *string
+	Name  *string `json:"name"`
+	Group *string `json:"group"`
 }
 
 func (c *ProjectController) list(ctx *gin.Context) {

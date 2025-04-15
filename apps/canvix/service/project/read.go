@@ -23,7 +23,7 @@ func GetInfoById(ctx context.Context, workspaceId uint64, code string) (*Project
 	return &result, nil
 }
 
-func List(ctx context.Context, workspaceId uint64, page, size int, name, group *string) ([]ProjectInfo, error) {
+func List(ctx context.Context, workspaceId uint64, page, size int, name, group *string) ([]*ProjectInfo, error) {
 	tx := db.NewTx(ctx)
 
 	var groupId *uint64
@@ -41,11 +41,12 @@ func List(ctx context.Context, workspaceId uint64, page, size int, name, group *
 		return nil, err
 	}
 
-	result := []ProjectInfo{}
+	result := []*ProjectInfo{}
 
 	for _, info := range *infos {
-		temp := ProjectInfo{}
-		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.GetCreatedDate(), info.GetUpdatedDate()
+		temp := &ProjectInfo{}
+		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.CreateTime.Unix(), info.CreateTime.Unix()
+		temp.Code = info.Code
 		result = append(result, temp)
 	}
 
