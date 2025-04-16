@@ -26,9 +26,9 @@ const PermissionManagement: React.FC = () => {
       const len = response.permissions.length;
       return {
         data: response.permissions,
-        page_index: 1,
-        page_size: len,
-        record_total: len
+        index: 1,
+        size: len,
+        total: len
       };
     }),
     [appId]

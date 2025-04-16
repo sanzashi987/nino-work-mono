@@ -1,10 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  TableCell, Stack, TableRow, TableBody,
-  TableHead, TableContainer, Box, Pagination,
-  Paper, Table
+  TableCell,
+  Stack,
+  TableRow,
+  TableBody,
+  TableHead,
+  TableContainer,
+  Box,
+  Pagination,
+  Paper,
+  Table
 } from '@mui/material';
-import { noop, PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import { noop, PaginationResponse, PageSize } from '@nino-work/shared';
 import { Model } from './defineModel';
 import loading from '../Loading';
 
@@ -18,7 +25,7 @@ export const useDeps = () => {
 
 type ManagerShellProps<Res, T = any> = {
   schema: Model<T>[],
-  requester: (parms: PagninationRequest) => Promise<PaginationResponse<Res>>
+  requester: (parms: PageSize) => Promise<PaginationResponse<Res>>
   ActionNode?: React.ReactNode,
   deps?: any[]
 };
@@ -29,7 +36,7 @@ const ManagerShell = <Res, T>({
   deps,
   ActionNode
 }: ManagerShellProps<Res, T>) => {
-  const [pagination, setPagination] = useState<PagninationRequest>({ page: 1, size: 10 });
+  const [pagination, setPagination] = useState<PageSize>({ page: 1, size: 10 });
   const [data, setData] = useState<PaginationResponse<Res> | null>(null);
 
   useEffect(() => {

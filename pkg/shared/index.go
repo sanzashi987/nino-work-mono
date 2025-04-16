@@ -6,9 +6,9 @@ type PaginationRequest struct {
 }
 
 type PaginationResponse struct {
-	PageIndex   int `json:"page_index"`
-	PageSize    int `json:"page_size"`
-	RecordTotal int `json:"record_total"`
+	PageIndex   int `json:"page"`
+	PageSize    int `json:"size"`
+	RecordTotal int `json:"total"`
 }
 
 type DBTime struct {

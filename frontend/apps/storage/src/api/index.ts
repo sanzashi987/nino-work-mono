@@ -1,4 +1,4 @@
-import { ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import { ModelMeta, PaginationResponse, PageSize } from '@nino-work/shared';
 import defineApi from './impls';
 
 type BucketData = {
@@ -8,7 +8,7 @@ type BucketData = {
   create_time: number
 };
 
-export const listBucket = defineApi<PagninationRequest, PaginationResponse<BucketData>>({
+export const listBucket = defineApi<PageSize, PaginationResponse<BucketData>>({
   url: 'bucket/list',
   method: 'POST'
 });
