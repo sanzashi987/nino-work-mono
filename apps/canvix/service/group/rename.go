@@ -13,8 +13,8 @@ import (
 var ErrorFailToRename = errors.New("Fail to rename group")
 
 type UpdateAssetGroupReq struct {
-	GroupName string `json:"name" binding:"required"`
-	GroupCode string `json:"code" binding:"required"`
+	GroupName string `json:"group_name" binding:"required"`
+	GroupCode string `json:"group_code" binding:"required"`
 	TypeTag   string `json:"type" binding:"required"`
 }
 

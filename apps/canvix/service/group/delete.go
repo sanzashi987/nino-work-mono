@@ -27,7 +27,7 @@ var typeTagToChainedHandler = map[string]DeleleGroupEffect{
 }
 
 type DeleteAssetGroupReq struct {
-	GroupCode string `json:"code" binding:"required"`
+	GroupCode string `json:"group_code" binding:"required"`
 	TypeTag   string `json:"type" binding:"required"`
 }
 

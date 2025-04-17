@@ -11,7 +11,7 @@ import (
 )
 
 type CreateAssetGroupReq struct {
-	GroupName string `json:"name" binding:"required"`
+	GroupName string `json:"group_name" binding:"required"`
 	TypeTag   string `json:"type" binding:"required"`
 }
 

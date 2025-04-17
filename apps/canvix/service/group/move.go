@@ -21,8 +21,8 @@ func commonMoveGroup(codes []string, groupCode string) (uint64, []uint64, error)
 }
 
 type BatchMoveProjectGroupReq struct {
-	GroupName   string   `json:"groupName"`
-	GroupCode   string   `json:"groupCode"`
+	GroupName   string   `json:"group_name"`
+	GroupCode   string   `json:"group_code"`
 	ToMoveCodes []string `json:"codes" binding:"required"`
 	TypeTag     string   `json:"typeTag" binding:"required"`
 }
