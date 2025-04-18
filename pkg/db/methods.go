@@ -22,42 +22,6 @@ func TableName(tableName string) Configure {
 	}
 }
 
-func (dao *BaseDao[Model]) BeginTransaction() {
-	dao.transaction = dao.db.Begin()
-}
-
-func (dao *BaseDao[Model]) RollbackTransaction() {
-	if dao.transaction != nil {
-		dao.transaction.Rollback()
-	}
-}
-
-func (dao *BaseDao[Model]) RollbackToTransaction(name string) {
-	if dao.transaction != nil {
-		dao.transaction.RollbackTo(name)
-	}
-}
-
-func (dao *BaseDao[Model]) SavePointTransaction(name string) {
-	if dao.transaction != nil {
-		dao.transaction.SavePoint(name)
-	}
-}
-
-func (dao *BaseDao[Model]) WithTransaction(fc func(tx *BaseDao[Model]) error) {
-
-	var callback = func(tx *gorm.DB) error {
-		dao.transaction = tx
-		defer func() {
-			dao.transaction = nil
-		}()
-
-		return fc(dao)
-	}
-
-	dao.db.Transaction(callback)
-}
-
 func (dao *BaseDao[Model]) GetOrm(config ...Configure) *gorm.DB {
 	defaultConfig := ORMConfig{}
 

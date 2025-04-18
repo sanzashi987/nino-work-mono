@@ -30,10 +30,7 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 
 }
 
-type ListAssetResponse struct {
-	Data []*asset.ListAssetRes `json:"data"`
-	shared.PaginationResponse
-}
+type ListAssetResponse = shared.ResponseWithPagination[[]*asset.ListAssetRes]
 
 func (c *AssetController) list(ctx *gin.Context) {
 	req := asset.ListAssetReq{}
@@ -42,20 +39,15 @@ func (c *AssetController) list(ctx *gin.Context) {
 		return
 	}
 
-	recordTotal, res, err := asset.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
+	recordTotal, data, err := asset.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "list: "+err.Error())
 		return
 	}
-
-	c.ResponseJson(ctx, ListAssetResponse{
-		Data: res,
-		PaginationResponse: shared.PaginationResponse{
-			PageIndex:   req.Page,
-			PageSize:    req.Size,
-			RecordTotal: int(recordTotal),
-		},
-	})
+	page := req.CalibratePage(int(recordTotal))
+	res := ListAssetResponse{}
+	res.Init(data, page, int(recordTotal))
+	c.ResponseJson(ctx, res)
 
 }
 

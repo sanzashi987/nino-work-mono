@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/service/project"
-	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type ProjectController struct {
@@ -28,15 +27,8 @@ func registerProjectRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceM
 	projectRoutes.POST("importScreen", projectController._import)
 }
 
-type GetProjectListRequest struct {
-	shared.PaginationRequest
-	// Workspace string
-	Name  *string `json:"name"`
-	Group *string `json:"group"`
-}
-
 func (c *ProjectController) list(ctx *gin.Context) {
-	req := &GetProjectListRequest{}
+	req := project.GetProjectListRequest{}
 
 	workspaceId, err := c.BindRequestJson(ctx, &req, "project list")
 
@@ -44,12 +36,12 @@ func (c *ProjectController) list(ctx *gin.Context) {
 		return
 	}
 
-	infoList, err := project.List(ctx, workspaceId, req.Page, req.Size, req.Name, req.Group)
+	res, err := project.List(ctx, workspaceId, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "project list error: "+err.Error())
 		return
 	}
-	c.ResponseJson(ctx, infoList)
+	c.ResponseJson(ctx, res)
 }
 
 /*CRUD*/

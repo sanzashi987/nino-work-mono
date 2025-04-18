@@ -1,19 +1,14 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { PageSize } from './types';
+import { PageSize, PaginationResponse } from './types';
 
 type PaginationRequest<F> = PageSize & Partial<F>;
-
-type PaginationResponse<T> = {
-  data: T[];
-  total: number;
-} & PageSize;
 
 type UsePaginationResult<T, F> = {
   loading: boolean
   data: T[];
   total: number;
+  currentSize: number;
   currentPage: number;
-  pageSize: number;
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
   setFilters: (filters: Partial<F>) => void;
@@ -40,7 +35,7 @@ export const usePagination = <T, F extends object>(
     setLoading(true);
     try {
       const response = await requestFnRef.current({ ...pagination, ...filters });
-      setPagination({ page: response.page, size: response.size });
+      setPagination((last) => ({ ...last, page: response.page }));
       setData(response.data);
       setTotal(response.total);
     } catch (error) {
@@ -73,7 +68,7 @@ export const usePagination = <T, F extends object>(
     data,
     total,
     currentPage: pagination.page,
-    pageSize: pagination.size,
+    currentSize: pagination.size,
     setPage,
     setPageSize,
     setFilters: (newFilters) => setFilters((prev) => ({ ...prev, ...newFilters })),

@@ -5,8 +5,7 @@ export type PageSize = {
 
 export type PaginationResponse<T> = {
   data: T[]
-  index: number
-  size: number
+  page: number
   total: number
 };
 

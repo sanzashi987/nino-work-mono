@@ -5,10 +5,30 @@ type PaginationRequest struct {
 	Size int `json:"size" form:"size" binding:"required"`
 }
 
-type PaginationResponse struct {
+func (r *PaginationRequest) CalibratePage(total int) int {
+	rest := total % r.Size
+	maxPage := total / r.Size
+	if rest > 0 {
+		return maxPage + 1
+	}
+	return maxPage
+}
+
+// type PaginationResponse struct {
+// 	PageIndex   int `json:"page"`
+// 	RecordTotal int `json:"total"`
+// }
+
+type ResponseWithPagination[T any] struct {
+	Data        T   `json:"data"`
 	PageIndex   int `json:"page"`
-	PageSize    int `json:"size"`
 	RecordTotal int `json:"total"`
+}
+
+func (r *ResponseWithPagination[T]) Init(data T, pageIndex, recordTotal int) {
+	r.Data = data
+	r.PageIndex = pageIndex
+	r.RecordTotal = recordTotal
 }
 
 type DBTime struct {

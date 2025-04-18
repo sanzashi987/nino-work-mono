@@ -32,7 +32,7 @@ type AppInfo struct {
 
 type ListAppResponse struct {
 	Data []*AppInfo `json:"data"`
-	shared.PaginationResponse
+	shared.ResponseWithPagination
 }
 
 func RegisterAppRoutes(router gin.IRoutes) {

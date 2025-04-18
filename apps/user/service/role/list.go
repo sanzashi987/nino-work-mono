@@ -21,10 +21,7 @@ type RoleMeta struct {
 	// Permissions []*shared.EnumMeta `json:"permissions"`
 }
 
-type ListRolesResponse struct {
-	Data []*RoleMeta `json:"data"`
-	shared.PaginationResponse
-}
+type ListRolesResponse = shared.ResponseWithPagination[[]*RoleMeta]
 
 func makeListRoleQuery(ctx context.Context, userId uint64) (*gorm.DB, []uint64, error) {
 	result, err := userService.GetUserAdmins(ctx, userId)
@@ -83,14 +80,10 @@ func ListRoles(ctx context.Context, userId uint64, payload *shared.PaginationReq
 		}
 	}
 
-	return &ListRolesResponse{
-		Data: roleMetas,
-		PaginationResponse: shared.PaginationResponse{
-			PageIndex:   payload.Page,
-			PageSize:    payload.Size,
-			RecordTotal: int(totalCount),
-		},
-	}, nil
+	res := &ListRolesResponse{}
+	res.Init(roleMetas, payload.Page, int(totalCount))
+	return res, nil
+
 }
 
 func ListAllRoles(ctx context.Context, userId uint64) ([]*shared.EnumMeta, error) {

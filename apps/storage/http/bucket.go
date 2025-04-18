@@ -164,10 +164,10 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		return
 	}
 
-	res := make([]*BucketInfo, len(buckets))
+	data := make([]*BucketInfo, len(buckets))
 
 	for i, bucket := range buckets {
-		res[i] = &BucketInfo{
+		data[i] = &BucketInfo{
 			Id:         bucket.Id,
 			Code:       bucket.Code,
 			UpdateTime: bucket.UpdateTime.Unix(),
@@ -175,20 +175,13 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 		}
 	}
 
-	paginationResponse := shared.PaginationResponse{
-		PageIndex:   pagination.Page,
-		PageSize:    pagination.Size,
-		RecordTotal: int(total),
-	}
+	res := shared.ResponseWithPagination[[]*BucketInfo]{}
 
-	var r struct {
-		Data []*BucketInfo `json:"data"`
-		*shared.PaginationResponse
-	}
-	r.PaginationResponse = &paginationResponse
-	r.Data = res
+	page := pagination.CalibratePage(int(total))
 
-	c.ResponseJson(ctx, r)
+	res.Init(data, page, int(total))
+
+	c.ResponseJson(ctx, res)
 
 }
 

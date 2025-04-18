@@ -92,10 +92,7 @@ type UserBio struct {
 	Username string `json:"username"`
 }
 
-type ListUserResponse struct {
-	Data []*UserBio `json:"data"`
-	shared.PaginationResponse
-}
+type ListUserResponse = shared.ResponseWithPagination[[]*UserBio]
 
 // TODO specific permission check for the operator
 func ListUser(ctx context.Context, pagination *shared.PaginationRequest) (*ListUserResponse, error) {
@@ -113,22 +110,20 @@ func ListUser(ctx context.Context, pagination *shared.PaginationRequest) (*ListU
 		return nil, err
 	}
 
-	res := []*UserBio{}
+	data := []*UserBio{}
 	for _, user := range users {
-		res = append(res, &UserBio{
+		data = append(data, &UserBio{
 			Id:       user.Id,
 			Username: user.Username,
 		})
 	}
 
-	return &ListUserResponse{
-		Data: res,
-		PaginationResponse: shared.PaginationResponse{
-			PageIndex:   pagination.Page,
-			PageSize:    pagination.Size,
-			RecordTotal: int(count),
-		},
-	}, nil
+	page := pagination.CalibratePage(int(count))
+
+	res := &ListUserResponse{}
+	res.Init(data, page, int(count))
+
+	return res, nil
 
 }
 
