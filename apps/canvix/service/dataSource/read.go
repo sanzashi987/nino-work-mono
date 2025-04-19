@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
+	"gorm.io/gorm"
 )
 
 type QuerySearchReq struct {
@@ -21,22 +21,51 @@ type ListReq struct {
 	QuerySearchReq
 }
 
-func List(ctx context.Context, workspaceId uint64, payload *ListReq) ([]*DataSourceDetail, error) {
+type ListRes = shared.ResponseWithPagination[[]*DataSourceDetail]
+
+func getListCommonQuery(tx *gorm.DB, workspaceId uint64, payload *ListReq) *gorm.DB {
+	query := tx.Model(&model.DataSourceModel{}).Where("workspace = ?", workspaceId)
+
+	if payload.SourceName != "" {
+		query = query.Where("name LIKE ?", payload.SourceName)
+	}
+
+	if len(payload.SourceType) != 0 {
+		sourceTypeEnums := []uint8{}
+
+		for _, v := range payload.SourceType {
+			enum, exist := model.SourceTypeStringToEnum[v]
+			if exist {
+				sourceTypeEnums = append(sourceTypeEnums, enum)
+			}
+		}
+
+		query = query.Where("source_type IN ?", sourceTypeEnums)
+	}
+	return query
+}
+
+func List(ctx context.Context, workspaceId uint64, payload *ListReq) (*ListRes, error) {
 	tx := db.NewTx(ctx)
 
-	records, err := dao.FindByNameOrType(tx, workspaceId, payload.SourceName, payload.SourceType, payload.PaginationRequest)
+	query := getListCommonQuery(tx, workspaceId, payload)
+
+	r, err := db.QueryWithTotal[model.DataSourceModel](query, payload.Page, payload.Size)
 	if err != nil {
 		return nil, err
 	}
 
-	response := []*DataSourceDetail{}
-	for _, source := range records {
+	data := []*DataSourceDetail{}
+	for _, source := range r.Records {
 		temp := intoDataSourceDetail(source)
 
-		response = append(response, temp)
+		data = append(data, temp)
 	}
 
-	return response, nil
+	res := ListRes{}
+	res.Init(data, r.Page, r.Total)
+
+	return &res, nil
 }
 
 func GetDataSourceById(ctx context.Context, workspaceId uint64, sourceIdCode string) (*DataSourceDetail, error) {

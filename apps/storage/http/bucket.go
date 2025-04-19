@@ -149,17 +149,17 @@ func (c *BucketController) ListBuckets(ctx *gin.Context) {
 
 	if total < int64(pagination.Page*pagination.Size) {
 		pagination.Page = 1
-		pagination.Size = int(total)
+		pagination.Size = int(total) //????
 	}
 
-	paginationScope := db.Paginate(pagination.Page, pagination.Size)
+	paginationScope := db.Paginate(pagination.Page, pagination.Size, int(total))
 
 	buckets := []*model.Bucket{}
 
 	if err := tx.Table("buckets").
 		Joins("INNER JOIN bucket_user ON bucket_user.bucket_id = buckets.id").
 		Where("user_id = ? ", user).
-		Scopes(paginationScope).Order("update_time DESC").Find(&buckets).Error; err != nil {
+		Scopes(paginationScope).Find(&buckets).Error; err != nil {
 		c.AbortServerError(ctx, "ListBuckets internal error: "+err.Error())
 		return
 	}

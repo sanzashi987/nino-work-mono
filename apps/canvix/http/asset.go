@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/service/asset"
-	"github.com/sanzashi987/nino-work/pkg/shared"
 )
 
 type AssetController struct {
@@ -30,8 +29,6 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 
 }
 
-type ListAssetResponse = shared.ResponseWithPagination[[]*asset.ListAssetRes]
-
 func (c *AssetController) list(ctx *gin.Context) {
 	req := asset.ListAssetReq{}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "list asset")
@@ -39,16 +36,13 @@ func (c *AssetController) list(ctx *gin.Context) {
 		return
 	}
 
-	recordTotal, data, err := asset.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
+	res, err := asset.ListAssetByType(ctx, workspaceId, consts.DATASOURCE, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "list: "+err.Error())
 		return
 	}
-	page := req.CalibratePage(int(recordTotal))
-	res := ListAssetResponse{}
-	res.Init(data, page, int(recordTotal))
-	c.ResponseJson(ctx, res)
 
+	c.ResponseJson(ctx, res)
 }
 
 type ReadQuery struct {

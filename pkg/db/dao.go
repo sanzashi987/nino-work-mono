@@ -32,24 +32,11 @@ func ConnectDB(names ...string) *gorm.DB {
 	return db
 }
 
-func NewDao[T any](ctx context.Context, dao ...*BaseDao[T]) BaseDao[T] {
-	var baseDao BaseDao[T]
-	if len(dao) > 0 {
-		baseDao = *dao[0]
-	} else {
-		baseDao = BaseDao[T]{
-			db:  instance.WithContext(ctx),
-			ctx: ctx,
-		}
-	}
-	return baseDao
-}
-
 func NewTx(ctx context.Context) *gorm.DB {
 	return instance.WithContext(ctx)
 }
 
-func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
+func Paginate(page, size, total int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		pageNumber, pageSize := page, size
 		if pageNumber == 0 {
@@ -61,7 +48,59 @@ func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
 		case pageSize <= 0:
 			pageSize = 10
 		}
+
+		rest := total % size
+		maxPage := total / size
+		if rest > 0 {
+			maxPage += 1
+		}
+		if page > maxPage {
+			page = maxPage
+		}
+
 		offset := (page - 1) * pageSize
-		return db.Offset(offset).Limit(pageSize)
+		return db.Offset(offset).Limit(pageSize).Order("update_time DESC")
 	}
+}
+
+func calibratePage(page, size, total int) int {
+	rest := total % size
+	maxPage := total / size
+	if rest > 0 {
+		maxPage += 1
+	}
+
+	if page > maxPage {
+		return maxPage
+	}
+	return page
+
+}
+
+type ListResponse[T any] struct {
+	Total   int
+	Records []*T
+	Page    int
+}
+
+func QueryWithTotal[T any](condition *gorm.DB, page, size int) (*ListResponse[T], error) {
+	var total *int64
+
+	if err := condition.Select("id").Count(total).Error; err != nil {
+		return nil, err
+	}
+	p := calibratePage(page, size, int(*total))
+
+	records := []*T{}
+	if err := condition.Scopes(Paginate(p, size, int(*total))).Find(&records).Error; err != nil {
+		return nil, err
+	}
+
+	res := ListResponse[T]{
+		Total:   int(*total),
+		Records: records,
+		Page:    p,
+	}
+
+	return &res, nil
 }

@@ -3,7 +3,6 @@ package dao
 import (
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
-	"github.com/sanzashi987/nino-work/pkg/db"
 	"gorm.io/gorm"
 )
 
@@ -30,26 +29,4 @@ func update(tx *gorm.DB, workspaceId, assetId uint64) *gorm.DB {
 
 func UpdateAssetName(tx *gorm.DB, workspaceId, assetId uint64, assetName string) error {
 	return update(tx, workspaceId, assetId).Update("name", assetName).Error
-}
-
-func ListAssets(tx *gorm.DB, workspaceId uint64, groupId *uint64, page, size int, typeTag string) ([]model.AssetModel, error) {
-	res := []model.AssetModel{}
-	orm := tx.Model(&model.AssetModel{}).Scopes(db.Paginate(page, size)).Where("workspace = ? ", workspaceId).Where("type_tag = ?", typeTag)
-	if groupId != nil {
-		orm = orm.Where("group_id = ? ", groupId)
-	}
-
-	err := orm.Find(&res).Error
-	return res, err
-}
-
-func GetAssetCount(tx *gorm.DB, workspaceId uint64, groupId *uint64, typeTag string) (int64, error) {
-
-	orm := tx.Model(&model.AssetModel{}).Select("id").Where("workspace = ? ", workspaceId).Where("type_tag = ?", typeTag)
-	if groupId != nil {
-		orm = orm.Where("group_id = ? ", groupId)
-	}
-	var recordCount *int64
-	err := orm.Count(recordCount).Error
-	return *recordCount, err
 }

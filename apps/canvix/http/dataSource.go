@@ -38,13 +38,13 @@ func (c *DataSourceController) list(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataSourceList, err := dataSource.List(ctx, workspaceId, &req)
+	res, err := dataSource.List(ctx, workspaceId, &req)
 	if err != nil {
 		c.AbortServerError(ctx, "list "+err.Error())
 		return
 	}
 
-	c.ResponseJson(ctx, dataSourceList)
+	c.ResponseJson(ctx, res)
 
 }
 

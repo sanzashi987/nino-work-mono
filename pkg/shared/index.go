@@ -9,9 +9,14 @@ func (r *PaginationRequest) CalibratePage(total int) int {
 	rest := total % r.Size
 	maxPage := total / r.Size
 	if rest > 0 {
-		return maxPage + 1
+		maxPage += 1
 	}
-	return maxPage
+
+	if r.Page > maxPage {
+		return maxPage
+	}
+	return r.Page
+
 }
 
 // type PaginationResponse struct {

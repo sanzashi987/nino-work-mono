@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
@@ -47,23 +46,31 @@ func List(ctx context.Context, workspaceId uint64, req *GetProjectListRequest) (
 		groupId = &id
 	}
 
-	infos, total, err := dao.GetList(tx, page, size, workspaceId, name, groupId)
+	query := tx.Model(&model.ProjectModel{})
+	if groupId != nil {
+		query = query.Where(" group_id = ?", *groupId)
+	}
+
+	if name != nil {
+		query = query.Where(" name LIKE ?", *name)
+	}
+
+	r, err := db.QueryWithTotal[model.ProjectModel](query, page, size)
 	if err != nil {
 		return nil, err
 	}
 
 	data := []*ProjectInfo{}
 
-	for _, info := range infos {
+	for _, info := range r.Records {
 		temp := &ProjectInfo{}
 		temp.Name, temp.CreateTime, temp.UpdateTime = info.Name, info.CreateTime.Unix(), info.CreateTime.Unix()
 		temp.Code = info.Code
 		data = append(data, temp)
 	}
 
-	p := req.CalibratePage(total)
 	res := &GetProjectListResponse{}
-	res.Init(data, p, total)
+	res.Init(data, r.Page, r.Total)
 
 	return res, nil
 

@@ -1,4 +1,4 @@
-import { Enum, ModelMeta, PaginationResponse, PagninationRequest } from '@nino-work/shared';
+import { Enum, ModelMeta, PaginationResponse, PageSize } from '@nino-work/shared';
 import defineApi from './impls';
 
 export enum AppStatus {
@@ -16,7 +16,7 @@ type AppModel = {
 
 export type AppListResponse = PaginationResponse<AppModel>;
 
-export const getAppList = defineApi<PagninationRequest, AppListResponse>({
+export const getAppList = defineApi<PageSize, AppListResponse>({
   url: 'apps/list',
   method: 'POST'
 });
@@ -66,7 +66,7 @@ type RoleInfo = {
   code: string
 };
 
-export const listRoles = defineApi<PagninationRequest, PaginationResponse<RoleInfo>>({
+export const listRoles = defineApi<PageSize, PaginationResponse<RoleInfo>>({
   url: 'roles/list',
   method: 'POST'
 });
@@ -105,7 +105,7 @@ export type UserBio = {
   username: string
 };
 
-export const listUsers = defineApi<PagninationRequest, PaginationResponse<UserBio>>({
+export const listUsers = defineApi<PageSize, PaginationResponse<UserBio>>({
   url: 'users/list',
   method: 'POST'
 });

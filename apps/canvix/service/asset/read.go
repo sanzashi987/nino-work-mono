@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sanzashi987/nino-work/apps/canvix/consts"
-	"github.com/sanzashi987/nino-work/apps/canvix/db/dao"
 	"github.com/sanzashi987/nino-work/apps/canvix/db/model"
 	"github.com/sanzashi987/nino-work/pkg/db"
 	"github.com/sanzashi987/nino-work/pkg/shared"
@@ -54,7 +53,7 @@ func GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, works
 	return &result, err
 }
 
-type ListAssetRes struct {
+type AssetInfo struct {
 	FileCode   string  `json:"fileId"`
 	Name       string  `json:"fileName"`
 	MimeType   string  `json:"mimeType"`
@@ -69,11 +68,13 @@ type ListAssetReq struct {
 	shared.PaginationRequest
 }
 
-func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, payload *ListAssetReq) (int64, []*ListAssetRes, error) {
+type ListAssetResponse = shared.ResponseWithPagination[[]*AssetInfo]
+
+func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, req *ListAssetReq) (*ListAssetResponse, error) {
 	var groupId *uint64
-	if payload.GroupCode != "" {
-		if id, _, err := consts.GetIdFromCode(payload.GroupCode); err != nil {
-			return 0, nil, err
+	if req.GroupCode != "" {
+		if id, _, err := consts.GetIdFromCode(req.GroupCode); err != nil {
+			return nil, err
 		} else {
 			groupId = &id
 		}
@@ -81,19 +82,16 @@ func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, pa
 
 	tx := db.NewTx(ctx)
 
-	records, err := dao.ListAssets(tx, workspaceId, groupId, payload.Page, payload.Size, typeTag)
+	condition := tx.Model(&model.AssetModel{}).Where("workspace = ? AND type_tag = ? AND group_id = ?", workspaceId, typeTag, *groupId)
+
+	r, err := db.QueryWithTotal[model.AssetModel](condition, req.Page, req.Size)
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 
-	recordTotal, err := dao.GetAssetCount(tx, workspaceId, groupId, typeTag)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	res := []*ListAssetRes{}
-	for _, record := range records {
-		res = append(res, &ListAssetRes{
+	data := []*AssetInfo{}
+	for _, record := range r.Records {
+		data = append(data, &AssetInfo{
 			FileCode:   record.Code,
 			Name:       record.Name,
 			CreateTime: record.GetCreatedDate(),
@@ -101,5 +99,8 @@ func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, pa
 		})
 	}
 
-	return recordTotal, res, nil
+	res := ListAssetResponse{}
+	res.Init(data, r.Page, r.Total)
+
+	return &res, nil
 }

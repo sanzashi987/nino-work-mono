@@ -5,10 +5,6 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/db"
 )
 
-type AnyDao[T any] struct {
-	db.BaseDao[T]
-}
-
 func ConnectDB(name ...string) {
 	instance := db.ConnectDB(name...)
 	instance.AutoMigrate(

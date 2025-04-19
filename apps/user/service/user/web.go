@@ -98,30 +98,21 @@ type ListUserResponse = shared.ResponseWithPagination[[]*UserBio]
 func ListUser(ctx context.Context, pagination *shared.PaginationRequest) (*ListUserResponse, error) {
 	tx := db.NewTx(ctx)
 
-	var users []*model.UserModel
-
-	var count int64
-
-	if err := tx.Model(&model.UserModel{}).Count(&count).Error; err != nil {
-		return nil, err
-	}
-
-	if err := tx.Scopes(db.Paginate(pagination.Page, pagination.Size)).Order("id DESC").Find(&users).Error; err != nil {
+	r, err := db.QueryWithTotal[model.UserModel](tx.Model(&model.UserModel{}), pagination.Page, pagination.Size)
+	if err != nil {
 		return nil, err
 	}
 
 	data := []*UserBio{}
-	for _, user := range users {
+	for _, user := range r.Records {
 		data = append(data, &UserBio{
 			Id:       user.Id,
 			Username: user.Username,
 		})
 	}
 
-	page := pagination.CalibratePage(int(count))
-
 	res := &ListUserResponse{}
-	res.Init(data, page, int(count))
+	res.Init(data, r.Page, r.Total)
 
 	return res, nil
 

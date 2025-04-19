@@ -62,17 +62,13 @@ func ListRoles(ctx context.Context, userId uint64, payload *shared.PaginationReq
 
 	query := tx.Model(&model.RoleModel{}).Where("id IN ?", roleIds)
 
-	var totalCount int64 = 0
-	if err := query.Count(&totalCount).Error; err != nil {
-		return nil, err
-	}
-	roles := []*model.RoleModel{}
-	if err := query.Order("id DESC").Scopes(db.Paginate(payload.Page, payload.Size)).Find(&roles).Error; err != nil {
+	r, err := db.QueryWithTotal[model.RoleModel](query, payload.Page, payload.Size)
+	if err != nil {
 		return nil, err
 	}
 
-	roleMetas := make([]*RoleMeta, len(roles))
-	for i, role := range roles {
+	roleMetas := make([]*RoleMeta, len(r.Records))
+	for i, role := range r.Records {
 		roleMetas[i] = &RoleMeta{
 			Id:   role.Id,
 			Name: role.Name,
@@ -81,7 +77,7 @@ func ListRoles(ctx context.Context, userId uint64, payload *shared.PaginationReq
 	}
 
 	res := &ListRolesResponse{}
-	res.Init(roleMetas, payload.Page, int(totalCount))
+	res.Init(roleMetas, r.Page, r.Total)
 	return res, nil
 
 }
