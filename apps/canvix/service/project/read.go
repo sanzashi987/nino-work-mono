@@ -25,7 +25,6 @@ func GetInfoById(ctx context.Context, workspaceId uint64, code string) (*Project
 
 type GetProjectListRequest struct {
 	shared.PaginationRequest
-	// Workspace string
 	Name  *string `json:"name"`
 	Group *string `json:"group"`
 }

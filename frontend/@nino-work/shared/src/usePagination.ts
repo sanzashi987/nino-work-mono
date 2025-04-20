@@ -34,7 +34,7 @@ export const usePagination = <T, F extends object>(
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await requestFnRef.current({ ...pagination, ...filters });
+      const response = await requestFnRef.current({ page: pagination.page, size: pagination.size, ...filters });
       setPagination((last) => ({ ...last, page: response.page }));
       setData(response.data);
       setTotal(response.total);
@@ -43,7 +43,7 @@ export const usePagination = <T, F extends object>(
     } finally {
       setLoading(false);
     }
-  }, [pagination, filters]);
+  }, [pagination.page, pagination.size, filters]);
 
   const fetchDataRef = useRef(fetchData);
 
