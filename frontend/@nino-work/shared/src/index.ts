@@ -2,6 +2,10 @@
 export { default as theme } from './theme';
 export { nanoid, uuid, createComponentId } from './uuid';
 export const noop = () => { };
+export const unImplemented = () => {
+  throw new Error('Function not implemented.');
+};
+
 export function returnVoidObject() {
   return {};
 }
@@ -12,4 +16,3 @@ export { stop, blockKeyEvent } from './event';
 export { default as usePromise } from './usePromise';
 export { queryStringify, parseQuery } from './url';
 export { usePagination } from './usePagination';
-
