@@ -5,5 +5,8 @@
   "main": "src/index",
   "devDependencies": {
     "@types/node": "^22.13.14"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
   }
 }

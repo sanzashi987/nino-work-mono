@@ -61,10 +61,7 @@ const imageInlineSizeLimit = parseInt(
 // Check if TypeScript is setup
 const useTypeScript = fs.existsSync(paths.appTsConfig);
 
-// Check if Tailwind config exists
-const useTailwind = fs.existsSync(
-  path.join(paths.appPath, 'tailwind.config.js')
-);
+
 
 // Get the path to the uncompiled service worker (if it exists).
 const { swSrc } = paths;
@@ -91,8 +88,14 @@ const hasJsxRuntime = (() => {
 
 const { infraPath } = paths;
 const hasInfraConfig = fs.existsSync(infraPath);
-const override = hasInfraConfig
-  ? require(infraPath).webpack ?? ((e) => e) : (e) => e;
+const infraConfig = hasInfraConfig ? require(infraPath) : {}
+const override = infraConfig.webpack ?? ((e) => e)
+
+// Check if Tailwind config exists
+const useTailwind = fs.existsSync(
+  path.join(paths.appPath, 'tailwind.config.js')
+) || infraConfig?.content
+
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -156,7 +159,10 @@ module.exports = function (webpackEnv) {
                 'postcss-normalize'
               ]
               : [
-                'tailwindcss',
+                [
+                  'tailwindcss',
+                  infraPath
+                ],
                 'postcss-flexbugs-fixes',
                 [
                   'postcss-preset-env',

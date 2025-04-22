@@ -62,8 +62,6 @@
     "@types/lodash.merge": "^4.6.9",
     "@types/node": "^22.13.14",
     "@types/react-transition-group": "^4.4.12",
-    "@types/tinycolor2": "^1.4.6",
-    "canvix.nino.work": "workspace:^",
-    "filter": "^0.1.1"
+    "@types/tinycolor2": "^1.4.6"
   }
 }

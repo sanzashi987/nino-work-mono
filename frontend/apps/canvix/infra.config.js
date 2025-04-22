@@ -1,6 +1,8 @@
 process.env.PORT = 3003
 
 module.exports = {
+  // tailwind
+  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
   // mode: 'micro-app',
   devServer(config) {
     const { proxy } = config
