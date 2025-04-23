@@ -1,11 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { loading } from '@nino-work/ui-components';
 import { usePromise } from '@nino-work/shared';
-import { getUserInfo, MenuType, UserContext } from '@nino-work/mf';
+import { getUserInfo, MenuType, MicroFrontendContext } from '@nino-work/mf';
+import PageContainer from '@/components/PageContainer';
 
 const AuthGuard: React.FC = () => {
   const { data: userInfo } = usePromise(getUserInfo);
+  const [title, setTitle] = useState('Dashboard');
+
   const menus = useMemo(
     () => {
       if (!userInfo) {
@@ -38,18 +41,25 @@ const AuthGuard: React.FC = () => {
     if (!userInfo) {
       return null;
     }
-    return ({ info: userInfo, menus, matched });
+    return ({ info: userInfo, menus, matched, updateTitle: setTitle });
   }, [userInfo, menus, matched]);
+
+  useEffect(() => {
+    if (matched?.name) {
+      setTitle(matched.name);
+    }
+  }, [matched?.name]);
 
   if (userInfo === null || ctx === null) {
     return loading;
   }
 
   return (
-    <UserContext.Provider value={ctx}>
-      {matched ? <Outlet /> : <Navigate to="/home" />}
-      {/* <Outlet /> */}
-    </UserContext.Provider>
+    <MicroFrontendContext.Provider value={ctx}>
+      <PageContainer title={title}>
+        {matched ? <Outlet /> : <Navigate to="/home" />}
+      </PageContainer>
+    </MicroFrontendContext.Provider>
   );
 };
 

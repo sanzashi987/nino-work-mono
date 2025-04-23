@@ -4,7 +4,7 @@ import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import { AccountCircle } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { UserContext } from '@nino-work/mf';
+import { MicroFrontendContext } from '@nino-work/mf';
 import PageContainer from '@/components/PageContainer';
 import SideBar from './SideBar';
 
@@ -29,42 +29,39 @@ const Dashboard: React.FC = () => {
     handleClose();
   };
 
-  const { matched } = useContext(UserContext);
+  const { matched } = useContext(MicroFrontendContext);
   const style = matched?.fullpage ? { display: 'none' } : undefined;
 
   return (
-    <PageContainer title={matched?.name ?? 'Dashboard'}>
-      <Stack height="100%">
-        <AppBar position="relative" style={style}>
-          <Toolbar style={{ minHeight: 48 }}>
-            <Logo width="35" height="35" />
-            <div style={{ flexGrow: 1 }} />
-            <IconButton onClick={openMenu}>
-              {mode}
-              <AccountCircle fontSize="medium" style={{ color: isLight ? 'white' : 'grey' }} />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              keepMounted
-              open={!!anchorEl}
-              onClose={handleClose}
-            >
-              {/* <MenuItem onClick={handleClose}>Profile</MenuItem> */}
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
-        <Stack minHeight={0} flexGrow={1} direction="row">
-          <SideBar style={style} />
-          <Box flexGrow={1} overflow="auto">
-            <Outlet />
-            <div id="nino-sub-app" />
-          </Box>
-        </Stack>
+    <Stack height="100%">
+      <AppBar position="relative" style={style}>
+        <Toolbar style={{ minHeight: 48 }}>
+          <Logo width="35" height="35" />
+          <div style={{ flexGrow: 1 }} />
+          <IconButton onClick={openMenu}>
+            {mode}
+            <AccountCircle fontSize="medium" style={{ color: isLight ? 'white' : 'grey' }} />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            keepMounted
+            open={!!anchorEl}
+            onClose={handleClose}
+          >
+            {/* <MenuItem onClick={handleClose}>Profile</MenuItem> */}
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+      <Stack minHeight={0} flexGrow={1} direction="row">
+        <SideBar style={style} />
+        <Box flexGrow={1} overflow="auto">
+          <Outlet />
+          <div id="nino-sub-app" />
+        </Box>
       </Stack>
-
-    </PageContainer>
+    </Stack>
   );
 };
 

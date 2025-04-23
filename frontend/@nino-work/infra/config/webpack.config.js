@@ -94,7 +94,7 @@ const override = infraConfig.webpack ?? ((e) => e)
 // Check if Tailwind config exists
 const useTailwind = fs.existsSync(
   path.join(paths.appPath, 'tailwind.config.js')
-) || infraConfig?.content
+) || infraConfig.tailwind
 
 
 // This is the production and development configuration.
@@ -161,7 +161,7 @@ module.exports = function (webpackEnv) {
               : [
                 [
                   'tailwindcss',
-                  infraPath
+                  infraConfig.tailwind
                 ],
                 'postcss-flexbugs-fixes',
                 [
@@ -693,7 +693,11 @@ module.exports = function (webpackEnv) {
       // It is absolutely essential that NODE_ENV is set to production
       // during a production build.
       // Otherwise React will be compiled in the very slow development mode.
-      new webpack.DefinePlugin(env.stringified),
+      new webpack.DefinePlugin({
+        ...(infraConfig.define ?? {}),
+        ...env.stringified,
+        NINO_IS_PROD: process.env.NODE_ENV === 'production',
+      }),
       // Experimental hot reloading for React .
       // https://github.com/facebook/react/tree/main/packages/react-refresh
       isEnvDevelopment

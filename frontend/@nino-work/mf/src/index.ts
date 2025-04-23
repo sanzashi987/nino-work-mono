@@ -29,16 +29,19 @@ export type UserInfoResponse = {
   roles: EnumType[]
 };
 
-export type UserContextType = {
+export type MicroFrontendContextType = {
   info: UserInfoResponse | null
   menus: MenuMeta[]
   matched: MenuMeta | null
+  updateTitle(title: string): void
 };
 
-export const UserContext = createContext<UserContextType>({
+export const MicroFrontendContext = createContext<MicroFrontendContextType>({
+  /** user info */
   info: null,
   menus: [],
-  matched: null
+  matched: null,
+  updateTitle() {}
 });
 
 export const getUserInfo = () => fetch('/backend/user/v1/info').then((res) => {

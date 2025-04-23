@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemButton, ListItemText, Paper } from '@mui/material';
-import { UserContext } from '@nino-work/mf';
+import { MicroFrontendContext } from '@nino-work/mf';
 import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ type SideBarProps = {
 };
 
 const SideBar: React.FC<SideBarProps> = ({ style }) => {
-  const { menus } = useContext(UserContext);
+  const { menus } = useContext(MicroFrontendContext);
 
   const localtion = useLocation();
   const navigate = useNavigate();

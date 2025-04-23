@@ -2,23 +2,24 @@ import React, { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AuthGuard from './RouterGuard';
 
+const dashboard = lazy(() => import('./Dashboard'));
+
 const BrowserRouter = createBrowserRouter([
   {
     path: 'login',
     Component: lazy(() => import('./Login'))
   },
   {
+    path: 'home',
     Component: AuthGuard,
     children: [
-      {
-        path: 'home/*',
-        Component: lazy(() => import('./Dashboard'))
-      }
+      { index: true, Component: dashboard },
+      { path: '*', Component: dashboard }
     ]
   },
   {
     path: '*',
-    Component: () => <Navigate to="/login" />
+    element: <Navigate to="/login" />
   }
 ]);
 

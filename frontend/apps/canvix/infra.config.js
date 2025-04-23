@@ -1,8 +1,15 @@
-process.env.PORT = 3003
 
+const productionInfo = require('./package.json');
+const prodVersion = productionInfo.version;
+process.env.PORT = 3003
+process.env.__VERSION__ = prodVersion
+process.env.TARGET_PLATFORM = ''
 module.exports = {
-  // tailwind
-  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
+  tailwind: {
+    content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
+  },
+
+  define: {},
   // mode: 'micro-app',
   devServer(config) {
     const { proxy } = config
