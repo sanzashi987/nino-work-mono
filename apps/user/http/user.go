@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+
 	iHttp "net/http"
 
 	"github.com/gin-gonic/gin"
@@ -52,7 +53,8 @@ func (c *UserController) UserLogin(ctx *gin.Context) {
 	}
 
 	expiry := int(res.Expiry)
-	ctx.SetCookie(controller.CookieName, res.JwtToken, expiry*60*60*24, "/", ".nino.work", false, false)
+	ctx.SetSameSite(iHttp.SameSiteStrictMode)
+	ctx.SetCookie(controller.CookieName, res.JwtToken, expiry*60*60*24, "/", ".nino.work", true, true)
 	if target, shouldRedirect := ctx.GetQuery("redirect"); shouldRedirect {
 		ctx.Redirect(iHttp.StatusSeeOther, fmt.Sprintf("%s?token=%s", target, res.JwtToken))
 		return

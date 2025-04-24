@@ -30,10 +30,7 @@ type AppInfo struct {
 	Description string `json:"description"`
 }
 
-type ListAppResponse struct {
-	Data []*AppInfo `json:"data"`
-	shared.ResponseWithPagination
-}
+type ListAppResponse = shared.ResponseWithPagination[[]*AppInfo]
 
 func RegisterAppRoutes(router gin.IRoutes) {
 	var appController = AppController{}
@@ -100,7 +97,6 @@ func (c *AppController) ListApps(ctx *gin.Context) {
 
 	res := ListAppResponse{}
 	res.PageIndex = pageIndex
-	res.PageSize = pageSize
 	res.RecordTotal = total
 	res.Data = pagedMetas
 

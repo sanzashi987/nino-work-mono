@@ -18,15 +18,14 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 	assetGroup := router.Group("assets")
 	// assetGroup.Use(loggedMiddleware, workspaceMiddleware)
 
-	assetGroup.POST("selectMyAssets", assetController.list)
+	assetGroup.POST("list", assetController.list)
 	assetGroup.POST("updateMyAssetsName", assetController.update)
 	assetGroup.DELETE("delete", assetController.delete)
 	assetGroup.POST("upload", assetController.upload)
 	assetGroup.POST("detail", assetController.read)
-	assetGroup.POST("replace", assetController.replace)
-	assetGroup.POST("loadAsset", assetController.download)
-	assetGroup.POST("importAsset", assetController._import)
-
+	assetGroup.POST("update", assetController.replace)
+	assetGroup.POST("download", assetController.download)
+	assetGroup.POST("import", assetController._import)
 }
 
 func (c *AssetController) list(ctx *gin.Context) {
