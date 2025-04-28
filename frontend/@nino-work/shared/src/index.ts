@@ -17,5 +17,5 @@ export { default as usePromise } from './usePromise';
 export { queryStringify, parseQuery } from './url';
 export { usePagination } from './usePagination';
 export { createMemo, useCreateMemo } from './createMemo';
-export { useEvent } from './useEvent';
+export { useEvent, useRefState } from './useEvent';
 export { shallowEqual, shallowClone, strictEquality } from './shallow';
