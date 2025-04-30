@@ -35,7 +35,7 @@ const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cance
 }) => {
   const { close, form } = useContext(OpenModalContext);
   const onSubmit = useCallback(async () => {
-    onOk?.(form as any).then(close);
+    onOk?.(form as any).then(close).catch((e) => { console.warn(e); });
   }, []);
   return (
     <Stack flexDirection="row-reverse">

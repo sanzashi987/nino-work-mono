@@ -160,7 +160,7 @@ module.exports = function (webpackEnv) {
               ]
               : [
                 [
-                  'tailwindcss',
+                  '@tailwindcss/postcss',
                   infraConfig.tailwind
                 ],
                 'postcss-flexbugs-fixes',
@@ -462,7 +462,8 @@ module.exports = function (webpackEnv) {
                     {
                       runtime: hasJsxRuntime ? 'automatic' : 'classic'
                     },
-                  ]
+                  ],
+                  ['@babel/preset-typescript', { allowDeclareFields: true }],
                 ],
 
                 plugins: [

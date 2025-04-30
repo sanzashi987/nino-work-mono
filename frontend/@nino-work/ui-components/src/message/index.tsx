@@ -7,23 +7,19 @@ import type { BasicConfigWithType, MessageType, MessageConfig, MessageContent } 
 import { formatConfig } from './utils';
 import StyledSnackbarProvider from './styled';
 
-const StyledMessageContainer = styled('div')({
-  '.frnc': {
-    display: 'flex',
-    alignItems: 'center'
+const StyledMessageContainer = styled('div')<React.CSSProperties>(({ right = 8, bottom = 24 }) => ({
+  '.notistack-SnackbarContainer ': {
+    bottom,
+    right
   },
-  '.SnackbarContainer-bottom.SnackbarContainer-right': {
-    bottom: 24,
-    right: 8
-  },
-  '.SnackbarItem-contentRoot.SnackbarContent-root': {
+  '.notistack-MuiContent': {
     padding: 0,
-    '.SnackbarItem-message': {
+    '#notistack-snackbar': {
       padding: 0,
       width: '100%'
     }
   }
-});
+}));
 
 class NinoMessage {
   private maxSnack = 5;
@@ -40,7 +36,6 @@ class NinoMessage {
   initRoot = () => {
     const dom = document.createElement('div');
     document.body.appendChild(dom);
-    dom.id = 'message-container';
     const root = createRoot(dom);
     const Content = (
       <StyledMessageContainer>

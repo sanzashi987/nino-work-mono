@@ -105,7 +105,7 @@ class Uploader extends React.Component<Props, State> {
 export class Droppable extends React.Component {
   static contextType = UploaderContext;
 
-  context: Uploader;
+  declare context: Uploader;
 
   ref = createRef<HTMLDivElement>();
 

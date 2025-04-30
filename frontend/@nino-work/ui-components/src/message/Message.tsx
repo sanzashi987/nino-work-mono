@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/no-unused-class-component-methods */
 import React, { CSSProperties, FC } from 'react';
-import { CircularProgress, ClickAwayListener } from '@mui/material';
+import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { enqueueSnackbar, closeSnackbar } from 'notistack';
 import { CheckCircleOutline, ErrorOutline, WarningAmber, InfoOutlined } from '@mui/icons-material';
@@ -48,7 +48,7 @@ const MessageContent: FC<MessageContentProps> = ({ content, type, onClickAway, c
     <MessageContentDiv className={`frnc ${className ?? ''}`}>
       <div className="frnc">
         <Icon className="message-icon" style={style} />
-        {content}
+        {typeof content === 'string' ? <Typography variant="overline">{content}</Typography> : content}
       </div>
     </MessageContentDiv>
   );
