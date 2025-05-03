@@ -31,7 +31,7 @@ type MessageContentProps = {
 };
 
 const MessageContentDiv = styled('div')({
-  fontSize: 12,
+  fontSize: '12px',
   padding: '6px 16px',
   width: '100%',
   '& div': {
@@ -48,7 +48,7 @@ const MessageContent: FC<MessageContentProps> = ({ content, type, onClickAway, c
     <MessageContentDiv className={`frnc ${className ?? ''}`}>
       <div className="frnc">
         <Icon className="message-icon" style={style} />
-        {typeof content === 'string' ? <Typography variant="overline">{content}</Typography> : content}
+        {typeof content === 'string' ? <Typography variant="button">{content}</Typography> : content}
       </div>
     </MessageContentDiv>
   );
