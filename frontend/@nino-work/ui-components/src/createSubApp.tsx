@@ -5,7 +5,7 @@ import { theme as defaultTheme, SubAppInjectProps } from '@nino-work/shared';
 
 const theme = createTheme(defaultTheme);
 
-const createSubApp = (renderRouter: (props:SubAppInjectProps) => React.ReactNode) => {
+const createSubApp = (renderRouter: (props: SubAppInjectProps) => React.ReactNode) => {
   const App: React.FC<SubAppInjectProps> = (props) => {
     const children = useMemo(() => {
       const { basename = '/' } = props;

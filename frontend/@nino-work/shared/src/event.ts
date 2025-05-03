@@ -7,3 +7,7 @@ export const blockKeyEvent = {
   onKeyUp: stop,
   tabIndex: 0
 };
+
+export function prevent(e: React.SyntheticEvent | Event) {
+  e.preventDefault();
+}
