@@ -1,5 +1,12 @@
 {
-  "extends": "@canvix/sdk/tsconfig.json",
-  "exclude": ["node_modules"],
-  "include": ["@canvix/sdk/env.d.ts"]
+  "extends": "@canvix/sdk/tsconfig.base.json",
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+  },
+  "include": [
+    "index.tsx"
+  ]
 }

@@ -51,13 +51,13 @@
   "rules": {
     "indent": "off",
     "linebreak-style": "off",
-    "import-newlines/enforce": [
-      "error",
-      {
-        "items": 40,
-        "max-len": 120
-      }
-    ],
+    // "import-newlines/enforce": [
+    //   "error",
+    //   {
+    //     "items": 40,
+    //     "max-len": 120
+    //   }
+    // ],
     "object-curly-newline": [
       "warn",
       {

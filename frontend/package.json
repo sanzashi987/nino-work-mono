@@ -5,6 +5,7 @@
     "@nino-work/infra": "workspace:*",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.13.14",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.3.0",

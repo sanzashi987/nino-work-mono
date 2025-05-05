@@ -1,4 +1,5 @@
 import React from 'react';
+import type { GeneralComponentProps } from '@canvix/sdk';
 import styles from './index.module.scss';
 
 type Attr = {
@@ -22,7 +23,7 @@ type Attr = {
   letterSpacing: number;
 };
 
-type Props = GeneralComponentProps<Attr, 'com'>;
+type Props = GeneralComponentProps<Attr>;
 const txtClass = styles['txt-component'];
 
 export default class Txt extends React.Component<Props> {
@@ -69,8 +70,8 @@ export default class Txt extends React.Component<Props> {
   };
 
   handleValueChange = (prevProps: Props, props: Props) => {
-    const { source } = props.data;
-    const { source: pSource } = prevProps.data;
+    const { source } = props.data!;
+    const { source: pSource } = prevProps.data!;
     const { txt } = props.config.attr;
     const { txt: pTxt } = prevProps.config.attr;
     if (source !== pSource || txt !== pTxt) {

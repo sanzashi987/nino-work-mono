@@ -8,6 +8,9 @@ type ComRuntime<Attr> = {
   config: {
     attr: Attr;
   } & Default;
+  utils: {
+    $emit(eventName: string, payload: any): void;
+  };
 };
 
-type GeneralComponentProps<Attr> = ComRuntime<Attr>;
+export type GeneralComponentProps<Attr> = ComRuntime<Attr>;

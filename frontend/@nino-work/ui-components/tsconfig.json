@@ -1,9 +1,6 @@
 {
-  "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "jsx": "react",
-    "baseUrl": ".",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["src"]
+  "extends": "@nino-work/infra/tsconfig.base.json",
+  "include": [
+    "src"
+  ]
 }

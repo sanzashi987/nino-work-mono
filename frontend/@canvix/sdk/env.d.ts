@@ -1,3 +1,4 @@
+/** eslint disable */
 declare module '*.svg' {
   import * as React from 'react';
 
@@ -58,3 +59,7 @@ declare module '*.webp' {
   const src: string;
   export default src;
 }
+
+// declare module '@canvix/runtime' {
+//   const
+// }

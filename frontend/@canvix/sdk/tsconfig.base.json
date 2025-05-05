@@ -30,8 +30,7 @@
     "jsx": "react",
     "declaration": true,
     "types": [
-      "node",
-      "@nino-work/infra/react-app-env.d.ts"
-    ]
-  }
+      "@canvix/sdk/env.d.ts"
+    ],
+  },
 }
