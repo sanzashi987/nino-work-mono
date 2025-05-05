@@ -28,20 +28,28 @@ dependencies:
     version: 6.0.3
 
 packages:
-
   /js-tokens@4.0.0:
-    resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+    resolution:
+      {
+        integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==,
+      }
     dev: false
 
   /loose-envify@1.4.0:
-    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    resolution:
+      {
+        integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==,
+      }
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):
-    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
+    resolution:
+      {
+        integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==,
+      }
     peerDependencies:
       react: ^18.3.1
     dependencies:
@@ -51,18 +59,27 @@ packages:
     dev: false
 
   /react@18.3.1:
-    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
-    engines: {node: '>=0.10.0'}
+    resolution:
+      {
+        integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==,
+      }
+    engines: { node: '>=0.10.0' }
     dependencies:
       loose-envify: 1.4.0
     dev: false
 
   /scheduler@0.23.2:
-    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
+    resolution:
+      {
+        integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==,
+      }
     dependencies:
       loose-envify: 1.4.0
     dev: false
 
   /single-spa@6.0.3:
-    resolution: {integrity: sha512-pXlwHXHhs3hx/MnGQHBLdFCVAN2rlm9TLBKazbDMyZ25QRxoen2vlUZ47MyXKa9K8Gd5UZs/gkuQad4TGbViwg==}
+    resolution:
+      {
+        integrity: sha512-pXlwHXHhs3hx/MnGQHBLdFCVAN2rlm9TLBKazbDMyZ25QRxoen2vlUZ47MyXKa9K8Gd5UZs/gkuQad4TGbViwg==,
+      }
     dev: false

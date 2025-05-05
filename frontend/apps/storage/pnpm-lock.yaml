@@ -25,16 +25,24 @@ dependencies:
     version: 6.0.3
 
 packages:
-
   /dayjs@1.11.13:
-    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+    resolution:
+      {
+        integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==,
+      }
     dev: false
 
   /filesize@10.1.6:
-    resolution: {integrity: sha512-sJslQKU2uM33qH5nqewAwVB2QgR6w1aMNsYUp3aN5rMRyXEwJGmZvaWzeJFNTOXWlHQyBFCWrdj3fV/fsTOX8w==}
-    engines: {node: '>= 10.4.0'}
+    resolution:
+      {
+        integrity: sha512-sJslQKU2uM33qH5nqewAwVB2QgR6w1aMNsYUp3aN5rMRyXEwJGmZvaWzeJFNTOXWlHQyBFCWrdj3fV/fsTOX8w==,
+      }
+    engines: { node: '>= 10.4.0' }
     dev: false
 
   /single-spa@6.0.3:
-    resolution: {integrity: sha512-pXlwHXHhs3hx/MnGQHBLdFCVAN2rlm9TLBKazbDMyZ25QRxoen2vlUZ47MyXKa9K8Gd5UZs/gkuQad4TGbViwg==}
+    resolution:
+      {
+        integrity: sha512-pXlwHXHhs3hx/MnGQHBLdFCVAN2rlm9TLBKazbDMyZ25QRxoen2vlUZ47MyXKa9K8Gd5UZs/gkuQad4TGbViwg==,
+      }
     dev: false

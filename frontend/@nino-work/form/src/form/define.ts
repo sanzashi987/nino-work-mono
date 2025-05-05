@@ -19,20 +19,18 @@ export type ValidationWithMessage<
   message: string;
 };
 
-export interface WidgetMutate<W, P> {
-
-}
+export interface WidgetMutate<W, P> {}
 
 export type WidgetStandardProps<T> = {
-  id?: string
-  value?: T
-  onChange?(next: T): void
+  id?: string;
+  value?: T;
+  onChange?(next: T): void;
 };
 
 // type Validate
 
 type WatchOption<Store extends {}> = {
-  form?: FormObject<Store>
+  form?: FormObject<Store>;
 };
 
 export type IModel<T, S> = PrimitiveModel<T, S> | ObjectModel<T, S> | ArrayModel<T, S>;
@@ -41,44 +39,46 @@ export type BaseModel<
   ModelValue,
   StoreValue extends {},
   ToWatch extends React.Key[][] = [],
-  StoreToWatch extends StoreValue = StoreValue
+  StoreToWatch extends StoreValue = StoreValue,
 > = {
   // label: React.ReactNode
-  label?: string
-  field: string
-  watch?: readonly [...ToWatch],
-  watchOptions?: WatchOption<StoreToWatch>
-  widget?: any
-  widgetProps?:any
+  label?: string;
+  field: string;
+  watch?: readonly [...ToWatch];
+  watchOptions?: WatchOption<StoreToWatch>;
+  widget?: any;
+  widgetProps?: any;
   formItemProps?: {
     initialValue?: ModelValue;
-    rules?: ValidatorRule[],
-    equality?:ValueEqualityFn<ModelValue>
-  },
+    rules?: ValidatorRule[];
+    equality?: ValueEqualityFn<ModelValue>;
+  };
 
-  callback?(value: any, form: FormObject<StoreToWatch>): void,
+  callback?(value: any, form: FormObject<StoreToWatch>): void;
 };
 
 type GetModel<V, S> = V extends (infer A)[]
   ? ArrayModel<A, S>
   : V extends object
     ? ObjectModel<V, S>
-    : V extends never ? PrimitiveModel<string, S> : PrimitiveModel<V, S>;
+    : V extends never
+      ? PrimitiveModel<string, S>
+      : PrimitiveModel<V, S>;
 
 export type PrimitiveModel<V, S> = BaseModel<V, S>;
 
 export type ArrayModel<V, S> = {
-  children?: Omit<GetModel<V, S>, 'field'>
+  children?: Omit<GetModel<V, S>, 'field'>;
 } & BaseModel<V[], S>;
 
 export type ObjectModel<V, S> = {
-  children?: DeriveChildrenForObject<V, S>
+  children?: DeriveChildrenForObject<V, S>;
 } & BaseModel<V, S>;
 
 export type ForceCompute<T> = T extends object
   ? {
-    [K in keyof T]: T[K]
-  }
+      [K in keyof T]: T[K];
+    }
   : never;
 
 export type ForceDeepCompute<T> = T extends object ? { [K in keyof T]: ForceDeepCompute<T[K]> } : T;
@@ -87,28 +87,34 @@ export type ForceDeepCompute<T> = T extends object ? { [K in keyof T]: ForceDeep
 // type MakeStaticArray<Key extends keyof T, T> = { [K in Key]: [ForceDeepCompute<
 // Omit<GetModel<T[K]>, 'field'> & { field: K }
 // >, ...(Exclude<Key, K> extends "" ? [] : MakeStaticArray<Exclude<Key, K>, T>)] }[Key]
-type MakeObjectChildren<Key extends keyof T, T, S> = { [K in Key]: Omit<GetModel<T[K], S>, 'field'> & { field: K } }[Key][];
-type DeriveChildrenForObject<V, S = V> = V extends object ? MakeObjectChildren<keyof V, V, S> : never;
+type MakeObjectChildren<Key extends keyof T, T, S> = {
+  [K in Key]: Omit<GetModel<T[K], S>, 'field'> & { field: K };
+}[Key][];
+type DeriveChildrenForObject<V, S = V> = V extends object
+  ? MakeObjectChildren<keyof V, V, S>
+  : never;
 type MakeArrayChildren<V, S> = Omit<GetModel<V, S>, 'field'>[];
 // type DeriveChildrenForArray<V, S> = V extends (infer A)[] ? MakeArrayChildren<A, S> : never;
 
 type Form = {
-  a: string
+  a: string;
   // // b: number
-  b: { test: string }
+  b: { test: string };
 
-  c: { test2: string }[]
-  d: number[]
+  c: { test2: string }[];
+  d: number[];
 };
 
 type Aa = ForceDeepCompute<DeriveChildrenForObject<Form>>;
 
 export type WidgetIdentifier = keyof WidgetMutate<unknown, unknown>;
 
-type MakeIntersect<T> = (T extends any ? (x: T) => void : never) extends (x: infer R) => void ?
-  R : never;
+type MakeIntersect<T> = (T extends any ? (x: T) => void : never) extends (x: infer R) => void
+  ? R
+  : never;
 
-export const model = (): IModel<any, any> & MakeIntersect<WidgetMutate<unknown, unknown>[WidgetIdentifier]> => ({} as any);
+export const model = (): IModel<any, any> &
+  MakeIntersect<WidgetMutate<unknown, unknown>[WidgetIdentifier]> => ({}) as any;
 
 export const defineModel = <const T>(models: DeriveChildrenForObject<T>) => models;
 
@@ -118,32 +124,32 @@ export const res = defineModel<Form>([
   {
     label: 'bb',
     field: 'b',
-    children:
-      [
-        { field: 'test', label: 'test', formItemProps: { initialValue: '2' } }
-      ]
-  }, {
+    children: [{ field: 'test', label: 'test', formItemProps: { initialValue: '2' } }],
+  },
+  {
     label: 'cc',
     field: 'c',
     children: {
       label: '',
-      children: [{
-        label: '',
-        field: 'test2',
-        formItemProps: { initialValue: '233' }
-      }]
+      children: [
+        {
+          label: '',
+          field: 'test2',
+          formItemProps: { initialValue: '233' },
+        },
+      ],
     },
-    formItemProps: { initialValue: [{ test2: '' }] }
+    formItemProps: { initialValue: [{ test2: '' }] },
   },
-  { label: 'd', field: 'd', children: { label: '2' } }
-
+  { label: 'd', field: 'd', children: { label: '2' } },
 ]);
 
 const buildValueFromSchema = <T>(
   schema: DeriveChildrenForObject<T>[number],
   currentLevelData: any = {}
 ) => {
-  currentLevelData[schema.field] = currentLevelData[schema.field] ?? schema.formItemProps?.initialValue;
+  currentLevelData[schema.field] =
+    currentLevelData[schema.field] ?? schema.formItemProps?.initialValue;
   if ('children' in schema) {
     if (Array.isArray(schema.children)) {
       const data: any = currentLevelData[schema.field] ?? {};
@@ -154,7 +160,7 @@ const buildValueFromSchema = <T>(
       currentLevelData[schema.field] = data;
       if (data.length) {
         data.forEach((v, i) => {
-          const tempSchmea = { ...schema.children as any, field: i };
+          const tempSchmea = { ...(schema.children as any), field: i };
           buildValueFromSchema<any>(tempSchmea as any, data);
         });
       }
@@ -163,14 +169,14 @@ const buildValueFromSchema = <T>(
 };
 
 const buildFormDataFromSchemas = <T = any>(schemas: DeriveChildrenForObject<T>, data: any = {}) => {
-  schemas.forEach((schmea) => {
+  schemas.forEach(schmea => {
     buildValueFromSchema<any>(schmea as any, data);
   });
   return data as T;
 };
 
 type FormOptions<T> = {
-  initialValue?: Partial<T>
+  initialValue?: Partial<T>;
 };
 
 export const createForm = <T>(schemas: DeriveChildrenForObject<T>, opts?: FormOptions<T>) => {

@@ -1,24 +1,24 @@
 import React, { lazy } from 'react';
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
 
-const routes :RouteObject[] = [
+const routes: RouteObject[] = [
   {
     path: '/oss',
     children: [
       {
         index: true,
-        Component: lazy(() => import('./list'))
+        Component: lazy(() => import('./list')),
       },
       {
         path: 'detail/:id',
-        Component: lazy(() => import('./detail'))
-      }
-    ]
+        Component: lazy(() => import('./detail')),
+      },
+    ],
   },
   {
     path: '*',
-    Component: () => <Navigate to="/oss" />
-  }
+    Component: () => <Navigate to="/oss" />,
+  },
 ];
 
 export default () => useRoutes(routes);

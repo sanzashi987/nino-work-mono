@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 type SideBarProps = {
-  style?:React.CSSProperties
+  style?: React.CSSProperties;
 };
 
 const SideBar: React.FC<SideBarProps> = ({ style }) => {
@@ -14,31 +14,32 @@ const SideBar: React.FC<SideBarProps> = ({ style }) => {
   const navigate = useNavigate();
 
   return (
-    <Paper elevation={9} style={style} sx={{ overflow: 'auto', height: '100%', width: 'fit-content' }}>
+    <Paper
+      elevation={9}
+      style={style}
+      sx={{ overflow: 'auto', height: '100%', width: 'fit-content' }}
+    >
       <List>
-        {
-          menus.map((menu) => (
-            <ListItem key={menu.code} disablePadding>
-              <ListItemButton
-                sx={{ py: 0.5 }}
-                selected={localtion.pathname === menu.path}
-                onClick={() => {
-                  if (localtion.pathname !== menu.path) {
-                    navigate(menu.path);
-                  }
-                }}
-              >
-                {/* <ListItemIcon>
+        {menus.map(menu => (
+          <ListItem key={menu.code} disablePadding>
+            <ListItemButton
+              sx={{ py: 0.5 }}
+              selected={localtion.pathname === menu.path}
+              onClick={() => {
+                if (localtion.pathname !== menu.path) {
+                  navigate(menu.path);
+                }
+              }}
+            >
+              {/* <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon> */}
-                <ListItemText primary={menu.name} />
-              </ListItemButton>
-            </ListItem>
-          ))
-        }
+              <ListItemText primary={menu.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Paper>
-
   );
 };
 

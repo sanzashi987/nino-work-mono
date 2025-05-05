@@ -28,12 +28,15 @@ export function shallowEqual(objA: any, objB: any, depth = 0) {
   for (let i = 0; i < keysA.length; i++) {
     if (depth) {
       if (
-        !hasOwnProperty$2.call(objB, keysA[i])
-        || !shallowEqual(objA[keysA[i]], objB[keysA[i]], depth - 1)
+        !hasOwnProperty$2.call(objB, keysA[i]) ||
+        !shallowEqual(objA[keysA[i]], objB[keysA[i]], depth - 1)
       ) {
         return false;
       }
-    } else if (!hasOwnProperty$2.call(objB, keysA[i]) || !objectIs(objA[keysA[i]], objB[keysA[i]])) {
+    } else if (
+      !hasOwnProperty$2.call(objB, keysA[i]) ||
+      !objectIs(objA[keysA[i]], objB[keysA[i]])
+    ) {
       return false;
     }
   }

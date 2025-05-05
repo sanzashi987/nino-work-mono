@@ -11,7 +11,7 @@ type PermissionMeta = ListPermissionsResponse['permissions'][number];
 const staticSchema = [
   { label: 'Id', field: 'id' },
   { label: 'Name', field: 'name' },
-  { label: 'Code', field: 'code' }
+  { label: 'Code', field: 'code' },
 ];
 
 const PermissionManagement: React.FC = () => {
@@ -21,16 +21,17 @@ const PermissionManagement: React.FC = () => {
   const naviagte = useNavigate();
 
   const requester = useCallback(
-    () => listPermissions({ app_id: Number(appId) }).then((response) => {
-      setRes(response);
-      const len = response.permissions.length;
-      return {
-        data: response.permissions,
-        index: 1,
-        size: len,
-        total: len
-      };
-    }),
+    () =>
+      listPermissions({ app_id: Number(appId) }).then(response => {
+        setRes(response);
+        const len = response.permissions.length;
+        return {
+          data: response.permissions,
+          index: 1,
+          size: len,
+          total: len,
+        };
+      }),
     [appId]
   );
 
@@ -38,27 +39,34 @@ const PermissionManagement: React.FC = () => {
     refresh();
   }, []);
 
-  const schema = useMemo(() => [
-    ...staticSchema,
-    {
-      label: 'Operation',
-      field: 'id',
-      dataCellProps: {
-        render(row: PermissionMeta) {
-          return (
-            <IconButton onClick={() => handleDeletePermission(row)}>
-              <Delete />
-            </IconButton>
-          );
-        }
-      }
-    }
-  ], []);
+  const schema = useMemo(
+    () => [
+      ...staticSchema,
+      {
+        label: 'Operation',
+        field: 'id',
+        dataCellProps: {
+          render(row: PermissionMeta) {
+            return (
+              <IconButton onClick={() => handleDeletePermission(row)}>
+                <Delete />
+              </IconButton>
+            );
+          },
+        },
+      },
+    ],
+    []
+  );
 
   return (
     <>
       <Stack direction="row" alignItems="center">
-        <IconButton onClick={() => { naviagte('..'); }}>
+        <IconButton
+          onClick={() => {
+            naviagte('..');
+          }}
+        >
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" gutterBottom m={0} ml={1}>
@@ -69,7 +77,7 @@ const PermissionManagement: React.FC = () => {
         deps={deps}
         schema={schema}
         requester={requester}
-        ActionNode={(
+        ActionNode={
           <Button
             color="info"
             variant="contained"
@@ -80,9 +88,8 @@ const PermissionManagement: React.FC = () => {
           >
             + Create Permission
           </Button>
-        )}
+        }
       />
-
     </>
   );
 };

@@ -2,8 +2,8 @@ import { Typography } from '@mui/material';
 import React from 'react';
 
 type FormLabelProps = {
-  title: string | React.ReactNode
-  field: string
+  title: string | React.ReactNode;
+  field: string;
 };
 
 const FormLabel: React.FC<FormLabelProps> = ({ title, field }) => (

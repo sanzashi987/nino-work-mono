@@ -9,7 +9,7 @@ import openCreateBucket from './openCreateBucket';
 const staticSchema = [
   { label: 'Id', field: 'id' },
   { label: 'Code', field: 'code' },
-  { label: 'Description', field: 'description' }
+  { label: 'Description', field: 'description' },
 ];
 
 const BucketList: React.FC = () => {
@@ -17,36 +17,41 @@ const BucketList: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const schema = useMemo(() => [
-    ...staticSchema,
-    {
-      label: 'Operation',
-      field: 'id',
-      headerCellProps: { align: 'center' as const },
-      dataCellProps: {
-        align: 'center' as const,
-        render: (row: any) => (
-          <>
-            <IconButton onClick={() => {
-              navigate(`./detail/${row.id}`);
-            }}
-            >
-              <Settings />
-            </IconButton>
-            <IconButton>
-              <Delete />
-            </IconButton>
-          </>
-        )
-      }
-    }], [navigate]);
+  const schema = useMemo(
+    () => [
+      ...staticSchema,
+      {
+        label: 'Operation',
+        field: 'id',
+        headerCellProps: { align: 'center' as const },
+        dataCellProps: {
+          align: 'center' as const,
+          render: (row: any) => (
+            <>
+              <IconButton
+                onClick={() => {
+                  navigate(`./detail/${row.id}`);
+                }}
+              >
+                <Settings />
+              </IconButton>
+              <IconButton>
+                <Delete />
+              </IconButton>
+            </>
+          ),
+        },
+      },
+    ],
+    [navigate]
+  );
 
   return (
     <ManagerShell
       schema={schema}
       deps={deps}
       requester={listBucket}
-      ActionNode={(
+      ActionNode={
         <Button
           color="info"
           variant="contained"
@@ -55,7 +60,7 @@ const BucketList: React.FC = () => {
         >
           + Create Bucket
         </Button>
-      )}
+      }
     />
   );
 };

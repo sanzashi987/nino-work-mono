@@ -2,13 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "allowSyntheticDefaultImports": true,
+    "lib": ["dom", "esnext"],
+    "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

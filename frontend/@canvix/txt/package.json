@@ -1,0 +1,164 @@
+{
+  "name": "txt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.tsx",
+  "author": "",
+  "license": "ISC",
+  "canvas": {
+    "icon": "assets/txt.png",
+    "cn_name": "标题",
+    "category": "text-label",
+    "type": "com",
+    "config": {
+      "txt": {
+        "type": "CText",
+        "name": "默认内容",
+        "default": "TXT",
+        "description": "配置数据源后不再生效",
+        "textArea": true,
+        "autoSize": {
+          "minRows": 2,
+          "maxRows": 10
+        }
+      },
+      "lineClamp": {
+        "type": "CStepper",
+        "name": "最大显示行数",
+        "default": null,
+        "allowEmpty": true,
+        "min": 1,
+        "step": 1,
+        "breakpointsEnable": true
+      },
+      "textStyle": {
+        "type": "CSuite",
+        "name": "文本样式",
+        "children": {
+          "fontSize": {
+            "type": "CStepper",
+            "name": "字号",
+            "default": 25,
+            "min": 0,
+            "max": 100,
+            "col": 12,
+            "breakpointsEnable": true
+          },
+          "fontFamily": {
+            "type": "CFont",
+            "name": "字体",
+            "default": "Microsoft Yahei",
+            "col": 12
+          },
+          "fontWeight": {
+            "type": "CSelect",
+            "name": "文字粗细",
+            "default": "normal",
+            "options": "$fontWeight",
+            "col": 12
+          },
+          "lineHeight": {
+            "type": "CStepper",
+            "name": "行高",
+            "default": null,
+            "allowEmpty": true,
+            "min": 0,
+            "col": 12,
+            "breakpointsEnable": true
+          }
+        }
+      },
+      "textAlign": {
+        "type": "CRadio",
+        "name": "对齐方式",
+        "default": "center",
+        "radioType": "button",
+        "options": [
+          {
+            "label": "左对齐",
+            "value": "left"
+          },
+          {
+            "label": "居中对齐",
+            "value": "center"
+          },
+          {
+            "label": "右对齐",
+            "value": "right"
+          }
+        ]
+      },
+      "cursor": {
+        "type": "CRadio",
+        "radioType": "icon",
+        "iconType": "iconfont",
+        "name": "鼠标样式",
+        "default": "default",
+        "options": [
+          {
+            "value": "pointer",
+            "src": "canvas-icon-cursor-pointer"
+          },
+          {
+            "value": "default",
+            "src": "canvas-icon-cursor-default"
+          }
+        ]
+      },
+      "color": {
+        "type": "CColor",
+        "name": "颜色",
+        "default": "#fff",
+        "themeIndex": "$textColor",
+        "modes": [
+          "solid",
+          "gradient"
+        ]
+      },
+      "letterSpacing": {
+        "type": "CStepper",
+        "name": "字间距",
+        "default": 1,
+        "breakpointsEnable": true,
+        "hideInModes": [
+          "simple"
+        ]
+      }
+    },
+    "apis": {
+      "source": {
+        "description": "数据接口",
+        "name": "数据接口",
+        "fields": {
+          "value": {
+            "description": "值",
+            "type": "string"
+          }
+        },
+        "controlledMode": true
+      }
+    },
+    "api_data": {
+      "source": []
+    },
+    "events": {
+      "valueChanged": {
+        "name": "值变化时",
+        "description": "当默认内容或者数据源内容变化时触发",
+        "fields": {
+          "type": "object",
+          "children": {
+            "value": {
+              "type": "string",
+              "name": "value",
+              "description": "值"
+            }
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@canvix/sdk": "workspace:*"
+  }
+}

@@ -1,7 +1,7 @@
 /// <reference types="node" />
 export { default as theme } from './theme';
 export { nanoid, uuid, createComponentId } from './uuid';
-export const noop = () => { };
+export const noop = () => {};
 export const unImplemented = () => {
   throw new Error('Function not implemented.');
 };

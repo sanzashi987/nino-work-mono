@@ -10,15 +10,15 @@ import StyledSnackbarProvider from './styled';
 const StyledMessageContainer = styled('div')<React.CSSProperties>(({ right = 8, bottom = 24 }) => ({
   '.notistack-SnackbarContainer ': {
     bottom,
-    right
+    right,
   },
   '.notistack-MuiContent': {
     padding: 0,
     '#notistack-snackbar': {
       padding: 0,
-      width: '100%'
-    }
-  }
+      width: '100%',
+    },
+  },
 }));
 
 class NinoMessage {
@@ -55,7 +55,7 @@ class NinoMessage {
   };
 
   initMethod = () => {
-    typeList.forEach((type) => {
+    typeList.forEach(type => {
       (this as any)[type] = (content: MessageContent | MessageConfig, duration?: number) => {
         const config = formatConfig(content, type, duration);
         if (!config) return;
@@ -70,13 +70,13 @@ class NinoMessage {
 
   /** For possible overriding */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  handleMessage = (message: BasicConfigWithType) => { };
+  handleMessage = (message: BasicConfigWithType) => {};
 
   showMessage = (config: BasicConfigWithType) => {
     const key = config.key ?? `message_${nanoid()}`;
     const newConfig: BasicConfigWithType = {
       ...config,
-      key
+      key,
     };
     this.handleMessage(newConfig);
     return this.messageRef?.current?.showMessage?.(newConfig);

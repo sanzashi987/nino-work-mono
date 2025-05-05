@@ -20,6 +20,7 @@
     // "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     // "plugin:@stylistic/eslint-plugin-ts"
+    "plugin:prettier/recommended"
   ],
   "settings": {
     "react": {
@@ -77,10 +78,7 @@
       "warn",
       "always"
     ],
-    "comma-dangle": [
-      "error",
-      "never"
-    ],
+    "comma-dangle": "off",
     "import/no-extraneous-dependencies": "off",
     "import/extensions": "off",
     "react/jsx-props-no-spreading": "off",
@@ -95,7 +93,6 @@
     "no-multi-spaces": "warn",
     "react/state-in-constructor": "off",
     "react/static-property-placement": "off",
-    "react/jsx-space-before-closing": "warn",
     "react/function-component-definition": "off",
     "react/require-default-props": "off",
     "react-hooks/rules-of-hooks": "error",
@@ -124,10 +121,7 @@
     "no-param-reassign": "off",
     "import/prefer-default-export": "off",
     "no-restricted-exports": "off",
-    "@typescript-eslint/indent": [
-      "error",
-      2,
-    ],
+    "@typescript-eslint/indent": "off",
     "react/sort-comp": "off",
     "no-continue": "off"
   }

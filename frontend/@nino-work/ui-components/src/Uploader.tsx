@@ -5,13 +5,13 @@ export type Props = {
   accept?: string;
   multiple?: boolean;
   disabled?: boolean;
-  children?: React.ReactNode
+  children?: React.ReactNode;
   sizeLimit?: number;
   onChange?: (fileList: File[]) => void;
 };
 
 type State = {
-  uid: string
+  uid: string;
 };
 
 const UploaderContext = React.createContext<Uploader>(null);
@@ -62,7 +62,7 @@ class Uploader extends React.Component<Props, State> {
   onChange = (files: File[]) => {
     const { onChange } = this.props;
     let res: File[] = files.concat();
-    res = res.filter((file) => this.beforeUpload(file));
+    res = res.filter(file => this.beforeUpload(file));
     onChange?.(res);
     this.reset();
   };
@@ -98,7 +98,6 @@ class Uploader extends React.Component<Props, State> {
           {children}
         </div>
       </UploaderContext.Provider>
-
     );
   }
 }

@@ -9,16 +9,13 @@ const AuthGuard: React.FC = () => {
   const { data: userInfo } = usePromise(getUserInfo);
   const [title, setTitle] = useState('Dashboard');
 
-  const menus = useMemo(
-    () => {
-      if (!userInfo) {
-        return [];
-      }
-      const { menus: m } = userInfo;
-      return m.filter((menu) => menu.type === MenuType.Menu).sort((a, b) => a.order - b.order);
-    },
-    [userInfo]
-  );
+  const menus = useMemo(() => {
+    if (!userInfo) {
+      return [];
+    }
+    const { menus: m } = userInfo;
+    return m.filter(menu => menu.type === MenuType.Menu).sort((a, b) => a.order - b.order);
+  }, [userInfo]);
 
   const location = useLocation();
 
@@ -30,10 +27,12 @@ const AuthGuard: React.FC = () => {
       return null;
     }
 
-    return menus.find((e) => {
-      const { path } = e;
-      return location.pathname.startsWith(path) || path.startsWith(location.pathname);
-    }) ?? null;
+    return (
+      menus.find(e => {
+        const { path } = e;
+        return location.pathname.startsWith(path) || path.startsWith(location.pathname);
+      }) ?? null
+    );
     // return menus.map((e) => e.path).some((e) => location.pathname.startsWith(e) || e.startsWith(location.pathname));
   }, [location.pathname, menus, userInfo]);
 
@@ -41,7 +40,7 @@ const AuthGuard: React.FC = () => {
     if (!userInfo) {
       return null;
     }
-    return ({ info: userInfo, menus, matched, updateTitle: setTitle });
+    return { info: userInfo, menus, matched, updateTitle: setTitle };
   }, [userInfo, menus, matched]);
 
   useEffect(() => {
@@ -56,9 +55,7 @@ const AuthGuard: React.FC = () => {
 
   return (
     <MicroFrontendContext.Provider value={ctx}>
-      <PageContainer title={title}>
-        {matched ? <Outlet /> : <Navigate to="/home" />}
-      </PageContainer>
+      <PageContainer title={title}>{matched ? <Outlet /> : <Navigate to="/home" />}</PageContainer>
     </MicroFrontendContext.Provider>
   );
 };

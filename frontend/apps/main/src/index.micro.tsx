@@ -18,12 +18,12 @@ const importMapPromise = getImportMap();
 //   }
 // ];
 
-importMapPromise.then((menuConfig) => {
-  menuConfig.forEach((menu) => {
+importMapPromise.then(menuConfig => {
+  menuConfig.forEach(menu => {
     registerApplication(
       menu.code,
       () => System.import(/* webpackIgnore: true */ menu.code),
-      (location) => location.pathname.startsWith(menu.path),
+      location => location.pathname.startsWith(menu.path),
       { domElementGetter: () => document.getElementById('nino-sub-app'), basename: 'home' }
     );
   });
@@ -32,6 +32,4 @@ importMapPromise.then((menuConfig) => {
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <App importMapPromise={importMapPromise} />
-);
+root.render(<App importMapPromise={importMapPromise} />);

@@ -8,7 +8,7 @@ import {
   setActiveConsumer,
   Signal,
   SIGNAL,
-  updateProducerValueVersion
+  updateProducerValueVersion,
 } from './reactive';
 
 export interface ComputedNode<T> extends ReactiveNode {
@@ -59,10 +59,11 @@ const COMPUTED_NODE = /* @__PURE__ */ (() => ({
       // We want to mark this node as errored if calling `equal` throws; however, we don't want
       // to track any reactive reads inside `equal`.
       setActiveConsumer(null);
-      wasEqual = oldValue !== UNSET
-          && oldValue !== ERRORED
-          && newValue !== ERRORED
-          && node.equal(oldValue, newValue);
+      wasEqual =
+        oldValue !== UNSET &&
+        oldValue !== ERRORED &&
+        newValue !== ERRORED &&
+        node.equal(oldValue, newValue);
     } catch (err) {
       newValue = ERRORED;
       node.error = err;
@@ -79,7 +80,7 @@ const COMPUTED_NODE = /* @__PURE__ */ (() => ({
 
     node.value = newValue;
     node.version++;
-  }
+  },
 }))();
 
 export function createComputed<T>(computation: () => T): ComputedGetter<T> {

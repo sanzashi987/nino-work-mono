@@ -13,39 +13,53 @@ import FormBuilder, { type FormBuilderProps } from './FormBuilder';
 type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
   title?: React.ReactNode;
   content: React.ReactNode;
-  contentProps?:DialogContentProps
+  contentProps?: DialogContentProps;
   action?: React.ReactNode;
   onOk?: (form: UseFormReturn<any, any, undefined>) => Promise<void>;
   onClose?: () => Promise<void>;
   afterClose?: () => Promise<void>;
-  okButtonProps?: ButtonProps
-  cancelButtonProps?: ButtonProps
+  okButtonProps?: ButtonProps;
+  cancelButtonProps?: ButtonProps;
 };
 
-export const OpenModalContext = React.createContext<
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-// eslint-disable-next-line @typescript-eslint/no-throw-literal
-{ close:() => Promise<void>, form: UseFormReturn }>({ close: async () => { throw 'not inside context'; }, form: {} });
+export const OpenModalContext =
+  React.createContext<// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/no-throw-literal
+  { close: () => Promise<void>; form: UseFormReturn }>({
+    close: async () => {
+      throw 'not inside context';
+    },
+    form: {},
+  });
 
 const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cancelButtonProps'>> = ({
   onOk,
   okButtonProps = {},
-  cancelButtonProps = {}
+  cancelButtonProps = {},
 }) => {
   const { close, form } = useContext(OpenModalContext);
   const onSubmit = useCallback(async () => {
-    onOk?.(form as any).then(close).catch((e) => { console.warn(e); });
+    onOk?.(form as any)
+      .then(close)
+      .catch(e => {
+        console.warn(e);
+      });
   }, []);
   return (
     <Stack flexDirection="row-reverse">
       <LoadingGroup>
-        {onOk
-          ? (
-            <RequestButton {...{ variant: 'contained', type: 'submit', children: 'Ok', ...okButtonProps }} onClick={onSubmit} />
-          ) : null}
+        {onOk ? (
+          <RequestButton
+            {...{ variant: 'contained', type: 'submit', children: 'Ok', ...okButtonProps }}
+            onClick={onSubmit}
+          />
+        ) : null}
         <Box mr={1}>
-          <RequestButton {...{ variant: 'outlined', children: 'Cancel', ...cancelButtonProps }} onClick={close} />
+          <RequestButton
+            {...{ variant: 'outlined', children: 'Cancel', ...cancelButtonProps }}
+            onClick={close}
+          />
         </Box>
       </LoadingGroup>
     </Stack>
@@ -53,12 +67,24 @@ const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cance
 };
 
 const Modal: React.FC<ModalProps> = ({
-  title, content, onClose, onOk, afterClose, action, contentProps = {},
+  title,
+  content,
+  onClose,
+  onOk,
+  afterClose,
+  action,
+  contentProps = {},
   okButtonProps,
   cancelButtonProps,
   ...dialogProps
 }) => {
-  const defaultActions = action ?? <DefaultAction onOk={onOk} okButtonProps={okButtonProps} cancelButtonProps={cancelButtonProps} />;
+  const defaultActions = action ?? (
+    <DefaultAction
+      onOk={onOk}
+      okButtonProps={okButtonProps}
+      cancelButtonProps={cancelButtonProps}
+    />
+  );
   const [open, setOpen] = useState(true);
   const defaultForm = useForm();
   const { form, content: contentWithForm } = useMemo(() => {
@@ -69,13 +95,21 @@ const Modal: React.FC<ModalProps> = ({
     if (React.isValidElement(content) && 'form' in (content as any).props) {
       return { form: (content.props as any).form as UseFormReturn, content };
     }
-    return { form: defaultForm, content: React.cloneElement(content as any, { form: defaultForm }) };
+    return {
+      form: defaultForm,
+      content: React.cloneElement(content as any, { form: defaultForm }),
+    };
   }, [content, defaultForm]);
 
-  const ctx = useMemo(() => ({
-    close: async () => { setOpen(false); },
-    form
-  }), []);
+  const ctx = useMemo(
+    () => ({
+      close: async () => {
+        setOpen(false);
+      },
+      form,
+    }),
+    []
+  );
 
   const afterCloseMerged = useCallback(() => {
     afterClose?.();
@@ -84,27 +118,28 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <OpenModalContext.Provider value={ctx}>
-      <Dialog maxWidth="sm" fullWidth TransitionProps={{ onExited: afterCloseMerged }} {...dialogProps} open={open}>
+      <Dialog
+        maxWidth="sm"
+        fullWidth
+        TransitionProps={{ onExited: afterCloseMerged }}
+        {...dialogProps}
+        open={open}
+      >
         {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContent sx={{ px: 3, pb: 0 }} {...contentProps}>
           {contentWithForm}
         </DialogContent>
-        {action === false ? null
-          : (
-            <DialogActions>
-              {defaultActions}
-            </DialogActions>
-          )}
+        {action === false ? null : <DialogActions>{defaultActions}</DialogActions>}
       </Dialog>
     </OpenModalContext.Provider>
   );
 };
 
 type SimpleFormSubmit<FormData> = {
-  onOk: (form:UseFormReturn<FormData, any, undefined>) => Promise<any>
+  onOk: (form: UseFormReturn<FormData, any, undefined>) => Promise<any>;
 };
 
-const openModal = (props:Omit<ModalProps, 'onClose'>) => {
+const openModal = (props: Omit<ModalProps, 'onClose'>) => {
   const modalRoot = document.createElement('div');
   document.body.appendChild(modalRoot);
 
@@ -124,14 +159,18 @@ const openModal = (props:Omit<ModalProps, 'onClose'>) => {
 };
 
 type OpenSimpleFormProps<FormData> = {
-  modalProps: Omit<ModalProps, 'onClose' | 'content'>,
+  modalProps: Omit<ModalProps, 'onClose' | 'content'>;
   formProps: FormBuilderProps<FormData> & SimpleFormSubmit<FormData>;
-  dataBackfill?: FormData
+  dataBackfill?: FormData;
 };
-export const openSimpleForm = <FormData,>({ modalProps, formProps }: OpenSimpleFormProps<FormData>) => openModal({
-  ...modalProps,
-  content: <FormBuilder {...formProps} />,
-  action: modalProps.action
-});
+export const openSimpleForm = <FormData,>({
+  modalProps,
+  formProps,
+}: OpenSimpleFormProps<FormData>) =>
+  openModal({
+    ...modalProps,
+    content: <FormBuilder {...formProps} />,
+    action: modalProps.action,
+  });
 
 export default openModal;

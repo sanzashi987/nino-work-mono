@@ -7,7 +7,7 @@ import {
   markConsumerDirty,
   REACTIVE_NODE,
   ReactiveNode,
-  SIGNAL
+  SIGNAL,
 } from './reactive';
 import { defaultScheduler, Schedulable, Scheduler } from './scheduler';
 
@@ -23,15 +23,15 @@ const WATCH_NODE: Partial<WatchNode> = /* @__PURE__ */ (() => ({
     }
   },
   hasRun: false,
-  cleanupFn: NOOP_CLEANUP_FN
+  cleanupFn: NOOP_CLEANUP_FN,
 }))();
 
 export interface WatchNode extends ReactiveNode {
-  hasRun: boolean
-  ref: Watch
-  fn: (() =>VoidFunction) | VoidFunction
-  cleanupFn: VoidFunction
-  schedule: ((watch: Watch) => void) | null
+  hasRun: boolean;
+  ref: Watch;
+  fn: (() => VoidFunction) | VoidFunction;
+  cleanupFn: VoidFunction;
+  schedule: ((watch: Watch) => void) | null;
 }
 
 export interface Watch {
@@ -102,7 +102,7 @@ export function createWatch(
     run,
     cleanup: () => node.cleanupFn(),
     destroy: () => destroy(node),
-    [SIGNAL]: node
+    [SIGNAL]: node,
   };
 
   return node.ref;
@@ -111,7 +111,11 @@ export function createWatch(
 class EffectHandle implements Schedulable {
   readonly watcher: Watch;
 
-  constructor(scheduler: Scheduler, private effectFn: WatchNode['fn'], allowSignalWrites: boolean) {
+  constructor(
+    scheduler: Scheduler,
+    private effectFn: WatchNode['fn'],
+    allowSignalWrites: boolean
+  ) {
     this.watcher = createWatch(effectFn, () => scheduler.schedule(this), allowSignalWrites);
   }
 
@@ -125,9 +129,9 @@ class EffectHandle implements Schedulable {
 }
 
 export function effect(
-  effectFn:WatchNode['fn'],
-  opt?: { allowSignalWrites?:boolean, scheduler?:Scheduler }
-): { destroy:VoidFunction } {
+  effectFn: WatchNode['fn'],
+  opt?: { allowSignalWrites?: boolean; scheduler?: Scheduler }
+): { destroy: VoidFunction } {
   const handle = new EffectHandle(
     opt.scheduler ?? defaultScheduler,
     effectFn,

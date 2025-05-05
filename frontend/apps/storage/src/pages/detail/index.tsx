@@ -2,7 +2,14 @@
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBack, Check, Close, CloudUpload, CreateNewFolder, HomeRounded } from '@mui/icons-material';
+import {
+  ArrowBack,
+  Check,
+  Close,
+  CloudUpload,
+  CreateNewFolder,
+  HomeRounded,
+} from '@mui/icons-material';
 import {
   Stack,
   IconButton,
@@ -22,7 +29,7 @@ import {
   Menu,
   MenuItem,
   Popper,
-  ClickAwayListener
+  ClickAwayListener,
 } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Empty, LoadingGroup, RequestButton, Uploader } from '@nino-work/ui-components';
@@ -36,7 +43,7 @@ import {
   DirResponse,
   getBucketInfo,
   listBucketDir,
-  uploadFiles
+  uploadFiles,
 } from '@/api';
 
 const BucketDetail: React.FC = () => {
@@ -50,13 +57,16 @@ const BucketDetail: React.FC = () => {
   const [dirContents, setDirContents] = useState<DirResponse | null>(null);
   const [paths, setPaths] = useState<DirInfo[] | undefined>(undefined);
   const [draftFolder, setDraftFolder] = useState<boolean>(false);
-  const [toUpload, setToUpload] = useState<{ files: File[], map: Record<string, boolean> }>({ files: [], map: {} });
+  const [toUpload, setToUpload] = useState<{ files: File[]; map: Record<string, boolean> }>({
+    files: [],
+    map: {},
+  });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [contextEl, setContextEl] = useState<null | { x:number, y:number, fileId:string }>(null);
+  const [contextEl, setContextEl] = useState<null | { x: number; y: number; fileId: string }>(null);
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getBucketInfo({ bucket_id: id }).then((res) => {
+    getBucketInfo({ bucket_id: id }).then(res => {
       setInfo(res);
       setDirContents(res.dir_contents);
       setPaths([{ id: res.root_path_id, name: res.code }]);
@@ -74,16 +84,15 @@ const BucketDetail: React.FC = () => {
     if (!currentPathId || !name) {
       return Promise.resolve();
     }
-    return createDir({ name, bucket_id: Number(id), parent_id: currentPathId })
-      .then(() => {
-        getBucketDirContent(currentPathId);
-        setDraftFolder(false);
-      });
+    return createDir({ name, bucket_id: Number(id), parent_id: currentPathId }).then(() => {
+      getBucketDirContent(currentPathId);
+      setDraftFolder(false);
+    });
   }, [id, paths]);
 
   const onSelectFile = useCallback((files: File[]) => {
-    setToUpload((last) => {
-      const toAdd = files.filter((e) => !last.map[e.name]);
+    setToUpload(last => {
+      const toAdd = files.filter(e => !last.map[e.name]);
       if (toAdd.length === 0) {
         return last;
       }
@@ -96,20 +105,27 @@ const BucketDetail: React.FC = () => {
     });
   }, []);
 
-  const openUploadMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (toUpload.files.length === 0) {
-      return;
-    }
-    setAnchorEl(e.currentTarget);
-  }, [toUpload]);
+  const openUploadMenu = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      if (toUpload.files.length === 0) {
+        return;
+      }
+      setAnchorEl(e.currentTarget);
+    },
+    [toUpload]
+  );
 
   const uploadFilesToBucket = useCallback(async () => {
     const currentPathId = paths?.at(-1)?.id;
     if (!currentPathId || toUpload.files.length === 0) {
       return Promise.resolve();
     }
-    return uploadFiles({ bucket_id: Number(id), path_id: currentPathId, file: toUpload.files }).then(() => {
+    return uploadFiles({
+      bucket_id: Number(id),
+      path_id: currentPathId,
+      file: toUpload.files,
+    }).then(() => {
       setAnchorEl(null);
       getBucketDirContent(currentPathId);
       setToUpload({ files: [], map: {} });
@@ -122,17 +138,23 @@ const BucketDetail: React.FC = () => {
     if (!contextEl?.fileId || !currentPathId) {
       return;
     }
-    deleteFile({ bucket_id: Number(id), file_id: contextEl.fileId }).then(() => {
-      getBucketDirContent(currentPathId);
-    }).finally(() => {
-      setContextEl(null);
-    });
+    deleteFile({ bucket_id: Number(id), file_id: contextEl.fileId })
+      .then(() => {
+        getBucketDirContent(currentPathId);
+      })
+      .finally(() => {
+        setContextEl(null);
+      });
   }, [contextEl, paths]);
 
   return (
     <Box p={2}>
       <Stack direction="row" alignItems="center" mb={1}>
-        <IconButton onClick={() => { naviagte('../list'); }}>
+        <IconButton
+          onClick={() => {
+            naviagte('../list');
+          }}
+        >
           <ArrowBack />
         </IconButton>
 
@@ -141,137 +163,146 @@ const BucketDetail: React.FC = () => {
         </Typography>
       </Stack>
 
-      {paths
-        ? (
-          <Stack direction="row" alignItems="center">
-            <HomeRounded fontSize="small" />
-            <Breadcrumbs maxItems={3}>
-              {paths.slice(0, -1).map((p, i) => (
-                <Link
-                  key={p.id}
-                  sx={{ cursor: 'pointer' }}
-                  underline="hover"
-                  color="inherit"
-                  onClick={() => {
-                    setPaths((last) => last?.slice(0, i + 1));
-                    getBucketDirContent(p.id);
-                  }}
-                >
-                  {p.name}
-                </Link>
-              ))}
+      {paths ? (
+        <Stack direction="row" alignItems="center">
+          <HomeRounded fontSize="small" />
+          <Breadcrumbs maxItems={3}>
+            {paths.slice(0, -1).map((p, i) => (
+              <Link
+                key={p.id}
+                sx={{ cursor: 'pointer' }}
+                underline="hover"
+                color="inherit"
+                onClick={() => {
+                  setPaths(last => last?.slice(0, i + 1));
+                  getBucketDirContent(p.id);
+                }}
+              >
+                {p.name}
+              </Link>
+            ))}
 
-              <Typography sx={{ color: 'text.primary' }}>
-                {paths.at(-1)?.name}
-              </Typography>
-            </Breadcrumbs>
-          </Stack>
-        ) : null}
+            <Typography sx={{ color: 'text.primary' }}>{paths.at(-1)?.name}</Typography>
+          </Breadcrumbs>
+        </Stack>
+      ) : null}
 
-      {!dirContents ? Empty
-        : (
-          <>
-            <Stack direction="row">
-              <IconButton onClick={() => { setDraftFolder(true); }}>
-                <CreateNewFolder />
+      {!dirContents ? (
+        Empty
+      ) : (
+        <>
+          <Stack direction="row">
+            <IconButton
+              onClick={() => {
+                setDraftFolder(true);
+              }}
+            >
+              <CreateNewFolder />
+            </IconButton>
+            <Uploader onChange={onSelectFile}>
+              <IconButton onContextMenu={openUploadMenu}>
+                <Badge badgeContent={toUpload.files.length} color="primary">
+                  <CloudUpload />
+                </Badge>
               </IconButton>
-              <Uploader onChange={onSelectFile}>
-                <IconButton onContextMenu={openUploadMenu}>
-                  <Badge badgeContent={toUpload.files.length} color="primary">
-                    <CloudUpload />
-                  </Badge>
-                </IconButton>
-              </Uploader>
-            </Stack>
+            </Uploader>
+          </Stack>
 
-            <TableContainer component={Paper} elevation={10}>
-              <Table size="small">
-                <TableHead>
+          <TableContainer component={Paper} elevation={10}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Size</TableCell>
+                  <TableCell>Update Time</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {draftFolder && (
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Size</TableCell>
-                    <TableCell>Update Time</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-
-                  {draftFolder
-                    && (
-                      <TableRow>
-                        <TableCell>
-                          <Stack direction="row" spacing={1}>
-                            <Input ref={ref} size="small" sx={{ input: { height: '12px', fontSize: '12px' } }} />
-                            <LoadingGroup>
-                              <RequestButton size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={handleCreateDir}>
-                                <Check fontSize="small" />
-                              </RequestButton>
-                              <RequestButton size="small" variant="text" sx={{ minWidth: 0, p: 0 }} onClick={async () => { setDraftFolder(false); }}>
-                                <Close fontSize="small" />
-                              </RequestButton>
-                            </LoadingGroup>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    )}
-
-                  {dirContents.dirs.map((e) => (
-                    <TableRow key={`d${e.id}`}>
-                      <TableCell>
-                        <Link
-                          underline="hover"
-                          sx={{ cursor: 'pointer' }}
-                          onClick={() => {
-                            setPaths((last) => last?.concat(e));
-                            getBucketDirContent(e.id);
-                          }}
-                        >
-                          {e.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell />
-                      <TableCell />
-                    </TableRow>
-                  ))}
-
-                  {dirContents.files.map((e) => (
-                    <TableRow
-                      key={`f${e.file_id}`}
-                      component="div"
-                      onContextMenu={(ev) => {
-                        ev.preventDefault();
-                        setContextEl({ x: ev.clientX, y: ev.clientY, fileId: e.file_id });
-                      }}
-                    >
-                      <TableCell>{e.name}</TableCell>
-                      <TableCell>{filesize(e.size)}</TableCell>
-                      <TableCell>{dayjs(e.update_time * 1000).format(DATE_TIME_FORMAT)}</TableCell>
-                    </TableRow>
-                  ))}
-
-                  {dirContents.dirs.length + dirContents.files.length === 0 && !draftFolder
-                    && (
-                      <Stack justifyContent="center" textAlign="center" minHeight="200px">
-                        No Data
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Input
+                          ref={ref}
+                          size="small"
+                          sx={{ input: { height: '12px', fontSize: '12px' } }}
+                        />
+                        <LoadingGroup>
+                          <RequestButton
+                            size="small"
+                            variant="text"
+                            sx={{ minWidth: 0, p: 0 }}
+                            onClick={handleCreateDir}
+                          >
+                            <Check fontSize="small" />
+                          </RequestButton>
+                          <RequestButton
+                            size="small"
+                            variant="text"
+                            sx={{ minWidth: 0, p: 0 }}
+                            onClick={async () => {
+                              setDraftFolder(false);
+                            }}
+                          >
+                            <Close fontSize="small" />
+                          </RequestButton>
+                        </LoadingGroup>
                       </Stack>
-                    )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
+                    </TableCell>
+                  </TableRow>
+                )}
 
-        )}
+                {dirContents.dirs.map(e => (
+                  <TableRow key={`d${e.id}`}>
+                    <TableCell>
+                      <Link
+                        underline="hover"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          setPaths(last => last?.concat(e));
+                          getBucketDirContent(e.id);
+                        }}
+                      >
+                        {e.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell />
+                    <TableCell />
+                  </TableRow>
+                ))}
 
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        onClose={() => setAnchorEl(null)}
-      >
+                {dirContents.files.map(e => (
+                  <TableRow
+                    key={`f${e.file_id}`}
+                    component="div"
+                    onContextMenu={ev => {
+                      ev.preventDefault();
+                      setContextEl({ x: ev.clientX, y: ev.clientY, fileId: e.file_id });
+                    }}
+                  >
+                    <TableCell>{e.name}</TableCell>
+                    <TableCell>{filesize(e.size)}</TableCell>
+                    <TableCell>{dayjs(e.update_time * 1000).format(DATE_TIME_FORMAT)}</TableCell>
+                  </TableRow>
+                ))}
+
+                {dirContents.dirs.length + dirContents.files.length === 0 && !draftFolder && (
+                  <Stack justifyContent="center" textAlign="center" minHeight="200px">
+                    No Data
+                  </Stack>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
+
+      <Menu id="basic-menu" anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
         {toUpload.files.map((f, i) => (
           <MenuItem
             key={f.name}
             onDoubleClick={() => {
-              setToUpload((last) => {
+              setToUpload(last => {
                 const next = last.files.concat();
                 const nextMap = { ...last.map };
                 next.splice(i, 1);
@@ -291,13 +322,20 @@ const BucketDetail: React.FC = () => {
         </MenuItem>
       </Menu>
       <Popper
-        sx={{ transform: `translate(${contextEl?.x}px, ${contextEl?.y}px)`, position: 'absolute', top: 0, left: 0 }}
+        sx={{
+          transform: `translate(${contextEl?.x}px, ${contextEl?.y}px)`,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}
         open={!!contextEl}
       >
         <ClickAwayListener onClickAway={() => setContextEl(null)}>
           <Paper>
             <MenuItem dense>Rename</MenuItem>
-            <MenuItem dense onClick={deleteFileFromPopper}>Delete</MenuItem>
+            <MenuItem dense onClick={deleteFileFromPopper}>
+              Delete
+            </MenuItem>
           </Paper>
         </ClickAwayListener>
       </Popper>

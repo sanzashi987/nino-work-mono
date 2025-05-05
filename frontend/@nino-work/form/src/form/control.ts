@@ -9,7 +9,7 @@ export const enum ControlStatus {
   VALID = 'VALID',
   INVALID = 'INVALID',
   PENDING = 'PENDING',
-  DISABLED = 'DISABLED'
+  DISABLED = 'DISABLED',
 }
 
 export type IsAny<T, Y, N> = 0 extends 1 & T ? Y : N;
@@ -31,7 +31,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   protected readonly protoModel: IModel<any, any>;
 
   constructor(model: IModel<TValue, any>, initialValue?: TValue) {
-    this.initialValue = initialValue ?? model.formItemProps.initialValue as TValue;
+    this.initialValue = initialValue ?? (model.formItemProps.initialValue as TValue);
     this.protoModel = model;
     // eslint-disable-next-line no-plusplus
     this.instanceId = `nino-control-${nextInstanceId++}`;
@@ -58,7 +58,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     if (this._composedValidatorFn) {
       this.statusReactive.set(ControlStatus.PENDING);
       this._composedValidatorFn(this.value).then(({ errors, warnings }) => {
-        this.errors = (errors.length === 0 && warnings.length === 0) ? null : { errors, warnings };
+        this.errors = errors.length === 0 && warnings.length === 0 ? null : { errors, warnings };
         this._updateErrors(this);
       });
     }
@@ -72,7 +72,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     }
   }
 
-  markAsPending(opts: { onlySelf?: boolean, source?: AbstractControl }) {
+  markAsPending(opts: { onlySelf?: boolean; source?: AbstractControl }) {
     this.statusReactive.set(ControlStatus.PENDING);
     const control = opts.source ?? this;
     if (this._parent && !opts.onlySelf) {
@@ -87,7 +87,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   /** structure tree */
 
   abstract _forEachChild(cb: (c: AbstractControl) => void): void;
-  abstract _anyControls(fn:(c: AbstractControl) => boolean):boolean;
+  abstract _anyControls(fn: (c: AbstractControl) => boolean): boolean;
   private _parent: LegalParent | null;
 
   setParent(p: LegalParent | null) {
@@ -155,7 +155,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     untracked(() => this._dirtyReactive.set(val));
   }
 
-  markAsDirty(opts: { onlySelf?: boolean, source?: AbstractControl }) {
+  markAsDirty(opts: { onlySelf?: boolean; source?: AbstractControl }) {
     const changed = this.dirty === false;
 
     const sourceControl = opts.source ?? this;
@@ -168,11 +168,11 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     }
   }
 
-  markAsPristine(opts: { onlySelf?: boolean, source?: AbstractControl }) {
+  markAsPristine(opts: { onlySelf?: boolean; source?: AbstractControl }) {
     const changed = this.dirty === true;
 
     const control = opts.source ?? this;
-    this._forEachChild((c) => {
+    this._forEachChild(c => {
       c.markAsPristine({ onlySelf: true });
     });
     if (changed) {
@@ -184,7 +184,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   _anyControlsDirty() {
-    return this._anyControls((c) => c.dirty);
+    return this._anyControls(c => c.dirty);
   }
 
   _updateDirty(opts: { onlySelf?: boolean }, source: AbstractControl) {
@@ -229,14 +229,14 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
     untracked(() => this.statusReactive.set(v));
   }
 
-  private _deriveStatus():ControlStatus {
+  private _deriveStatus(): ControlStatus {
     if (this._allControlsDisabled()) return ControlStatus.DISABLED;
     if (this.errors) return ControlStatus.INVALID;
     if (this._anyControlsHaveStatus(ControlStatus.PENDING)) return ControlStatus.PENDING;
     return ControlStatus.VALID;
   }
 
-  updateValueAndValidity(opts: { onlySelf?: boolean, source?:AbstractControl }) {
+  updateValueAndValidity(opts: { onlySelf?: boolean; source?: AbstractControl }) {
     const status = this._allControlsDisabled() ? ControlStatus.DISABLED : ControlStatus.VALID;
     this._deriveValue();
     const source = opts.source ?? this;
@@ -252,7 +252,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   enable(opts: { onlySelf?: boolean }) {
     this.statusReactive.set(ControlStatus.VALID);
     const dirty = this._isParentDirty();
-    this._forEachChild((c) => {
+    this._forEachChild(c => {
       c.enable({ ...opts, onlySelf: true });
     });
     this.updateValueAndValidity({ onlySelf: true });
@@ -262,7 +262,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   disable(opts: { onlySelf?: boolean }) {
     this.statusReactive.set(ControlStatus.DISABLED);
     const dirty = this._isParentDirty();
-    this._forEachChild((c) => {
+    this._forEachChild(c => {
       c.disable({ ...opts, onlySelf: true });
     });
     this.updateValueAndValidity({ onlySelf: true });
@@ -275,7 +275,7 @@ export abstract class AbstractControl<TValue = any, TRawValue extends TValue = T
   }
 
   _anyControlsHaveStatus(status: ControlStatus): boolean {
-    return this._anyControls((c) => c.status === status);
+    return this._anyControls(c => c.status === status);
   }
 
   private _updateParents(

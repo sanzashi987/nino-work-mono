@@ -12,7 +12,7 @@ import router from './pages';
 const theme = createTheme(themeConfig as ThemeOptions);
 
 type AppProps = {
-  importMapPromise : Promise<MenuMeta[]>
+  importMapPromise: Promise<MenuMeta[]>;
 };
 const App: React.FC<AppProps> = ({ importMapPromise }) => {
   const { data } = usePromise(useCallback(() => importMapPromise, []));

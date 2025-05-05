@@ -8,7 +8,7 @@ import {
   REACTIVE_NODE,
   ReactiveNode,
   Signal,
-  SIGNAL
+  SIGNAL,
 } from './reactive';
 
 let postSignalSetFn: (() => void) | null = null;
@@ -37,7 +37,7 @@ export const SIGNAL_NODE: SignalNode<unknown> = /* @__PURE__ */ (() => ({
   ...REACTIVE_NODE,
   equal: defaultEquals,
   value: undefined,
-  kind: 'signal'
+  kind: 'signal',
 }))();
 
 export function createSignal<T>(value: T): SignalGetter<T> {

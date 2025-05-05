@@ -9,7 +9,7 @@ import {
   Box,
   Pagination,
   Paper,
-  Table
+  Table,
 } from '@mui/material';
 import { noop, PaginationResponse, PageSize } from '@nino-work/shared';
 import { Model } from './defineModel';
@@ -18,23 +18,23 @@ import loading from '../Loading';
 export const useDeps = () => {
   const [key, setKey] = useState(0);
 
-  const refresh = useCallback(() => setKey((k) => k + 1), []);
+  const refresh = useCallback(() => setKey(k => k + 1), []);
 
   return [useMemo(() => [key], [key]), refresh] as const;
 };
 
 type ManagerShellProps<Res, T = any> = {
-  schema: Model<T>[],
-  requester: (parms: PageSize) => Promise<PaginationResponse<Res>>
-  ActionNode?: React.ReactNode,
-  deps?: any[]
+  schema: Model<T>[];
+  requester: (parms: PageSize) => Promise<PaginationResponse<Res>>;
+  ActionNode?: React.ReactNode;
+  deps?: any[];
 };
 
 const ManagerShell = <Res, T>({
   requester,
   schema,
   deps,
-  ActionNode
+  ActionNode,
 }: ManagerShellProps<Res, T>) => {
   const [pagination, setPagination] = useState<PageSize>({ page: 1, size: 10 });
   const [data, setData] = useState<PaginationResponse<Res> | null>(null);
@@ -44,17 +44,20 @@ const ManagerShell = <Res, T>({
     requester(pagination).then(setData).catch(noop);
   }, [...deps, pagination]);
 
-  const tableHeader = useMemo(() => (
-    <TableHead>
-      <TableRow>
-        {schema.map((e) => (
-          <TableCell key={e.field} {...e.headerCellProps ?? {}}>
-            {e.label}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  ), [schema]);
+  const tableHeader = useMemo(
+    () => (
+      <TableHead>
+        <TableRow>
+          {schema.map(e => (
+            <TableCell key={e.field} {...(e.headerCellProps ?? {})}>
+              {e.label}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+    ),
+    [schema]
+  );
 
   const content = useMemo(() => {
     if (!data) {
@@ -71,14 +74,14 @@ const ManagerShell = <Res, T>({
     }
 
     const inner = data.data.map((row, i) => (
-      <TableRow
-        key={i as any}
-        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-      >
-        {schema.map((e) => {
-          const val = typeof e.dataCellProps?.render === 'function' ? e.dataCellProps.render(row, i) : (row as any)[e.field as any];
+      <TableRow key={i as any} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        {schema.map(e => {
+          const val =
+            typeof e.dataCellProps?.render === 'function'
+              ? e.dataCellProps.render(row, i)
+              : (row as any)[e.field as any];
           return (
-            <TableCell key={e.field} {...e.dataCellProps ?? {}}>
+            <TableCell key={e.field} {...(e.dataCellProps ?? {})}>
               {val}
             </TableCell>
           );
@@ -91,23 +94,25 @@ const ManagerShell = <Res, T>({
   return (
     <Stack p={3}>
       {ActionNode}
-      {!data
-        ? (
-          <Box flexGrow={1} mt={2}>
-            {loading}
-          </Box>
-        )
-        : (
-          <>
-            <TableContainer component={Paper} elevation={10} sx={{ my: 3 }}>
-              <Table size="small">
-                {tableHeader}
-                {content}
-              </Table>
-            </TableContainer>
-            <Pagination sx={{ mt: 2, '.MuiPagination-ul': { justifyContent: 'end' } }} shape="rounded" size="small" />
-          </>
-        )}
+      {!data ? (
+        <Box flexGrow={1} mt={2}>
+          {loading}
+        </Box>
+      ) : (
+        <>
+          <TableContainer component={Paper} elevation={10} sx={{ my: 3 }}>
+            <Table size="small">
+              {tableHeader}
+              {content}
+            </Table>
+          </TableContainer>
+          <Pagination
+            sx={{ mt: 2, '.MuiPagination-ul': { justifyContent: 'end' } }}
+            shape="rounded"
+            size="small"
+          />
+        </>
+      )}
     </Stack>
   );
 };

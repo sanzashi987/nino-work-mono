@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import { createBucket, BucketMeta } from '@/api';
 
 type CreateProps = {
-  onSuccess: VoidFunction
-  requester: (params: BucketMeta) => Promise<any>
+  onSuccess: VoidFunction;
+  requester: (params: BucketMeta) => Promise<any>;
 };
 
 const CreateBucket = ({ onSuccess, requester }: CreateProps) => {
@@ -16,9 +16,12 @@ const CreateBucket = ({ onSuccess, requester }: CreateProps) => {
 
   const onSubmit = useCallback((payload: BucketMeta) => {
     setLoading(true);
-    requester(payload).then(onSuccess).then(close).finally(() => {
-      setLoading(false);
-    });
+    requester(payload)
+      .then(onSuccess)
+      .then(close)
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -30,14 +33,22 @@ const CreateBucket = ({ onSuccess, requester }: CreateProps) => {
         </Box>
         <Box my={2}>
           <FormLabel title="Description" field="description" />
-          <TextField id="description" fullWidth {...register('description')} multiline minRows={3} />
+          <TextField
+            id="description"
+            fullWidth
+            {...register('description')}
+            multiline
+            minRows={3}
+          />
         </Box>
         <Stack flexDirection="row-reverse">
           <Button loading={loading} variant="contained" size="medium" type="submit">
             Create
           </Button>
           <Box mr={1}>
-            <Button variant="outlined" onClick={close}>Cancel</Button>
+            <Button variant="outlined" onClick={close}>
+              Cancel
+            </Button>
           </Box>
         </Stack>
       </form>
@@ -49,7 +60,7 @@ const openCreateBucket = (onSuccess: VoidFunction) => {
   openModal({
     title: 'Create Bucket',
     content: <CreateBucket onSuccess={onSuccess} requester={createBucket} />,
-    action: false
+    action: false,
   });
 };
 

@@ -22,9 +22,11 @@ dependencies:
     version: link:../../@nino-work/ui-components
 
 packages:
-
   /@atlaskit/pragmatic-drag-and-drop@1.5.3:
-    resolution: {integrity: sha512-YFhSvBJjnPbYuZrCDaiTLwdJ+zxgS7uBaBObzB8Io77DFnGi3M4IV87Jwc1dwb6RS4BszslPOrX0axz0pODCsw==}
+    resolution:
+      {
+        integrity: sha512-YFhSvBJjnPbYuZrCDaiTLwdJ+zxgS7uBaBObzB8Io77DFnGi3M4IV87Jwc1dwb6RS4BszslPOrX0axz0pODCsw==,
+      }
     dependencies:
       '@babel/runtime': 7.27.0
       bind-event-listener: 3.0.0
@@ -32,20 +34,32 @@ packages:
     dev: false
 
   /@babel/runtime@7.27.0:
-    resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
-    engines: {node: '>=6.9.0'}
+    resolution:
+      {
+        integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==,
+      }
+    engines: { node: '>=6.9.0' }
     dependencies:
       regenerator-runtime: 0.14.1
     dev: false
 
   /bind-event-listener@3.0.0:
-    resolution: {integrity: sha512-PJvH288AWQhKs2v9zyfYdPzlPqf5bXbGMmhmUIY9x4dAUGIWgomO771oBQNwJnMQSnUIXhKu6sgzpBRXTlvb8Q==}
+    resolution:
+      {
+        integrity: sha512-PJvH288AWQhKs2v9zyfYdPzlPqf5bXbGMmhmUIY9x4dAUGIWgomO771oBQNwJnMQSnUIXhKu6sgzpBRXTlvb8Q==,
+      }
     dev: false
 
   /raf-schd@4.0.3:
-    resolution: {integrity: sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==}
+    resolution:
+      {
+        integrity: sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==,
+      }
     dev: false
 
   /regenerator-runtime@0.14.1:
-    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
+    resolution:
+      {
+        integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==,
+      }
     dev: false

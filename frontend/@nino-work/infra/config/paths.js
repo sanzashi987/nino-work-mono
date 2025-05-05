@@ -5,7 +5,7 @@ const fs = require('fs');
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebook/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
+const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 // We use `PUBLIC_URL` environment variable or "homepage" field to infer
 // "public path" at which the app is served.
@@ -32,12 +32,14 @@ const moduleFileExtensions = [
   'tsx',
   'json',
   'web.jsx',
-  'jsx'
+  'jsx',
 ];
 
 // Resolve file paths in the same order as webpack
 const resolveModule = (resolveFn, filePath) => {
-  const extension = moduleFileExtensions.find((extension) => fs.existsSync(resolveFn(`${filePath}.${extension}`)));
+  const extension = moduleFileExtensions.find(extension =>
+    fs.existsSync(resolveFn(`${filePath}.${extension}`))
+  );
 
   if (extension) {
     return resolveFn(`${filePath}.${extension}`);
@@ -67,7 +69,7 @@ module.exports = {
   appTsBuildInfoFile: resolveApp('node_modules/.cache/tsconfig.tsbuildinfo'),
   swSrc: resolveModule(resolveApp, 'src/service-worker'),
   publicUrlOrPath,
-  infraPath: resolveApp('infra.config.js')
+  infraPath: resolveApp('infra.config.js'),
 };
 
 module.exports.moduleFileExtensions = moduleFileExtensions;

@@ -12,7 +12,7 @@ export function producerIncrementEpoch(): void {
   epoch++;
 }
 
-export const SIGNAL = /* @__PURE__ */Symbol('SIGNAL');
+export const SIGNAL = /* @__PURE__ */ Symbol('SIGNAL');
 
 export function setActiveConsumer(consumer: ReactiveNode | null): ReactiveNode | null {
   const prev = activeConsumer;
@@ -40,16 +40,16 @@ export function isReactive(value: unknown): value is Reactive {
 }
 
 export type Signal<T> = (() => T) & {
-  [SIGNAL]:unknown
+  [SIGNAL]: unknown;
 };
 
 export interface ReactiveNode {
-  version: Version
+  version: Version;
   lastCleanEpoch: Version;
   dirty: boolean;
 
   producers?: ReactiveNode[];
-  indexInThoseProducers?: number[]
+  indexInThoseProducers?: number[];
   producerLastReadVersion?: Version[];
   nextProducerIndex: number;
 
@@ -65,8 +65,8 @@ export interface ReactiveNode {
   consumerMarkedDirty(node: unknown): void;
 
   /**
- * Called when a signal is read within this consumer.
- */
+   * Called when a signal is read within this consumer.
+   */
   consumerOnSignalRead(node: unknown): void;
 
   kind: string;
@@ -152,7 +152,11 @@ function producerRemoveConsumer(producer: ReactiveNode, idx: number): void {
   }
 }
 
-function producerAddConsumer(producer: ReactiveNode, consumer: ReactiveNode, indexOfConsumer: number): number {
+function producerAddConsumer(
+  producer: ReactiveNode,
+  consumer: ReactiveNode,
+  indexOfConsumer: number
+): number {
   assertProducer(producer);
   if (producer.consumers.length === 0 && isConsumer(producer)) {
     for (let i = 0; i < producer.producers.length; i++) {
@@ -173,7 +177,10 @@ export function destroyConsumer(consumer: ReactiveNode) {
   }
 
   // eslint-disable-next-line no-multi-assign
-  consumer.producers.length = consumer.producerLastReadVersion.length = consumer.indexInThoseProducers.length = 0;
+  consumer.producers.length =
+    consumer.producerLastReadVersion.length =
+    consumer.indexInThoseProducers.length =
+      0;
   if (consumer.consumers) {
     // eslint-disable-next-line no-multi-assign
     consumer.consumers.length = consumer.indexInThoseConsumers.length = 0;
@@ -250,7 +257,9 @@ export function accessProducer(node: ReactiveNode) {
 
   if (activeConsumer.producers[idx] !== node) {
     activeConsumer.producers[idx] = node;
-    activeConsumer.indexInThoseProducers[idx] = isConsumerLive(activeConsumer) ? producerAddConsumer(node, activeConsumer, idx) : 0;
+    activeConsumer.indexInThoseProducers[idx] = isConsumerLive(activeConsumer)
+      ? producerAddConsumer(node, activeConsumer, idx)
+      : 0;
   }
 
   activeConsumer.producerLastReadVersion[idx] = node.version;
@@ -262,13 +271,15 @@ export function consumerBeginWork(node: ReactiveNode | null): ReactiveNode | nul
   return setActiveConsumer(node);
 }
 
-export function consumerCompleteWork(
-  node: ReactiveNode | null,
-  prevConsumer: ReactiveNode | null
-) {
+export function consumerCompleteWork(node: ReactiveNode | null, prevConsumer: ReactiveNode | null) {
   setActiveConsumer(prevConsumer);
 
-  if (!node || node.producers === undefined || node.indexInThoseProducers === undefined || node.producerLastReadVersion === undefined) {
+  if (
+    !node ||
+    node.producers === undefined ||
+    node.indexInThoseProducers === undefined ||
+    node.producerLastReadVersion === undefined
+  ) {
     return;
   }
 
@@ -302,7 +313,7 @@ export const REACTIVE_NODE: ReactiveNode = {
   producerMustRecompute: () => false,
   producerRecomputeValue: () => {},
   consumerMarkedDirty: () => {},
-  consumerOnSignalRead: () => {}
+  consumerOnSignalRead: () => {},
 };
 
 export function untracked<T>(untrackedReader: () => T): T {

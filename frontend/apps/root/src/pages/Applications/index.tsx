@@ -11,7 +11,7 @@ const staticSchema = [
   { label: 'Name', field: 'name' },
   { label: 'Code', field: 'code' },
   { label: 'Description', field: 'description' },
-  { label: 'Status', field: 'status' }
+  { label: 'Status', field: 'status' },
 ];
 
 const AppsManagement: React.FC = () => {
@@ -19,40 +19,50 @@ const AppsManagement: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const schema = useMemo(() => [
-    ...staticSchema,
-    {
-      label: 'Operation',
-      field: 'id',
-      headerCellProps: { align: 'center' as const },
-      dataCellProps: {
-        align: 'center' as const,
-        render: (row: any) => (
-          <>
-            <IconButton onClick={() => {
-              navigate(`./permission/${row.id}`);
-            }}
-            >
-              <Settings />
-            </IconButton>
-            <IconButton>
-              <Delete />
-            </IconButton>
-          </>
-        )
-      }
-    }], [navigate]);
+  const schema = useMemo(
+    () => [
+      ...staticSchema,
+      {
+        label: 'Operation',
+        field: 'id',
+        headerCellProps: { align: 'center' as const },
+        dataCellProps: {
+          align: 'center' as const,
+          render: (row: any) => (
+            <>
+              <IconButton
+                onClick={() => {
+                  navigate(`./permission/${row.id}`);
+                }}
+              >
+                <Settings />
+              </IconButton>
+              <IconButton>
+                <Delete />
+              </IconButton>
+            </>
+          ),
+        },
+      },
+    ],
+    [navigate]
+  );
 
   return (
     <ManagerShell
       deps={deps}
       schema={schema}
       requester={getAppList}
-      ActionNode={(
-        <Button color="info" variant="contained" sx={{ width: 'fit-content' }} onClick={() => openCreateApp(refresh)}>
+      ActionNode={
+        <Button
+          color="info"
+          variant="contained"
+          sx={{ width: 'fit-content' }}
+          onClick={() => openCreateApp(refresh)}
+        >
           + Create Application
         </Button>
-      )}
+      }
     />
   );
 };

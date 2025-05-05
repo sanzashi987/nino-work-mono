@@ -3,33 +3,31 @@ import { decideControl, type IModel, type ObjectModel } from './define';
 import { AbstractControl, ControlStatus, FormRawValue, FormValue, TypedOrUntyped } from './control';
 import { Path } from './validators';
 
-export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
-T,
-Partial<{ [K in keyof T]: FormValue<T[K]> }>,
-{ [key: string]: any }
->;
+export type ExtractFormObjectValue<T extends { [K in keyof T]?: AbstractControl<any> }> =
+  TypedOrUntyped<T, Partial<{ [K in keyof T]: FormValue<T[K]> }>, { [key: string]: any }>;
 
-export type ExtractFormObjectRawValue<T extends { [K in keyof T]?: AbstractControl<any> }> = TypedOrUntyped<
-T,
-{ [K in keyof T]: FormRawValue<T[K]> },
-{ [key: string]: any }
->;
+export type ExtractFormObjectRawValue<T extends { [K in keyof T]?: AbstractControl<any> }> =
+  TypedOrUntyped<T, { [K in keyof T]: FormRawValue<T[K]> }, { [key: string]: any }>;
 
-class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
-  extends AbstractControl<TValue, TRawValue> {
+class FormObject<
+  TValue extends object = any,
+  TRawValue extends TValue = TValue,
+> extends AbstractControl<TValue, TRawValue> {
   constructor(model: ObjectModel<TValue, any>, initialValue: any = {}) {
     super(model, initialValue);
     const myInitialValue = {};
     const otherValue = { ...initialValue };
     if (Array.isArray(model.children)) {
-      this.controls = Object.fromEntries((model.children as IModel<any, any>[]).map((ctrl) => {
-        const { field } = ctrl;
-        if (field in initialValue) {
-          myInitialValue[field] = initialValue[field];
-          delete otherValue[field];
-        }
-        return [field, decideControl(ctrl, initialValue[field])];
-      })) as any;
+      this.controls = Object.fromEntries(
+        (model.children as IModel<any, any>[]).map(ctrl => {
+          const { field } = ctrl;
+          if (field in initialValue) {
+            myInitialValue[field] = initialValue[field];
+            delete otherValue[field];
+          }
+          return [field, decideControl(ctrl, initialValue[field])];
+        })
+      ) as any;
     }
     // @ts-ignore
     this.initialValue = myInitialValue;
@@ -65,7 +63,7 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
 
   override setValue(value: Partial<TRawValue>, options?: object): void {
     if (!(value instanceof Array) && typeof value === 'object') {
-      Object.keys(value).forEach((name) => {
+      Object.keys(value).forEach(name => {
         const control = this.controls[name];
         if (control) {
           control.setValue(value[name]);
@@ -79,7 +77,7 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
 
   override patchValue(value: Partial<TRawValue>, options?: object): void {
     if (value == null) return;
-    (Object.keys(value) as Array<keyof TValue>).forEach((name) => {
+    (Object.keys(value) as Array<keyof TValue>).forEach(name => {
       const control = (this.controls as any)[name];
       if (control) {
         control.patchValue(value[name as any]);
@@ -122,13 +120,13 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
   }
 
   setupControls(): void {
-    this._forEachChild((c) => {
+    this._forEachChild(c => {
       c.setParent(this);
     });
   }
 
-  override _forEachChild(cb: (c: any, key:any) => void): void {
-    Object.keys(this.controls).forEach((key) => {
+  override _forEachChild(cb: (c: any, key: any) => void): void {
+    Object.keys(this.controls).forEach(key => {
       const control = (this.controls as any)[key];
       if (control) {
         cb(control, key);
@@ -149,7 +147,7 @@ class FormObject<TValue extends object = any, TRawValue extends TValue = TValue>
   }
 
   override _findChildName(control: AbstractControl): Path | null {
-    const res = Object.entries(this.controls).find((c) => c[1] === control);
+    const res = Object.entries(this.controls).find(c => c[1] === control);
     if (!res) return null;
     return res[0];
   }

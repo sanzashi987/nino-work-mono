@@ -4,7 +4,7 @@ import { PageSize, PaginationResponse } from './types';
 type PaginationRequest<F> = PageSize & Partial<F>;
 
 type UsePaginationResult<T, F> = {
-  loading: boolean
+  loading: boolean;
   data: T[];
   total: number;
   currentSize: number;
@@ -21,7 +21,7 @@ export const usePagination = <T, F extends object>(
 ): UsePaginationResult<T, F> => {
   const [pagination, setPagination] = useState<PageSize>({
     page: page ?? 1,
-    size: size ?? 25
+    size: size ?? 25,
   });
   const [data, setData] = useState<T[]>([]);
   const [total, setTotal] = useState(0);
@@ -34,8 +34,12 @@ export const usePagination = <T, F extends object>(
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await requestFnRef.current({ page: pagination.page, size: pagination.size, ...filters });
-      setPagination((last) => ({ ...last, page: response.page }));
+      const response = await requestFnRef.current({
+        page: pagination.page,
+        size: pagination.size,
+        ...filters,
+      });
+      setPagination(last => ({ ...last, page: response.page }));
       setData(response.data);
       setTotal(response.total);
     } catch (error) {
@@ -51,17 +55,20 @@ export const usePagination = <T, F extends object>(
     fetchData();
   }, [fetchData]);
 
-  const { setPage, setPageSize, refresh } = useMemo(() => ({
-    setPage: (nextPage: number) => {
-      setPagination((prev) => ({ ...prev, page: nextPage }));
-    },
-    setPageSize: (nextSize: number) => {
-      setPagination((prev) => ({ ...prev, size: nextSize, page: 1 })); // Reset to page 1 when page size changes
-    },
-    refresh: () => {
-      fetchDataRef.current();
-    }
-  }), []);
+  const { setPage, setPageSize, refresh } = useMemo(
+    () => ({
+      setPage: (nextPage: number) => {
+        setPagination(prev => ({ ...prev, page: nextPage }));
+      },
+      setPageSize: (nextSize: number) => {
+        setPagination(prev => ({ ...prev, size: nextSize, page: 1 })); // Reset to page 1 when page size changes
+      },
+      refresh: () => {
+        fetchDataRef.current();
+      },
+    }),
+    []
+  );
 
   return {
     loading,
@@ -71,7 +78,7 @@ export const usePagination = <T, F extends object>(
     currentSize: pagination.size,
     setPage,
     setPageSize,
-    setFilters: (newFilters) => setFilters((prev) => ({ ...prev, ...newFilters })),
-    refresh
+    setFilters: newFilters => setFilters(prev => ({ ...prev, ...newFilters })),
+    refresh,
   };
 };

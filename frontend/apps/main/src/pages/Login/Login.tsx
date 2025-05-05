@@ -26,12 +26,15 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
   const onSubmit = ({ username, password, remember }: any) => {
     const payload = { username, password, expiry: remember ? 30 : 1 };
     setLoading(true);
-    login(payload).then(({ jwt_token }) => {
-      Cookie.set('login_token', jwt_token);
-      navigate('/home');
-    }).catch(noop).finally(() => {
-      setLoading(false);
-    });
+    login(payload)
+      .then(({ jwt_token }) => {
+        Cookie.set('login_token', jwt_token);
+        navigate('/home');
+      })
+      .catch(noop)
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -45,10 +48,8 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
     () => (
       <InputAdornment position="end">
         <IconButton
-          aria-label={
-            showPassword ? 'hide the password' : 'display the password'
-          }
-          onClick={() => setShowPassword((last) => !last)}
+          aria-label={showPassword ? 'hide the password' : 'display the password'}
+          onClick={() => setShowPassword(last => !last)}
         >
           {showPassword ? <VisibilityOff /> : <Visibility />}
         </IconButton>
@@ -80,20 +81,9 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
               endAdornment={indornent}
             />
           </Box>
-          <Stack
-            justifyContent="space-between"
-            direction="row"
-            alignItems="center"
-            my={2}
-          >
+          <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
             <FormControlLabel
-              control={(
-                <Checkbox
-                  id="remember"
-                  {...register('remember')}
-                  defaultChecked
-                />
-              )}
+              control={<Checkbox id="remember" {...register('remember')} defaultChecked />}
               label="Remember me in 30 days"
             />
             {/* <Typography
@@ -106,13 +96,7 @@ const AuthLogin: React.FC<LoginProps> = ({ title, subtitle }) => {
           </Stack>
         </Stack>
         <Box>
-          <Button
-            loading={loading}
-            variant="contained"
-            size="large"
-            fullWidth
-            type="submit"
-          >
+          <Button loading={loading} variant="contained" size="large" fullWidth type="submit">
             Sign In
           </Button>
         </Box>

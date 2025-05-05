@@ -13,11 +13,18 @@ const upsertModels: Model[] = [
         size: 'small',
         multiple: true,
         defaultValue: [],
-        requester: () => listAdminstratedPermissions().then((res) => res.map((e) => ({ label: e.name, value: e.value })))
-      }
-    }
+        requester: () =>
+          listAdminstratedPermissions().then(res =>
+            res.map(e => ({ label: e.name, value: e.value }))
+          ),
+      },
+    },
   },
-  { label: 'Description', field: 'description', formCellProps: { widgetProps: { multiline: true, minRows: 3 } } }
+  {
+    label: 'Description',
+    field: 'description',
+    formCellProps: { widgetProps: { multiline: true, minRows: 3 } },
+  },
 ];
 
 function openUpsertRole(refresh: VoidFunction, backfill?: CreateRoleRequest) {
@@ -36,9 +43,9 @@ function openUpsertRole(refresh: VoidFunction, backfill?: CreateRoleRequest) {
         } else {
           return createRole(val).then(refresh);
         }
-      }
+      },
     },
-    dataBackfill: backfill
+    dataBackfill: backfill,
   });
 }
 

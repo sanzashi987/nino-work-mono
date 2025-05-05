@@ -1,5 +1,3 @@
-
-
 const chalk = require('react-dev-utils/chalk');
 const resolve = require('resolve');
 const fs = require('fs');
@@ -12,7 +10,7 @@ const paths = require('./paths');
  * @param {Object} options
  */
 function getAdditionalModulePaths(options = {}) {
-  const {baseUrl} = options;
+  const { baseUrl } = options;
 
   if (!baseUrl) {
     return '';
@@ -43,8 +41,8 @@ function getAdditionalModulePaths(options = {}) {
   // Otherwise, throw an error.
   throw new Error(
     chalk.red.bold(
-      "Your project's `baseUrl` can only be set to `src` or `node_modules`."
-      + ' Create React App does not support other values at this time.',
+      "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
+        ' Create React App does not support other values at this time.'
     )
   );
 }
@@ -55,7 +53,7 @@ function getAdditionalModulePaths(options = {}) {
  * @param {*} options
  */
 function getWebpackAliases(options = {}) {
-  const {baseUrl} = options;
+  const { baseUrl } = options;
 
   if (!baseUrl) {
     return {};
@@ -77,7 +75,7 @@ function getWebpackAliases(options = {}) {
  * @param {*} options
  */
 function getJestAliases(options = {}) {
-  const {baseUrl} = options;
+  const { baseUrl } = options;
 
   if (!baseUrl) {
     return {};
@@ -99,7 +97,7 @@ function getModules() {
 
   if (hasTsConfig && hasJsConfig) {
     throw new Error(
-      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.',
+      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.'
     );
   }
 
@@ -109,9 +107,11 @@ function getModules() {
   // TypeScript project and set up the config
   // based on tsconfig.json
   if (hasTsConfig) {
-    const ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
+    const ts = require(
+      resolve.sync('typescript', {
+        basedir: paths.appNodeModules,
+      })
+    );
     config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
     // Otherwise we'll check if there is jsconfig.json
     // for non TS projects.

@@ -1,9 +1,9 @@
-process.env.PORT = 3000
+process.env.PORT = 3000;
 
 module.exports = {
   // mode: 'micro-host',
   devServer(config) {
-    const { proxy } = config
+    const { proxy } = config;
 
     config.proxy = {
       ...proxy,
@@ -14,7 +14,7 @@ module.exports = {
       '/backend': {
         target: 'http://localhost:8081',
         changeOrigin: true,
-      }
-    }
-  }
-}
+      },
+    };
+  },
+};

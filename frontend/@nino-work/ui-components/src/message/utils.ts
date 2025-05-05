@@ -27,7 +27,7 @@ export const formatConfig = (
     return {
       type,
       duration,
-      content: (config as any)?.resultMessage || (config as any)?.message
+      content: (config as any)?.resultMessage || (config as any)?.message,
     };
   }
 
@@ -41,7 +41,7 @@ export const formatConfig = (
     return {
       ...other,
       content: nextContent as React.ReactNode,
-      type
+      type,
     };
   }
 
@@ -49,6 +49,6 @@ export const formatConfig = (
   return {
     type,
     duration,
-    content: config as React.ReactNode
+    content: config as React.ReactNode,
   };
 };

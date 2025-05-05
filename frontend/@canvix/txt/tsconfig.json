@@ -1,0 +1,5 @@
+{
+  "extends": "@canvix/sdk/tsconfig.json",
+  "exclude": ["node_modules"],
+  "include": ["@canvix/sdk/env.d.ts"]
+}

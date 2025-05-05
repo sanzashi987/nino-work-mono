@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 
 export interface Schedulable {
-  run: VoidFunction
+  run: VoidFunction;
 }
 
 export class Scheduler {
@@ -13,7 +13,9 @@ export class Scheduler {
     this.enqueue(handle);
     if (this.hasTask === false) {
       this.hasTask = true;
-      queueMicrotask(() => { this.flush(); });
+      queueMicrotask(() => {
+        this.flush();
+      });
     }
   }
 

@@ -4,7 +4,7 @@ type ErrorUI = string | React.ReactElement;
 
 export interface ValidatorFn {
   // (control: AbstractControl):ValidationErrors | null |(Promise<ValidationErrors | null>) ;
-  (value: any): Promise<ErrorUI>
+  (value: any): Promise<ErrorUI>;
 }
 
 export type Path = string | number;
@@ -22,20 +22,23 @@ export interface ValidatorRule {
 }
 
 export type ValidationError = {
-  errors: ErrorUI[]
-  warnings: ErrorUI[]
+  errors: ErrorUI[];
+  warnings: ErrorUI[];
 };
 
 export type ValidationErrorWithName = {
-  name: Path[]
+  name: Path[];
 } & ValidationError;
 
 type ParsedValidatorFn = (value: any) => Promise<ErrorUI[]>;
 
 type BuiltInValidatorMap = {
-  [K in keyof ValidatorRule]: (value: any, rule: Omit<ValidatorRule, K> & Required<Pick<ValidatorRule, K>>) => Promise<ErrorUI>;
+  [K in keyof ValidatorRule]: (
+    value: any,
+    rule: Omit<ValidatorRule, K> & Required<Pick<ValidatorRule, K>>
+  ) => Promise<ErrorUI>;
 };
-const builtInValidators:BuiltInValidatorMap = {
+const builtInValidators: BuiltInValidatorMap = {
   len: async (value, rule) => {
     if ('length' in value && typeof rule.len === 'number') {
       if (value.length > rule.len) {
@@ -72,27 +75,28 @@ const builtInValidators:BuiltInValidatorMap = {
     return null;
   },
   required: async (value, rule) => {
-    if ((value === undefined) && rule.required) {
+    if (value === undefined && rule.required) {
       return Promise.reject(rule.message ?? 'Field is required');
     }
     return null;
   },
   validator: async (value, rule) => {
     if (typeof rule.validator === 'function') {
-      return rule.validator(value).catch((reason) => Promise.reject(reason ?? rule.message));
+      return rule.validator(value).catch(reason => Promise.reject(reason ?? rule.message));
     }
     return null;
-  }
-
+  },
 };
 
 function parseRule(rule: ValidatorRule): ParsedValidatorFn {
-  return function (value:any) {
-    const result = Object.keys(rule).map((key) => {
+  return function (value: any) {
+    const result = Object.keys(rule).map(key => {
       const validator = builtInValidators[key as keyof ValidatorRule];
       return validator(value, rule as any);
     });
-    return Promise.allSettled(result).then((r) => r.filter((p) => p.status === 'rejected').map((p) => p.reason));
+    return Promise.allSettled(result).then(r =>
+      r.filter(p => p.status === 'rejected').map(p => p.reason)
+    );
   };
 }
 
@@ -101,21 +105,30 @@ export type ComposedValidatorFn = (value: any) => Promise<Omit<ValidationError, 
 export function composeValidator(rules: ValidatorRule[] = []): ComposedValidatorFn | null {
   if (!rules.length) return null;
 
-  const { errorRules, warningRules } = rules.reduce<{ errorRules: ValidatorRule[], warningRules: ValidatorRule[] }>((last, cur) => {
-    last[cur.warning ? 'warnings' : 'errors'].push(cur);
-    return last;
-  }, { errorRules: [], warningRules: [] });
+  const { errorRules, warningRules } = rules.reduce<{
+    errorRules: ValidatorRule[];
+    warningRules: ValidatorRule[];
+  }>(
+    (last, cur) => {
+      last[cur.warning ? 'warnings' : 'errors'].push(cur);
+      return last;
+    },
+    { errorRules: [], warningRules: [] }
+  );
 
-  const errFns = errorRules.map((e) => parseRule(e));
-  const warnFns = warningRules.map((e) => parseRule(e));
+  const errFns = errorRules.map(e => parseRule(e));
+  const warnFns = warningRules.map(e => parseRule(e));
 
-  return function (value:any) {
-    const errPromises = errFns.map((fn) => fn(value));
-    const mergedErrors = Promise.all(errPromises).then((errs) => errs.flat());
+  return function (value: any) {
+    const errPromises = errFns.map(fn => fn(value));
+    const mergedErrors = Promise.all(errPromises).then(errs => errs.flat());
 
-    const warnPromises = warnFns.map((fn) => fn(value));
-    const mergedWarnings = Promise.all(warnPromises).then((errs) => errs.flat());
+    const warnPromises = warnFns.map(fn => fn(value));
+    const mergedWarnings = Promise.all(warnPromises).then(errs => errs.flat());
 
-    return Promise.all([mergedErrors, mergedWarnings]).then(([errors, warnings]) => ({ errors, warnings }));
+    return Promise.all([mergedErrors, mergedWarnings]).then(([errors, warnings]) => ({
+      errors,
+      warnings,
+    }));
   };
 }

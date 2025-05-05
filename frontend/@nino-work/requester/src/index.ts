@@ -2,9 +2,9 @@ import NinoFetchAbortController, { AbortConfig } from './abort';
 
 /* eslint-disable no-restricted-syntax */
 export type StandardResponse<T> = {
-  msg: string
-  data: T
-  code: number
+  msg: string;
+  data: T;
+  code: number;
 };
 
 export type ParserOption = {
@@ -12,26 +12,26 @@ export type ParserOption = {
 }[keyof Body];
 
 export type ParserConfig = {
-  parser ?: ParserOption
+  parser?: ParserOption;
 };
 
 export interface DefineApiOptions<Res, Out> extends AbortConfig, ParserConfig {
-  method?: 'GET' | 'POST' | 'POSTFORM' | 'DELETE',
-  url: string
-  onError?(payload?: any): Promise<any>
-  onResponse?(input: StandardResponse<Res>): Promise<Out>
-  headers?: Record<string, string>
+  method?: 'GET' | 'POST' | 'POSTFORM' | 'DELETE';
+  url: string;
+  onError?(payload?: any): Promise<any>;
+  onResponse?(input: StandardResponse<Res>): Promise<Out>;
+  headers?: Record<string, string>;
 }
 
 const defaultHeaders = {
   // Accept: 'application/json, text/html, */*'
-  'Content-Type': 'application/json'
+  'Content-Type': 'application/json',
 };
 
 type PathMeta = {
-  dynamic: boolean
-  name: string
-  optional: boolean
+  dynamic: boolean;
+  name: string;
+  optional: boolean;
 };
 
 function defaultOnResponse<Input, Output>(input: Input): Promise<Output> {
@@ -45,7 +45,7 @@ function defaultOnResponse<Input, Output>(input: Input): Promise<Output> {
   return Promise.reject(input);
 }
 
-export interface NinoRequestInit extends RequestInit, AbortConfig, ParserConfig { }
+export interface NinoRequestInit extends RequestInit, AbortConfig, ParserConfig {}
 
 export async function autoParseResponse(response: Response, parser?: ParserOption) {
   if (parser) {
@@ -61,22 +61,39 @@ export async function autoParseResponse(response: Response, parser?: ParserOptio
   // 根据 Content-Type 选择解析方法
   if (contentType.includes('application/json')) {
     return response.json(); // 解析 JSON 数据
-  } if (contentType.includes('text/')) {
+  }
+  if (contentType.includes('text/')) {
     return response.text(); // 解析文本数据
-  } if (contentType.includes('image/') || contentType.includes('application/pdf')) {
+  }
+  if (contentType.includes('image/') || contentType.includes('application/pdf')) {
     return response.blob(); // 解析二进制数据（如图片、PDF）
-  } if (contentType.includes('multipart/form-data') || contentType.includes('application/x-www-form-urlencoded')) {
+  }
+  if (
+    contentType.includes('multipart/form-data') ||
+    contentType.includes('application/x-www-form-urlencoded')
+  ) {
     return response.formData(); // 解析表单数据
-  } if (contentType.includes('application/octet-stream')) {
+  }
+  if (contentType.includes('application/octet-stream')) {
     return response.arrayBuffer(); // 解析原始二进制数据
   }
   // 如果 Content-Type 未知，默认返回json
   return response.json();
 }
 
-export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<Res, Out>, mock?: Res) => {
-  const { method = 'GET', url, onError = Promise.reject, headers = defaultHeaders, onResponse = defaultOnResponse, timeout } = options;
-  const pathMetas = url.split('/').map((param) => {
+export const defineApi = <Req, Res = void, Out = Res>(
+  options: DefineApiOptions<Res, Out>,
+  mock?: Res
+) => {
+  const {
+    method = 'GET',
+    url,
+    onError = Promise.reject,
+    headers = defaultHeaders,
+    onResponse = defaultOnResponse,
+    timeout,
+  } = options;
+  const pathMetas = url.split('/').map(param => {
     const meta: PathMeta = { dynamic: false, optional: false, name: param };
     let name = param;
     if (param.startsWith(':')) {
@@ -99,7 +116,10 @@ export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
-  const requester: Requester = async (input: Record<string, any> = {}, opts: NinoRequestInit = {}) => {
+  const requester: Requester = async (
+    input: Record<string, any> = {},
+    opts: NinoRequestInit = {}
+  ) => {
     const { headers: overrideHeaders, signal, timeout: runtimeTimeout, ...others } = opts;
     const inputNext = { ...input };
 
@@ -146,14 +166,15 @@ export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<
       body = JSON.stringify(inputNext);
     }
 
-    const signalWithDefault = signal ?? new NinoFetchAbortController({ timeout: runtimeTimeout ?? timeout }).signal;
+    const signalWithDefault =
+      signal ?? new NinoFetchAbortController({ timeout: runtimeTimeout ?? timeout }).signal;
 
     const res = await fetch(fullurl, {
       headers: { ...headers, ...overrideHeaders },
       method: method === 'POSTFORM' ? 'POST' : method,
       ...others,
       signal: signalWithDefault,
-      body
+      body,
     });
 
     if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
@@ -167,7 +188,10 @@ export const defineApi = <Req, Res = void, Out = Res>(options: DefineApiOptions<
     }
 
     // const data = await res.json() as StandardResponse<Res>;
-    const data = await autoParseResponse(res, options.parser ?? opts.parser) as StandardResponse<Res>;
+    const data = (await autoParseResponse(
+      res,
+      options.parser ?? opts.parser
+    )) as StandardResponse<Res>;
 
     return onResponse(data).catch(onError);
   };

@@ -5,7 +5,7 @@ export function stop(e: React.SyntheticEvent | Event) {
 export const blockKeyEvent = {
   onKeyDown: stop,
   onKeyUp: stop,
-  tabIndex: 0
+  tabIndex: 0,
 };
 
 export function prevent(e: React.SyntheticEvent | Event) {
