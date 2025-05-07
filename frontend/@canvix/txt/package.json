@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "author": "",
   "license": "ISC",
-  "canvas": {
+  "canvix": {
     "icon": "assets/txt.png",
     "cn_name": "标题",
     "category": "text-label",

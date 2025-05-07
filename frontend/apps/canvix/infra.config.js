@@ -1,4 +1,5 @@
 const productionInfo = require('./package.json');
+const path = require('path');
 const prodVersion = productionInfo.version;
 process.env.PORT = 3003;
 process.env.__VERSION__ = prodVersion;
@@ -21,8 +22,11 @@ module.exports = {
       },
     };
   },
-  // webpack(config) {
-  //   config.output.publicPath = 'http://localhost:3002/'
-  //   return config
-  // }
+  webpack(config) {
+    // config.output.publicPath = 'http://localhost:3002/';
+    // return config;
+    config.resolve.alias['@dev-coms'] = path.resolve(__dirname, '../../@canvix');
+
+    return config;
+  },
 };
