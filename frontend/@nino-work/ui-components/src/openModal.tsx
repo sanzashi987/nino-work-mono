@@ -7,6 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import { ButtonProps } from '@mui/material/Button';
 import { Box, Stack } from '@mui/material';
 import { useForm, UseFormReturn } from 'react-hook-form';
+import { unImplemented } from '@nino-work/shared';
 import RequestButton, { LoadingGroup } from './RequestButton';
 import FormBuilder, { type FormBuilderProps } from './FormBuilder';
 
@@ -22,16 +23,13 @@ type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
   cancelButtonProps?: ButtonProps;
 };
 
-export const OpenModalContext =
-  React.createContext<// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  // eslint-disable-next-line @typescript-eslint/no-throw-literal
-  { close: () => Promise<void>; form: UseFormReturn }>({
-    close: async () => {
-      throw 'not inside context';
-    },
-    form: {},
-  });
+export const OpenModalContext = React.createContext<{
+  close: () => Promise<void>;
+  form: UseFormReturn;
+}>({
+  close: unImplemented,
+  form: {},
+});
 
 const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cancelButtonProps'>> = ({
   onOk,
