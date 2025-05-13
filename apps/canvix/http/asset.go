@@ -19,11 +19,12 @@ func registerAssetRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMid
 	// assetGroup.Use(loggedMiddleware, workspaceMiddleware)
 
 	assetGroup.POST("list", assetController.list)
-	assetGroup.POST("updateMyAssetsName", assetController.update)
+	assetGroup.POST("list-all", assetController.list)
+	assetGroup.POST("update", assetController.update)
 	assetGroup.DELETE("delete", assetController.delete)
 	assetGroup.POST("upload", assetController.upload)
 	assetGroup.POST("detail", assetController.read)
-	assetGroup.POST("update", assetController.replace)
+	assetGroup.POST("replace", assetController.replace)
 	assetGroup.POST("download", assetController.download)
 	assetGroup.POST("import", assetController._import)
 }

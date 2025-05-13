@@ -9,8 +9,8 @@ import (
 )
 
 type UpdateAssetReq struct {
-	FileId   string `json:"fileId" binding:"required"`
-	FileName string `json:"fileName" binding:"required"`
+	FileId   string `json:"file_id" binding:"required"`
+	FileName string `json:"file_name" binding:"required"`
 }
 
 func UpdateName(ctx context.Context, workspaceId uint64, req *UpdateAssetReq) error {

@@ -54,17 +54,18 @@ func GetAssetDetail(ctx context.Context, uploadRpc storage.StorageService, works
 }
 
 type AssetInfo struct {
-	FileCode   string  `json:"fileId"`
-	Name       string  `json:"fileName"`
-	MimeType   string  `json:"mimeType"`
+	FileCode   string  `json:"asset_code"`
+	Name       string  `json:"asset_name"`
+	MimeType   string  `json:"mime_type"`
 	Size       int     `json:"size"`
 	Suffix     *string `json:"suffix"`
-	CreateTime string  `json:"createTime"`
-	UpdateTime string  `json:"updateTime"`
+	CreateTime string  `json:"create_time"`
+	UpdateTime string  `json:"update_time"`
+	TypeTag    string  `json:"type_tag"`
 }
 
 type ListAssetReq struct {
-	GroupCode string `json:"groupCode"`
+	GroupCode string `json:"group_code"`
 	shared.PaginationRequest
 }
 
@@ -92,6 +93,7 @@ func ListAssetByType(ctx context.Context, workspaceId uint64, typeTag string, re
 	data := []*AssetInfo{}
 	for _, record := range r.Records {
 		data = append(data, &AssetInfo{
+			TypeTag:    typeTag,
 			FileCode:   record.Code,
 			Name:       record.Name,
 			CreateTime: record.GetCreatedDate(),
