@@ -11,8 +11,8 @@ import (
 )
 
 type QuerySearchReq struct {
-	SourceName string   `json:"sourceName"`
-	SourceType []string `json:"sourceType"`
+	SourceName string   `json:"source_name"`
+	SourceType []string `json:"source_type"`
 	Search     string   `json:"search"`
 }
 

@@ -67,7 +67,7 @@ func (c *DataSourceController) create(ctx *gin.Context) {
 
 func (c *DataSourceController) read(ctx *gin.Context) {
 	var query struct {
-		SourceId string `uri:"sourceId" binding:"required"`
+		SourceId string `uri:"source_code" binding:"required"`
 	}
 	if err := ctx.ShouldBindUri(&query); err != nil {
 		c.AbortClientError(ctx, "data read error: "+err.Error())
@@ -102,7 +102,7 @@ func (c *DataSourceController) update(ctx *gin.Context) {
 
 func (c *DataSourceController) delete(ctx *gin.Context) {
 	var req struct {
-		SourceId []string `json:"sourceId" binding:"required"`
+		SourceId []string `json:"source_code" binding:"required"`
 	}
 	workspaceId, err := c.BindRequestJson(ctx, &req, "data delete")
 	if err != nil {
@@ -143,7 +143,7 @@ func (c *DataSourceController) search(ctx *gin.Context) {
 
 func (c *DataSourceController) previewFile(ctx *gin.Context) {
 	// var req struct {
-	// 	SourceId string `json:"sourceId" binding:"required"`
+	// 	SourceId string `json:"source_code" binding:"required"`
 	// }
 	// if workspaceId, err := c.BindRequestJson(ctx, &req, "previewFile"); err != nil {
 	// return
