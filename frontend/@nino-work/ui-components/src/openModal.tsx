@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { ComponentType, useCallback, useContext, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -64,7 +64,7 @@ const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cance
   );
 };
 
-const Modal: React.FC<ModalProps> = ({
+export const ModalWrapper: React.FC<ModalProps> = ({
   title,
   content,
   onClose,
@@ -111,7 +111,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const afterCloseMerged = useCallback(() => {
     afterClose?.();
-    onClose();
+    onClose?.();
   }, [afterClose, onClose]);
 
   return (
@@ -137,7 +137,10 @@ type SimpleFormSubmit<FormData> = {
   onOk: (form: UseFormReturn<FormData, any, undefined>) => Promise<any>;
 };
 
-const openModal = (props: Omit<ModalProps, 'onClose'>) => {
+const openModal = (
+  props: Omit<ModalProps, 'onClose'>,
+  Modal: ComponentType<ModalProps> = ModalWrapper
+) => {
   const modalRoot = document.createElement('div');
   document.body.appendChild(modalRoot);
 
