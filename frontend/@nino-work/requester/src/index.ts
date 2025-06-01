@@ -1,7 +1,7 @@
 import NinoFetchAbortController, { AbortConfig } from './abort';
 
 /* eslint-disable no-restricted-syntax */
-export type StandardResponse<T> = {
+export type StandardResponse<T = any> = {
   msg: string;
   data: T;
   code: number;

@@ -11,3 +11,8 @@ export const blockKeyEvent = {
 export function prevent(e: React.SyntheticEvent | Event) {
   e.preventDefault();
 }
+
+export const preventFormEvent = (event: React.FormEvent<HTMLFormElement>) => {
+  event.stopPropagation();
+  event.preventDefault();
+};

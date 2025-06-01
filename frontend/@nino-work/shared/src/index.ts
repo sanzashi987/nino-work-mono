@@ -12,7 +12,7 @@ export function returnVoidObject() {
 export type * from './types';
 export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export * from './env';
-export { stop, blockKeyEvent, prevent } from './event';
+export { stop, blockKeyEvent, prevent, preventFormEvent } from './event';
 export { default as usePromise } from './usePromise';
 export { queryStringify, parseQuery } from './url';
 export { usePagination } from './usePagination';
