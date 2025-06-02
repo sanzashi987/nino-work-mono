@@ -46,13 +46,13 @@ func (c *AssetController) list(ctx *gin.Context) {
 }
 
 type ReadQuery struct {
-	FileId string `form:"fileId" binding:"required"`
+	FileId string `form:"file_id" binding:"required"`
 }
 
 /*CRUD*/
 func (c *AssetController) read(ctx *gin.Context) {
 	var query struct {
-		FileId string `form:"fileId" binding:"required"`
+		FileId string `form:"file_id" binding:"required"`
 	}
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		c.AbortClientError(ctx, "read: "+err.Error())
