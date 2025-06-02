@@ -105,8 +105,8 @@ func (c *AssetController) delete(ctx *gin.Context) {
 }
 
 type UploadAssetForm struct {
-	GroupCode string                `form:"groupCode"`
-	GroupName string                `form:"groupName"`
+	GroupCode string                `form:"group_code"`
+	GroupName string                `form:"group_name"`
 	Type      string                `form:"type"`
 	File      *multipart.FileHeader `form:"file" binding:"required"`
 }
