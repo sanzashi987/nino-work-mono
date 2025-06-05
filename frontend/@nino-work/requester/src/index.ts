@@ -143,8 +143,10 @@ export const defineApi = <Req, Res = void, Out = Res>(
     const isGet = method === 'GET';
 
     if (isGet) {
-      const search = new URLSearchParams(input);
-      fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
+      const search = new URLSearchParams(inputNext);
+      if (search.size > 0) {
+        fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
+      }
     } else if (method === 'POSTFORM') {
       delete headers['Content-Type'];
       const formData = new FormData();
