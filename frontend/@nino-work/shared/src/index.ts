@@ -19,3 +19,4 @@ export { usePagination } from './usePagination';
 export { createMemo, useCreateMemo } from './createMemo';
 export { useEvent, useRefState } from './useEvent';
 export { shallowEqual, shallowClone, strictEquality } from './shallow';
+export { saturate } from './saturate';
