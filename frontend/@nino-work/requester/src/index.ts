@@ -23,10 +23,28 @@ export interface DefineApiOptions<Res, Out> extends AbortConfig, ParserConfig {
   headers?: Record<string, string>;
 }
 
-const defaultHeaders = {
+const globalHeaders = {
   // Accept: 'application/json, text/html, */*'
   'Content-Type': 'application/json',
 };
+
+export function mergeHeader(target: Record<string, string>, source: Record<string, string>) {
+  Object.entries(source).forEach(([k, v]) => {
+    target[k] = v;
+  });
+  return target;
+}
+
+export function mergeGlobalHeader(source: Record<string, string>) {
+  mergeHeader(globalHeaders, source);
+}
+
+export function resetGlobalHeader() {
+  Object.keys(globalHeaders).forEach(k => {
+    delete globalHeaders[k];
+  });
+  globalHeaders['Content-Type'] = 'application/json';
+}
 
 type PathMeta = {
   dynamic: boolean;
@@ -89,7 +107,7 @@ export const defineApi = <Req, Res = void, Out = Res>(
     method = 'GET',
     url,
     onError = Promise.reject,
-    headers = defaultHeaders,
+    headers: optionHeaders = {},
     onResponse = defaultOnResponse,
     timeout,
   } = options;
@@ -141,6 +159,8 @@ export const defineApi = <Req, Res = void, Out = Res>(
     let fullurl = dynamicPaths.join('/');
     let body: BodyInit;
     const isGet = method === 'GET';
+
+    const headers = mergeHeader({ ...optionHeaders }, globalHeaders);
 
     if (isGet) {
       const search = new URLSearchParams(inputNext);
