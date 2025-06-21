@@ -1,5 +1,5 @@
 import { Enum, ModelMeta, PaginationResponse, PageSize } from '@nino-work/shared';
-import defineApi from './impls';
+import defineRequester from './impls';
 
 export enum AppStatus {
   ENABLE = 0,
@@ -16,7 +16,7 @@ type AppModel = {
 
 export type AppListResponse = PaginationResponse<AppModel>;
 
-export const getAppList = defineApi<PageSize, AppListResponse>({
+export const getAppList = defineRequester<PageSize, AppListResponse>({
   url: 'apps/list',
   method: 'POST',
 });
@@ -25,7 +25,7 @@ export type CreateAppRequest = Pick<AppModel, 'code' | 'name' | 'description'>;
 
 export type CreateAppResponse = AppModel;
 
-export const createApp = defineApi<CreateAppRequest, CreateAppResponse>({
+export const createApp = defineRequester<CreateAppRequest, CreateAppResponse>({
   url: 'apps/create',
   method: 'POST',
 });
@@ -46,7 +46,7 @@ export type ListPermissionsResponse = {
   app_name: string;
 };
 
-export const listPermissions = defineApi<ListPermissionsRequest, ListPermissionsResponse>({
+export const listPermissions = defineRequester<ListPermissionsRequest, ListPermissionsResponse>({
   url: 'apps/permission/list',
 });
 
@@ -55,7 +55,7 @@ export type CreatePermissionRequest = {
   permissions: ModelMeta[];
 };
 
-export const createPermission = defineApi<CreatePermissionRequest, void>({
+export const createPermission = defineRequester<CreatePermissionRequest, void>({
   url: 'apps/permission/create',
   method: 'POST',
 });
@@ -66,7 +66,7 @@ type RoleInfo = {
   code: string;
 };
 
-export const listRoles = defineApi<PageSize, PaginationResponse<RoleInfo>>({
+export const listRoles = defineRequester<PageSize, PaginationResponse<RoleInfo>>({
   url: 'roles/list',
   method: 'POST',
 });
@@ -78,7 +78,7 @@ export type CreateRoleRequest = {
   permission_ids?: number[];
 };
 
-export const createRole = defineApi<CreateRoleRequest, void>({
+export const createRole = defineRequester<CreateRoleRequest, void>({
   url: 'roles/create',
   method: 'POST',
 });
@@ -90,12 +90,12 @@ type UpdateRoleRequest = {
   permission_ids?: number[];
 };
 
-export const updateRole = defineApi<UpdateRoleRequest, void>({
+export const updateRole = defineRequester<UpdateRoleRequest, void>({
   url: 'roles/update',
   method: 'POST',
 });
 
-export const listAdminstratedPermissions = defineApi<void, Enum[]>({
+export const listAdminstratedPermissions = defineRequester<void, Enum[]>({
   url: 'apps/permission/admined-permission',
   method: 'POST',
 });
@@ -105,23 +105,23 @@ export type UserBio = {
   username: string;
 };
 
-export const listUsers = defineApi<PageSize, PaginationResponse<UserBio>>({
+export const listUsers = defineRequester<PageSize, PaginationResponse<UserBio>>({
   url: 'users/list',
   method: 'POST',
 });
 
-export const getUserRoles = defineApi<{ id: number }, Enum<number>[]>({ url: 'users/user-roles' });
+export const getUserRoles = defineRequester<{ id: number }, Enum<number>[]>({ url: 'users/user-roles' });
 
 export type BindRoleRequest = {
   user_id: number;
   role_ids: number[];
 };
-export const bindRoles = defineApi<BindRoleRequest, void>({
+export const bindRoles = defineRequester<BindRoleRequest, void>({
   url: 'users/bind-roles',
   method: 'POST',
 });
 
-export const listRolesAll = defineApi<void, Enum<number>[]>({
+export const listRolesAll = defineRequester<void, Enum<number>[]>({
   url: 'roles/list-all',
   method: 'POST',
 });

@@ -15,35 +15,12 @@ export type ParserConfig = {
   parser?: ParserOption;
 };
 
-export interface DefineApiOptions<Res, Out> extends AbortConfig, ParserConfig {
+export interface DefineRequesterOptions<Res, Out> extends AbortConfig, ParserConfig {
   method?: 'GET' | 'POST' | 'POSTFORM' | 'DELETE';
   url: string;
   onError?(payload?: any): Promise<any>;
   onResponse?(input: StandardResponse<Res>): Promise<Out>;
   headers?: Record<string, string>;
-}
-
-const globalHeaders = {
-  // Accept: 'application/json, text/html, */*'
-  'Content-Type': 'application/json',
-};
-
-export function mergeHeader(target: Record<string, string>, source: Record<string, string>) {
-  Object.entries(source).forEach(([k, v]) => {
-    target[k] = v;
-  });
-  return target;
-}
-
-export function mergeGlobalHeader(source: Record<string, string>) {
-  mergeHeader(globalHeaders, source);
-}
-
-export function resetGlobalHeader() {
-  Object.keys(globalHeaders).forEach(k => {
-    delete globalHeaders[k];
-  });
-  globalHeaders['Content-Type'] = 'application/json';
 }
 
 type PathMeta = {
@@ -99,128 +76,159 @@ export async function autoParseResponse(response: Response, parser?: ParserOptio
   return response.json();
 }
 
-export const defineApi = <Req, Res = void, Out = Res>(
-  options: DefineApiOptions<Res, Out>,
-  mock?: Res
-) => {
-  const {
-    method = 'GET',
-    url,
-    onError = Promise.reject,
-    headers: optionHeaders = {},
-    onResponse = defaultOnResponse,
-    timeout,
-  } = options;
-  const pathMetas = url.split('/').map(param => {
-    const meta: PathMeta = { dynamic: false, optional: false, name: param };
-    let name = param;
-    if (param.startsWith(':')) {
-      name = name.slice(1);
-      meta.dynamic = true;
-      if (param.endsWith('?')) {
-        name = name.slice(0, -1);
-        meta.optional = true;
-      }
-    }
-    meta.name = name;
-    return meta;
+export function mergeHeader(target: Record<string, string>, source: Record<string, string>) {
+  Object.entries(source).forEach(([k, v]) => {
+    target[k] = v;
   });
+  return target;
+}
 
-  const hasQuery = pathMetas.at(-1).name.includes('?');
-
-  type Requester = Req extends undefined
-    ? (input?: null, opts?: NinoRequestInit) => Promise<Res>
-    : (input: Req, opts?: NinoRequestInit) => Promise<Res>;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  const requester: Requester = async (
-    input: Record<string, any> = {},
-    opts: NinoRequestInit = {}
-  ) => {
-    const { headers: overrideHeaders, signal, timeout: runtimeTimeout, ...others } = opts;
-    const inputNext = { ...input };
-
-    const dynamicPaths: string[] = [];
-    for (const meta of pathMetas) {
-      if (!meta.dynamic) {
-        dynamicPaths.push(meta.name);
-      } else {
-        const val = inputNext[meta.name];
-        if (val) {
-          delete inputNext[meta.name];
-          dynamicPaths.push(val);
-        } else if (!meta.optional) {
-          throw new Error('required params not given');
-        }
-      }
-    }
-
-    let fullurl = dynamicPaths.join('/');
-    let body: BodyInit;
-    const isGet = method === 'GET';
-
-    const headers = mergeHeader({ ...optionHeaders }, globalHeaders);
-
-    if (isGet) {
-      const search = new URLSearchParams(inputNext);
-      if (search.size > 0) {
-        fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
-      }
-    } else if (method === 'POSTFORM') {
-      delete headers['Content-Type'];
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(inputNext)) {
-        if (Array.isArray(value) && value[0] instanceof File) {
-          delete inputNext[key];
-          for (const file of value) {
-            formData.append(`${key}[]`, file, file.name);
-          }
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-        if (value !== undefined) {
-          formData.append(key, value);
-        }
-      }
-      body = formData;
-    } else {
-      body = JSON.stringify(inputNext);
-    }
-
-    const signalWithDefault =
-      signal ?? new NinoFetchAbortController({ timeout: runtimeTimeout ?? timeout }).signal;
-
-    const res = await fetch(fullurl, {
-      headers: { ...headers, ...overrideHeaders },
-      method: method === 'POSTFORM' ? 'POST' : method,
-      ...others,
-      signal: signalWithDefault,
-      body,
-    });
-
-    if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
-      window.location.href = res.url;
-      return onError(`Redirected to ${res.url}`);
-    }
-
-    if (!res.ok) {
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return onError(`Response Status Error:${res.status}`);
-    }
-
-    // const data = await res.json() as StandardResponse<Res>;
-    const data = (await autoParseResponse(
-      res,
-      options.parser ?? opts.parser
-    )) as StandardResponse<Res>;
-
-    return onResponse(data).catch(onError);
+export function makeRequesterMaker() {
+  const globalHeaders = {
+    // Accept: 'application/json, text/html, */*'
+    'Content-Type': 'application/json',
   };
 
-  if (mock) {
-    return (() => Promise.resolve(mock)) as unknown as Requester;
+  function mergeGlobalHeader(source: Record<string, string>) {
+    mergeHeader(globalHeaders, source);
   }
 
-  return requester;
-};
+  function resetGlobalHeader() {
+    Object.keys(globalHeaders).forEach(k => {
+      delete globalHeaders[k];
+    });
+    globalHeaders['Content-Type'] = 'application/json';
+  }
+
+  const defineRequester = <Req, Res = void, Out = Res>(
+    options: DefineRequesterOptions<Res, Out>,
+    mock?: Res
+  ) => {
+    const {
+      method = 'GET',
+      url,
+      onError = Promise.reject,
+      headers: optionHeaders = {},
+      onResponse = defaultOnResponse,
+      timeout,
+    } = options;
+    const pathMetas = url.split('/').map(param => {
+      const meta: PathMeta = { dynamic: false, optional: false, name: param };
+      let name = param;
+      if (param.startsWith(':')) {
+        name = name.slice(1);
+        meta.dynamic = true;
+        if (param.endsWith('?')) {
+          name = name.slice(0, -1);
+          meta.optional = true;
+        }
+      }
+      meta.name = name;
+      return meta;
+    });
+
+    const hasQuery = pathMetas.at(-1).name.includes('?');
+
+    type Requester = Req extends undefined
+      ? (input?: null, opts?: NinoRequestInit) => Promise<Res>
+      : (input: Req, opts?: NinoRequestInit) => Promise<Res>;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const requester: Requester = async (
+      input: Record<string, any> = {},
+      opts: NinoRequestInit = {}
+    ) => {
+      const { headers: overrideHeaders, signal, timeout: runtimeTimeout, ...others } = opts;
+      const inputNext = { ...input };
+
+      const dynamicPaths: string[] = [];
+      for (const meta of pathMetas) {
+        if (!meta.dynamic) {
+          dynamicPaths.push(meta.name);
+        } else {
+          const val = inputNext[meta.name];
+          if (val) {
+            delete inputNext[meta.name];
+            dynamicPaths.push(val);
+          } else if (!meta.optional) {
+            throw new Error('required params not given');
+          }
+        }
+      }
+
+      let fullurl = dynamicPaths.join('/');
+      let body: BodyInit;
+      const isGet = method === 'GET';
+
+      const headers = mergeHeader({ ...optionHeaders }, globalHeaders);
+
+      if (isGet) {
+        const search = new URLSearchParams(inputNext);
+        if (search.size > 0) {
+          fullurl += hasQuery ? search.toString() : `?${search.toString()}`;
+        }
+      } else if (method === 'POSTFORM') {
+        delete headers['Content-Type'];
+        const formData = new FormData();
+        for (const [key, value] of Object.entries(inputNext)) {
+          if (Array.isArray(value) && value[0] instanceof File) {
+            delete inputNext[key];
+            for (const file of value) {
+              formData.append(`${key}[]`, file, file.name);
+            }
+            // eslint-disable-next-line no-continue
+            continue;
+          }
+          if (value !== undefined) {
+            formData.append(key, value);
+          }
+        }
+        body = formData;
+      } else {
+        body = JSON.stringify(inputNext);
+      }
+
+      const signalWithDefault =
+        signal ?? new NinoFetchAbortController({ timeout: runtimeTimeout ?? timeout }).signal;
+
+      const res = await fetch(fullurl, {
+        headers: { ...headers, ...overrideHeaders },
+        method: method === 'POSTFORM' ? 'POST' : method,
+        ...others,
+        signal: signalWithDefault,
+        body,
+      });
+
+      if (res.redirected && res.headers.get('Content-Type')?.includes('text/html')) {
+        window.location.href = res.url;
+        return onError(`Redirected to ${res.url}`);
+      }
+
+      if (!res.ok) {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return onError(`Response Status Error:${res.status}`);
+      }
+
+      // const data = await res.json() as StandardResponse<Res>;
+      const data = (await autoParseResponse(
+        res,
+        options.parser ?? opts.parser
+      )) as StandardResponse<Res>;
+
+      return onResponse(data).catch(onError);
+    };
+
+    if (mock) {
+      return (() => Promise.resolve(mock)) as unknown as Requester;
+    }
+
+    return requester;
+  };
+
+  return { mergeGlobalHeader, resetGlobalHeader, defineRequester };
+}
+
+const { mergeGlobalHeader, resetGlobalHeader, defineRequester } = makeRequesterMaker();
+
+export { mergeGlobalHeader, resetGlobalHeader, defineRequester };

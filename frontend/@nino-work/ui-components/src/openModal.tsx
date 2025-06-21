@@ -28,7 +28,7 @@ export const OpenModalContext = React.createContext<{
   form: UseFormReturn;
 }>({
   close: unImplemented,
-  form: {},
+  form: {} as any,
 });
 
 const DefaultAction: React.FC<Pick<ModalProps, 'onOk' | 'okButtonProps' | 'cancelButtonProps'>> = ({
@@ -133,7 +133,7 @@ export const ModalWrapper: React.FC<ModalProps> = ({
   );
 };
 
-type SimpleFormSubmit<FormData> = {
+type SimpleFormSubmit<FormData extends Record<string, any>> = {
   onOk: (form: UseFormReturn<FormData, any, undefined>) => Promise<any>;
 };
 
@@ -159,12 +159,12 @@ const openModal = (
   return { close: handleClose, isClose: promise };
 };
 
-type OpenSimpleFormProps<FormData> = {
+type OpenSimpleFormProps<FormData extends Record<string, any>> = {
   modalProps: Omit<ModalProps, 'onClose' | 'content'>;
   formProps: FormBuilderProps<FormData> & SimpleFormSubmit<FormData>;
   dataBackfill?: FormData;
 };
-export const openSimpleForm = <FormData,>({
+export const openSimpleForm = <FormData extends Record<string, any>>({
   modalProps,
   formProps,
 }: OpenSimpleFormProps<FormData>) =>

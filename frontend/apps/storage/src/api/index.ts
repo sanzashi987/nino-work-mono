@@ -1,5 +1,5 @@
 import { ModelMeta, PaginationResponse, PageSize } from '@nino-work/shared';
-import defineApi from './impls';
+import defineRequester from './impls';
 
 type BucketData = {
   id: number;
@@ -8,7 +8,7 @@ type BucketData = {
   create_time: number;
 };
 
-export const listBucket = defineApi<PageSize, PaginationResponse<BucketData>>({
+export const listBucket = defineRequester<PageSize, PaginationResponse<BucketData>>({
   url: 'bucket/list',
   method: 'POST',
 });
@@ -40,25 +40,25 @@ export type BucketInfo = {
   dir_contents: DirResponse;
   root_path_id: number;
 };
-export const getBucketInfo = defineApi<GetBucketRequest, BucketInfo>({ url: 'bucket/info' });
+export const getBucketInfo = defineRequester<GetBucketRequest, BucketInfo>({ url: 'bucket/info' });
 
 type ListBucketDirRequest = {
   bucket_id: number | string;
   path_id: number;
 };
 
-export const listBucketDir = defineApi<ListBucketDirRequest, DirResponse>({
+export const listBucketDir = defineRequester<ListBucketDirRequest, DirResponse>({
   url: 'bucket/dir/list',
 });
 
 export type BucketMeta = Omit<ModelMeta, 'name'>;
 
-export const createBucket = defineApi<{ code: string }, { id: number }>({
+export const createBucket = defineRequester<{ code: string }, { id: number }>({
   url: 'bucket/create',
   method: 'POST',
 });
 
-export const createDir = defineApi<{ bucket_id: number; parent_id: number; name: string }, void>({
+export const createDir = defineRequester<{ bucket_id: number; parent_id: number; name: string }, void>({
   url: 'bucket/dir/create',
   method: 'POST',
 });
@@ -69,12 +69,12 @@ export type UploadFileRequest = {
   file: File[];
 };
 
-export const uploadFiles = defineApi<UploadFileRequest, { file_ids: string[] }>({
+export const uploadFiles = defineRequester<UploadFileRequest, { file_ids: string[] }>({
   url: 'asset/upload',
   method: 'POSTFORM',
 });
 
-export const deleteFile = defineApi<{ bucket_id: number; file_id: string }, void>({
+export const deleteFile = defineRequester<{ bucket_id: number; file_id: string }, void>({
   url: 'asset/delete',
   method: 'POST',
 });

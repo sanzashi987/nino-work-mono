@@ -1,4 +1,4 @@
-import defineApi from './impls';
+import defineRequester from './impls';
 
 type LoginRequest = {
   username: string;
@@ -10,7 +10,7 @@ type LoginResponse = {
   jwt_token: string;
 };
 
-export const login = defineApi<LoginRequest, LoginResponse>({
+export const login = defineRequester<LoginRequest, LoginResponse>({
   url: 'users/login',
   method: 'POST',
 });
