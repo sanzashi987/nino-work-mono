@@ -11,7 +11,7 @@ const createSubApp = (
 ) => {
   const App: React.FC<SubAppInjectProps> = props => {
     const children = useMemo(() => {
-      const { basename = '/' } = props;
+      const { basename } = props;
       const withDefaults = { ...props, basename };
       return React.createElement(renderRouter, withDefaults);
     }, [props]);

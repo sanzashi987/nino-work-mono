@@ -29,16 +29,18 @@ export type UserInfoResponse = {
   roles: EnumType[];
 };
 
-export type MicroFrontendContextType = {
+export type NinoAppContextType = {
   info: UserInfoResponse | null;
   menus: MenuMeta[];
   matched: MenuMeta | null;
+  appBasename: string | null;
   updateTitle(title: string): void;
 };
 
-export const MicroFrontendContext = createContext<MicroFrontendContextType>({
+export const NinoAppContext = createContext<NinoAppContextType>({
   /** user info */
   info: null,
+  appBasename: null,
   menus: [],
   matched: null,
   updateTitle() {},
