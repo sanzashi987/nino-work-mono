@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createElement, createContext, FC, ReactNode } from 'react';
 
 export enum MenuType {
   Menu = 1,
@@ -10,6 +10,7 @@ export type MenuMeta = {
   name: string;
   code: string;
   icon: string;
+  // basename for the app
   path: string;
   type: MenuType;
   order: number;
@@ -33,18 +34,28 @@ export type NinoAppContextType = {
   info: UserInfoResponse | null;
   menus: MenuMeta[];
   matched: MenuMeta | null;
-  appBasename: string | null;
   updateTitle(title: string): void;
 };
 
 export const NinoAppContext = createContext<NinoAppContextType>({
   /** user info */
   info: null,
-  appBasename: null,
   menus: [],
   matched: null,
   updateTitle() {},
 });
+
+// eslint-disable-next-line import/no-mutable-exports
+export let updateTitle = (_: string) => null;
+
+export const NinoAppProvider: FC<{
+  value: NinoAppContextType;
+  children: ReactNode;
+}> = ({ value, children }) => {
+  updateTitle = value.updateTitle;
+
+  return createElement(NinoAppContext.Provider, { value }, children);
+};
 
 export const getUserInfo = () =>
   fetch('/backend/user/v1/info').then(res => {

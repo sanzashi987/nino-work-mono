@@ -17,6 +17,7 @@ export type ModelMeta = {
 
 export type SubAppInjectProps = {
   basename?: string;
+  ninoAppCtx?: any;
 };
 
 export type Enum<T = string> = {

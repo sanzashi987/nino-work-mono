@@ -13,8 +13,7 @@ import { ReactComponent as Logo } from '@nino-work/assets/logo.svg';
 import { AccountCircle } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { MicroFrontendContext } from '@nino-work/mf';
-import PageContainer from '@/components/PageContainer';
+import { NinoAppContext } from '@nino-work/mf';
 import SideBar from './SideBar';
 
 // type DashboardProps = {};
@@ -38,7 +37,7 @@ const Dashboard: React.FC = () => {
     handleClose();
   };
 
-  const { matched } = useContext(MicroFrontendContext);
+  const { matched } = useContext(NinoAppContext);
   const style = matched?.fullpage ? { display: 'none' } : undefined;
 
   return (

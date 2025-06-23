@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { loading } from '@nino-work/ui-components';
 import { usePromise } from '@nino-work/shared';
-import { getUserInfo, MenuType, MicroFrontendContext } from '@nino-work/mf';
+import { getUserInfo, MenuType, NinoAppProvider } from '@nino-work/mf';
 import PageContainer from '@/components/PageContainer';
+import mfStore from './mf-store';
 
 const AuthGuard: React.FC = () => {
   const { data: userInfo } = usePromise(getUserInfo);
@@ -23,7 +24,7 @@ const AuthGuard: React.FC = () => {
     if (!userInfo) {
       return null;
     }
-    if (location.pathname === '/home') {
+    if (location.pathname.startsWith('/home')) {
       return null;
     }
 
@@ -43,6 +44,12 @@ const AuthGuard: React.FC = () => {
     return { info: userInfo, menus, matched, updateTitle: setTitle };
   }, [userInfo, menus, matched]);
 
+  useMemo(() => {
+    if (matched && ctx) {
+      mfStore[matched.code] = ctx;
+    }
+  }, [matched, ctx]);
+
   useEffect(() => {
     if (matched?.name) {
       setTitle(matched.name);
@@ -54,9 +61,9 @@ const AuthGuard: React.FC = () => {
   }
 
   return (
-    <MicroFrontendContext.Provider value={ctx}>
+    <NinoAppProvider value={ctx}>
       <PageContainer title={title}>{matched ? <Outlet /> : <Navigate to="/home" />}</PageContainer>
-    </MicroFrontendContext.Provider>
+    </NinoAppProvider>
   );
 };
 

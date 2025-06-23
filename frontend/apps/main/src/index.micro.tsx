@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { registerApplication, start } from 'single-spa';
 import { getImportMap } from '@nino-work/mf';
 import App from './App';
+import mfStore from './pages/mf-store';
 
 const importMapPromise = getImportMap();
 
@@ -19,11 +20,19 @@ const importMapPromise = getImportMap();
 
 importMapPromise.then(menuConfig => {
   menuConfig.forEach(menu => {
+    const basename = menu.path.startsWith('/') ? menu.path.slice(1) : menu.path;
     registerApplication(
       menu.code,
       () => System.import(/* webpackIgnore: true */ menu.code),
       location => location.pathname.startsWith(menu.path),
-      { domElementGetter: () => document.getElementById('nino-sub-app'), basename: 'home' }
+      () => {
+        const ninoAppCtx = mfStore[menu.code];
+        return {
+          domElement: () => document.getElementById('nino-sub-app'),
+          basename,
+          ninoAppCtx,
+        };
+      }
     );
   });
 
