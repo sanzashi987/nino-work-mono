@@ -45,15 +45,10 @@ export const NinoAppContext = createContext<NinoAppContextType>({
   updateTitle() {},
 });
 
-// eslint-disable-next-line import/no-mutable-exports
-export let updateTitle = (_: string) => null;
-
 export const NinoAppProvider: FC<{
-  value: NinoAppContextType;
+  value: NinoAppContextType | undefined;
   children: ReactNode;
 }> = ({ value, children }) => {
-  updateTitle = value.updateTitle;
-
   return createElement(NinoAppContext.Provider, { value }, children);
 };
 
