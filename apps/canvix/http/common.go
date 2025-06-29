@@ -23,7 +23,7 @@ func registerCommonRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMi
 // func (c *CommonController) searchComponents(ctx *gin.Context) {
 
 // }
-
+// TODO, call rpc from sso, to fetch the canvix permissions only
 func (c *CommonController) getUserInfo(ctx *gin.Context) {
 
 }

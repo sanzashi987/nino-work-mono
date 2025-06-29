@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	User        = 0
-	Application = 1 // 新增应用类型用户
+	User        = 0 // 常规用户
+	Application = 1 // 应用类型用户
 )
 
 type UserModel struct {
@@ -17,7 +17,7 @@ type UserModel struct {
 	Password string            `gorm:"column:password;type:varchar(255)"`
 	Fobidden bool              `gorm:"column:forbidden"`
 	Roles    []*RoleModel      `gorm:"many2many:user_roles;"`
-	Type     int               `gorm:"column:type;default:0"` // 新增用户类型字段
+	Type     int               `gorm:"column:type;default:0"`
 	App      *ApplicationModel `gorm:"foreignKey:ServiceUser"`
 }
 
