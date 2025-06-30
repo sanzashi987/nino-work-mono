@@ -67,7 +67,16 @@ func (u *ApplicationServiceWeb) CreateApp(ctx context.Context, userId uint64, pa
 
 	user := model.UserModel{}
 	user.Id = userId
-	if err := tx.Model(&user).Association("Roles").Append(&rolesToCreate); err != nil {
+
+	userRoles := make([]*model.UserRoleModel, 0, len(rolesToCreate))
+	for _, role := range rolesToCreate {
+		userRole := &model.UserRoleModel{
+			RoleId: role.Id,
+			UserId: user.Id,
+		}
+		userRoles = append(userRoles, userRole)
+	}
+	if err := tx.Create(&userRoles).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

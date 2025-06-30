@@ -34,9 +34,26 @@ func UpdateUser(tx *gorm.DB, nextUser *model.UserModel) error {
 func FindUserWithRoles(tx *gorm.DB, id uint64) (*model.UserModel, error) {
 	user := model.UserModel{}
 	user.Id = id
-	if err := tx.Model(&user).Preload("Roles").Find(&user).Error; err != nil {
+	if err := tx.Model(&user).Find(&user).Error; err != nil {
 		return nil, err
 	}
+
+	var userRoles []*model.UserRoleModel
+	if err := tx.Model(&model.UserRoleModel{UserId: id}).Find(&userRoles).Error; err != nil {
+		return nil, err
+	}
+
+	roleIds := make([]uint64, len(userRoles))
+	for i, ur := range userRoles {
+		roleIds[i] = ur.RoleId
+	}
+	var roles []*model.RoleModel
+	if len(roleIds) > 0 {
+		if err := tx.Model(&model.RoleModel{}).Where("id IN ?", roleIds).Find(&roles).Error; err != nil {
+			return nil, err
+		}
+	}
+	user.Roles = roles
 
 	return &user, nil
 }

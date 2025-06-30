@@ -16,9 +16,10 @@ type UserModel struct {
 	Username string            `gorm:"column:username;type:varchar(255);unique"`
 	Password string            `gorm:"column:password;type:varchar(255)"`
 	Fobidden bool              `gorm:"column:forbidden"`
-	Roles    []*RoleModel      `gorm:"many2many:user_roles;"`
 	Type     int               `gorm:"column:type;default:0"`
 	App      *ApplicationModel `gorm:"foreignKey:ServiceUser"`
+	// Roles    []*RoleModel      `gorm:"many2many:user_roles;"`
+	Roles []*RoleModel `gorm:"-"`
 }
 
 func (u UserModel) TableName() string {

@@ -173,8 +173,20 @@ func GetUserRoles(ctx context.Context, user, targetUser uint64) ([]*shared.EnumM
 	targetUserModel.Id = targetUser
 
 	tx := db.NewTx(ctx)
-	if err := tx.Model(targetUserModel).Association("Roles").Find(&targetUserModel.Roles); err != nil {
+	var userRoleModels []model.UserRoleModel
+	if err := tx.Where("user_id = ?", targetUser).Find(&userRoleModels).Error; err != nil {
 		return nil, err
+	}
+	roleIds := make([]uint64, 0, len(userRoleModels))
+	for _, ur := range userRoleModels {
+		roleIds = append(roleIds, ur.RoleId)
+	}
+	if len(roleIds) == 0 {
+		targetUserModel.Roles = []*model.RoleModel{}
+	} else {
+		if err := tx.Where("id IN ?", roleIds).Find(&targetUserModel.Roles).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	result := []*shared.EnumMeta{}

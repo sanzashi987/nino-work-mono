@@ -50,7 +50,10 @@ func defaultRecord(db *gorm.DB) {
 		}
 
 		user.Roles = userRoles
-		tx.Create(&user)
+		if err := tx.Create(&user).Error; err != nil {
+			tx.Rollback()
+			return
+		}
 
 		menus := []*model.MenuModel{}
 		for _, code := range codes {
@@ -65,10 +68,16 @@ func defaultRecord(db *gorm.DB) {
 			menus = append(menus, menu)
 		}
 
-		tx.Create(&menus)
+		if err := tx.Create(&menus).Error; err != nil {
+			tx.Rollback()
+			return
+		}
 		for index := range codes {
 			menu := menus[index]
-			tx.Model(menu).Association("Roles").Append(&user.Roles[index+1])
+			if err := tx.Model(menu).Association("Roles").Append(&user.Roles[index+1]); err != nil {
+				tx.Rollback()
+				return
+			}
 		}
 
 		// Create default application
@@ -82,10 +91,15 @@ func defaultRecord(db *gorm.DB) {
 			Admin:       rootPermission.Id,
 		}
 
-		tx.Create(application)
-		tx.Model(application).Association("Permissions").Append(&permissionsToCreate)
+		if err := tx.Create(application).Error; err != nil {
+			tx.Rollback()
+			return
+		}
+		if err := tx.Model(application).Association("Permissions").Append(&permissionsToCreate); err != nil {
+			tx.Rollback()
+			return
+		}
 	}
-
 	tx.Commit()
 
 }
