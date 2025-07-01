@@ -150,17 +150,22 @@ func BindUserRoles(ctx context.Context, operator uint64, payload *BindRoleReques
 		return ErrOutsidepermission
 	}
 
-	toBindUser := &model.UserModel{}
-	toBindUser.Id = payload.UserId
-	toBindRoles := []*model.RoleModel{}
-	for _, roleId := range payload.RoleIds {
-		role := &model.RoleModel{}
-		role.Id = roleId
-		toBindRoles = append(toBindRoles, role)
-	}
-
-	if err := tx.Model(toBindUser).Association("Roles").Replace(toBindRoles); err != nil {
+	// Remove all existing user_roles for the user
+	if err := tx.Where("user_id = ?", payload.UserId).Delete(&model.UserRoleModel{}).Error; err != nil {
 		return err
+	}
+	// Insert new user_roles for the user
+	if len(payload.RoleIds) > 0 {
+		userRoles := make([]model.UserRoleModel, len(payload.RoleIds))
+		for _, roleId := range payload.RoleIds {
+			userRoles = append(userRoles, model.UserRoleModel{
+				UserId: payload.UserId,
+				RoleId: roleId,
+			})
+		}
+		if err := tx.Create(&userRoles).Error; err != nil {
+			return err
+		}
 	}
 
 	return nil
