@@ -10,9 +10,9 @@ import (
 )
 
 type CreateReq struct {
-	SourceName string `json:"sourceName" binding:"required"`
-	SourceType string `json:"sourceType" binding:"required"`
-	SourceInfo string `json:"sourceInfo" binding:"required"`
+	SourceName string `json:"source_name" binding:"required"`
+	SourceType string `json:"source_type" binding:"required"`
+	SourceInfo string `json:"source_info" binding:"required"`
 }
 
 func Create(ctx context.Context, workspaceId uint64, payload *CreateReq) (*DataSourceDetail, error) {

@@ -11,10 +11,10 @@ import (
 )
 
 type AssetDetailResponse struct {
-	Name      string `json:"fileName"`
-	Code      string `json:"fileId"`
-	GroupCode string `json:"groupCode"`
-	MimeType  string `json:"mimeType"`
+	Name      string `json:"file_name"`
+	Code      string `json:"file_id"`
+	GroupCode string `json:"group_code"`
+	MimeType  string `json:"mime_type"`
 	Size      int64  `json:"size"`
 	Suffix    string `json:"suffix"`
 	shared.DBTime

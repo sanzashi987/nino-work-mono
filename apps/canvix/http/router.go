@@ -66,7 +66,7 @@ func NewRouter(loginPageUrl string, rpcServices map[string]any) *gin.Engine {
 		ctx.Set(RPCKEY, rpcServices)
 	}
 
-	loggedInMiddleware := middleware.CanvasUserLoggedIn(loginPageUrl)
+	loggedInMiddleware := middleware.CanvixUserLoggedIn(loginPageUrl)
 
 	root.Use(mergeRpcMiddleware)
 	registerCommonRoutes(root, loggedInMiddleware, workspaceMiddleware)

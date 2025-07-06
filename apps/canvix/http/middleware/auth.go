@@ -5,7 +5,7 @@ import (
 	"github.com/sanzashi987/nino-work/pkg/controller"
 )
 
-func CanvasUserLoggedIn(loginUrl string) func(*gin.Context) {
+func CanvixUserLoggedIn(loginUrl string) func(*gin.Context) {
 	sdkMiddleware := controller.ValidateMiddleware(loginUrl)
 	return func(ctx *gin.Context) {
 		jwtToken := ctx.GetHeader("auth")

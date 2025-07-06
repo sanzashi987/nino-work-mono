@@ -8,7 +8,7 @@ type AssetModel struct {
 	FileId  string
 	// FilePath string
 	GroupId     uint64 `gorm:"default:0"`
-	AssetConfig string `gorm:"type:blob"`
+	AssetConfig string `gorm:"type:blob;column:asset_config"`
 }
 
 func (m AssetModel) TableName() string {

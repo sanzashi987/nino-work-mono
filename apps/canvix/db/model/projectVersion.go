@@ -10,6 +10,6 @@ type ProjectVersionModel struct {
 	DeleteTime gorm.DeletedAt `gorm:"index"`
 
 	Version       string `gorm:"column:version"`
-	RootConfig    string `gorm:"column:root_config"`
-	PublishConfig string `gorm:"column:publish_config"`
+	RootConfig    string `gorm:"column:root_config;type:blob"`
+	PublishConfig string `gorm:"column:publish_config;type:blob"`
 }
