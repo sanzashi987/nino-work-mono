@@ -12,10 +12,10 @@ type CommonController struct {
 func registerCommonRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMiddleware gin.HandlerFunc) {
 
 	commonController := CommonController{}
-	nonAuthed := router.Group("common")
+	nonAuthed := router.Group("user")
 	authed := nonAuthed.Use(loggedMiddleware)
 
-	authed.GET("user", commonController.getUserInfo)
+	authed.GET("auth", commonController.getUserAuth)
 	authed.GET("console", commonController.GetConsoleInfo)
 
 }
@@ -24,7 +24,7 @@ func registerCommonRoutes(router *gin.RouterGroup, loggedMiddleware, workspaceMi
 
 // }
 // TODO, call rpc from sso, to fetch the canvix permissions only
-func (c *CommonController) getUserInfo(ctx *gin.Context) {
+func (c *CommonController) getUserAuth(ctx *gin.Context) {
 
 }
 

@@ -3,7 +3,7 @@ module github.com/sanzashi987/nino-work
 go 1.22.0
 
 require (
-	github.com/Masterminds/semver/v3 v3.3.1
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/gin-gonic/gin v1.10.0

@@ -3,8 +3,8 @@ package model
 const (
 	ProjectPublishFlagNotPublish = 0
 	ProjectPublishFlagNormal     = 1
-	ProjectPublishFlagToken      = 2
-	ProjectPublishFlagSecret     = 3
+	ProjectPublishFlagSecret     = 2
+	ProjectPublishFlagToken      = 3
 )
 
 type ProjectSettingsJson struct {
@@ -12,9 +12,9 @@ type ProjectSettingsJson struct {
 
 type ProjectModel struct {
 	TemplateModel
-	PublishToken  string
-	PublishSecret string
-	PublishFlag   int8
+	// PublishToken  string
+	PublishStatus int8   `gorm:"column:publish_status;default:0"`
+	PublishSecret string `gorm:"column:publish_secret"`
 	/** In type of `ProjectSettingsJson`*/
 	// Settings string `gorm:"type:blob"`
 }
