@@ -16,15 +16,15 @@ func GetUserWorkspaces(tx *gorm.DB, userId uint64) (*model.CanvixUserModel, erro
 		}
 	}
 
-	canvasUser := model.CanvixUserModel{UnifiedUserId: userId}
-	if err := tx.Model(&canvasUser).Association("Workspaces").Find(&canvasUser.Workspaces); err != nil {
+	canvixUser := model.CanvixUserModel{UnifiedUserId: userId}
+	if err := tx.Model(&canvixUser).Association("Workspaces").Find(&canvixUser.Workspaces); err != nil {
 		return nil, err
 	}
-	userWorkspaceCache.Store(userId, &canvasUser)
-	return &canvasUser, nil
+	userWorkspaceCache.Store(userId, &canvixUser)
+	return &canvixUser, nil
 }
 
 func CreateUser(tx *gorm.DB, userId uint64) error {
-	canvasUser := model.CanvixUserModel{UnifiedUserId: userId}
-	return tx.Create(&canvasUser).Error
+	canvixUser := model.CanvixUserModel{UnifiedUserId: userId}
+	return tx.Create(&canvixUser).Error
 }
