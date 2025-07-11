@@ -166,12 +166,13 @@ type OpenSimpleFormProps<FormData extends Record<string, any>> = {
 };
 export const openSimpleForm = <FormData extends Record<string, any>>({
   modalProps,
-  formProps,
+  formProps: { onOk, ...rest },
 }: OpenSimpleFormProps<FormData>) =>
   openModal({
     ...modalProps,
-    content: <FormBuilder {...formProps} />,
+    content: <FormBuilder {...rest} />,
     action: modalProps.action,
+    onOk,
   });
 
 export default openModal;

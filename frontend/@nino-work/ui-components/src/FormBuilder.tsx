@@ -27,7 +27,7 @@ const FormBuilder = <FormData, T = any>(props: FormBuilderProps<FormData, T>) =>
         const widget = formCellProps.widget ?? TextField;
         const hidden = formCellProps.type === 'hidden';
         if (hidden) {
-          /* @ts-ignore */
+          /* @ts-expect-error */
           return <input id={field} {...usedForm.register(field)} type="hidden" />;
         }
 
@@ -35,7 +35,7 @@ const FormBuilder = <FormData, T = any>(props: FormBuilderProps<FormData, T>) =>
           <Grid key={field} size={size}>
             <Stack direction={lay}>
               <FormLabel title={label} field={field} />
-              {/* @ts-ignore */}
+              {/* @ts-expect-error */}
               {React.createElement(widget, {
                 id: field,
                 ...usedForm.register(field),
@@ -49,7 +49,7 @@ const FormBuilder = <FormData, T = any>(props: FormBuilderProps<FormData, T>) =>
   );
 
   return (
-    <form onSubmit={usedForm.handleSubmit(props.onSubmit)}>
+    <form onSubmit={usedForm.handleSubmit(props.onSubmit!)}>
       <Grid spacing={spacing ?? 2} container>
         {widgets}
       </Grid>
