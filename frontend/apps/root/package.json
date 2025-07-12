@@ -29,7 +29,7 @@
     "@nino-work/ui-components": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "^7.60.0",
     "react-router-dom": "^7.1.1",
     "single-spa-react": "^6.0.2"
   }
