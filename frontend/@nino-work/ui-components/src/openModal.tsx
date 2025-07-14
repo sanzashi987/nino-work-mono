@@ -25,7 +25,7 @@ type ModalProps = Omit<DialogProps, 'open' | 'content' | 'onClose'> & {
 
 export const OpenModalContext = React.createContext<{
   close: () => Promise<void>;
-  form: UseFormReturn;
+  form: UseFormReturn<any, any, undefined>;
 }>({
   close: unImplemented,
   form: {} as any,
@@ -84,14 +84,14 @@ export const ModalWrapper: React.FC<ModalProps> = ({
     />
   );
   const [open, setOpen] = useState(true);
-  const defaultForm = useForm();
+  const defaultForm = useForm<any, any, undefined>();
   const { form, content: contentWithForm } = useMemo(() => {
     if (typeof content === 'string') {
       return { form: defaultForm, content };
     }
 
     if (React.isValidElement(content) && 'form' in (content as any).props) {
-      return { form: (content.props as any).form as UseFormReturn, content };
+      return { form: (content.props as any).form, content };
     }
     return {
       form: defaultForm,

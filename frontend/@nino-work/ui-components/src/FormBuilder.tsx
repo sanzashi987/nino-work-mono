@@ -66,6 +66,10 @@ const FormBuilder = <FormData extends FieldValues, T = any>(
   );
 
   useEffect(() => {
+    setRuntimeSchema(schema);
+  }, [schema]);
+
+  useEffect(() => {
     const toUbsubscribe = schema.map((model, idx) => {
       return subscribe({
         name: model.formCellProps!.watch as any[],
@@ -84,7 +88,11 @@ const FormBuilder = <FormData extends FieldValues, T = any>(
           });
           setRuntimeSchema(last => {
             const newSchema = [...last];
-            newSchema[idx] = { ...model, formCellProps: { ...model.formCellProps, ...res } };
+            const currentRuntime = newSchema[idx];
+            newSchema[idx] = {
+              ...currentRuntime,
+              formCellProps: { ...currentRuntime.formCellProps, ...res },
+            };
             return newSchema;
           });
         },
