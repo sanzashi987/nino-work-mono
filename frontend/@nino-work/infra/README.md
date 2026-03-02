@@ -56,7 +56,7 @@ your-app/
 ```javascript
 module.exports = {
   // 开发服务器端口
-  // process.env.PORT = 3000;
+  port: 3000,
   
   // Tailwind CSS 配置
   tailwind: {

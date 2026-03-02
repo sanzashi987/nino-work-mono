@@ -1,6 +1,9 @@
-process.env.PORT = 3000;
+const productionInfo = require('./package.json');
+const path = require('path');
+const prodVersion = productionInfo.version;
 
 module.exports = {
+  port: 3000,
   // mode: 'micro-host',
   devServer(config) {
     const { proxy } = config;

@@ -1,6 +1,5 @@
-process.env.PORT = 3002;
-
 module.exports = {
+  port: 3002,
   // mode: 'micro-app',
   devServer(config) {
     const { proxy } = config;
@@ -13,8 +12,4 @@ module.exports = {
       },
     };
   },
-  // webpack(config) {
-  //   config.output.publicPath = 'http://localhost:3002/'
-  //   return config
-  // }
 };

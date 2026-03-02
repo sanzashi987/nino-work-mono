@@ -1,15 +1,16 @@
 const productionInfo = require('./package.json');
 const path = require('path');
 const prodVersion = productionInfo.version;
-process.env.PORT = 3003;
-process.env.__VERSION__ = prodVersion;
-process.env.TARGET_PLATFORM = '';
+
 module.exports = {
+  port: 3003,
   tailwind: {
     content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
   },
-
-  define: {},
+  define: {
+    __VERSION__: JSON.stringify(prodVersion),
+    TARGET_PLATFORM: JSON.stringify(''),
+  },
   // mode: 'micro-app',
   devServer(config) {
     const { proxy } = config;
@@ -23,10 +24,7 @@ module.exports = {
     };
   },
   webpack(config) {
-    // config.output.publicPath = 'http://localhost:3002/';
-    // return config;
     config.resolve.alias['@dev-coms'] = path.resolve(__dirname, '../../@canvix');
-
     return config;
   },
 };
