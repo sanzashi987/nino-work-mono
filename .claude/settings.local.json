@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "WebSearch",
+      "WebFetch(domain:rsbuild.dev)",
+      "Bash(grep -r \"html:\" --include=\"*.js\" --include=\"*.ts\" apps/*/infra.config.js @nino-work/infra/config/rsbuild.config.js)"
+    ]
+  }
+}

@@ -7,6 +7,14 @@ process.env.NODE_ENV = 'development';
 const { rsbuild } = require('@rsbuild/core');
 const { createRsbuildConfig, loadEnv } = require('../config/rsbuild.config');
 
+// Parse --mode argument
+const args = process.argv.slice(2);
+const modeArg = args.find(arg => arg.startsWith('--mode='));
+if (modeArg) {
+  const mode = modeArg.split('=')[1];
+  process.env.INFRA_MODE = mode;
+}
+
 loadEnv();
 
 async function start() {

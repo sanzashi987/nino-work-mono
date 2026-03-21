@@ -78,16 +78,24 @@ function getEnvDefinitions() {
 
 function loadInfraConfig() {
   if (fs.existsSync(paths.infraPath)) {
-    return require(paths.infraPath);
+    const config = require(paths.infraPath);
+    // CLI --mode takes precedence over infra.config.js mode
+    if (process.env.INFRA_MODE) {
+      config.mode = process.env.INFRA_MODE;
+    }
+    return config;
   }
-  return {};
+  // If no infra.config.js, check CLI mode
+  return {
+    mode: process.env.INFRA_MODE || null
+  };
 }
 
-function createRsbuildConfig(webpackEnv) {
+function createRsbuildConfig(environment) {
   loadEnv();
 
-  const isEnvDevelopment = webpackEnv === 'development';
-  const isEnvProduction = webpackEnv === 'production';
+  const isEnvDevelopment = environment === 'development';
+  const isEnvProduction = environment === 'production';
   const env = getEnvDefinitions();
   const infraConfig = loadInfraConfig();
 
@@ -127,6 +135,10 @@ function createRsbuildConfig(webpackEnv) {
     html: !isMicro || isMicroHost ? {
       template: paths.appHtml,
       scriptLoading: isMicroHost ? 'module' : 'defer',
+      title: pkg.name || 'App',
+      meta: {
+        description: pkg.description || 'Web application'
+      }
     } : false,
     devServer: isEnvDevelopment ? {
       port: infraConfig.port || 3000,
