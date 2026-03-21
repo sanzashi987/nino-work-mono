@@ -1,6 +1,7 @@
 {
   "name": "@nino-work/infra",
   "version": "0.2.0",
+  "types": "./infra.config.d.ts",
   "bin": {
     "infra-start": "./scripts/start.js",
     "infra-build": "./scripts/build.js"
